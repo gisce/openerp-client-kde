@@ -28,7 +28,9 @@
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from Koo.Common.Ui import *
-from PyQt5.QtWebKit import *
+# @xtorello toreview
+# from PyQt5.QtWebKit import *
+"""
 from PyQt5.QtNetwork import *
 
 from Koo.Common import Common
@@ -52,6 +54,7 @@ class CookieJar(QNetworkCookieJar):
 
 class WebFieldWidget(AbstractFieldWidget, WebFieldWidgetUi):
     def __init__(self, parent, model, attrs={}):
+        pass
         AbstractFieldWidget.__init__(self, parent, model, attrs)
         WebFieldWidgetUi.__init__(self)
         self.setupUi(self)
@@ -132,3 +135,4 @@ class WebFieldWidget(AbstractFieldWidget, WebFieldWidgetUi):
         self.uiWeb.page().networkAccessManager().setCookieJar(self.cookieJar)
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:
+"""
