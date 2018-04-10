@@ -28,7 +28,7 @@
 
 import re
 import time
-import exceptions
+#import exceptions
 from Koo import Rpc
 from Koo.Common import Notifier
 from Koo.Rpc import RpcProxy
