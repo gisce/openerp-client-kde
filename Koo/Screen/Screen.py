@@ -405,7 +405,7 @@ class Screen(QScrollArea):
         # that the first time a screen with a TreeView is shown currentRecord() will be called but there
         # will be no currentRecord. TreeView then will set the appropiate order by loading settings from
         # the server through restoreViewSettings, and KooModel will load data on demand.
-        if self._currentRecordPosition >= 0 and self.group.count():
+        if self._currentRecordPosition and self._currentRecordPosition >= 0 and self.group.count():
             # In some cases self._currentRecordPosition might point to a position
             # beyond group size. In this case ensure current record is set to None.
             if self._currentRecordPosition >= self.group.count():
