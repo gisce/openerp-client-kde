@@ -675,7 +675,7 @@ class RecordGroup(QObject):
         ids = self.ids()
         pos = ids.index(record.id) / self.limit
 
-        queryIds = ids[pos * self.limit: pos * self.limit + self.limit]
+        queryIds = ids[int(pos * self.limit): int(pos * self.limit) + self.limit]
         if None in queryIds:
             queryIds.remove(None)
 
