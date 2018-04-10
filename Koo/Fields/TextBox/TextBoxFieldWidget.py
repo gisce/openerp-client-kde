@@ -34,73 +34,76 @@ from Koo.Fields.AbstractFieldWidget import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+
 class TextBoxFieldWidget(AbstractFieldWidget):
-	def __init__(self, parent, model, attrs={}):
-		AbstractFieldWidget.__init__(self, parent, model, attrs)
-		self.uiText = QTextEdit( self )
-		self.uiText.setSizePolicy( QSizePolicy.Preferred, QSizePolicy.Expanding )
-		self.uiText.setTabChangesFocus( True )
-		self.uiText.setAcceptRichText( False )
-		self.installPopupMenu( self.uiText )
-		layout = QHBoxLayout( self )
-		layout.setContentsMargins( 0, 0, 0, 0 )
-		layout.addWidget( self.uiText )
-		if attrs.get('translate', False):
-			pushTranslate = QToolButton( self )
-			pushTranslate.setIcon( QIcon( ':/images/locale.png' ) )
-			pushTranslate.setFocusPolicy( Qt.NoFocus )
-			layout.addWidget( pushTranslate )
-			self.connect( pushTranslate, SIGNAL('clicked()'), self.translate )
+    def __init__(self, parent, model, attrs={}):
+        AbstractFieldWidget.__init__(self, parent, model, attrs)
+        self.uiText = QTextEdit(self)
+        self.uiText.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        self.uiText.setTabChangesFocus(True)
+        self.uiText.setAcceptRichText(False)
+        self.installPopupMenu(self.uiText)
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.uiText)
+        if attrs.get('translate', False):
+            pushTranslate = QToolButton(self)
+            pushTranslate.setIcon(QIcon(':/images/locale.png'))
+            pushTranslate.setFocusPolicy(Qt.NoFocus)
+            layout.addWidget(pushTranslate)
+            self.connect(pushTranslate, SIGNAL('clicked()'), self.translate)
 
-			self.scTranslate = QShortcut( self.uiText )
-			self.scTranslate.setKey( Shortcuts.SearchInField )
-			self.scTranslate.setContext( Qt.WidgetShortcut )
-			self.connect( self.scTranslate, SIGNAL('activated()'), self.translate )
+            self.scTranslate = QShortcut(self.uiText)
+            self.scTranslate.setKey(Shortcuts.SearchInField)
+            self.scTranslate.setContext(Qt.WidgetShortcut)
+            self.connect(self.scTranslate, SIGNAL(
+                'activated()'), self.translate)
 
-		# Activate Spell Checker
-		language = str( Rpc.session.context.get('lang','en_US') )
-		if 'lang' in self.extraAttributes:
-			language = str( self.extraAttributes['lang'] )
-		self._highlighter = SpellCheckHighlighter( self, language )
-		self._highlighter.setDocument( self.uiText.document() )
+        # Activate Spell Checker
+        language = str(Rpc.session.context.get('lang', 'en_US'))
+        if 'lang' in self.extraAttributes:
+            language = str(self.extraAttributes['lang'])
+        self._highlighter = SpellCheckHighlighter(self, language)
+        self._highlighter.setDocument(self.uiText.document())
 
+    def translate(self):
+        if not self.record.id:
+            QMessageBox.information(self, _('Translation dialog'), _(
+                'You must save the resource before adding translations'))
+            return
+        dialog = TranslationDialog(self.record.id, self.record.group.resource, self.attrs['name'], unicode(
+            self.uiText.toPlainText()), TranslationDialog.TextEdit, self)
+        if dialog.exec_() == QDialog.Accepted:
+            self.uiText.setPlainText(dialog.result)
+            self._highlighter.setDocument(self.uiText.document())
 
-	def translate(self):
-		if not self.record.id:
-			QMessageBox.information( self, _('Translation dialog'), _('You must save the resource before adding translations'))
-			return
-		dialog = TranslationDialog( self.record.id, self.record.group.resource, self.attrs['name'], unicode(self.uiText.toPlainText()), TranslationDialog.TextEdit, self )
-		if dialog.exec_() == QDialog.Accepted:
-			self.uiText.setPlainText( dialog.result )
-			self._highlighter.setDocument( self.uiText.document() )
+    def setReadOnly(self, value):
+        AbstractFieldWidget.setReadOnly(self, value)
+        self.uiText.setReadOnly(value)
 
-	def setReadOnly(self, value):
-		AbstractFieldWidget.setReadOnly(self, value)
-		self.uiText.setReadOnly( value )
+    def colorWidget(self):
+        return self.uiText
 
-	def colorWidget(self):
-		return self.uiText
+    def storeValue(self):
+        self.record.setValue(self.name, unicode(
+            self.uiText.document().toPlainText()) or False)
 
-	def storeValue(self):
-		self.record.setValue(self.name, unicode( self.uiText.document().toPlainText() ) or False )
+    def clear(self):
+        self.uiText.clear()
+        self._highlighter.setDocument(self.uiText.document())
 
-	def clear(self):
-		self.uiText.clear()
-		self._highlighter.setDocument( self.uiText.document() )
-
-	def showValue(self):
-		vScroll = self.uiText.verticalScrollBar().value()
-		hScroll = self.uiText.horizontalScrollBar().value()
-		position = self.uiText.textCursor().position()
-		value = self.record.value(self.name)
-		if not value:
-			self.uiText.clear()
-		else:
-			self.uiText.setPlainText( value )
-		cursor = self.uiText.textCursor()
-		cursor.setPosition( position )
-		self.uiText.setTextCursor( cursor )
-		self.uiText.verticalScrollBar().setValue( vScroll )
-		self.uiText.horizontalScrollBar().setValue( hScroll )
-		self._highlighter.setDocument( self.uiText.document() )
-
+    def showValue(self):
+        vScroll = self.uiText.verticalScrollBar().value()
+        hScroll = self.uiText.horizontalScrollBar().value()
+        position = self.uiText.textCursor().position()
+        value = self.record.value(self.name)
+        if not value:
+            self.uiText.clear()
+        else:
+            self.uiText.setPlainText(value)
+        cursor = self.uiText.textCursor()
+        cursor.setPosition(position)
+        self.uiText.setTextCursor(cursor)
+        self.uiText.verticalScrollBar().setValue(vScroll)
+        self.uiText.horizontalScrollBar().setValue(hScroll)
+        self._highlighter.setDocument(self.uiText.document())

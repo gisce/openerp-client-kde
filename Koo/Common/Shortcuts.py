@@ -27,7 +27,7 @@
 
 from PyQt4.QtCore import *
 
-## @brief The Shortcuts module stores default keyboard shortcuts for common functions
+# @brief The Shortcuts module stores default keyboard shortcuts for common functions
 
 CreateInField = Qt.Key_F1
 SearchInField = Qt.Key_F2

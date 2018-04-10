@@ -28,4 +28,4 @@
 from BooleanSearchWidget import *
 from Koo.Search.SearchWidgetFactory import *
 
-SearchWidgetFactory.register( 'boolean', BooleanSearchWidget )
+SearchWidgetFactory.register('boolean', BooleanSearchWidget)

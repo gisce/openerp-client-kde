@@ -29,14 +29,19 @@ from Koo.Common import Api
 from Koo.Plugins import Plugins
 from Koo import Rpc
 
-## @brief Opens a new window with user's settings for the views of the current model
-def editViewSettings(model, id, ids, context):
-	domain = [
-		('model', '=', model), 
-		('user', '=', Rpc.session.uid)
-	]
-	Api.instance.createWindow( None, 'nan.koo.view.settings', mode='tree,form', domain=domain, context=context )
+# @brief Opens a new window with user's settings for the views of the current model
 
-Plugins.register( 'EditViewSettings', '.*', _('Edit View Settings'), editViewSettings)
+
+def editViewSettings(model, id, ids, context):
+    domain = [
+        ('model', '=', model),
+        ('user', '=', Rpc.session.uid)
+    ]
+    Api.instance.createWindow(
+        None, 'nan.koo.view.settings', mode='tree,form', domain=domain, context=context)
+
+
+Plugins.register('EditViewSettings', '.*',
+                 _('Edit View Settings'), editViewSettings)
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:

@@ -35,41 +35,45 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from Koo.Common.Ui import *
 
-(FieldPreferencesDialogUi, FieldPreferencesDialogBase) = loadUiType( Common.uiPath('field_preferences.ui') ) 
+(FieldPreferencesDialogUi, FieldPreferencesDialogBase) = loadUiType(
+    Common.uiPath('field_preferences.ui'))
 
-## @brief FieldPreferencesDialog class provides a dialog for storing a value as default 
+# @brief FieldPreferencesDialog class provides a dialog for storing a value as default
 # for a field in a model.
-class FieldPreferencesDialog( QDialog, FieldPreferencesDialogUi ):
-	## @brief Constructs a new FieldPreferencesDialog.
-	def __init__(self, field, name, model, value, dependance=[], parent=None):
-		QDialog.__init__( self, parent )
-		FieldPreferencesDialogUi.__init__(self)
-		self.setupUi(self)
 
-		self.uiFieldName.setText( name )
-		self.uiDomain.setText( model )
-		self.uiDefaultValue.setText( (value and unicode(value)) or '/' )
 
-		self.model = model
-		self.field = field
-		self.value = value
-		frameLayout = QVBoxLayout( self.uiFrame )
-		self.widgets = {}
-		for (fname, fvalue, rname, rvalue) in dependance:
-			w = QCheckBox(self)
-			w.setText( fname + ' = ' + unicode(rname) )
-			self.widgets[(fvalue,rvalue)] = w
-			frameLayout.addWidget( w )
-		if not len(dependance):
-			frameLayout.addWidget(QLabel(_('<center>Always applicable!</center>'), self))
-		self.connect( self.pushAccept, SIGNAL('clicked()'), self.slotAccept )
+class FieldPreferencesDialog(QDialog, FieldPreferencesDialogUi):
+    # @brief Constructs a new FieldPreferencesDialog.
+    def __init__(self, field, name, model, value, dependance=[], parent=None):
+        QDialog.__init__(self, parent)
+        FieldPreferencesDialogUi.__init__(self)
+        self.setupUi(self)
 
-	def slotAccept(self):
-		deps = False
-		for x in self.widgets.keys():
-			if self.widgets[x].isChecked():
-				deps = x[0] + '=' + str(x[1])	
-				break
-		Rpc.session.execute('/object', 'execute', 'ir.values', 'set', 'default', deps, self.field, [(self.model,False)], self.value, True, False, False, self.uiOnlyForYou.isChecked())
-		self.accept()
+        self.uiFieldName.setText(name)
+        self.uiDomain.setText(model)
+        self.uiDefaultValue.setText((value and unicode(value)) or '/')
 
+        self.model = model
+        self.field = field
+        self.value = value
+        frameLayout = QVBoxLayout(self.uiFrame)
+        self.widgets = {}
+        for (fname, fvalue, rname, rvalue) in dependance:
+            w = QCheckBox(self)
+            w.setText(fname + ' = ' + unicode(rname))
+            self.widgets[(fvalue, rvalue)] = w
+            frameLayout.addWidget(w)
+        if not len(dependance):
+            frameLayout.addWidget(
+                QLabel(_('<center>Always applicable!</center>'), self))
+        self.connect(self.pushAccept, SIGNAL('clicked()'), self.slotAccept)
+
+    def slotAccept(self):
+        deps = False
+        for x in self.widgets.keys():
+            if self.widgets[x].isChecked():
+                deps = x[0] + '=' + str(x[1])
+                break
+        Rpc.session.execute('/object', 'execute', 'ir.values', 'set', 'default', deps, self.field, [
+                            (self.model, False)], self.value, True, False, False, self.uiOnlyForYou.isChecked())
+        self.accept()

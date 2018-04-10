@@ -34,45 +34,45 @@ from Koo.Common.Ui import *
 from Koo.Plugins import Plugins
 
 try:
-	from NanScan.Scanner import *
-	from NanScan.ScanDialog import *
-	isNanScanAvailable = True
+    from NanScan.Scanner import *
+    from NanScan.ScanDialog import *
+    isNanScanAvailable = True
 except:
-	isNanScanAvailable = False
-	
+    isNanScanAvailable = False
+
 
 if isNanScanAvailable:
-	def scan(model, id, ids, context):
-		saver = DocumentSaverFactory(context)
-		dialog = ScanDialog()
-		dialog.setImageSaverFactory( saver )
-		dialog.exec_()
+    def scan(model, id, ids, context):
+        saver = DocumentSaverFactory(context)
+        dialog = ScanDialog()
+        dialog.setImageSaverFactory(saver)
+        dialog.exec_()
 
-	class DocumentSaverFactory(AbstractImageSaverFactory):
-		def __init__(self, context):
-			self.context = context
+    class DocumentSaverFactory(AbstractImageSaverFactory):
+        def __init__(self, context):
+            self.context = context
 
-		def create(self, parent):
-			saver = DocumentSaver( parent )
-			saver.context = self.context
-			return saver
+        def create(self, parent):
+            saver = DocumentSaver(parent)
+            saver.context = self.context
+            return saver
 
-	class DocumentSaver(AbstractImageSaver):
-		def run(self):
-			self.error = True
+    class DocumentSaver(AbstractImageSaver):
+        def run(self):
+            self.error = True
 
-			image = QBuffer()
-			if not self.item.image.save( image, 'PNG' ):
-				return
-	
-			id = Rpc.session.execute('/object', 'execute', 'nan.document', 'create', {
-				'name': unicode( self.item.name ),
-				'datas': base64.encodestring( str(image.buffer()) ),
-				'filename': _('document.png'),
-			}, self.context )
-			if not id:
-				return
+            image = QBuffer()
+            if not self.item.image.save(image, 'PNG'):
+                return
 
-			self.error = False
+            id = Rpc.session.execute('/object', 'execute', 'nan.document', 'create', {
+                'name': unicode(self.item.name),
+                'datas': base64.encodestring(str(image.buffer())),
+                'filename': _('document.png'),
+            }, self.context)
+            if not id:
+                return
 
-	Plugins.register( 'scanner', 'nan.document', _('Scan Documents'), scan )
+            self.error = False
+
+    Plugins.register('scanner', 'nan.document', _('Scan Documents'), scan)

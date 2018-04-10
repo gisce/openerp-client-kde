@@ -32,45 +32,46 @@ import sys
 import inspect
 from Koo.Common.Settings import Settings
 
-## @brief This functions searches the given file (optionally adding a subdirectory)
+# @brief This functions searches the given file (optionally adding a subdirectory)
 # in the possible directories it could be found.
 #
 # This should hide different installation and operating system directories. Making
 # it easier to find resource files.
-def searchFile(file, subdir=None, extraDir=None):
-	tests = []
-	if Settings.value('koo.custom_ui_dir'):
-		tests += [Settings.value('koo.custom_ui_dir')]
-	if extraDir:
-		tests += [extraDir]
-	if subdir:
-		tests += [os.path.join( x, subdir ) for x in sys.path]
-		tests += [os.path.join( x, 'Koo', subdir ) for x in sys.path]
-		# The following line is needed for Koo to work properly
-		# under windows. Mainly we say attach 'share/koo/subdir' to
-		# sys.path, which by default has 'c:\python25' (among others). 
-		# This will give 'c:\python25\share\koo\ui' for example, which is 
-		# where '.ui' files are stored under the Windows platform.
-		tests += [os.path.join( x, 'share', 'Koo', subdir ) for x in sys.path]
-		tests += ['%s/share/Koo/%s' % ( sys.prefix, subdir)]
-	else:
-		tests += [os.path.join( x, 'Koo' ) for x in sys.path]
-		tests += sys.path
 
-	for p in tests:
-		x = os.path.join(p, file)
-		if os.path.exists(x):
-			return x
-	# Previously we returned False but None is more appropiate
-	# and even some functions (such as initializeTranslations using
-	# gettext.translation() will depend on it).
-	return None
+
+def searchFile(file, subdir=None, extraDir=None):
+    tests = []
+    if Settings.value('koo.custom_ui_dir'):
+        tests += [Settings.value('koo.custom_ui_dir')]
+    if extraDir:
+        tests += [extraDir]
+    if subdir:
+        tests += [os.path.join(x, subdir) for x in sys.path]
+        tests += [os.path.join(x, 'Koo', subdir) for x in sys.path]
+        # The following line is needed for Koo to work properly
+        # under windows. Mainly we say attach 'share/koo/subdir' to
+        # sys.path, which by default has 'c:\python25' (among others).
+        # This will give 'c:\python25\share\koo\ui' for example, which is
+        # where '.ui' files are stored under the Windows platform.
+        tests += [os.path.join(x, 'share', 'Koo', subdir) for x in sys.path]
+        tests += ['%s/share/Koo/%s' % (sys.prefix, subdir)]
+    else:
+        tests += [os.path.join(x, 'Koo') for x in sys.path]
+        tests += sys.path
+
+    for p in tests:
+        x = os.path.join(p, file)
+        if os.path.exists(x):
+            return x
+    # Previously we returned False but None is more appropiate
+    # and even some functions (such as initializeTranslations using
+    # gettext.translation() will depend on it).
+    return None
+
 
 def uiPath(uiFile, pyFile=None):
-	if not pyFile:
-		frame = inspect.stack()[1][0]
-	pyFile = frame.f_code.co_filename
-	extraDir=pyFile and os.path.abspath(os.path.dirname(pyFile) or None)
-	return searchFile(uiFile, 'ui', extraDir)
-
-
+    if not pyFile:
+        frame = inspect.stack()[1][0]
+    pyFile = frame.f_code.co_filename
+    extraDir = pyFile and os.path.abspath(os.path.dirname(pyFile) or None)
+    return searchFile(uiFile, 'ui', extraDir)

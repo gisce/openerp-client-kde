@@ -28,85 +28,92 @@
 from Koo.Common import Common
 from Koo import Rpc
 
-## @brief The addInformationToFile function makes use of Nepomuk adds semantic information to the given file.
+# @brief The addInformationToFile function makes use of Nepomuk adds semantic information to the given file.
 #
 # Note you need to provide the model and ids this file was generated from. You can
 # optionally provide the fields too.
-# 
+#
 # If Nepomuk is not available (it doesn't work on Windows nor Mac) it just won't do anything.
-def addInformationToFile( fileName, model, ids, field = None ):
-	if not Common.isKdeAvailable:
-		return
-	if not isinstance(ids, list):
-		ids = [ids]
-	field = False
-	try:
-		# Obtain ratings 
-		ratings = Rpc.session.call( '/semantic', 'rating', model, ids, field, Rpc.session.context )
-		# Obtain all tags
-		allTags = Rpc.session.call( '/semantic', 'tags', model, ids, field, Rpc.session.context )
-		# Obtain all descriptions
-		allDescriptions = Rpc.session.call( '/semantic', 'description', model, ids, field, Rpc.session.context )
-		# Obtain all contacts
-		allContacts = Rpc.session.call( '/semantic', 'contacts', model, ids, field, Rpc.session.context )
-	except:
-		ratings = {}
-		allTags = {}
-		allDescriptions = {}
-		allContacts = {}
 
-	# Calculate average rating
-	rating = 0
-	if ratings:
-		for x in ratings.values():
-			rating += x
-		rating = rating / len(ratings)
-	# Pickup all tags
-	tags = []
-	for x in allTags.values():
-		tags += x
-	tags = list( set( tags ) )
-	# Pickup all descriptions and merge them into one
-	description = '\n--\n'.join( set(allDescriptions.values()) )
-	# Pickup all contacts 
-	contacts = []
-	for x in allContacts.values():
-		contacts += x
-	contacts = list( set( contacts ) )
 
-	from PyKDE4.nepomuk import Nepomuk
-	from PyKDE4.soprano import Soprano 
+def addInformationToFile(fileName, model, ids, field=None):
+    if not Common.isKdeAvailable:
+        return
+    if not isinstance(ids, list):
+        ids = [ids]
+    field = False
+    try:
+        # Obtain ratings
+        ratings = Rpc.session.call(
+            '/semantic', 'rating', model, ids, field, Rpc.session.context)
+        # Obtain all tags
+        allTags = Rpc.session.call(
+            '/semantic', 'tags', model, ids, field, Rpc.session.context)
+        # Obtain all descriptions
+        allDescriptions = Rpc.session.call(
+            '/semantic', 'description', model, ids, field, Rpc.session.context)
+        # Obtain all contacts
+        allContacts = Rpc.session.call(
+            '/semantic', 'contacts', model, ids, field, Rpc.session.context)
+    except:
+        ratings = {}
+        allTags = {}
+        allDescriptions = {}
+        allContacts = {}
 
-	resource = Nepomuk.Resource( 'file://%s' % fileName, Soprano.Vocabulary.Xesam.File() )
-	resource.setTags( [Nepomuk.Tag( tag ) for tag in tags] )
-	resource.setRating( max(rating,0) )
-	resource.setDescription( description )
-	if not resource.isValid():
-		return
+    # Calculate average rating
+    rating = 0
+    if ratings:
+        for x in ratings.values():
+            rating += x
+        rating = rating / len(ratings)
+    # Pickup all tags
+    tags = []
+    for x in allTags.values():
+        tags += x
+    tags = list(set(tags))
+    # Pickup all descriptions and merge them into one
+    description = '\n--\n'.join(set(allDescriptions.values()))
+    # Pickup all contacts
+    contacts = []
+    for x in allContacts.values():
+        contacts += x
+    contacts = list(set(contacts))
 
-	manager = Nepomuk.ResourceManager.instance()
-	# We cannot use manager.mainModel() because bindings for that function do not exist yet.
-	# So Sebastian suggested this workaround.
-	client = Soprano.Client.DBusClient( 'org.kde.NepomukStorage' )
-	models = client.allModels()
-	if not models:
-		return
-	model = client.createModel( models[0] )
+    from PyKDE4.nepomuk import Nepomuk
+    from PyKDE4.soprano import Soprano
 
-	emails = [ '<mailto:%s>' % contact for contact in contacts ]
-	emails = ', '.join( emails )
-	if emails:
-		# Search if there are any contacts on user's addresses with these e-mails.
-		#iterator = model.executeQuery( "PREFIX nco: <http://www.semanticdesktop.org/ontologies/2007/03/22/nco#> SELECT ?name WHERE { ?contact nco:hasEmailAddress ?o. ?contact nco:fullname ?name }", Soprano.Query.QueryLanguageSparql )
-		iterator = model.executeQuery( "PREFIX nco: <http://www.semanticdesktop.org/ontologies/2007/03/22/nco#> SELECT ?contact WHERE { ?contact nco:hasEmailAddress %s. }" % emails, Soprano.Query.QueryLanguageSparql )
-		contacts = []
-		# First store all contacts we want the document to be related to because
-		# Soprano doesn't support adding resources while iterating.
-		while iterator.next():
-			x = iterator.binding('contact')
-			if x.isResource():
-				contacts.append( unicode( x.uri() ) )
-		# Add the relation to the corresponding PIMO of the resource.
-		for contact in contacts:
-			resource.addIsRelated( Nepomuk.Resource( x.uri() ).pimoThing() )
+    resource = Nepomuk.Resource('file://%s' %
+                                fileName, Soprano.Vocabulary.Xesam.File())
+    resource.setTags([Nepomuk.Tag(tag) for tag in tags])
+    resource.setRating(max(rating, 0))
+    resource.setDescription(description)
+    if not resource.isValid():
+        return
 
+    manager = Nepomuk.ResourceManager.instance()
+    # We cannot use manager.mainModel() because bindings for that function do not exist yet.
+    # So Sebastian suggested this workaround.
+    client = Soprano.Client.DBusClient('org.kde.NepomukStorage')
+    models = client.allModels()
+    if not models:
+        return
+    model = client.createModel(models[0])
+
+    emails = ['<mailto:%s>' % contact for contact in contacts]
+    emails = ', '.join(emails)
+    if emails:
+        # Search if there are any contacts on user's addresses with these e-mails.
+        # iterator = model.executeQuery( "PREFIX nco: <http://www.semanticdesktop.org/ontologies/2007/03/22/nco#> SELECT ?name WHERE { ?contact nco:hasEmailAddress ?o. ?contact nco:fullname ?name }", Soprano.Query.QueryLanguageSparql )
+        iterator = model.executeQuery(
+            "PREFIX nco: <http://www.semanticdesktop.org/ontologies/2007/03/22/nco#> SELECT ?contact WHERE { ?contact nco:hasEmailAddress %s. }" % emails, Soprano.Query.QueryLanguageSparql)
+        contacts = []
+        # First store all contacts we want the document to be related to because
+        # Soprano doesn't support adding resources while iterating.
+        while iterator.next():
+            x = iterator.binding('contact')
+            if x.isResource():
+                contacts.append(unicode(x.uri()))
+        # Add the relation to the corresponding PIMO of the resource.
+        for contact in contacts:
+            resource.addIsRelated(Nepomuk.Resource(x.uri()).pimoThing())

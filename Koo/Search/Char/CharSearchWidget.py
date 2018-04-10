@@ -30,27 +30,28 @@
 from Koo.Search.AbstractSearchWidget import *
 from PyQt4.QtGui import *
 
+
 class CharSearchWidget(AbstractSearchWidget):
-	def __init__(self, name, parent, attrs={}):
-		AbstractSearchWidget.__init__(self, name, parent, attrs)
-		self.layout = QHBoxLayout( self )
-		self.layout.setSpacing( 0 )
-		self.layout.setContentsMargins( 0, 0, 0, 0 )
-		self.uiText = QLineEdit( self )
-		self.layout.addWidget( self.uiText )
-		self.focusWidget = self.uiText
-		# Catch keyDownPressed
-		self.focusWidget.installEventFilter( self )
+    def __init__(self, name, parent, attrs={}):
+        AbstractSearchWidget.__init__(self, name, parent, attrs)
+        self.layout = QHBoxLayout(self)
+        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.uiText = QLineEdit(self)
+        self.layout.addWidget(self.uiText)
+        self.focusWidget = self.uiText
+        # Catch keyDownPressed
+        self.focusWidget.installEventFilter(self)
 
-	def value(self):
-		s = unicode(self.uiText.text())
-		if s:
-			return [(self.name,self.attrs.get('comparator','ilike'),s)]
-		else:
-			return []
+    def value(self):
+        s = unicode(self.uiText.text())
+        if s:
+            return [(self.name, self.attrs.get('comparator', 'ilike'), s)]
+        else:
+            return []
 
-	def clear(self):
-		self.uiText.clear()
+    def clear(self):
+        self.uiText.clear()
 
-	def setValue(self, value):
-		self.uiText.setText( value )
+    def setValue(self, value):
+        self.uiText.setText(value)

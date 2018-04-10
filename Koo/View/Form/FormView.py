@@ -39,330 +39,341 @@ from Koo.Fields.AbstractFieldWidget import *
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
-## @brief The FormTabWidget class is the widget used instead of QTabWidget in forms.
+# @brief The FormTabWidget class is the widget used instead of QTabWidget in forms.
 #
 # It extends QTabWidget functionalities to show an icon when a field in a tab is invalid.
 
-class FormTabWidget( QTabWidget ):
-	def __init__(self, parent=None):
-		QTabWidget.__init__(self, parent)
-	
-	def setTabValid(self, index, value):
-		if value:
-			self.setTabIcon( index, QIcon() )
-		else:
-			self.setTabIcon( index, QIcon( ':/images/warning.png' ) )
+
+class FormTabWidget(QTabWidget):
+    def __init__(self, parent=None):
+        QTabWidget.__init__(self, parent)
+
+    def setTabValid(self, index, value):
+        if value:
+            self.setTabIcon(index, QIcon())
+        else:
+            self.setTabIcon(index, QIcon(':/images/warning.png'))
 
 
-## @brief The FormContainer class is a widget with some functionalities to help
+# @brief The FormContainer class is a widget with some functionalities to help
 # the parser construct a Form.
-class FormContainer( QWidget ):
-	def __init__(self, parent=None, maxColumns=4, fields=None):
-		QWidget.__init__(self, parent)
-		self.row = 0
-		self.column = 0
-		self.layout = QGridLayout( self )
-		self.layout.setContentsMargins( 0, 0, 0, 0 )
-		self.layout.setVerticalSpacing( 0 )
-		self.layout.setAlignment( Qt.AlignTop )
-		self.maxColumns = maxColumns
-		self.isTab = False
-		if isinstance( parent, FormTabWidget ):
-			self.tabWidget = parent
-		else:
-			self.tabWidget = None
-		self.fieldWidgets = []
-		self.containerWidgets = []
-		self.fields = fields
+class FormContainer(QWidget):
+    def __init__(self, parent=None, maxColumns=4, fields=None):
+        QWidget.__init__(self, parent)
+        self.row = 0
+        self.column = 0
+        self.layout = QGridLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setVerticalSpacing(0)
+        self.layout.setAlignment(Qt.AlignTop)
+        self.maxColumns = maxColumns
+        self.isTab = False
+        if isinstance(parent, FormTabWidget):
+            self.tabWidget = parent
+        else:
+            self.tabWidget = None
+        self.fieldWidgets = []
+        self.containerWidgets = []
+        self.fields = fields
 
-	def setTabEnabled(self, value):
-		if self.tabWidget:
-			self.tabWidget.setTabEnabled( self.tabWidget.indexOf( self ), value )
+    def setTabEnabled(self, value):
+        if self.tabWidget:
+            self.tabWidget.setTabEnabled(self.tabWidget.indexOf(self), value)
 
-	def setTabValid(self, value):
-		if self.tabWidget:
-			self.tabWidget.setTabValid( self.tabWidget.indexOf( self ), value )
+    def setTabValid(self, value):
+        if self.tabWidget:
+            self.tabWidget.setTabValid(self.tabWidget.indexOf(self), value)
 
-	def isValid(self, record):
-		valid = True
-		if not record:
-			return valid
+    def isValid(self, record):
+        valid = True
+        if not record:
+            return valid
 
-		for w in self.fieldWidgets:
-			if not record.isFieldValid( w.name ):
-				valid = False
-				break
+        for w in self.fieldWidgets:
+            if not record.isFieldValid(w.name):
+                valid = False
+                break
 
-		if valid:
-			for c in self.containerWidgets:
-				if not c.isValid( record ):
-					valid = False
-					break
-		return valid
+        if valid:
+            for c in self.containerWidgets:
+                if not c.isValid(record):
+                    valid = False
+                    break
+        return valid
 
-	def addWidget(self, widget, attributes=None, labelText=None):
-		if attributes is None:
-			attributes = {}
-		if widget.inherits( 'AbstractFieldWidget' ):
-			self.fieldWidgets.append( widget )
-		if widget.inherits( 'FormContainer' ):
-			self.containerWidgets.append( widget )
+    def addWidget(self, widget, attributes=None, labelText=None):
+        if attributes is None:
+            attributes = {}
+        if widget.inherits('AbstractFieldWidget'):
+            self.fieldWidgets.append(widget)
+        if widget.inherits('FormContainer'):
+            self.containerWidgets.append(widget)
 
-		colspan = int(attributes.get( 'colspan', 1 ))
-		helpText = attributes.get( 'help', False )
-		if Settings.value('koo.developer_mode',False) and isinstance(widget, AbstractFieldWidget):
-			helpText = (helpText or '') + _('<p><i>Field name: %s</i></p>') % widget.name
-			helpAttributes = attributes.copy()
-			helpAttributes.update( self.fields.get(widget.name,{}) )
-			helpAttributes = [ '<b>%s</b>: %s<br/>' % (x, helpAttributes[x]) for x in sorted( helpAttributes.keys() ) ]
-			helpAttributes = '\n'.join( helpAttributes )
-			helpText += _('<p><i>Attributes:<br/>%s</i></p>') % helpAttributes
-			attributes['help'] = helpText
+        colspan = int(attributes.get('colspan', 1))
+        helpText = attributes.get('help', False)
+        if Settings.value('koo.developer_mode', False) and isinstance(widget, AbstractFieldWidget):
+            helpText = (helpText or '') + \
+                _('<p><i>Field name: %s</i></p>') % widget.name
+            helpAttributes = attributes.copy()
+            helpAttributes.update(self.fields.get(widget.name, {}))
+            helpAttributes = ['<b>%s</b>: %s<br/>' %
+                              (x, helpAttributes[x]) for x in sorted(helpAttributes.keys())]
+            helpAttributes = '\n'.join(helpAttributes)
+            helpText += _('<p><i>Attributes:<br/>%s</i></p>') % helpAttributes
+            attributes['help'] = helpText
 
-		stylesheet = attributes.get( 'stylesheet', False )
+        stylesheet = attributes.get('stylesheet', False)
 
-		# Get colspan
-		if colspan > self.maxColumns:
-			colspan = self.maxColumns
-			
-		a = labelText and 1 or 0
-		colspan -= a
-		colspan = max(colspan, 1)
-		if colspan + self.column + a  > self.maxColumns:
-			self.newRow()
+        # Get colspan
+        if colspan > self.maxColumns:
+            colspan = self.maxColumns
 
-		# Get rowspan
-		rowspan = int( attributes.get( 'rowspan', 1 ) )
+        a = labelText and 1 or 0
+        colspan -= a
+        colspan = max(colspan, 1)
+        if colspan + self.column + a > self.maxColumns:
+            self.newRow()
 
-		if labelText:
-			label = QLabel( self )
-			label.setText( unicode( Common.normalizeLabel( labelText ) ) )
-			label.setAlignment( Qt.AlignRight | Qt.AlignVCenter )
-			label.setSizePolicy( QSizePolicy.Fixed, QSizePolicy.Fixed )
+        # Get rowspan
+        rowspan = int(attributes.get('rowspan', 1))
 
-			if helpText:
-				color = 'blue'
-				helpText = '<b>%s</b><br/>%s' % (labelText, helpText)
-				label.setToolTip( helpText )
-				label.setWhatsThis( helpText )
-				widget.setWhatsThis( helpText )
-			else:
-				color = 'black'
+        if labelText:
+            label = QLabel(self)
+            label.setText(unicode(Common.normalizeLabel(labelText)))
+            label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
-			label.setText( unicode( '<small><a style="color: %s" href="help">?</a></small> %s' % (color, labelText ) ) )
-			self.connect( label, SIGNAL('linkActivated(QString)'), widget.showHelp )
+            if helpText:
+                color = 'blue'
+                helpText = '<b>%s</b><br/>%s' % (labelText, helpText)
+                label.setToolTip(helpText)
+                label.setWhatsThis(helpText)
+                widget.setWhatsThis(helpText)
+            else:
+                color = 'black'
 
-			self.layout.addWidget( label, self.row, self.column )
-			self.column = self.column + 1
+            label.setText(unicode(
+                '<small><a style="color: %s" href="help">?</a></small> %s' % (color, labelText)))
+            self.connect(label, SIGNAL(
+                'linkActivated(QString)'), widget.showHelp)
 
-		self.layout.addWidget( widget, self.row, self.column, rowspan, colspan )
+            self.layout.addWidget(label, self.row, self.column)
+            self.column = self.column + 1
 
-		if stylesheet:
-			widget.setStyleSheet( stylesheet )
-		self.column += colspan
+        self.layout.addWidget(widget, self.row, self.column, rowspan, colspan)
 
-	def newRow(self):
-		self.row = self.row + 1
-		self.column = 0
+        if stylesheet:
+            widget.setStyleSheet(stylesheet)
+        self.column += colspan
 
-## @brief The FormView class is an AbstractView capable of showing one in an read-write form.
-class FormView( AbstractView ):
-	def __init__(self, parent=None):
-		AbstractView.__init__( self, parent )
-		# We still depend on the parent being a screen because of ButtonFieldWidget
-		self.screen = parent
-		self.title = ""
-		self.record = None
-		self._readOnly = False
+    def newRow(self):
+        self.row = self.row + 1
+        self.column = 0
 
-		self.layout = QHBoxLayout( self )
-		self.layout.setContentsMargins( 0, 0, 0, 0 )
-		self.layout.setAlignment( Qt.AlignTop )
+# @brief The FormView class is an AbstractView capable of showing one in an read-write form.
 
-		# The parser will include all the widgets here with {name: widget} structure
-		self.widgets = {}
-		# The parser will include here all widgets that can change their state (such as visibility).
-		# This can include field widgets but also tabs, and others.
-		self.stateWidgets = []
 
-	def viewType(self):
-		return 'form'
+class FormView(AbstractView):
+    def __init__(self, parent=None):
+        AbstractView.__init__(self, parent)
+        # We still depend on the parent being a screen because of ButtonFieldWidget
+        self.screen = parent
+        self.title = ""
+        self.record = None
+        self._readOnly = False
 
-	def setWidget(self, widget):
-		self.widget = widget
-		self.layout.addWidget( self.widget, 10 )
+        self.layout = QHBoxLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setAlignment(Qt.AlignTop)
 
-	# @brief Ensures the given field is shown by opening the tab it is in, if the field 
-	# is inside a tab widget.
-	def ensureFieldVisible(self, fieldName):
-		if not fieldName in self.widgets:
-			return
+        # The parser will include all the widgets here with {name: widget} structure
+        self.widgets = {}
+        # The parser will include here all widgets that can change their state (such as visibility).
+        # This can include field widgets but also tabs, and others.
+        self.stateWidgets = []
 
-		previousContainer = None
-		widget = self.widgets[fieldName].parent()
-		while widget:
-			if isinstance( widget, FormTabWidget ):
-				widget.setCurrentWidget( previousContainer )
-			if isinstance( widget, FormContainer ):
-				previousContainer = widget
-			widget = widget.parent()
+    def viewType(self):
+        return 'form'
 
-	def __getitem__(self, name):
-		return self.widgets[name]
-	
-	def store(self):
-		if not self.record:
-			return
-		
-		for name in self.widgets:
-			if self.widgets[name].record:
-				self.widgets[name].store()
-			else:
-				# TODO: Why should this happen?
-				print "NO MODEL SET FOR WIDGET: ", name
+    def setWidget(self, widget):
+        self.widget = widget
+        self.layout.addWidget(self.widget, 10)
 
-	def selectedRecords(self):
-		if self.record:
-			return [self.record]
-		return []
+    # @brief Ensures the given field is shown by opening the tab it is in, if the field
+    # is inside a tab widget.
+    def ensureFieldVisible(self, fieldName):
+        if not fieldName in self.widgets:
+            return
 
-	def reset(self):
-		for name, widget in self.widgets.items():
-			widget.reset()
+        previousContainer = None
+        widget = self.widgets[fieldName].parent()
+        while widget:
+            if isinstance(widget, FormTabWidget):
+                widget.setCurrentWidget(previousContainer)
+            if isinstance(widget, FormContainer):
+                previousContainer = widget
+            widget = widget.parent()
 
-	def display(self, currentRecord, records):
-		# Though it might seem it's not necessary to connect FormView to recordChanged signal it
-		# actually is. This is due to possible 'on_change' events triggered by the modification of
-		# a field. This forces those widgets that might change the record before a 'lostfocus' has been
-		# triggered to ensure the view has saved all its fields. As an example, modifying a char field
-		# and pressing the new button of a OneToMany widget might trigger a recordChanged before 
-		# char field has actually changed the value in the record. After updateDisplay, char field will
-		# be reset to its previous state. Take a look at OneToMany implementation to see what's needed
-		# in such buttons.
-		if self.record:
-			self.disconnect(self.record,SIGNAL('recordChanged(PyQt_PyObject)'),self.updateDisplay)
-			self.disconnect(self.record,SIGNAL('setFocus(QString)'),self.setFieldFocus)
-		self.record = currentRecord
-		if self.record:
-			self.connect(self.record,SIGNAL('recordChanged(PyQt_PyObject)'),self.updateDisplay)
-			self.connect(self.record,SIGNAL('setFocus(QString)'),self.setFieldFocus)
-		self.updateDisplay(self.record)
+    def __getitem__(self, name):
+        return self.widgets[name]
 
-	def setFieldFocus(self, fieldName):
-		fieldName = unicode( fieldName )
-		if not fieldName in self.widgets:
-			return
-		self.widgets[fieldName].setFocus()
+    def store(self):
+        if not self.record:
+            return
 
-	def updateDisplay(self, record):
+        for name in self.widgets:
+            if self.widgets[name].record:
+                self.widgets[name].store()
+            else:
+                # TODO: Why should this happen?
+                print "NO MODEL SET FOR WIDGET: ", name
 
-		# Update data on widgets
-		for name in self.widgets:
-			self.widgets[name].setReadOnly( False )
-			if self.record:
-				self.widgets[name].load(self.record)
-			else:
-				self.widgets[name].load(None)
+    def selectedRecords(self):
+        if self.record:
+            return [self.record]
+        return []
 
-		# Update state widgets
-		for widget in self.stateWidgets:
-			widgetGui = widget['widget']
+    def reset(self):
+        for name, widget in self.widgets.items():
+            widget.reset()
 
-			# Consider 'attrs' attribute
-			for attribute, condition in widget['attributes'].iteritems():
-				if self.record:
-					value = self.record.evaluateCondition( condition )
-				else:
-					value = False
-				if attribute == 'invisible':
-					self.setWidgetVisible( widgetGui, not value )
-				elif attribute == 'readonly':
-					self.setWidgetReadOnly( widgetGui, value )
-			# Consider 'states' attribute
-			if widget['states']:
-				if self.record and self.record.fieldExists('state'):
-					state = self.record.value('state')
-				else:
-					state = ''
-				if state in widget['states']:
-					self.setWidgetVisible( widgetGui, True )
-				else:
-					self.setWidgetVisible( widgetGui, False )
+    def display(self, currentRecord, records):
+        # Though it might seem it's not necessary to connect FormView to recordChanged signal it
+        # actually is. This is due to possible 'on_change' events triggered by the modification of
+        # a field. This forces those widgets that might change the record before a 'lostfocus' has been
+        # triggered to ensure the view has saved all its fields. As an example, modifying a char field
+        # and pressing the new button of a OneToMany widget might trigger a recordChanged before
+        # char field has actually changed the value in the record. After updateDisplay, char field will
+        # be reset to its previous state. Take a look at OneToMany implementation to see what's needed
+        # in such buttons.
+        if self.record:
+            self.disconnect(self.record, SIGNAL(
+                'recordChanged(PyQt_PyObject)'), self.updateDisplay)
+            self.disconnect(self.record, SIGNAL(
+                'setFocus(QString)'), self.setFieldFocus)
+        self.record = currentRecord
+        if self.record:
+            self.connect(self.record, SIGNAL(
+                'recordChanged(PyQt_PyObject)'), self.updateDisplay)
+            self.connect(self.record, SIGNAL(
+                'setFocus(QString)'), self.setFieldFocus)
+        self.updateDisplay(self.record)
 
-			if isinstance(widgetGui, FormContainer):
-				if widgetGui.isTab:
-					widgetGui.setTabValid( widgetGui.isValid( record ) )
+    def setFieldFocus(self, fieldName):
+        fieldName = unicode(fieldName)
+        if not fieldName in self.widgets:
+            return
+        self.widgets[fieldName].setFocus()
 
-		if self._readOnly:
-			for name in self.widgets:
-				self.widgets[name].setReadOnly( True )
+    def updateDisplay(self, record):
 
-	def setWidgetVisible(self, widget, value):
-		# We need to know if the widget is a FormContainer and it's the
-		# main widget in a tab in which case we'll want to disable
-		# the whole tab (we can't hide it because Qt doesn't provide an
-		# easy way of doing it).
-		if isinstance(widget, FormContainer) and widget.isTab:
-			widget.setTabEnabled( value )
-		else:
-			widget.setVisible( value )
+        # Update data on widgets
+        for name in self.widgets:
+            self.widgets[name].setReadOnly(False)
+            if self.record:
+                self.widgets[name].load(self.record)
+            else:
+                self.widgets[name].load(None)
 
-	def setWidgetReadOnly(self, widget, value):
-		# We need to know if the widget is a FormContainer and it's the
-		# main widget in a tab in which case we'll want to disable
-		# the whole tab 
-		if isinstance(widget, FormContainer) and widget.isTab:
-			widget.setTabEnabled( not value )
-		else:
-			widget.setEnabled( not value )
+        # Update state widgets
+        for widget in self.stateWidgets:
+            widgetGui = widget['widget']
 
-	def addStateWidget(self, widget, attributes, states):
-		if not attributes:
-			attributes = "{}"
-		attributes = eval( attributes )
-		if states:
-			states = states.split(',')
-		else:
-			states = []
-		self.stateWidgets.append({
-			'widget': widget,
-			'attributes': attributes,
-			'states': states
-		})
+            # Consider 'attrs' attribute
+            for attribute, condition in widget['attributes'].iteritems():
+                if self.record:
+                    value = self.record.evaluateCondition(condition)
+                else:
+                    value = False
+                if attribute == 'invisible':
+                    self.setWidgetVisible(widgetGui, not value)
+                elif attribute == 'readonly':
+                    self.setWidgetReadOnly(widgetGui, value)
+            # Consider 'states' attribute
+            if widget['states']:
+                if self.record and self.record.fieldExists('state'):
+                    state = self.record.value('state')
+                else:
+                    state = ''
+                if state in widget['states']:
+                    self.setWidgetVisible(widgetGui, True)
+                else:
+                    self.setWidgetVisible(widgetGui, False)
 
-	def setReadOnly(self, value):
-		self._readOnly = value
+            if isinstance(widgetGui, FormContainer):
+                if widgetGui.isTab:
+                    widgetGui.setTabValid(widgetGui.isValid(record))
 
-	def viewSettings(self):
-		splitters = self.findChildren( QSplitter )
-		data = QByteArray()
-		stream = QDataStream( data, QIODevice.WriteOnly )
-		for x in splitters:
-			stream << x.saveState()
-		for x in sorted( self.widgets.keys() ):
-			stream << self.widgets[x].saveState()
-		return str( data.toBase64() )
+        if self._readOnly:
+            for name in self.widgets:
+                self.widgets[name].setReadOnly(True)
 
-	def setViewSettings(self, settings):
-		if not settings:
-			return
-		splitters = self.findChildren( QSplitter )
-		data = QByteArray.fromBase64( settings )
-		stream = QDataStream( data )
-		for x in splitters:
-			if stream.atEnd():
-				return
-			value = QByteArray()
-			stream >> value
-			x.restoreState( value )
-		for x in sorted( self.widgets.keys() ):
-			if stream.atEnd():
-				return
-			value = QByteArray()
-			stream >> value
-			self.widgets[x].restoreState( value )
+    def setWidgetVisible(self, widget, value):
+        # We need to know if the widget is a FormContainer and it's the
+        # main widget in a tab in which case we'll want to disable
+        # the whole tab (we can't hide it because Qt doesn't provide an
+        # easy way of doing it).
+        if isinstance(widget, FormContainer) and widget.isTab:
+            widget.setTabEnabled(value)
+        else:
+            widget.setVisible(value)
 
-	def showsMultipleRecords(self):
-		return False
+    def setWidgetReadOnly(self, widget, value):
+        # We need to know if the widget is a FormContainer and it's the
+        # main widget in a tab in which case we'll want to disable
+        # the whole tab
+        if isinstance(widget, FormContainer) and widget.isTab:
+            widget.setTabEnabled(not value)
+        else:
+            widget.setEnabled(not value)
+
+    def addStateWidget(self, widget, attributes, states):
+        if not attributes:
+            attributes = "{}"
+        attributes = eval(attributes)
+        if states:
+            states = states.split(',')
+        else:
+            states = []
+        self.stateWidgets.append({
+            'widget': widget,
+            'attributes': attributes,
+            'states': states
+        })
+
+    def setReadOnly(self, value):
+        self._readOnly = value
+
+    def viewSettings(self):
+        splitters = self.findChildren(QSplitter)
+        data = QByteArray()
+        stream = QDataStream(data, QIODevice.WriteOnly)
+        for x in splitters:
+            stream << x.saveState()
+        for x in sorted(self.widgets.keys()):
+            stream << self.widgets[x].saveState()
+        return str(data.toBase64())
+
+    def setViewSettings(self, settings):
+        if not settings:
+            return
+        splitters = self.findChildren(QSplitter)
+        data = QByteArray.fromBase64(settings)
+        stream = QDataStream(data)
+        for x in splitters:
+            if stream.atEnd():
+                return
+            value = QByteArray()
+            stream >> value
+            x.restoreState(value)
+        for x in sorted(self.widgets.keys()):
+            if stream.atEnd():
+                return
+            value = QByteArray()
+            stream >> value
+            self.widgets[x].restoreState(value)
+
+    def showsMultipleRecords(self):
+        return False
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:

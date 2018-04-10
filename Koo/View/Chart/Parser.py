@@ -43,63 +43,62 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 
-class ChartParser( AbstractParser ):
+class ChartParser(AbstractParser):
 
-	def create(self, viewId, parent, viewModel, node, fields):
-		self.viewModel = viewModel
-		self.parent = parent
+    def create(self, viewId, parent, viewModel, node, fields):
+        self.viewModel = viewModel
+        self.parent = parent
 
-		attrs = Common.nodeAttributes(node)
+        attrs = Common.nodeAttributes(node)
 
+        # Create the view
+        self.view = ChartView(parent)
+        self.view.id = viewId
+        self.view.title = attrs.get('string', _('Unknown'))
+        self.view.model = self.parent.currentRecord()
 
-		# Create the view
-		self.view = ChartView( parent )
-		self.view.id = viewId
-		self.view.title = attrs.get('string', _('Unknown') )
-		self.view.model = self.parent.currentRecord()
+        widget, onWriteFunction = self.parse(
+            self.parent.currentRecord(), node, fields, self.view)
+        self.view.setWidget(widget)
+        self.view.setOnWriteFunction(onWriteFunction)
 
-		widget, onWriteFunction = self.parse( self.parent.currentRecord(), node, fields , self.view )
-		self.view.setWidget( widget )
-		self.view.setOnWriteFunction( onWriteFunction )
+        return self.view
 
-		return self.view
+    def parse(self, model, root_node, fields, container):
+        attrs = Common.nodeAttributes(root_node)
+        self.title = attrs.get('string', 'Unknown')
 
-	def parse(self, model, root_node, fields, container):
-		attrs = Common.nodeAttributes(root_node)
-		self.title = attrs.get('string', 'Unknown')
+        onWriteFunction = ''
 
-		onWriteFunction = '' 
+        axis = []
+        groups = []
+        axis_data = {}
+        for node in root_node.childNodes:
+            if node.localName == 'field':
+                node_attrs = Common.nodeAttributes(node)
+                if node_attrs.get('group', False):
+                    groups.append(str(node_attrs['name']))
+                else:
+                    axis.append(str(node_attrs['name']))
+                axis_data[str(node_attrs['name'])] = node_attrs
 
-		axis = []
-		groups = []
-		axis_data = {}
-		for node in root_node.childNodes:
-			if node.localName == 'field':
-				node_attrs = Common.nodeAttributes(node)
-				if node_attrs.get('group', False):
-					groups.append(str(node_attrs['name']))
-				else:
-					axis.append(str(node_attrs['name']))
-				axis_data[str(node_attrs['name'])] = node_attrs
+        #
+        # TODO: parse root_node to fill in axis
+        #
 
-		#
-		# TODO: parse root_node to fill in axis
-		#
+        chart = ChartGraphicsView(container)
+        chart.setModel(self.parent.currentRecord())
+        chart.setType(attrs.get('type', 'pie'))
+        chart.setAxis(axis)
+        chart.setGroups(groups)
+        chart.setFields(fields)
+        chart.setAxisData(axis_data)
+        if attrs.get('orientation', 'vertical') == 'vertical':
+            chart.setOrientation(Qt.Vertical)
+        else:
+            chart.setOrientation(Qt.Horizontal)
 
-		chart = ChartGraphicsView( container )
-		chart.setModel( self.parent.currentRecord() )
-		chart.setType( attrs.get('type', 'pie') )
-		chart.setAxis( axis )
-		chart.setGroups( groups )
-		chart.setFields( fields )
-		chart.setAxisData( axis_data )
-		if attrs.get('orientation', 'vertical') == 'vertical':
-			chart.setOrientation( Qt.Vertical )
-		else:
-			chart.setOrientation( Qt.Horizontal )
-
-		return chart, onWriteFunction
+        return chart, onWriteFunction
 
 
 # vim:noexpandtab:
-

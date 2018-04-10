@@ -28,5 +28,5 @@
 from FloatSearchWidget import *
 from Koo.Search.SearchWidgetFactory import *
 
-SearchWidgetFactory.register( 'float', FloatSearchWidget )
-SearchWidgetFactory.register( 'float_time', FloatSearchWidget )
+SearchWidgetFactory.register('float', FloatSearchWidget)
+SearchWidgetFactory.register('float_time', FloatSearchWidget)

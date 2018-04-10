@@ -33,61 +33,60 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 
-class CalendarParser( AbstractParser ):
+class CalendarParser(AbstractParser):
 
-	def create(self, viewId, parent, model, rootNode, fields):
-		self.screen = parent
-		view = CalendarView( parent )
-		view.id = viewId
+    def create(self, viewId, parent, model, rootNode, fields):
+        self.screen = parent
+        view = CalendarView(parent)
+        view.id = viewId
 
-		attrs = Common.nodeAttributes(rootNode)
- 		view.setOnWriteFunction( attrs.get('on_write', '') )
+        attrs = Common.nodeAttributes(rootNode)
+        view.setOnWriteFunction(attrs.get('on_write', ''))
 
-		if not view.title:
- 			view.title = attrs.get('string', _('Unknown'))
+        if not view.title:
+            view.title = attrs.get('string', _('Unknown'))
 
-		startDate = attrs.get('date_start')
-		stopDate = attrs.get('date_stop')
-		dateDelay = attrs.get('date_delay')
-		color = attrs.get('color')
+        startDate = attrs.get('date_start')
+        stopDate = attrs.get('date_stop')
+        dateDelay = attrs.get('date_delay')
+        color = attrs.get('color')
 
-		header = []
-		header.append( startDate )
-		if dateDelay:
-			header.append( dateDelay )
-		if color:
-			header.append( color )
-		for node in rootNode.childNodes:
-			node_attrs = Common.nodeAttributes(node)
- 			if node.localName == 'field':
-				header.append( node_attrs['name'] )
+        header = []
+        header.append(startDate)
+        if dateDelay:
+            header.append(dateDelay)
+        if color:
+            header.append(color)
+        for node in rootNode.childNodes:
+            node_attrs = Common.nodeAttributes(node)
+            if node.localName == 'field':
+                header.append(node_attrs['name'])
 
-		#<calendar string="Tasks" date_start="date_start" date_delay="planned_hours" color="user_id">
-		#	<field name="name"/>
-		#	<field name="project_id"/>
-		#</calendar>
+        # <calendar string="Tasks" date_start="date_start" date_delay="planned_hours" color="user_id">
+        #	<field name="name"/>
+        #	<field name="project_id"/>
+        # </calendar>
 
-		model = KooModel( view )
-		model.setMode( KooModel.ListMode )
-		model.setRecordGroup( self.screen.group )
-		model.setFields( fields )
-		model.setFieldsOrder( header )
-		model.setReadOnly( not attrs.get('editable', False) )
-		model.setShowBackgroundColor( True )
+        model = KooModel(view)
+        model.setMode(KooModel.ListMode)
+        model.setRecordGroup(self.screen.group)
+        model.setFields(fields)
+        model.setFieldsOrder(header)
+        model.setReadOnly(not attrs.get('editable', False))
+        model.setShowBackgroundColor(True)
 
-		view.setReadOnly( not attrs.get('editable', False) )
-		view.setModel( model )
-		view.setModelDateColumn( 0 )
-		column = 1
-		if dateDelay:
-			view.setModelDurationColumn( column )
-			column += 1
-		if color:
-			view.setModelColorColumn( column )
-			column += 1
-		view.setModelTitleColumn( column )
+        view.setReadOnly(not attrs.get('editable', False))
+        view.setModel(model)
+        view.setModelDateColumn(0)
+        column = 1
+        if dateDelay:
+            view.setModelDurationColumn(column)
+            column += 1
+        if color:
+            view.setModelColorColumn(column)
+            column += 1
+        view.setModelTitleColumn(column)
 
-		return view
+        return view
 
 # vim:noexpandtab:
-

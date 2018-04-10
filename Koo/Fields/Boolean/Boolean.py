@@ -31,64 +31,67 @@ from PyQt4.QtGui import *
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
 
+
 class BooleanFieldWidget(AbstractFieldWidget):
-	def __init__(self, parent, model, attrs={}):
-		AbstractFieldWidget.__init__(self, parent, model, attrs)
-		self.setSizePolicy( QSizePolicy.Preferred, QSizePolicy.Fixed )
-		self.widget = QCheckBox( self )
-		self.widget.setSizePolicy( QSizePolicy.Fixed, QSizePolicy.Fixed )
-		layout = QHBoxLayout( self )
-		layout.setContentsMargins( 0, 0, 0, 0 )
-		layout.setSpacing( 0 )
-		layout.addWidget( self.widget )
-		layout.setAlignment( Qt.AlignLeft )
-		self.installPopupMenu( self.widget )
-		self.connect( self.widget, SIGNAL('stateChanged(int)'), self.callModified )
+    def __init__(self, parent, model, attrs={}):
+        AbstractFieldWidget.__init__(self, parent, model, attrs)
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        self.widget = QCheckBox(self)
+        self.widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(self.widget)
+        layout.setAlignment(Qt.AlignLeft)
+        self.installPopupMenu(self.widget)
+        self.connect(self.widget, SIGNAL(
+            'stateChanged(int)'), self.callModified)
 
-	def callModified(self, value):
-		self.modified()
+    def callModified(self, value):
+        self.modified()
 
-	def setReadOnly(self, value):
-		AbstractFieldWidget.setReadOnly(self, value)
-		self.widget.setEnabled( not value )
+    def setReadOnly(self, value):
+        AbstractFieldWidget.setReadOnly(self, value)
+        self.widget.setEnabled(not value)
 
-	def storeValue(self):
-		self.record.setValue(self.name, self.widget.isChecked())
+    def storeValue(self):
+        self.record.setValue(self.name, self.widget.isChecked())
 
-	def clear(self):
-		self.widget.setChecked(False)
+    def clear(self):
+        self.widget.setChecked(False)
 
-	def showValue(self):
-		self.widget.setChecked(self.record.value(self.name))
+    def showValue(self):
+        self.widget.setChecked(self.record.value(self.name))
 
-	def colorWidget(self):
-		return self.widget
+    def colorWidget(self):
+        return self.widget
 
-class BooleanFieldDelegate( AbstractFieldDelegate ):
-	def createEditor(self, parent, option, index):
-		return None
-	
-	def editorEvent(self, event, model, option, index):
-		if event.type() == QEvent.MouseButtonPress:
-			model.setData( index, QVariant( not model.data(index).toBool() ), Qt.EditRole )
-		return False
 
-	def paint(self, painter, option, index):
-		# Paint background
-		itemOption = QStyleOptionViewItemV4(option)
-		# Last parameter (None) shouldn't be necessary but we put it to workaround a bug in
-		# KStyle which expects always four parameters, wheareas QStyle makes it optional.
-		QApplication.style().drawControl(QStyle.CE_ItemViewItem, itemOption, painter, None)
+class BooleanFieldDelegate(AbstractFieldDelegate):
+    def createEditor(self, parent, option, index):
+        return None
 
-		# Paint CheckBox
-		op = QStyleOptionButton()
-		op.rect = option.rect
-		value = index.data(Qt.DisplayRole).toBool()
-		if value:
-			op.state = QStyle.State_On
-		else:
-			op.state = QStyle.State_Off
-		# Last parameter (None) shouldn't be necessary but we put it to workaround a bug in
-		# KStyle which expects always four parameters, wheareas QStyle makes it optional.
-		QApplication.style().drawControl(QStyle.CE_CheckBox, op, painter, None)
+    def editorEvent(self, event, model, option, index):
+        if event.type() == QEvent.MouseButtonPress:
+            model.setData(index, QVariant(
+                not model.data(index).toBool()), Qt.EditRole)
+        return False
 
+    def paint(self, painter, option, index):
+        # Paint background
+        itemOption = QStyleOptionViewItemV4(option)
+        # Last parameter (None) shouldn't be necessary but we put it to workaround a bug in
+        # KStyle which expects always four parameters, wheareas QStyle makes it optional.
+        QApplication.style().drawControl(QStyle.CE_ItemViewItem, itemOption, painter, None)
+
+        # Paint CheckBox
+        op = QStyleOptionButton()
+        op.rect = option.rect
+        value = index.data(Qt.DisplayRole).toBool()
+        if value:
+            op.state = QStyle.State_On
+        else:
+            op.state = QStyle.State_Off
+        # Last parameter (None) shouldn't be necessary but we put it to workaround a bug in
+        # KStyle which expects always four parameters, wheareas QStyle makes it optional.
+        QApplication.style().drawControl(QStyle.CE_CheckBox, op, painter, None)

@@ -33,134 +33,140 @@ from Koo.Common import Common
 from Koo.Model.Group import RecordGroup
 from Koo.Screen.ViewQueue import *
 
-(BatchUpdateMessageBoxUi, BatchUpdateMessageBoxBase) = loadUiType( Common.uiPath('batchupdate_msgbox.ui') )
+(BatchUpdateMessageBoxUi, BatchUpdateMessageBoxBase) = loadUiType(
+    Common.uiPath('batchupdate_msgbox.ui'))
+
 
 class BatchUpdateMessageBoxDialog(QDialog, BatchUpdateMessageBoxUi):
-	def __init__(self, parent=None):
-		QDialog.__init__(self, parent)
-		BatchUpdateMessageBoxUi.__init__(self)
-		self.setupUi(self)
-		self._fields = []
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        BatchUpdateMessageBoxUi.__init__(self)
+        self.setupUi(self)
+        self._fields = []
 
-	def setMessage(self, message):
-		self.uiMessage.setText( message )
+    def setMessage(self, message):
+        self.uiMessage.setText(message)
 
-	def setFields(self, fields):
-		"""
-		fields = [(label, name)...]
-		"""
-		self._fields = fields
-		for field in self._fields:
-			item = QListWidgetItem( self.uiFields )
-			item.setText( field[0] )
-			item.setSelected( True )
-			self.uiFields.addItem( item )
+    def setFields(self, fields):
+        """
+        fields = [(label, name)...]
+        """
+        self._fields = fields
+        for field in self._fields:
+            item = QListWidgetItem(self.uiFields)
+            item.setText(field[0])
+            item.setSelected(True)
+            self.uiFields.addItem(item)
 
-	def selectedFields(self):
-		selected = []
-		for x in xrange(self.uiFields.count()):
-			item = self.uiFields.item(x)
-			if item.isSelected():
-				selected.append( self._fields[x][1] )
-		return selected
+    def selectedFields(self):
+        selected = []
+        for x in xrange(self.uiFields.count()):
+            item = self.uiFields.item(x)
+            if item.isSelected():
+                selected.append(self._fields[x][1])
+        return selected
 
 
-(BatchUpdateDialogUi, BatchUpdateDialogBase) = loadUiType( Common.uiPath('batchupdate.ui') )
+(BatchUpdateDialogUi, BatchUpdateDialogBase) = loadUiType(
+    Common.uiPath('batchupdate.ui'))
 
-class BatchUpdateDialog( QDialog, BatchUpdateDialogUi ):
-	def __init__( self, parent=None ):
-		QDialog.__init__(self, parent)
-		BatchUpdateDialogUi.__init__(self)
-		self.setupUi( self )
-		
-		self.connect( self.pushAccept, SIGNAL('clicked()'), self.save )
-		self.connect( self.pushCancel, SIGNAL('clicked()'), self.cancelled )
 
-		self.ids = []
-		self.model = None
-		self.group = None
-		self.isGroupNew = False
-		self.context = None
-		self.updateOnServer = True
-		self.newValues = {}
+class BatchUpdateDialog(QDialog, BatchUpdateDialogUi):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        BatchUpdateDialogUi.__init__(self)
+        self.setupUi(self)
 
-	def setIds( self, ids ):
-		self.ids = ids
+        self.connect(self.pushAccept, SIGNAL('clicked()'), self.save)
+        self.connect(self.pushCancel, SIGNAL('clicked()'), self.cancelled)
 
-	def setModel(self, model):
-		self.model = model
+        self.ids = []
+        self.model = None
+        self.group = None
+        self.isGroupNew = False
+        self.context = None
+        self.updateOnServer = True
+        self.newValues = {}
 
-	def setGroup(self, group):
-		self.group = group
-		self.isGroupNew = False
+    def setIds(self, ids):
+        self.ids = ids
 
-	def setContext(self, context):
-		self.context = context
+    def setModel(self, model):
+        self.model = model
 
-	def setUpdateOnServer(self, update):
-		self.updateOnServer = update
+    def setGroup(self, group):
+        self.group = group
+        self.isGroupNew = False
 
-	def setup( self, viewTypes, viewIds ):
-		if not self.group:
-			self.group = RecordGroup( self.model, context=self.context )
-			self.group.setDomainForEmptyGroup()
-			self.isGroupNew = True
+    def setContext(self, context):
+        self.context = context
 
-		self.screen.setRecordGroup( self.group )
-		self.screen.setEmbedded( True )
-		if 'form' in viewTypes:
-			queue = ViewQueue()	
-			queue.setup( viewTypes, viewIds )	
-			type = ''
-			while type != 'form':
-				id, type = queue.next()
-			self.screen.setupViews( ['form'], [id] )
-		else:
-			self.screen.setupViews( ['form'], [False] )
-		self.screen.new()
+    def setUpdateOnServer(self, update):
+        self.updateOnServer = update
 
-	def save( self ):
-                self.screen.currentView().store()
-                record = self.screen.currentRecord()
-		fields = []
-                if record.isModified():
-			values = record.get(get_readonly=False, get_modifiedonly=True)
-			for field in values:
-				attrs = record.fields()[ field ].attrs
-				if 'string' in attrs:
-					name = attrs['string']
-				else:
-					name = field
-				fields.append( (name, field) )
+    def setup(self, viewTypes, viewIds):
+        if not self.group:
+            self.group = RecordGroup(self.model, context=self.context)
+            self.group.setDomainForEmptyGroup()
+            self.isGroupNew = True
 
-			fields.sort(key=lambda x: x[0])
+        self.screen.setRecordGroup(self.group)
+        self.screen.setEmbedded(True)
+        if 'form' in viewTypes:
+            queue = ViewQueue()
+            queue.setup(viewTypes, viewIds)
+            type = ''
+            while type != 'form':
+                id, type = queue.next()
+            self.screen.setupViews(['form'], [id])
+        else:
+            self.screen.setupViews(['form'], [False])
+        self.screen.new()
 
-			if fields:
-				messageBox = BatchUpdateMessageBoxDialog(self)
-				messageBox.setFields(fields)
-				messageBox.setMessage( _('Select the fields you want to update in the <b>%d</b> selected records:') % len(self.ids) )
-				if messageBox.exec_() == QDialog.Rejected:
-					return
-				self.newValues = {}
-				for field in messageBox.selectedFields():
-					if not self.updateOnServer and self.group.fieldType(field) == 'many2many':
-						if len(values[field]):
-							self.newValues[field] = values[field][0][2]
-						else:
-							self.newValues[field] = []
-					else:
-						self.newValues[field] = values[field]
+    def save(self):
+        self.screen.currentView().store()
+        record = self.screen.currentRecord()
+        fields = []
+        if record.isModified():
+            values = record.get(get_readonly=False, get_modifiedonly=True)
+            for field in values:
+                attrs = record.fields()[field].attrs
+                if 'string' in attrs:
+                    name = attrs['string']
+                else:
+                    name = field
+                fields.append((name, field))
 
-				if self.updateOnServer:
-					Rpc.session.execute('/object', 'execute', self.model, 'write', self.ids, self.newValues, self.context)
+            fields.sort(key=lambda x: x[0])
 
-		if not self.isGroupNew:
-			self.group.removeRecord( self.screen.currentRecord() )
+            if fields:
+                messageBox = BatchUpdateMessageBoxDialog(self)
+                messageBox.setFields(fields)
+                messageBox.setMessage(
+                    _('Select the fields you want to update in the <b>%d</b> selected records:') % len(self.ids))
+                if messageBox.exec_() == QDialog.Rejected:
+                    return
+                self.newValues = {}
+                for field in messageBox.selectedFields():
+                    if not self.updateOnServer and self.group.fieldType(field) == 'many2many':
+                        if len(values[field]):
+                            self.newValues[field] = values[field][0][2]
+                        else:
+                            self.newValues[field] = []
+                    else:
+                        self.newValues[field] = values[field]
 
-		self.accept()
+                if self.updateOnServer:
+                    Rpc.session.execute(
+                        '/object', 'execute', self.model, 'write', self.ids, self.newValues, self.context)
 
-	def cancelled(self):
-		if not self.isGroupNew:
-			self.group.removeRecord( self.screen.currentRecord() )
+        if not self.isGroupNew:
+            self.group.removeRecord(self.screen.currentRecord())
+
+        self.accept()
+
+    def cancelled(self):
+        if not self.isGroupNew:
+            self.group.removeRecord(self.screen.currentRecord())
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:

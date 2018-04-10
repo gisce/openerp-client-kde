@@ -37,34 +37,38 @@ from Koo.Common import Paths
 
 SupportAnchor = "<a href='http://www.NaN-tic.com'>NaN-tic</a>"
 
-## @brief Opens the application used for helpdesk assistant to connect to user's desktop.
+# @brief Opens the application used for helpdesk assistant to connect to user's desktop.
+
+
 def remoteHelp(parent):
-	message = _("<p><b>Remote Help</b> will allow you to share your desktop with one member "
-		"of our support team. This will provide you with first class "
-		"support in real time by an application expert.</p>"
-		"<p>You will be able to close the connection at any time by right "
-		"clicking the orange icon that will appear in the system tray of your "
-		"desktop.</p>"
-		"<p>In order to receive such service, you should first contract the support "
-		"at %(anchor)s.</p>"
-		"<p>Once you've contracted it, you can contact our helpdesk department "
-		"and one member of our staff will contact you briefly and tell you which "
-		"channel you have to use in the next dialog.</p>"
-		"<p>If you already received the call of one member of our experts you can "
-		"proceed.</p>") % {
-			'anchor': SupportAnchor
-		}
-	answer = QMessageBox.question(parent, _('Remote Help'), message, _("Proceed"), _("Cancel") )
-	if answer == 1:
-		return
-	language = Rpc.session.context and Rpc.session.context.get('lang') or 'en'
-	if not language in ('ca','es','en'):
-		language = 'en'
-	
-	path = os.path.join( 'Plugins', 'RemoteHelp', 'data' )
-	path = Paths.searchFile( 'koo_help_%s.exe' % language, path )
-	if path:
-		subprocess.Popen([path])
+    message = _("<p><b>Remote Help</b> will allow you to share your desktop with one member "
+                "of our support team. This will provide you with first class "
+                "support in real time by an application expert.</p>"
+                "<p>You will be able to close the connection at any time by right "
+                "clicking the orange icon that will appear in the system tray of your "
+                "desktop.</p>"
+                "<p>In order to receive such service, you should first contract the support "
+                "at %(anchor)s.</p>"
+                "<p>Once you've contracted it, you can contact our helpdesk department "
+                "and one member of our staff will contact you briefly and tell you which "
+                "channel you have to use in the next dialog.</p>"
+                "<p>If you already received the call of one member of our experts you can "
+                "proceed.</p>") % {
+        'anchor': SupportAnchor
+    }
+    answer = QMessageBox.question(
+        parent, _('Remote Help'), message, _("Proceed"), _("Cancel"))
+    if answer == 1:
+        return
+    language = Rpc.session.context and Rpc.session.context.get('lang') or 'en'
+    if not language in ('ca', 'es', 'en'):
+        language = 'en'
+
+    path = os.path.join('Plugins', 'RemoteHelp', 'data')
+    path = Paths.searchFile('koo_help_%s.exe' % language, path)
+    if path:
+        subprocess.Popen([path])
+
 
 def isRemoteHelpAvailable():
-	return os.name == 'nt'
+    return os.name == 'nt'

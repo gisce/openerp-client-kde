@@ -46,129 +46,132 @@ from Koo.Common.ViewSettings import *
 
 
 class TreeParser(AbstractParser):
-	def create(self, viewId, parent, model, rootNode, fields):
-		# It's expected that parent will be a Screen
-		screen = parent
+    def create(self, viewId, parent, model, rootNode, fields):
+        # It's expected that parent will be a Screen
+        screen = parent
 
-		attrs = Common.nodeAttributes(rootNode)
-		
-		view = TreeView( parent, attrs.get('type','tree') )
-		view.id = viewId
-		if 'gridwidth' in attrs:
-			view.setGridWidth( int(attrs['gridwidth']) )
-		if 'gridheight' in attrs:
-			view.setGridWidth( int(attrs['gridheight']) )
+        attrs = Common.nodeAttributes(rootNode)
 
-		view.setOnWriteFunction( attrs.get('on_write', '') )
+        view = TreeView(parent, attrs.get('type', 'tree'))
+        view.id = viewId
+        if 'gridwidth' in attrs:
+            view.setGridWidth(int(attrs['gridwidth']))
+        if 'gridheight' in attrs:
+            view.setGridWidth(int(attrs['gridheight']))
 
-		if not view.title:
- 			view.title = attrs.get('string', 'Unknown' )
+        view.setOnWriteFunction(attrs.get('on_write', ''))
 
-		colors = []
-		for color_spec in attrs.get('colors', '').split(';'):
-			if color_spec:
-				colour, test = color_spec.split(':')
-				colors.append( ( colour, str(test) ) )
+        if not view.title:
+            view.title = attrs.get('string', 'Unknown')
 
-		columns = []
-		buttons = {}
-		for node in rootNode.childNodes:
-			node_attrs = Common.nodeAttributes(node)
-			if node.localName == 'button':
-				fname = node_attrs['name']
-				columns.append({
-					'name': fname, 
-					'width': 20,
-					'type': 'button',
-					'attributes': node_attrs,
-					'visible': True,
-				})
-				buttons[ fname ] = node_attrs
- 			if node.localName == 'field':
-				fname = node_attrs['name']
-				twidth = {
-					'integer': 60,
-					'float': 80,
-					'date': 70,
-					'datetime': 130,
-					'selection': 130,
-					'char': 140,
-					'one2many': 50,
-				}
+        colors = []
+        for color_spec in attrs.get('colors', '').split(';'):
+            if color_spec:
+                colour, test = color_spec.split(':')
+                colors.append((colour, str(test)))
 
+        columns = []
+        buttons = {}
+        for node in rootNode.childNodes:
+            node_attrs = Common.nodeAttributes(node)
+            if node.localName == 'button':
+                fname = node_attrs['name']
+                columns.append({
+                    'name': fname,
+                    'width': 20,
+                    'type': 'button',
+                    'attributes': node_attrs,
+                    'visible': True,
+                })
+                buttons[fname] = node_attrs
+            if node.localName == 'field':
+                fname = node_attrs['name']
+                twidth = {
+                    'integer': 60,
+                    'float': 80,
+                    'date': 70,
+                    'datetime': 130,
+                    'selection': 130,
+                    'char': 140,
+                    'one2many': 50,
+                }
 
-				if 'readonly' in node_attrs:
-					fields[fname]['readonly'] = Common.stringToBool(node_attrs['readonly'])
-				if 'required' in node_attrs:
-					fields[fname]['required'] = Common.stringToBool(node_attrs['required'])
+                if 'readonly' in node_attrs:
+                    fields[fname]['readonly'] = Common.stringToBool(
+                        node_attrs['readonly'])
+                if 'required' in node_attrs:
+                    fields[fname]['required'] = Common.stringToBool(
+                        node_attrs['required'])
 
-				if 'sum' in node_attrs and fields[fname]['type'] in ('integer', 'float', 'float_time'):
-					bold = bool(int(node_attrs.get('sum_bold', 0)))
-					label = node_attrs['sum']
-					digits = fields.get('digits', (16,2))
-					view.addAggregate( fname, label, bold, digits ) 
+                if 'sum' in node_attrs and fields[fname]['type'] in ('integer', 'float', 'float_time'):
+                    bold = bool(int(node_attrs.get('sum_bold', 0)))
+                    label = node_attrs['sum']
+                    digits = fields.get('digits', (16, 2))
+                    view.addAggregate(fname, label, bold, digits)
 
-				node_attrs.update(fields[fname])
+                node_attrs.update(fields[fname])
 
-				visible = not eval(fields[fname].get('invisible', 'False'), {'context': screen.context})
+                visible = not eval(fields[fname].get('invisible', 'False'), {
+                                   'context': screen.context})
 
-				if 'width' in fields[fname]:
-					width = int(fields[fname]['width'])
-				else:
-					width = twidth.get(fields[fname]['type'], 200)
-				columns.append({ 
-					'name': fname,
-					'width': width , 
-					'type': fields[fname]['type'], 
-					'attributes':node_attrs,
-					'visible': visible,
-				})
+                if 'width' in fields[fname]:
+                    width = int(fields[fname]['width'])
+                else:
+                    width = twidth.get(fields[fname]['type'], 200)
+                columns.append({
+                    'name': fname,
+                    'width': width,
+                    'type': fields[fname]['type'],
+                    'attributes': node_attrs,
+                    'visible': visible,
+                })
 
-		view.finishAggregates()
+        view.finishAggregates()
 
-		model = KooModel.KooModel( view )
-		model.setMode( KooModel.KooModel.ListMode )
-		model.setRecordGroup( screen.group )
-		model.setFields( fields )
-		model.setButtons( buttons )
-		model.setFieldsOrder( [x['name'] for x in columns] )
-		model.setColors( colors )
-		model.setReadOnly( not attrs.get('editable', False) )
-		view.setReadOnly( not attrs.get('editable', False) )
+        model = KooModel.KooModel(view)
+        model.setMode(KooModel.KooModel.ListMode)
+        model.setRecordGroup(screen.group)
+        model.setFields(fields)
+        model.setButtons(buttons)
+        model.setFieldsOrder([x['name'] for x in columns])
+        model.setColors(colors)
+        model.setReadOnly(not attrs.get('editable', False))
+        view.setReadOnly(not attrs.get('editable', False))
 
-		if attrs.get('editable', False) == 'top':
-			view.setAddOnTop( True )
+        if attrs.get('editable', False) == 'top':
+            view.setAddOnTop(True)
 
-		if view.isReadOnly():
-			model.setShowBackgroundColor( False )
-		else:
-			model.setShowBackgroundColor( True )
+        if view.isReadOnly():
+            model.setShowBackgroundColor(False)
+        else:
+            model.setShowBackgroundColor(True)
 
-		# Here we use a trick to avoid double data loading.
-		# If we don't disallow record loading, records would be loaded twice
-		# once, in "view.setModel( model )" and another one when Screen loads
-		# view.setViewSettings(). What we do here is disallow record loading,
-		# run setModel(), load settings and finally allow record loading again.
-		# This optimizes Tree View loading times.
-		domain = screen.group.domain()
-		screen.group.setDomainForEmptyGroup()
+        # Here we use a trick to avoid double data loading.
+        # If we don't disallow record loading, records would be loaded twice
+        # once, in "view.setModel( model )" and another one when Screen loads
+        # view.setViewSettings(). What we do here is disallow record loading,
+        # run setModel(), load settings and finally allow record loading again.
+        # This optimizes Tree View loading times.
+        domain = screen.group.domain()
+        screen.group.setDomainForEmptyGroup()
 
-		view.setModel( model )
+        view.setModel(model)
 
-		for column in range(len(columns)):
-			current = columns[column]
-			if view._widgetType in ('tree','table'):
-				view.widget.setColumnWidth( column, current['width'] )
-			if not current['visible']:
-				view.widget.hideColumn( column )
+        for column in range(len(columns)):
+            current = columns[column]
+            if view._widgetType in ('tree', 'table'):
+                view.widget.setColumnWidth(column, current['width'])
+            if not current['visible']:
+                view.widget.hideColumn(column)
 
-			delegate = FieldDelegateFactory.create( current['type'], view.widget, current['attributes'] )
-			view.widget.setItemDelegateForColumn( column, delegate )
+            delegate = FieldDelegateFactory.create(
+                current['type'], view.widget, current['attributes'])
+            view.widget.setItemDelegateForColumn(column, delegate)
 
-		view.setViewSettings( ViewSettings.load( view.id ) )
+        view.setViewSettings(ViewSettings.load(view.id))
 
-		screen.group.setDomain( domain )
+        screen.group.setDomain(domain)
 
-		return view
+        return view
 
 # vim:noexpandtab:

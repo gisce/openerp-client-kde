@@ -31,24 +31,24 @@ from PyQt4.QtCore import *
 
 from Koo.View.AbstractView import *
 
-class ChartView( AbstractView ) :
-	def __init__(self, parent=None ):
-		AbstractView.__init__( self, parent )
-		self.widget = None 
-		layout = QVBoxLayout( self )
-		self.title= ''
-		self.model = None
 
-	def viewType(self):
-		return 'graph'
+class ChartView(AbstractView):
+    def __init__(self, parent=None):
+        AbstractView.__init__(self, parent)
+        self.widget = None
+        layout = QVBoxLayout(self)
+        self.title = ''
+        self.model = None
 
-	def setWidget( self, widget ):
-		self.widget = widget
-		self.layout().addWidget( self.widget )
+    def viewType(self):
+        return 'graph'
 
-	def __getitem__(self, name):
-		return None
+    def setWidget(self, widget):
+        self.widget = widget
+        self.layout().addWidget(self.widget)
 
- 	def display(self, currentModel, models):
-		self.widget.display(models)
+    def __getitem__(self, name):
+        return None
 
+    def display(self, currentModel, models):
+        self.widget.display(models)

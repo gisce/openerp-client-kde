@@ -28,63 +28,63 @@
 ##############################################################################
 
 from Koo.Common.Numeric import *
-from Koo.Search.AbstractSearchWidget import * 
+from Koo.Search.AbstractSearchWidget import *
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from Koo.Common.Ui import *
 
+
 class FloatSearchWidget(AbstractSearchWidget):
-	def __init__(self, name, parent, attrs={}):
-		AbstractSearchWidget.__init__(self, name, parent, attrs)
-		layout = QHBoxLayout( self )
-		layout.setSpacing( 0 )
-		layout.setContentsMargins( 0, 0, 0, 0 )
-		self.uiStart = QLineEdit( self )
-		label = QLabel( '-', self )
-		self.uiEnd = QLineEdit( self )
-		layout.addWidget( self.uiStart )
-		layout.addWidget( label )
-		layout.addWidget( self.uiEnd )
+    def __init__(self, name, parent, attrs={}):
+        AbstractSearchWidget.__init__(self, name, parent, attrs)
+        layout = QHBoxLayout(self)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.uiStart = QLineEdit(self)
+        label = QLabel('-', self)
+        self.uiEnd = QLineEdit(self)
+        layout.addWidget(self.uiStart)
+        layout.addWidget(label)
+        layout.addWidget(self.uiEnd)
 
-		# Catch keyDownPressed
-		self.uiStart.installEventFilter( self )
-		self.uiEnd.installEventFilter( self )
+        # Catch keyDownPressed
+        self.uiStart.installEventFilter(self)
+        self.uiEnd.installEventFilter(self)
 
-		self.connect( self.uiStart, SIGNAL('returnPressed()'), self.calculate )
-		self.connect( self.uiEnd, SIGNAL('returnPressed()'), self.calculate )
+        self.connect(self.uiStart, SIGNAL('returnPressed()'), self.calculate)
+        self.connect(self.uiEnd, SIGNAL('returnPressed()'), self.calculate)
 
-		self.focusWidget = self.uiStart
+        self.focusWidget = self.uiStart
 
-	def calculate(self):
-		widget = self.sender()
-		val = textToFloat( str(widget.text() ) )
-		if val:
-			widget.setText( str(val) )
-		else:
-			widget.setText('')
+    def calculate(self):
+        widget = self.sender()
+        val = textToFloat(str(widget.text()))
+        if val:
+            widget.setText(str(val))
+        else:
+            widget.setText('')
 
-	def value(self):
-		res = []
-		start = textToFloat( str(self.uiStart.text()) )
-		end = textToFloat( str(self.uiEnd.text()) )
-		if start and not end:
-			res.append((self.name, '=', start))
-			return res
-		if start:
-			res.append((self.name, '>=', start))
-		if end:
-			res.append((self.name, '<=', end))
-		return res
+    def value(self):
+        res = []
+        start = textToFloat(str(self.uiStart.text()))
+        end = textToFloat(str(self.uiEnd.text()))
+        if start and not end:
+            res.append((self.name, '=', start))
+            return res
+        if start:
+            res.append((self.name, '>=', start))
+        if end:
+            res.append((self.name, '<=', end))
+        return res
 
-	def clear(self):
-		self.uiStart.clear()
-		self.uiEnd.clear()
+    def clear(self):
+        self.uiStart.clear()
+        self.uiEnd.clear()
 
-	def setValue(self, value):
-		if value:
-			self.uiStart.setText( str(value) )
-			self.uiEnd.setText( str(value) )
-		else:
-			self.uiStart.clear()
-			self.uiEnd.clear()
-
+    def setValue(self, value):
+        if value:
+            self.uiStart.setText(str(value))
+            self.uiEnd.setText(str(value))
+        else:
+            self.uiStart.clear()
+            self.uiEnd.clear()

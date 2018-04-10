@@ -36,76 +36,78 @@ from PyQt4.QtGui import *
 
 
 class CharFieldWidget(AbstractFieldWidget):
-	def __init__(self, parent, view, attrs={}):
-		AbstractFieldWidget.__init__(self, parent, view, attrs)
+    def __init__(self, parent, view, attrs={}):
+        AbstractFieldWidget.__init__(self, parent, view, attrs)
 
-		self.widget = QLineEdit( self )
-		self.widget.setSizePolicy( QSizePolicy.Preferred, QSizePolicy.Fixed )
-		if 'size' in attrs:
-			self.widget.setMaxLength( int( attrs['size'] ) )
-		if 'password' in attrs:
-			self.widget.setEchoMode( QLineEdit.Password )
+        self.widget = QLineEdit(self)
+        self.widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        if 'size' in attrs:
+            self.widget.setMaxLength(int(attrs['size']))
+        if 'password' in attrs:
+            self.widget.setEchoMode(QLineEdit.Password)
 
-		# As there's no sense in this widget to handle focus
-		# we set QLineEdit as the proxy widget. Without this
-		# editable lists don't work properly.
-		self.setFocusProxy( self.widget )
-		self.installPopupMenu( self.widget )
+        # As there's no sense in this widget to handle focus
+        # we set QLineEdit as the proxy widget. Without this
+        # editable lists don't work properly.
+        self.setFocusProxy(self.widget)
+        self.installPopupMenu(self.widget)
 
-		layout = QHBoxLayout( self )
-		layout.setContentsMargins( 0, 0, 0, 0 )
-		layout.addWidget( self.widget )
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.widget)
 
-		self.scClear = QShortcut( self.widget )
-		self.scClear.setKey( Shortcuts.ClearInField )
-		self.scClear.setContext( Qt.WidgetShortcut )
-		self.connect( self.scClear, SIGNAL('activated()'), self.clear )
+        self.scClear = QShortcut(self.widget)
+        self.scClear.setKey(Shortcuts.ClearInField)
+        self.scClear.setContext(Qt.WidgetShortcut)
+        self.connect(self.scClear, SIGNAL('activated()'), self.clear)
 
-		if attrs.get('translate', False):
-			pushTranslate = QToolButton( self )
-			pushTranslate.setIcon( QIcon( ':/images/locale.png' ) )
-			pushTranslate.setFocusPolicy( Qt.NoFocus )
-			layout.addWidget( pushTranslate )
-			self.connect( pushTranslate, SIGNAL('clicked()'), self.translate )
+        if attrs.get('translate', False):
+            pushTranslate = QToolButton(self)
+            pushTranslate.setIcon(QIcon(':/images/locale.png'))
+            pushTranslate.setFocusPolicy(Qt.NoFocus)
+            layout.addWidget(pushTranslate)
+            self.connect(pushTranslate, SIGNAL('clicked()'), self.translate)
 
-			self.scTranslate = QShortcut( self.widget )
-			self.scTranslate.setKey( Shortcuts.SearchInField )
-			self.scTranslate.setContext( Qt.WidgetShortcut )
-			self.connect( self.scTranslate, SIGNAL('activated()'), self.translate )
+            self.scTranslate = QShortcut(self.widget)
+            self.scTranslate.setKey(Shortcuts.SearchInField)
+            self.scTranslate.setContext(Qt.WidgetShortcut)
+            self.connect(self.scTranslate, SIGNAL(
+                'activated()'), self.translate)
 
-		self.connect( self.widget, SIGNAL('editingFinished()'), self.store )
+        self.connect(self.widget, SIGNAL('editingFinished()'), self.store)
 
-	def translate(self):
-		if not self.record.id:
-			QMessageBox.information( self, _('Translation dialog'), _('You must save the resource before adding translations'))
-			return
-		dialog = TranslationDialog( self.record.id, self.record.group.resource, self.attrs['name'], unicode(self.widget.text()), TranslationDialog.LineEdit, self )
-		if dialog.exec_() == QDialog.Accepted:
-			self.setText( dialog.result )
+    def translate(self):
+        if not self.record.id:
+            QMessageBox.information(self, _('Translation dialog'), _(
+                'You must save the resource before adding translations'))
+            return
+        dialog = TranslationDialog(self.record.id, self.record.group.resource, self.attrs['name'], unicode(
+            self.widget.text()), TranslationDialog.LineEdit, self)
+        if dialog.exec_() == QDialog.Accepted:
+            self.setText(dialog.result)
 
-	def storeValue(self):
-		# The function might be called by 'editingFinished()' signal when no
-		# record is set.
-		if not self.record:
-			return
-		self.record.setValue( self.name, unicode(self.widget.text()) or False )
+    def storeValue(self):
+        # The function might be called by 'editingFinished()' signal when no
+        # record is set.
+        if not self.record:
+            return
+        self.record.setValue(self.name, unicode(self.widget.text()) or False)
 
-	def clear(self):
-		self.widget.clear()
-		self.widget.setToolTip('')
-	
-	def showValue(self):
-		self.setText( self.record.value(self.name) or '' )
+    def clear(self):
+        self.widget.clear()
+        self.widget.setToolTip('')
 
-	def setText(self, text):
-		self.widget.setCursorPosition( 0 )
-		self.widget.setText( text )
-		self.widget.setToolTip( text )
+    def showValue(self):
+        self.setText(self.record.value(self.name) or '')
 
-	def setReadOnly(self, value):
-		AbstractFieldWidget.setReadOnly(self, value)
-		self.widget.setReadOnly( value )
+    def setText(self, text):
+        self.widget.setCursorPosition(0)
+        self.widget.setText(text)
+        self.widget.setToolTip(text)
 
-	def colorWidget(self):
-		return self.widget
+    def setReadOnly(self, value):
+        AbstractFieldWidget.setReadOnly(self, value)
+        self.widget.setReadOnly(value)
 
+    def colorWidget(self):
+        return self.widget

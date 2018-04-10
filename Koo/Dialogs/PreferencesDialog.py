@@ -41,55 +41,61 @@ import copy
 from Koo.Screen.Screen import Screen
 from Koo.Model.Group import RecordGroup
 
-(PreferencesDialogUi, PreferencesDialogBase) = loadUiType( Common.uiPath('preferences.ui') )
+(PreferencesDialogUi, PreferencesDialogBase) = loadUiType(
+    Common.uiPath('preferences.ui'))
+
 
 class PreferencesDialog(QDialog, PreferencesDialogUi):
-	def __init__(self, parent=None):
-		QDialog.__init__(self, parent)
-		PreferencesDialogUi.__init__(self)
-		self.setupUi( self )
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        PreferencesDialogUi.__init__(self)
+        self.setupUi(self)
 
-		self.connect( self.pushAccept, SIGNAL('clicked()'), self.slotAccept )
+        self.connect(self.pushAccept, SIGNAL('clicked()'), self.slotAccept)
 
-		self.setWindowTitle( _('User Preferences') )
-		QApplication.setOverrideCursor( Qt.WaitCursor )
-		QTimer.singleShot( 0, self.initGui )
+        self.setWindowTitle(_('User Preferences'))
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QTimer.singleShot(0, self.initGui)
 
-	def initGui(self):
-		actionId = Rpc.session.execute('/object', 'execute', 'res.users', 'action_get', {})
-		action = Rpc.session.execute('/object', 'execute', 'ir.actions.act_window', 'read', [actionId], False, Rpc.session.context)[0]
+    def initGui(self):
+        actionId = Rpc.session.execute(
+            '/object', 'execute', 'res.users', 'action_get', {})
+        action = Rpc.session.execute(
+            '/object', 'execute', 'ir.actions.act_window', 'read', [actionId], False, Rpc.session.context)[0]
 
-		viewIds=[]
-		if action.get('views', []):
-			viewIds=[x[0] for x in action['views']]
-		elif action.get('view_id', False):
-			viewIds=[action['view_id'][0]]
+        viewIds = []
+        if action.get('views', []):
+            viewIds = [x[0] for x in action['views']]
+        elif action.get('view_id', False):
+            viewIds = [action['view_id'][0]]
 
-		self.group = RecordGroup('res.users')
-		self.group.load( [Rpc.session.uid] )
-		self.screen.setRecordGroup( self.group )
-		self.screen.setupViews( ['form'], [viewIds[0]] )
-		self.screen.display( Rpc.session.uid )
+        self.group = RecordGroup('res.users')
+        self.group.load([Rpc.session.uid])
+        self.screen.setRecordGroup(self.group)
+        self.screen.setupViews(['form'], [viewIds[0]])
+        self.screen.display(Rpc.session.uid)
 
-		# Adjust size and center the dialog
-		self.adjustSize()
-		if self.parent():
-			rect = self.parent().geometry()
-		else:
-			rect = QApplication.desktop().availableGeometry( self )
-		self.move( rect.x() + (rect.width() / 2) - (self.width() / 2), 
-				rect.y() + (rect.height() / 2) - (self.height() / 2) )
+        # Adjust size and center the dialog
+        self.adjustSize()
+        if self.parent():
+            rect = self.parent().geometry()
+        else:
+            rect = QApplication.desktop().availableGeometry(self)
+        self.move(rect.x() + (rect.width() / 2) - (self.width() / 2),
+                  rect.y() + (rect.height() / 2) - (self.height() / 2))
 
-		QApplication.restoreOverrideCursor()
+        QApplication.restoreOverrideCursor()
 
-	def slotAccept(self):
-		if not self.screen.currentRecord().validate():
-			return
+    def slotAccept(self):
+        if not self.screen.currentRecord().validate():
+            return
 
-		if self.screen.currentRecord().fieldExists( 'context_lang' ):
-			Settings.setValue( 'client.language', self.screen.currentRecord().value( 'context_lang' ) )
-			Settings.saveToFile()
+        if self.screen.currentRecord().fieldExists('context_lang'):
+            Settings.setValue(
+                'client.language', self.screen.currentRecord().value('context_lang'))
+            Settings.saveToFile()
 
-		Rpc.session.execute('/object', 'execute', 'res.users', 'write', [Rpc.session.uid], self.screen.get())
-		Rpc.session.reloadContext()
-		self.accept()
+        Rpc.session.execute('/object', 'execute', 'res.users',
+                            'write', [Rpc.session.uid], self.screen.get())
+        Rpc.session.reloadContext()
+        self.accept()

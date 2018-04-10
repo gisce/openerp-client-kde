@@ -30,9 +30,13 @@ from Koo.Common import Common
 from Koo.Plugins import Plugins
 from Koo import Rpc
 
-## @brief Opens a new window with the current model (ir.model) so the user can modify its fields.
-def editModel(model, id, ids, context):
-	domain = [('model','=',model)]
-	Api.instance.createWindow( None, 'ir.model', mode='tree,form', domain=domain, context=context )
+# @brief Opens a new window with the current model (ir.model) so the user can modify its fields.
 
-Plugins.register( 'ModelEditor', '.*', _('Edit Model'), editModel )
+
+def editModel(model, id, ids, context):
+    domain = [('model', '=', model)]
+    Api.instance.createWindow(
+        None, 'ir.model', mode='tree,form', domain=domain, context=context)
+
+
+Plugins.register('ModelEditor', '.*', _('Edit Model'), editModel)

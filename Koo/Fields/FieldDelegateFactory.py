@@ -29,38 +29,38 @@ from AbstractFieldDelegate import *
 from Koo.Common import Plugins
 import os
 
-## @brief The FieldDelegateFactory class specializes in creating the appropiate 
+# @brief The FieldDelegateFactory class specializes in creating the appropiate
 # delegates for a given type.
 
+
 class FieldDelegateFactory:
-	delegates = {}
+    delegates = {}
 
-	## @brief Scans for all available delegates.
-	@staticmethod
-	def scan():
-		# Scan only once
-		if FieldDelegateFactory.delegates:
-			return
-		# Search for all available views
-		Plugins.scan( 'Koo.Fields', os.path.abspath(os.path.dirname(__file__)) )
+    # @brief Scans for all available delegates.
+    @staticmethod
+    def scan():
+        # Scan only once
+        if FieldDelegateFactory.delegates:
+            return
+        # Search for all available views
+        Plugins.scan('Koo.Fields', os.path.abspath(os.path.dirname(__file__)))
 
-	## @brief Creates a new delegate given type, parent and attributes.
-	@staticmethod
-	def create(delegateType, parent, attributes):
-		FieldDelegateFactory.scan()
-		if not delegateType in FieldDelegateFactory.delegates:
-			return AbstractFieldDelegate( parent, attributes )
+    # @brief Creates a new delegate given type, parent and attributes.
+    @staticmethod
+    def create(delegateType, parent, attributes):
+        FieldDelegateFactory.scan()
+        if not delegateType in FieldDelegateFactory.delegates:
+            return AbstractFieldDelegate(parent, attributes)
 
-		# We do not support relational fields treated as selection ones
-		if delegateType == 'selection' and 'relation' in attributes:
-			delegateType = 'many2one'
+        # We do not support relational fields treated as selection ones
+        if delegateType == 'selection' and 'relation' in attributes:
+            delegateType = 'many2one'
 
-		delegateClass = FieldDelegateFactory.delegates[delegateType]
-		return delegateClass(parent, attributes)
+        delegateClass = FieldDelegateFactory.delegates[delegateType]
+        return delegateClass(parent, attributes)
 
-	## @brief Registers a new delegate, given it's name (or type) and reference
-	# to the class.
-	@staticmethod
-	def register( name, delegate ):
-		FieldDelegateFactory.delegates[ name ] = delegate
-
+    # @brief Registers a new delegate, given it's name (or type) and reference
+    # to the class.
+    @staticmethod
+    def register(name, delegate):
+        FieldDelegateFactory.delegates[name] = delegate

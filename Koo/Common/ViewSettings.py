@@ -25,121 +25,123 @@
 #
 ##############################################################################
 
-from Koo import Rpc 
+from Koo import Rpc
 
-## @brief ViewSettings class allows storing and retrieving of view state
+# @brief ViewSettings class allows storing and retrieving of view state
 # information such as column size and ordering in QListViews and the such.
 #
 # Settings are stored as a string (not unicode) and in most cases
 # end up converted to/from a QByteArray; hence the need of ensuring
 # we use str instead of unicode. That's why we enforce str() in a
 # couple of places.
+
+
 class ViewSettings:
-	cache = {}
-	databaseName = None
-	uid = None
-	hasSettingsModule = True
+    cache = {}
+    databaseName = None
+    uid = None
+    hasSettingsModule = True
 
-	## @brief Stores settings for the given view id.
-	@staticmethod
-	def store( id, settings ):
-		if not id:
-			return
+    # @brief Stores settings for the given view id.
+    @staticmethod
+    def store(id, settings):
+        if not id:
+            return
 
-		ViewSettings.checkConnection()
+        ViewSettings.checkConnection()
 
-		if settings:
-			# Ensure it's a string and not unicode
-			settings = str(settings)
+        if settings:
+            # Ensure it's a string and not unicode
+            settings = str(settings)
 
-		# Do not update store data in the server if it settings have not changed
-		# from the ones in cache.
-		if id in ViewSettings.cache and ViewSettings.cache[id] == settings:
-			return
+        # Do not update store data in the server if it settings have not changed
+        # from the ones in cache.
+        if id in ViewSettings.cache and ViewSettings.cache[id] == settings:
+            return
 
-		# Add settings in the cache. Note that even if the required koo
-		# module is not installed in the server view settings will be kept
-		# during user session.
-		ViewSettings.cache[id] = settings
+        # Add settings in the cache. Note that even if the required koo
+        # module is not installed in the server view settings will be kept
+        # during user session.
+        ViewSettings.cache[id] = settings
 
-		if not ViewSettings.hasSettingsModule:
-			return
-			
-		try:
-			# We don't want to crash if the koo module is not installed on the server
-			# but we do want to crash if there are mistakes in setViewSettings() code.
-			ids = Rpc.session.call( '/object', 'execute', 'nan.koo.view.settings', 'search', [
-				('user','=',Rpc.session.uid),('view','=',id)
-			])
-		except:
-			ViewSettings.hasSettingsModule = False
-			return
-		# As 'nan.koo.view.settings' is proved to exist we don't need try-except here. And we
-		# can use execute() instead of call().
-		if ids:
-			Rpc.session.execute( '/object', 'execute', 'nan.koo.view.settings', 'write', ids, {
-				'data': settings 
-			})
-		else:
-			Rpc.session.execute( '/object', 'execute', 'nan.koo.view.settings', 'create', {
-				'user': Rpc.session.uid, 
-				'view': id, 
-				'data': settings 
-			})
+        if not ViewSettings.hasSettingsModule:
+            return
 
-	## @brief Loads information for the given view id.
-	@staticmethod
-	def load( id ):
-		if not id:
-			return None
+        try:
+            # We don't want to crash if the koo module is not installed on the server
+            # but we do want to crash if there are mistakes in setViewSettings() code.
+            ids = Rpc.session.call('/object', 'execute', 'nan.koo.view.settings', 'search', [
+                ('user', '=', Rpc.session.uid), ('view', '=', id)
+            ])
+        except:
+            ViewSettings.hasSettingsModule = False
+            return
+        # As 'nan.koo.view.settings' is proved to exist we don't need try-except here. And we
+        # can use execute() instead of call().
+        if ids:
+            Rpc.session.execute('/object', 'execute', 'nan.koo.view.settings', 'write', ids, {
+                'data': settings
+            })
+        else:
+            Rpc.session.execute('/object', 'execute', 'nan.koo.view.settings', 'create', {
+                'user': Rpc.session.uid,
+                'view': id,
+                'data': settings
+            })
 
-		ViewSettings.checkConnection()
-		if id in ViewSettings.cache:
-			# Restore settings from the cache. Note that even if the required koo
-			# module is not installed in the server view settings will be kept
-			# during user session.
-			return ViewSettings.cache[id]
+    # @brief Loads information for the given view id.
+    @staticmethod
+    def load(id):
+        if not id:
+            return None
 
-		if not ViewSettings.hasSettingsModule:
-			return None
+        ViewSettings.checkConnection()
+        if id in ViewSettings.cache:
+            # Restore settings from the cache. Note that even if the required koo
+            # module is not installed in the server view settings will be kept
+            # during user session.
+            return ViewSettings.cache[id]
 
-		try:
-			# We don't want to crash if the koo module is not installed on the server
-			# but we do want to crash if there are mistakes in setViewSettings() code.
-			ids = Rpc.session.call( '/object', 'execute', 'nan.koo.view.settings', 'search', [
-				('user','=',Rpc.session.uid),('view','=',id)
-			])
-		except:
-			ViewSettings.hasSettingsModule = False
-			return None
+        if not ViewSettings.hasSettingsModule:
+            return None
 
-		# As 'nan.koo.view.settings' is proved to exist we don't need try-except here.
-		if not ids:
-			ViewSettings.cache[id] = None
-			return None
-		settings = Rpc.session.execute( '/object', 'execute', 'nan.koo.view.settings', 'read', ids, ['data'] )[0]['data']
+        try:
+            # We don't want to crash if the koo module is not installed on the server
+            # but we do want to crash if there are mistakes in setViewSettings() code.
+            ids = Rpc.session.call('/object', 'execute', 'nan.koo.view.settings', 'search', [
+                ('user', '=', Rpc.session.uid), ('view', '=', id)
+            ])
+        except:
+            ViewSettings.hasSettingsModule = False
+            return None
 
-		if settings:
-			# Ensure it's a string and not unicode
-			settings = str(settings)
+        # As 'nan.koo.view.settings' is proved to exist we don't need try-except here.
+        if not ids:
+            ViewSettings.cache[id] = None
+            return None
+        settings = Rpc.session.execute(
+            '/object', 'execute', 'nan.koo.view.settings', 'read', ids, ['data'])[0]['data']
 
-		ViewSettings.cache[id] = settings
+        if settings:
+            # Ensure it's a string and not unicode
+            settings = str(settings)
 
-		return settings
+        ViewSettings.cache[id] = settings
 
-	## @brief Checks if connection has changed and clears cache and hasSettingsModule flag
-	@staticmethod
-	def checkConnection():
-		if ViewSettings.databaseName != Rpc.session.databaseName or ViewSettings.uid != Rpc.session.uid:
-			ViewSettings.clear()
+        return settings
 
-	## @brief Clears cache and resets state. This means that after installing the koo
-	# module you don't have to close session and login again because
-	# hasSettingsModule is reset to True.
-	@staticmethod
-	def clear():
-		ViewSettings.databaseName = Rpc.session.databaseName
-		ViewSettings.uid = Rpc.session.uid
-		ViewSettings.hasSettingsModule = True
-		ViewSettings.cache = {}
+    # @brief Checks if connection has changed and clears cache and hasSettingsModule flag
+    @staticmethod
+    def checkConnection():
+        if ViewSettings.databaseName != Rpc.session.databaseName or ViewSettings.uid != Rpc.session.uid:
+            ViewSettings.clear()
 
+    # @brief Clears cache and resets state. This means that after installing the koo
+    # module you don't have to close session and login again because
+    # hasSettingsModule is reset to True.
+    @staticmethod
+    def clear():
+        ViewSettings.databaseName = Rpc.session.databaseName
+        ViewSettings.uid = Rpc.session.uid
+        ViewSettings.hasSettingsModule = True
+        ViewSettings.cache = {}

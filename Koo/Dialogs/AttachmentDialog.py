@@ -30,72 +30,75 @@ import FormWidget
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from Koo.Common.Ui import * 
+from Koo.Common.Ui import *
 
-(AttachmentDialogUi, AttachmentDialogBase) = loadUiType( Common.uiPath('win_attach.ui') )
+(AttachmentDialogUi, AttachmentDialogBase) = loadUiType(
+    Common.uiPath('win_attach.ui'))
+
 
 class AttachmentDialog(QMainWindow, AttachmentDialogUi):
 
-	def __init__(self, model, id, parent = None ):	
-		QMainWindow.__init__(self, parent)
-		AttachmentDialogUi.__init__(self)
-		self.setupUi( self )
+    def __init__(self, model, id, parent=None):
+        QMainWindow.__init__(self, parent)
+        AttachmentDialogUi.__init__(self)
+        self.setupUi(self)
 
-		# Center dialog on the screen
-		rect = QApplication.desktop().screenGeometry()
-		centerh = rect.width() / 2
-		centerv = rect.height() / 2
-		self.setGeometry( centerh - self.width() / 2, centerv - self.height() / 2, self.width(), self.height() )
+        # Center dialog on the screen
+        rect = QApplication.desktop().screenGeometry()
+        centerh = rect.width() / 2
+        centerv = rect.height() / 2
+        self.setGeometry(centerh - self.width() / 2, centerv -
+                         self.height() / 2, self.width(), self.height())
 
-		self.model = model
-		self.id = id
+        self.model = model
+        self.id = id
 
-		context = {
-			'default_res_model': self.model,
-			'default_res_id': self.id,
-		}
-		self.form = FormWidget.FormWidget( 'ir.attachment', view_type=['tree','form'], domain=[('res_model','=',self.model), ('res_id', '=', self.id)], context=context)
-		self.form.setAllowOpenInNewWindow( False )
+        context = {
+            'default_res_model': self.model,
+            'default_res_id': self.id,
+        }
+        self.form = FormWidget.FormWidget('ir.attachment', view_type=['tree', 'form'], domain=[
+                                          ('res_model', '=', self.model), ('res_id', '=', self.id)], context=context)
+        self.form.setAllowOpenInNewWindow(False)
 
-		self.layout = self.centralWidget().layout()
-		self.layout.addWidget( self.form )
+        self.layout = self.centralWidget().layout()
+        self.layout.addWidget(self.form)
 
-		# Set minimum and maximum dialog size
-		size = self.form.sizeHint()
-		self.setMinimumSize( size.width()+100, min(600, size.height()+25) ) 
-		size = QApplication.desktop().availableGeometry( self ).size()
-		size -= QSize( 50, 50 )
-		self.setMaximumSize( size )
+        # Set minimum and maximum dialog size
+        size = self.form.sizeHint()
+        self.setMinimumSize(size.width() + 100, min(600, size.height() + 25))
+        size = QApplication.desktop().availableGeometry(self).size()
+        size -= QSize(50, 50)
+        self.setMaximumSize(size)
 
-		# These actions are not handled by the Main Window but by the currently opened tab.
-		# What we do here, is connect all these actions to a single handler that will
-		# call the current child/tab/form. This is handled this way instead of signals because we
-		# may have several windows opened at the same time and all children would receive
-		# the signal...
-		self.actions = [ 'New', 'Save', 'Delete', 'Next', 'Previous', 'Switch' ]
-		for x in self.actions:
-			action = eval('self.action' + x)
-			self.connect( action, SIGNAL('triggered()'), self.callChildView )
-		self.connect( self.actionClose, SIGNAL('triggered()'), self.slotClose )
-		self.updateEnabledActions()
+        # These actions are not handled by the Main Window but by the currently opened tab.
+        # What we do here, is connect all these actions to a single handler that will
+        # call the current child/tab/form. This is handled this way instead of signals because we
+        # may have several windows opened at the same time and all children would receive
+        # the signal...
+        self.actions = ['New', 'Save', 'Delete', 'Next', 'Previous', 'Switch']
+        for x in self.actions:
+            action = eval('self.action' + x)
+            self.connect(action, SIGNAL('triggered()'), self.callChildView)
+        self.connect(self.actionClose, SIGNAL('triggered()'), self.slotClose)
+        self.updateEnabledActions()
 
-	def updateEnabledActions(self):
-		for x in self.actions:
-			action = eval( 'self.action' + x )
-			action.setEnabled( x in self.form.handlers )
+    def updateEnabledActions(self):
+        for x in self.actions:
+            action = eval('self.action' + x)
+            action.setEnabled(x in self.form.handlers)
 
-	def callChildView( self  ):
-		o = self.sender()	
-		action = str( o.objectName() ).replace( 'action', '' )
-		res = True
-		if action in self.form.handlers:
-			res = self.form.handlers[action]()
+    def callChildView(self):
+        o = self.sender()
+        action = str(o.objectName()).replace('action', '')
+        res = True
+        if action in self.form.handlers:
+            res = self.form.handlers[action]()
 
-	def slotClose( self ):
-		if self.form.canClose():
-			self.close()
-			# We need this so the window will be deleted (resources freed)
-			# and destroyed() signal will be sent. This way the caller can
-			# update the number of attachments for the current model.
-			self.deleteLater()
-
+    def slotClose(self):
+        if self.form.canClose():
+            self.close()
+            # We need this so the window will be deleted (resources freed)
+            # and destroyed() signal will be sent. This way the caller can
+            # update the number of attachments for the current model.
+            self.deleteLater()

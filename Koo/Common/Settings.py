@@ -34,174 +34,181 @@ from Koo import Rpc
 import Debug
 from PyQt4.QtCore import QDir, QUrl
 
-## @brief The ConfigurationManager class handles Koo settings information. 
+# @brief The ConfigurationManager class handles Koo settings information.
 # Those settings can be specified in the command line, .koorc configuration file
 # or koo server module.
+
+
 class Settings(object):
-	rcFile = False
-	options = {
-		'login.db': 'test',
-		'login.url': 'http://admin@localhost:8069',
-		'pyrossl.certdir':  os.path.join(sys.prefix, 'share/Koo/certs'),
-		'pyrossl.cert': 'client.pem',
-		'pyrossl.ca_cert': 'ca.pem',
-		'pyrossl.key': None,
-		'pyrossl.postconncheck': 1,
-		'pyro.dns_uri': 1,
-		'pyro.tracelevel': 0,
-		'pyro.logfile': '/tmp/pyro_client.log',
-		'path.share': os.path.join(sys.prefix, 'share/Koo/'),
-		'path.pixmaps': os.path.join(sys.prefix, 'share/pixmaps/Koo/'),
-		'path.ui': os.path.join(sys.prefix, 'share/Koo/ui'), 
-		'tip.autostart': True,
-		'tip.position': 0,
-		'client.default_path': os.path.expanduser('~'),
-		'client.language': False,
-		'client.debug': False,
-		'koo.print_directly': False,
-		'koo.stylesheet' : '',
-		'koo.tabs_position' : 'top',
-		'koo.tabs_closable' : True,
-		'koo.show_toolbar' : True,
-		'koo.sort_mode' : 'all_items',
-		'koo.pos_mode' : False,
-		'koo.enter_as_tab' : False,
-		'kde.enabled' : True,
-		'koo.attachments_dialog' : False,
-		'koo.load_on_open' : True,
-		'koo.smtp_server' : 'mail.nan-tic.com',
-		'koo.smtp_from' : 'koo@nan-tic.com',
-		'koo.smtp_backtraces_to' : 'backtraces@nan-tic.com',
-		'koo.custom_ui_dir': False,
-		'koo.enable_event_filters': False, # Not recommended for performance reasons
-	}
+    rcFile = False
+    options = {
+        'login.db': 'test',
+        'login.url': 'http://admin@localhost:8069',
+        'pyrossl.certdir':  os.path.join(sys.prefix, 'share/Koo/certs'),
+        'pyrossl.cert': 'client.pem',
+        'pyrossl.ca_cert': 'ca.pem',
+        'pyrossl.key': None,
+        'pyrossl.postconncheck': 1,
+        'pyro.dns_uri': 1,
+        'pyro.tracelevel': 0,
+        'pyro.logfile': '/tmp/pyro_client.log',
+        'path.share': os.path.join(sys.prefix, 'share/Koo/'),
+        'path.pixmaps': os.path.join(sys.prefix, 'share/pixmaps/Koo/'),
+        'path.ui': os.path.join(sys.prefix, 'share/Koo/ui'),
+        'tip.autostart': True,
+        'tip.position': 0,
+        'client.default_path': os.path.expanduser('~'),
+        'client.language': False,
+        'client.debug': False,
+        'koo.print_directly': False,
+        'koo.stylesheet': '',
+        'koo.tabs_position': 'top',
+        'koo.tabs_closable': True,
+        'koo.show_toolbar': True,
+        'koo.sort_mode': 'all_items',
+        'koo.pos_mode': False,
+        'koo.enter_as_tab': False,
+        'kde.enabled': True,
+        'koo.attachments_dialog': False,
+        'koo.load_on_open': True,
+        'koo.smtp_server': 'mail.nan-tic.com',
+        'koo.smtp_from': 'koo@nan-tic.com',
+        'koo.smtp_backtraces_to': 'backtraces@nan-tic.com',
+        'koo.custom_ui_dir': False,
+        'koo.enable_event_filters': False,  # Not recommended for performance reasons
+    }
 
-	## @brief Stores current settings in the appropiate config file.
-	@staticmethod
-	def saveToFile():
-		if not Settings.rcFile:
-			# If no file was specified we try to read it from environment 
-			# variable o standard path
-			Settings.rcFile = os.environ.get('TERPRC') or os.path.join(unicode(QDir.toNativeSeparators(QDir.homePath())), '.koorc')
-		try:
-			parser = ConfigParser.ConfigParser()
-			sections = {}
-			for option in Settings.options.keys():
-				if not len(option.split('.'))==2:
-					continue
+    # @brief Stores current settings in the appropiate config file.
+    @staticmethod
+    def saveToFile():
+        if not Settings.rcFile:
+            # If no file was specified we try to read it from environment
+            # variable o standard path
+            Settings.rcFile = os.environ.get('TERPRC') or os.path.join(
+                unicode(QDir.toNativeSeparators(QDir.homePath())), '.koorc')
+        try:
+            parser = ConfigParser.ConfigParser()
+            sections = {}
+            for option in Settings.options.keys():
+                if not len(option.split('.')) == 2:
+                    continue
 
-				optionSection, optionName = option.split('.')
+                optionSection, optionName = option.split('.')
 
-				if not parser.has_section(optionSection):
-					parser.add_section(optionSection)
+                if not parser.has_section(optionSection):
+                    parser.add_section(optionSection)
 
-				# Do not store 'open' settings unless the 'always' flag is
-				# present.
-				value = Settings.options[option]
-				if optionSection == 'open' and not Settings.value('open.always'):
-					value = ''
+                # Do not store 'open' settings unless the 'always' flag is
+                # present.
+                value = Settings.options[option]
+                if optionSection == 'open' and not Settings.value('open.always'):
+                    value = ''
 
-				parser.set(optionSection, optionName, value)
+                parser.set(optionSection, optionName, value)
 
-			# Set umask='077' to ensure file permissions used are '600'.
-			# This way we can store passwords and other information safely.
-			oldUmask = os.umask(63)
-			f = open(Settings.rcFile, 'wb')
-			try:
-				parser.write( f )
-			except:
-				Debug.warning( 'Unable to write config file %s !' % Settings.rcFile )
-			finally:
-				f.close()
-			os.umask(oldUmask)
-		except:
-			Debug.warning( 'Unable to write config file %s !' % Settings.rcFile )
-		return True
+            # Set umask='077' to ensure file permissions used are '600'.
+            # This way we can store passwords and other information safely.
+            oldUmask = os.umask(63)
+            f = open(Settings.rcFile, 'wb')
+            try:
+                parser.write(f)
+            except:
+                Debug.warning('Unable to write config file %s !' %
+                              Settings.rcFile)
+            finally:
+                f.close()
+            os.umask(oldUmask)
+        except:
+            Debug.warning('Unable to write config file %s !' % Settings.rcFile)
+        return True
 
-	## @brief Loads settings from the appropiate config file.
-	@staticmethod
-	def loadFromFile():
-		if not Settings.rcFile:
-			# If no file was specified we try to read it from environment 
-			# variable o standard path
-			Settings.rcFile = os.environ.get('TERPRC') or os.path.join(unicode(QDir.toNativeSeparators(QDir.homePath())), '.koorc')
-		try:
-			if not os.path.isfile(Settings.rcFile):
-				Settings.save()
-				return False
+    # @brief Loads settings from the appropiate config file.
+    @staticmethod
+    def loadFromFile():
+        if not Settings.rcFile:
+            # If no file was specified we try to read it from environment
+            # variable o standard path
+            Settings.rcFile = os.environ.get('TERPRC') or os.path.join(
+                unicode(QDir.toNativeSeparators(QDir.homePath())), '.koorc')
+        try:
+            if not os.path.isfile(Settings.rcFile):
+                Settings.save()
+                return False
 
-			p = ConfigParser.ConfigParser()
-			p.read([Settings.rcFile])
-			for section in p.sections():
-				for (name,value) in p.items(section):
-					if value=='True' or value=='true':
-						value = True
-					if value=='False' or value=='false':
-						value = False
-					if value=='None' or value=='none':
-						value = None
-					Settings.options[section+'.'+name] = value
-		except Exception, e:
-			Debug.warning( 'Unable to read config file %s !' % Settings.rcFile )
-		return True
+            p = ConfigParser.ConfigParser()
+            p.read([Settings.rcFile])
+            for section in p.sections():
+                for (name, value) in p.items(section):
+                    if value == 'True' or value == 'true':
+                        value = True
+                    if value == 'False' or value == 'false':
+                        value = False
+                    if value == 'None' or value == 'none':
+                        value = None
+                    Settings.options[section + '.' + name] = value
+        except Exception, e:
+            Debug.warning('Unable to read config file %s !' % Settings.rcFile)
+        return True
 
-	## @brief Loads settings from Windows registry.
-	@staticmethod
-	def loadFromRegistry():
-		if os.name != 'nt':
-			return
+    # @brief Loads settings from Windows registry.
+    @staticmethod
+    def loadFromRegistry():
+        if os.name != 'nt':
+            return
 
-		languages = {
-			'1027': 'ca',
-			'1031': 'de',
-			'1033': 'en',
-			'1034': 'es',
-			'1040': 'it',
-		}
-			
-		import _winreg
-		key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r"Software\Koo")
-		value, value_type = _winreg.QueryValueEx(key, "Language")
-		Settings.options['client.language'] = languages.get(value, False)
+        languages = {
+            '1027': 'ca',
+            '1031': 'de',
+            '1033': 'en',
+            '1034': 'es',
+            '1040': 'it',
+        }
 
-	## @brief Sets the value for the given key.
-	@staticmethod
-	def setValue(key, value):
-		Settings.options[key]=value
+        import _winreg
+        key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r"Software\Koo")
+        value, value_type = _winreg.QueryValueEx(key, "Language")
+        Settings.options['client.language'] = languages.get(value, False)
 
-	## @brief Returns the value for the given key.
-	#
-	# If defaultValue parameter is given, defaultValue is returned if the key does not exist.
-	# If type is given, it will convert the value to the given type.
-	@staticmethod
-	def value(key, defaultValue=None, toType=None):
-		value = Settings.options.get(key, defaultValue)
-		if toType == int:
-			return int( value )
-		return value
+    # @brief Sets the value for the given key.
+    @staticmethod
+    def setValue(key, value):
+        Settings.options[key] = value
 
-	## @brief Returns the value associated with the given key. If the key has no valu
-	# returns defaultValue
-	@staticmethod
-	def get(key, defaultValue=None):
-		return Settings.options.get(key, defaultValue)
+    # @brief Returns the value for the given key.
+    #
+    # If defaultValue parameter is given, defaultValue is returned if the key does not exist.
+    # If type is given, it will convert the value to the given type.
+    @staticmethod
+    def value(key, defaultValue=None, toType=None):
+        value = Settings.options.get(key, defaultValue)
+        if toType == int:
+            return int(value)
+        return value
 
-	## @brief Tries to load settings from koo server module.
-	# If the module is not installed, no exception or error is thrown.
-	@staticmethod
-	def loadFromServer():
-		try:
-			settings = Rpc.session.call( '/object', 'execute', 'nan.koo.settings', 'get_settings' )
-		except:
-			settings = {}
-		new_settings = {}
-		for key, value in settings.iteritems():
-			if key == 'stylesheet':
-				new_settings[ 'koo.stylesheet_code' ] = value
-				continue
-			if key != 'id':
-				new_settings[ 'koo.%s' % key ] = value
-		Settings.options.update( new_settings )
-		Rpc.ViewCache.exceptions = Settings.options.get('koo.cache_exceptions', [])
+    # @brief Returns the value associated with the given key. If the key has no valu
+    # returns defaultValue
+    @staticmethod
+    def get(key, defaultValue=None):
+        return Settings.options.get(key, defaultValue)
+
+    # @brief Tries to load settings from koo server module.
+    # If the module is not installed, no exception or error is thrown.
+    @staticmethod
+    def loadFromServer():
+        try:
+            settings = Rpc.session.call(
+                '/object', 'execute', 'nan.koo.settings', 'get_settings')
+        except:
+            settings = {}
+        new_settings = {}
+        for key, value in settings.iteritems():
+            if key == 'stylesheet':
+                new_settings['koo.stylesheet_code'] = value
+                continue
+            if key != 'id':
+                new_settings['koo.%s' % key] = value
+        Settings.options.update(new_settings)
+        Rpc.ViewCache.exceptions = Settings.options.get(
+            'koo.cache_exceptions', [])
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:

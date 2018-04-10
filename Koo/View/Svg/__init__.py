@@ -30,4 +30,4 @@ from Parser import *
 from Koo.View.ViewFactory import *
 
 #ViewFactory.register( SvgParser, 'gantt', _('SVG View'), ':/images/convert.png' )
-ViewFactory.register( SvgParser, 'svg', _('SVG View'), ':/images/convert.png' )
+ViewFactory.register(SvgParser, 'svg', _('SVG View'), ':/images/convert.png')

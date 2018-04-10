@@ -30,22 +30,24 @@ from PyQt4.QtCore import *
 
 from AbstractView import *
 
-class DummyView( AbstractView ) :
-	def __init__(self, parent=None ):
-		AbstractView.__init__( self, parent )
-		self.widget = QLabel( self )
-		self.widget.setAlignment( Qt.AlignCenter )
-		layout = QVBoxLayout( self )
-		layout.addWidget( self.widget )
-		self._viewType = ''
 
-	def setViewType(self, type):
-		self._viewType = type
-		self.widget.setText( _('Views of type %s not available in Koo.') % self._viewType )
+class DummyView(AbstractView):
+    def __init__(self, parent=None):
+        AbstractView.__init__(self, parent)
+        self.widget = QLabel(self)
+        self.widget.setAlignment(Qt.AlignCenter)
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.widget)
+        self._viewType = ''
 
-	def viewType(self):
-		return self._viewType
+    def setViewType(self, type):
+        self._viewType = type
+        self.widget.setText(
+            _('Views of type %s not available in Koo.') % self._viewType)
 
-	# Return False so the search widget is not shown.
-	def showsMultipleRecords(self):
-		return False
+    def viewType(self):
+        return self._viewType
+
+    # Return False so the search widget is not shown.
+    def showsMultipleRecords(self):
+        return False

@@ -28,35 +28,35 @@
 from Koo.Common import Plugins
 import os
 
-## @brief The SearchWidgetFactory class specializes in creating the appropiate 
+# @brief The SearchWidgetFactory class specializes in creating the appropiate
 # search widget for a given type.
 
+
 class SearchWidgetFactory:
-	widgets = {}
+    widgets = {}
 
-	## @brief Scans for all available search widgets.
-	@staticmethod
-	def scan():
-		# Scan only once
-		if SearchWidgetFactory.widgets:
-			return
-		# Search for all available views
-		Plugins.scan( 'Koo.Search', os.path.abspath(os.path.dirname(__file__)) )
+    # @brief Scans for all available search widgets.
+    @staticmethod
+    def scan():
+        # Scan only once
+        if SearchWidgetFactory.widgets:
+            return
+        # Search for all available views
+        Plugins.scan('Koo.Search', os.path.abspath(os.path.dirname(__file__)))
 
-	## @brief Creates a new widget given type, parent and attributes.
-	@staticmethod
-	def create(widgetType, name, parent, attributes):
-		SearchWidgetFactory.scan()
-		if not widgetType in SearchWidgetFactory.widgets:
-			print "Search widget '%s' not available" % widgetType
-			return None
+    # @brief Creates a new widget given type, parent and attributes.
+    @staticmethod
+    def create(widgetType, name, parent, attributes):
+        SearchWidgetFactory.scan()
+        if not widgetType in SearchWidgetFactory.widgets:
+            print "Search widget '%s' not available" % widgetType
+            return None
 
-		widgetClass = SearchWidgetFactory.widgets[ widgetType ]
-		return widgetClass(name, parent, attributes)
+        widgetClass = SearchWidgetFactory.widgets[widgetType]
+        return widgetClass(name, parent, attributes)
 
-	## @brief Registers a new widget, given it's name (or type) and reference
-	# to the class.
-	@staticmethod
-	def register(name, widget):
-		SearchWidgetFactory.widgets[ name ] = widget
-
+    # @brief Registers a new widget, given it's name (or type) and reference
+    # to the class.
+    @staticmethod
+    def register(name, widget):
+        SearchWidgetFactory.widgets[name] = widget

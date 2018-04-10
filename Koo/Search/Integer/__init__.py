@@ -28,4 +28,4 @@
 from IntegerSearchWidget import *
 from Koo.Search.SearchWidgetFactory import *
 
-SearchWidgetFactory.register( 'integer', IntegerSearchWidget )
+SearchWidgetFactory.register('integer', IntegerSearchWidget)

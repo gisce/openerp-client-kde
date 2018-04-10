@@ -34,97 +34,101 @@ from PyQt4.QtNetwork import *
 from Koo.Common import Common
 from Koo.Fields.AbstractFieldWidget import *
 
-(WebFieldWidgetUi, WebFieldWidgetBase) = loadUiType( Common.uiPath('web.ui') ) 
+(WebFieldWidgetUi, WebFieldWidgetBase) = loadUiType(Common.uiPath('web.ui'))
 
-## @brief The CookieJar class inherits QNetworkCookieJar to make a couple of functions public.
+# @brief The CookieJar class inherits QNetworkCookieJar to make a couple of functions public.
+
+
 class CookieJar(QNetworkCookieJar):
-	def __init__(self, parent=None):
-		QNetworkCookieJar.__init__(self, parent)
+    def __init__(self, parent=None):
+        QNetworkCookieJar.__init__(self, parent)
 
-	def allCookies(self):
-		return QNetworkCookieJar.allCookies(self)
-	
-	def setAllCookies(self, cookieList):
-		QNetworkCookieJar.setAllCookies(self, cookieList)
+    def allCookies(self):
+        return QNetworkCookieJar.allCookies(self)
+
+    def setAllCookies(self, cookieList):
+        QNetworkCookieJar.setAllCookies(self, cookieList)
+
 
 class WebFieldWidget(AbstractFieldWidget, WebFieldWidgetUi):
-	def __init__(self, parent, model, attrs={}):
-		AbstractFieldWidget.__init__(self, parent, model, attrs)
-		WebFieldWidgetUi.__init__(self)
-		self.setupUi( self )
-		self.cookieJar = CookieJar()
-		self.uiWeb.page().networkAccessManager().setCookieJar( self.cookieJar )
+    def __init__(self, parent, model, attrs={}):
+        AbstractFieldWidget.__init__(self, parent, model, attrs)
+        WebFieldWidgetUi.__init__(self)
+        self.setupUi(self)
+        self.cookieJar = CookieJar()
+        self.uiWeb.page().networkAccessManager().setCookieJar(self.cookieJar)
 
-	def sizeHint(self):
-		size = super(WebFieldWidget, self).sizeHint()
-		width = self.attrs.get('width')
-		height = self.attrs.get('height')
-		if width:
-			size.setWidth( int(width) )
-		if height:
-			size.setHeight( int(height) )
-		return size
+    def sizeHint(self):
+        size = super(WebFieldWidget, self).sizeHint()
+        width = self.attrs.get('width')
+        height = self.attrs.get('height')
+        if width:
+            size.setWidth(int(width))
+        if height:
+            size.setHeight(int(height))
+        return size
 
-	def storeValue(self):
-		pass
+    def storeValue(self):
+        pass
 
-	def clear( self ):
-		self.uiWeb.setUrl(QUrl(''))
+    def clear(self):
+        self.uiWeb.setUrl(QUrl(''))
 
-	def showValue(self):
-		value = self.record.value(self.name) or ''
-		url = QUrl(value)
-		if not value or unicode(url.scheme()):
-			self.uiWeb.setUrl( url )
-		else:
-			self.uiWeb.setHtml( value )
+    def showValue(self):
+        value = self.record.value(self.name) or ''
+        url = QUrl(value)
+        if not value or unicode(url.scheme()):
+            self.uiWeb.setUrl(url)
+        else:
+            self.uiWeb.setHtml(value)
 
-	def setReadOnly(self, value):
-		AbstractFieldWidget.setReadOnly(self, value)
-		# We always enable the browser so the user can use links.
-		self.uiWeb.setEnabled( True )
+    def setReadOnly(self, value):
+        AbstractFieldWidget.setReadOnly(self, value)
+        # We always enable the browser so the user can use links.
+        self.uiWeb.setEnabled(True)
 
-	def saveState(self):
-		cookieList = self.cookieJar.allCookies()
-		raw = []
-		for cookie in cookieList:
-			# We don't want to store session cookies
-			if cookie.isSessionCookie():
-				continue
-			# Store cookies in a list as a dict would occupy
-			# more space and we want to minimize network bandwidth
-			if Common.isQtVersion45():
-				isHttpOnly = str(cookie.isHttpOnly())
-			else:
-				isHttpOnly = True
-			raw.append( [
-				str(cookie.name().toBase64()), 
-				str(cookie.value().toBase64()), 
-				unicode(cookie.path()).encode('utf-8'),
-				unicode(cookie.domain()).encode('utf-8'),
-				unicode(cookie.expirationDate().toString()).encode('utf-8'),
-				str(isHttpOnly),
-				str(cookie.isSecure()),
-			])
-		return QByteArray( str( raw ) )
+    def saveState(self):
+        cookieList = self.cookieJar.allCookies()
+        raw = []
+        for cookie in cookieList:
+            # We don't want to store session cookies
+            if cookie.isSessionCookie():
+                continue
+            # Store cookies in a list as a dict would occupy
+            # more space and we want to minimize network bandwidth
+            if Common.isQtVersion45():
+                isHttpOnly = str(cookie.isHttpOnly())
+            else:
+                isHttpOnly = True
+            raw.append([
+                str(cookie.name().toBase64()),
+                str(cookie.value().toBase64()),
+                unicode(cookie.path()).encode('utf-8'),
+                unicode(cookie.domain()).encode('utf-8'),
+                unicode(cookie.expirationDate().toString()).encode('utf-8'),
+                str(isHttpOnly),
+                str(cookie.isSecure()),
+            ])
+        return QByteArray(str(raw))
 
-	def restoreState(self, value):
-		if not value:
-			return
-		raw = eval( str( value ) )
-		cookieList = []
-		for cookie in raw:
-			name = QByteArray.fromBase64( cookie[0] )
-			value = QByteArray.fromBase64( cookie[1] )
-			networkCookie = QNetworkCookie( name, value )
-			networkCookie.setPath( unicode( cookie[2], 'utf-8' ) )
-			networkCookie.setDomain( unicode( cookie[3], 'utf-8' ) )
-			networkCookie.setExpirationDate( QDateTime.fromString( unicode( cookie[4], 'utf-8' ) ) )
-			if Common.isQtVersion45():
-				networkCookie.setHttpOnly( eval(cookie[5]) )
-			networkCookie.setSecure( eval(cookie[6]) )
-			cookieList.append( networkCookie )
-		self.cookieJar.setAllCookies( cookieList )
-		self.uiWeb.page().networkAccessManager().setCookieJar( self.cookieJar )
+    def restoreState(self, value):
+        if not value:
+            return
+        raw = eval(str(value))
+        cookieList = []
+        for cookie in raw:
+            name = QByteArray.fromBase64(cookie[0])
+            value = QByteArray.fromBase64(cookie[1])
+            networkCookie = QNetworkCookie(name, value)
+            networkCookie.setPath(unicode(cookie[2], 'utf-8'))
+            networkCookie.setDomain(unicode(cookie[3], 'utf-8'))
+            networkCookie.setExpirationDate(
+                QDateTime.fromString(unicode(cookie[4], 'utf-8')))
+            if Common.isQtVersion45():
+                networkCookie.setHttpOnly(eval(cookie[5]))
+            networkCookie.setSecure(eval(cookie[6]))
+            cookieList.append(networkCookie)
+        self.cookieJar.setAllCookies(cookieList)
+        self.uiWeb.page().networkAccessManager().setCookieJar(self.cookieJar)
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:

@@ -33,42 +33,44 @@ import Koo.Common.Plugins
 import re
 import os
 
+
 class Plugins:
-	plugins = {}
+    plugins = {}
 
-	## @brief This function obtains the list of all available plugins by iterating
-	# over every subdirectory inside Plugins/
-	# 
-	# This means that some plugins are activated the first time this function is 
-	# called.
-	@staticmethod
-	def list( model = None ):
-		# Search for all available plugins
-		# Scan only once
-		if not Plugins.plugins:
-			Koo.Common.Plugins.scan( 'Koo.Plugins', os.path.abspath(os.path.dirname(__file__)) )
+    # @brief This function obtains the list of all available plugins by iterating
+    # over every subdirectory inside Plugins/
+    #
+    # This means that some plugins are activated the first time this function is
+    # called.
+    @staticmethod
+    def list(model=None):
+        # Search for all available plugins
+        # Scan only once
+        if not Plugins.plugins:
+            Koo.Common.Plugins.scan(
+                'Koo.Plugins', os.path.abspath(os.path.dirname(__file__)))
 
-		plugins = {}
-		for name, plugin in Plugins.plugins.items():
-			if model:
-				if plugin['model_regexp'].search( model ):
-					plugins[name] = plugin
-			else:
-				plugins[name] = plugin
-		return plugins
+        plugins = {}
+        for name, plugin in Plugins.plugins.items():
+            if model:
+                if plugin['model_regexp'].search(model):
+                    plugins[name] = plugin
+            else:
+                plugins[name] = plugin
+        return plugins
 
-	## @brief Executes the given plugin.
-	@staticmethod
-	def execute(plugin, model, id, ids, context):
-		plugins = Plugins.list()
-		action = plugins[plugin]['action']
-		action( model, id, ids, context )
+    # @brief Executes the given plugin.
+    @staticmethod
+    def execute(plugin, model, id, ids, context):
+        plugins = Plugins.list()
+        action = plugins[plugin]['action']
+        action(model, id, ids, context)
 
-	@staticmethod
-	def register(name, model, title, action):
-		Plugins.plugins[ name ] = {
-			'model': model,
-			'string': title,
-			'action': action,
-			'model_regexp': re.compile( model )
-		}
+    @staticmethod
+    def register(name, model, title, action):
+        Plugins.plugins[name] = {
+            'model': model,
+            'string': title,
+            'action': action,
+            'model_regexp': re.compile(model)
+        }

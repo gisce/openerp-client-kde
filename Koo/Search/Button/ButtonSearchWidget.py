@@ -33,30 +33,31 @@ from Koo.Search.AbstractSearchWidget import *
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
+
 class ButtonSearchWidget(AbstractSearchWidget):
-	def __init__(self, name, parent, attributes=None):
-		if attributes is None:
-			attributes = {}
-		AbstractSearchWidget.__init__(self, name, parent, attributes)
-		self.pushButton = QPushButton( self )
-		self.pushButton.setText( attributes.get('string', '') )
-		self.pushButton.setCheckable( True )
-		layout = QVBoxLayout( self )
-		layout.addWidget( self.pushButton )
-		layout.setSpacing( 0 )
-		layout.setContentsMargins( 0, 0, 0, 0 )
-		self.focusWidget = self.pushButton
+    def __init__(self, name, parent, attributes=None):
+        if attributes is None:
+            attributes = {}
+        AbstractSearchWidget.__init__(self, name, parent, attributes)
+        self.pushButton = QPushButton(self)
+        self.pushButton.setText(attributes.get('string', ''))
+        self.pushButton.setCheckable(True)
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.pushButton)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.focusWidget = self.pushButton
 
-		self.domain = attributes.get('domain', "[]")
-		self.context = attributes.get('context', "{}")
+        self.domain = attributes.get('domain', "[]")
+        self.context = attributes.get('context', "{}")
 
-	def value(self):
-		return Rpc.session.evaluateExpression( self.domain, Rpc.session.context )
+    def value(self):
+        return Rpc.session.evaluateExpression(self.domain, Rpc.session.context)
 
-	def clear(self):
-		self.pushButton.setDown( False )
+    def clear(self):
+        self.pushButton.setDown(False)
 
-	def setValue(self, value):
-		pass
+    def setValue(self, value):
+        pass
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:

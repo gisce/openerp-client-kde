@@ -46,425 +46,455 @@ from PyQt4.QtGui import *
 from Koo.Common.Ui import *
 
 
-(ManyToOneFieldWidgetUi, ManyToOneFieldWidgetBase ) = loadUiType( Common.uiPath('many2one.ui') ) 
+(ManyToOneFieldWidgetUi, ManyToOneFieldWidgetBase) = loadUiType(
+    Common.uiPath('many2one.ui'))
+
 
 class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
-	def __init__(self, parent, model, attrs={}):
-		AbstractFieldWidget.__init__(self, parent, model, attrs)
-		ManyToOneFieldWidgetUi.__init__(self)
-		self.setupUi(self)
-		
-		self.uiText.installEventFilter( self )
-		self.connect( self.uiText, SIGNAL( "editingFinished()" ), self.match )
-		self.connect( self.pushNew, SIGNAL( "clicked()" ), self.new )
-		self.connect( self.pushOpen, SIGNAL( "clicked()" ), self.open )
-		self.connect( self.pushClear, SIGNAL( "clicked()" ), self.clear )
+    def __init__(self, parent, model, attrs={}):
+        AbstractFieldWidget.__init__(self, parent, model, attrs)
+        ManyToOneFieldWidgetUi.__init__(self)
+        self.setupUi(self)
 
-		self.setFocusProxy( self.uiText )
+        self.uiText.installEventFilter(self)
+        self.connect(self.uiText, SIGNAL("editingFinished()"), self.match)
+        self.connect(self.pushNew, SIGNAL("clicked()"), self.new)
+        self.connect(self.pushOpen, SIGNAL("clicked()"), self.open)
+        self.connect(self.pushClear, SIGNAL("clicked()"), self.clear)
 
-		# Create shortcuts
-		self.scNew = QShortcut( self.uiText )
-		self.scNew.setKey( Shortcuts.CreateInField )
-		self.scNew.setContext( Qt.WidgetShortcut )
-		self.connect( self.scNew, SIGNAL('activated()'), self.new )
+        self.setFocusProxy(self.uiText)
 
-		self.scSearch = QShortcut( self.uiText )
-		self.scSearch.setKey( Shortcuts.SearchInField )
-		self.scSearch.setContext( Qt.WidgetShortcut )
-		self.connect( self.scSearch, SIGNAL('activated()'), self.open )
+        # Create shortcuts
+        self.scNew = QShortcut(self.uiText)
+        self.scNew.setKey(Shortcuts.CreateInField)
+        self.scNew.setContext(Qt.WidgetShortcut)
+        self.connect(self.scNew, SIGNAL('activated()'), self.new)
 
-		self.scClear = QShortcut( self.uiText )
-		self.scClear.setKey( Shortcuts.ClearInField )
-		self.scClear.setContext( Qt.WidgetShortcut )
-		self.connect( self.scClear, SIGNAL('activated()'), self.clear )
+        self.scSearch = QShortcut(self.uiText)
+        self.scSearch.setKey(Shortcuts.SearchInField)
+        self.scSearch.setContext(Qt.WidgetShortcut)
+        self.connect(self.scSearch, SIGNAL('activated()'), self.open)
 
-		self.searching = False
+        self.scClear = QShortcut(self.uiText)
+        self.scClear.setKey(Shortcuts.ClearInField)
+        self.scClear.setContext(Qt.WidgetShortcut)
+        self.connect(self.scClear, SIGNAL('activated()'), self.clear)
 
-		# To build the menu entries we need to query the server so we only make 
-		# the call if necessary and only once. Hence with self.menuLoaded we know
-		# if we've got it in the 'cache'
- 		self.menuLoaded = False
-		self.newMenuEntries = []
-		self.newMenuEntries.append((_('Open'), lambda: self.open(), False))
- 		self.newMenuEntries.append((None, None, None))
- 		self.newMenuEntries.append((_('Action'), lambda: self.executeAction('client_action_multi'), False))
- 		self.newMenuEntries.append((_('Report'), lambda: self.executeAction('client_print_multi'), False))
- 		self.newMenuEntries.append((None, None, None))
+        self.searching = False
 
-	def initGui( self ):
-		QTimer.singleShot( 0, self.delayedInitGui )
+        # To build the menu entries we need to query the server so we only make
+        # the call if necessary and only once. Hence with self.menuLoaded we know
+        # if we've got it in the 'cache'
+        self.menuLoaded = False
+        self.newMenuEntries = []
+        self.newMenuEntries.append((_('Open'), lambda: self.open(), False))
+        self.newMenuEntries.append((None, None, None))
+        self.newMenuEntries.append(
+            (_('Action'), lambda: self.executeAction('client_action_multi'), False))
+        self.newMenuEntries.append(
+            (_('Report'), lambda: self.executeAction('client_print_multi'), False))
+        self.newMenuEntries.append((None, None, None))
 
-	def delayedInitGui( self ):
-		# Name completion can be delayied without side effects.
- 		if self.attrs.get('completion'):
- 			ids = Rpc.session.execute('/object', 'execute', self.attrs['relation'], 'name_search', '', [], 'ilike', Rpc.session.context, False)
- 			if ids:
-				self.loadCompletion( ids )
-		elif self.attrs.get('selection'):
-			self.loadCompletion( self.attrs.get('selection') )
+    def initGui(self):
+        QTimer.singleShot(0, self.delayedInitGui)
 
-	def loadCompletion(self,ids):
-		self.completer = QCompleter()
-		self.completer.setCaseSensitivity( Qt.CaseInsensitive )
-		self.completer.setCompletionMode( QCompleter.UnfilteredPopupCompletion )
-		self.connect( self.completer, SIGNAL('activated(QModelIndex)'), self.completerActivated )
-		self.uiText.setCompleter( self.completer )
+    def delayedInitGui(self):
+        # Name completion can be delayied without side effects.
+        if self.attrs.get('completion'):
+            ids = Rpc.session.execute(
+                '/object', 'execute', self.attrs['relation'], 'name_search', '', [], 'ilike', Rpc.session.context, False)
+            if ids:
+                self.loadCompletion(ids)
+        elif self.attrs.get('selection'):
+            self.loadCompletion(self.attrs.get('selection'))
 
-		model = QStandardItemModel( self )
-		self.completerList = []
-		for key, value in enumerate( ids ):
-			if value[1] and value[1][0] == '[':
-				i = value[1].find( ']')
-				text = value[1][i+2:]
-			else:
-				text = value[1]
-			self.completerList.append( (key, text) )
-			model.appendRow( [QStandardItem( key ), QStandardItem( text )] )
+    def loadCompletion(self, ids):
+        self.completer = QCompleter()
+        self.completer.setCaseSensitivity(Qt.CaseInsensitive)
+        self.completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
+        self.connect(self.completer, SIGNAL(
+            'activated(QModelIndex)'), self.completerActivated)
+        self.uiText.setCompleter(self.completer)
 
-		self.completer.setModel( model )
-		self.completer.setCompletionColumn( 1 )
+        model = QStandardItemModel(self)
+        self.completerList = []
+        for key, value in enumerate(ids):
+            if value[1] and value[1][0] == '[':
+                i = value[1].find(']')
+                text = value[1][i + 2:]
+            else:
+                text = value[1]
+            self.completerList.append((key, text))
+            model.appendRow([QStandardItem(key), QStandardItem(text)])
 
-	def clear( self ):
-		# As the 'clear' button might modify the model we need to be sure all other fields/widgets
-		# have been stored in the model. Otherwise the recordChanged() triggered by modifying
-		# the parent model could make us lose changes.
-		self.view.store()
+        self.completer.setModel(model)
+        self.completer.setCompletionColumn(1)
 
-		if self.record:
-			self.record.setValue( self.name, False )
-		self.uiText.clear()
-		self.uiText.setToolTip('')
-		self.pushOpen.setIcon( QIcon( ":/images/find.png"))
-		self.pushOpen.setToolTip( _("Search") )
+    def clear(self):
+        # As the 'clear' button might modify the model we need to be sure all other fields/widgets
+        # have been stored in the model. Otherwise the recordChanged() triggered by modifying
+        # the parent model could make us lose changes.
+        self.view.store()
 
-	def setReadOnly(self, value):
-		AbstractFieldWidget.setReadOnly(self, value)
-		self.uiText.setReadOnly( value )
-		self.pushNew.setEnabled( not value )
-		self.pushClear.setEnabled( not value )
-		if self.record and self.record.value(self.name):
-			self.pushOpen.setEnabled( True )
-		else:
-			self.pushOpen.setEnabled( not value )
+        if self.record:
+            self.record.setValue(self.name, False)
+        self.uiText.clear()
+        self.uiText.setToolTip('')
+        self.pushOpen.setIcon(QIcon(":/images/find.png"))
+        self.pushOpen.setToolTip(_("Search"))
 
-	def colorWidget(self):
-		return self.uiText
+    def setReadOnly(self, value):
+        AbstractFieldWidget.setReadOnly(self, value)
+        self.uiText.setReadOnly(value)
+        self.pushNew.setEnabled(not value)
+        self.pushClear.setEnabled(not value)
+        if self.record and self.record.value(self.name):
+            self.pushOpen.setEnabled(True)
+        else:
+            self.pushOpen.setEnabled(not value)
 
-	def completerActivated(self, index):
-		id = self.completerList[index.row()][0]
-		assert isinstance(id, (int, long)), id
-		text = unicode( index.data().toString() )
-		self.record.setValue(self.name, (id, text))
+    def colorWidget(self):
+        return self.uiText
 
-	def match(self):
-		if self.searching:
-			return
-		if not self.record:
-			return
-		name = unicode( self.uiText.text() )
-		if name.strip() == '':
-			self.record.setValue( self.name, False )			
-			self.showValue()
-			return
-		if name == self.record.value(self.name):
-			return
-		# Probably due to a bug in Qt, editingFinished signal may be fired
-		# again in "def search()" so we ensure we don't open the dialog twice.
-		self.searching = True
-		self.search( name )
-		self.searching = False
+    def completerActivated(self, index):
+        id = self.completerList[index.row()][0]
+        assert isinstance(id, (int, long)), id
+        text = unicode(index.data().toString())
+        self.record.setValue(self.name, (id, text))
 
-	def open(self):
-		# As the 'open' button might modify the model we need to be sure all other fields/widgets
-		# have been stored in the model. Otherwise the recordChanged() triggered by modifying
-		# the parent model could make us lose changes.
-		self.view.store()
+    def match(self):
+        if self.searching:
+            return
+        if not self.record:
+            return
+        name = unicode(self.uiText.text())
+        if name.strip() == '':
+            self.record.setValue(self.name, False)
+            self.showValue()
+            return
+        if name == self.record.value(self.name):
+            return
+        # Probably due to a bug in Qt, editingFinished signal may be fired
+        # again in "def search()" so we ensure we don't open the dialog twice.
+        self.searching = True
+        self.search(name)
+        self.searching = False
 
-		if self.record.value(self.name):
-			# If Control Key is pressed when the open button is clicked
-			# the record will be opened in a new tab. Otherwise it's opened
-			# in a new modal dialog.
-			if QApplication.keyboardModifiers() & Qt.ControlModifier:
-				model = self.attrs['relation']
-				id = self.record.get()[self.name]
-				if QApplication.keyboardModifiers() & Qt.ShiftModifier:
-					target = 'background'
-				else:
-					target = 'current'
-				Api.instance.createWindow(False, model, id, [('id','=',id)], 'form', mode='form,tree', target=target)
-			else:	
-				dialog = ScreenDialog( self )
-				dialog.setAttributes( self.attrs )
-				dialog.setup( self.attrs['relation'], self.record.get()[self.name] )
-				if dialog.exec_() == QDialog.Accepted:
-					# TODO: As we want to ensure that if the user changed any field
-					# in the related model, on_change event is triggered in our model
-					# so those changes can take effect, we force the change by setting
-					# the field to False first.
-					#
-					# Note that this is technically correct but not ideal because it will
-					# trigger two on_change server calls instead of only one. We'd need to
-					# have explicit support for that by having a special "forceChange" 
-					# parameter or something like that.
-					if not self.isReadOnly():
-						if dialog.record and dialog.record[0] == self.record.get()[self.name]:
-							self.record.setValue(self.name, False)
-						self.record.setValue(self.name, dialog.record)
-						self.display()
-		else:
-			text = unicode( self.uiText.text() )
-			if text.strip() == '':
-				self.search('')
+    def open(self):
+        # As the 'open' button might modify the model we need to be sure all other fields/widgets
+        # have been stored in the model. Otherwise the recordChanged() triggered by modifying
+        # the parent model could make us lose changes.
+        self.view.store()
 
-	# This function searches the given name within the available records. If none or more than
-	# one possible name matches the search dialog is shown. If only one matches we set the
-	# value and don't even show the search dialog. This is also true if the function is called
-	# with "name=''" and only one record exists in the database (hence the call from open())
-	def search(self, name):
-		domain = self.record.domain( self.name )
-		context = self.record.fieldContext( self.name )
-		ids = Rpc.session.execute('/object', 'execute', self.attrs['relation'], 'name_search', name, domain, 'ilike', context, False)
-		if ids and len(ids)==1:
-			self.record.setValue( self.name, ids[0] )
-			self.display()
-		else:
-			dialog = SearchDialog(self.attrs['relation'], sel_multi=False, ids=[x[0] for x in ids], context=context, domain=domain, parent=self)
-			if dialog.exec_() == QDialog.Accepted and dialog.result:
-				id = dialog.result[0]
-				name = Rpc.session.execute('/object', 'execute', self.attrs['relation'], 'name_get', [id], context)[0]
-				self.record.setValue(self.name, name)
-				self.display()
-			else:
-				self.clear()
+        if self.record.value(self.name):
+            # If Control Key is pressed when the open button is clicked
+            # the record will be opened in a new tab. Otherwise it's opened
+            # in a new modal dialog.
+            if QApplication.keyboardModifiers() & Qt.ControlModifier:
+                model = self.attrs['relation']
+                id = self.record.get()[self.name]
+                if QApplication.keyboardModifiers() & Qt.ShiftModifier:
+                    target = 'background'
+                else:
+                    target = 'current'
+                Api.instance.createWindow(
+                    False, model, id, [('id', '=', id)], 'form', mode='form,tree', target=target)
+            else:
+                dialog = ScreenDialog(self)
+                dialog.setAttributes(self.attrs)
+                dialog.setup(self.attrs['relation'],
+                             self.record.get()[self.name])
+                if dialog.exec_() == QDialog.Accepted:
+                    # TODO: As we want to ensure that if the user changed any field
+                    # in the related model, on_change event is triggered in our model
+                    # so those changes can take effect, we force the change by setting
+                    # the field to False first.
+                    #
+                    # Note that this is technically correct but not ideal because it will
+                    # trigger two on_change server calls instead of only one. We'd need to
+                    # have explicit support for that by having a special "forceChange"
+                    # parameter or something like that.
+                    if not self.isReadOnly():
+                        if dialog.record and dialog.record[0] == self.record.get()[self.name]:
+                            self.record.setValue(self.name, False)
+                        self.record.setValue(self.name, dialog.record)
+                        self.display()
+        else:
+            text = unicode(self.uiText.text())
+            if text.strip() == '':
+                self.search('')
 
-	def new(self):
-		dialog = ScreenDialog(self)
-		dialog.setAttributes( self.attrs )
-		dialog.setContext( self.record.fieldContext( self.name ) )
-		dialog.setDomain( self.record.domain(self.name) )
-		dialog.setup( self.attrs['relation'] )
-		if dialog.exec_() == QDialog.Accepted:
-			self.record.setValue(self.name, dialog.record)
-			self.display()
+    # This function searches the given name within the available records. If none or more than
+    # one possible name matches the search dialog is shown. If only one matches we set the
+    # value and don't even show the search dialog. This is also true if the function is called
+    # with "name=''" and only one record exists in the database (hence the call from open())
+    def search(self, name):
+        domain = self.record.domain(self.name)
+        context = self.record.fieldContext(self.name)
+        ids = Rpc.session.execute(
+            '/object', 'execute', self.attrs['relation'], 'name_search', name, domain, 'ilike', context, False)
+        if ids and len(ids) == 1:
+            self.record.setValue(self.name, ids[0])
+            self.display()
+        else:
+            dialog = SearchDialog(self.attrs['relation'], sel_multi=False, ids=[
+                                  x[0] for x in ids], context=context, domain=domain, parent=self)
+            if dialog.exec_() == QDialog.Accepted and dialog.result:
+                id = dialog.result[0]
+                name = Rpc.session.execute(
+                    '/object', 'execute', self.attrs['relation'], 'name_get', [id], context)[0]
+                self.record.setValue(self.name, name)
+                self.display()
+            else:
+                self.clear()
 
-	def storeValue(self):
-		if self.uiText.hasFocus():
-			# Ensure match() is executed. Otherwise clicking on save() while the cursor
-			# is on the widget doesn't behave as expected and returns the field to its 
-			# previous value.
-			self.match()
+    def new(self):
+        dialog = ScreenDialog(self)
+        dialog.setAttributes(self.attrs)
+        dialog.setContext(self.record.fieldContext(self.name))
+        dialog.setDomain(self.record.domain(self.name))
+        dialog.setup(self.attrs['relation'])
+        if dialog.exec_() == QDialog.Accepted:
+            self.record.setValue(self.name, dialog.record)
+            self.display()
 
-	def reset(self):
-		self.uiText.clear()
-		self.uiText.setToolTip('')
-		
-	def showValue(self):
-		res = self.record.value(self.name)
- 		if res:
-			self.uiText.setCursorPosition( 0 )
-			self.uiText.setText( res )
-			self.uiText.setToolTip( res )
-			self.pushOpen.setIcon( QIcon( ":/images/folder.png"))
-			self.pushOpen.setToolTip( _("Open") )
-			# pushOpen will always be enabled if it has to open an existing
-			# element
-			self.pushOpen.setEnabled( True )
- 		else:
-			self.uiText.clear()
-			self.uiText.setToolTip('') 
- 			self.pushOpen.setIcon( QIcon( ":/images/find.png"))
-			self.pushOpen.setToolTip( _("Search") )
-			# pushOpen won't be enabled if it is to find an element
-			self.pushOpen.setEnabled( not self.isReadOnly() )
+    def storeValue(self):
+        if self.uiText.hasFocus():
+            # Ensure match() is executed. Otherwise clicking on save() while the cursor
+            # is on the widget doesn't behave as expected and returns the field to its
+            # previous value.
+            self.match()
 
-	def menuEntries(self):
-		if not self.menuLoaded:
-			related = Rpc.session.execute('/object', 'execute', 'ir.values', 'get', 'action', 'client_action_relate', [(self.attrs['relation'], False)], False, Rpc.session.context)
-			actions = [x[2] for x in related]
-			for action in actions:
-				f = lambda action: lambda: self.executeRelation(action)
-				self.newMenuEntries.append(('... '+ action['name'], f(action), False))
-			self.menuLoaded = True
+    def reset(self):
+        self.uiText.clear()
+        self.uiText.setToolTip('')
 
-		# Set enabled/disabled values
-		value = self.record.value(self.name)
-		if value:
-			value = True
-		else:
-			value = False
-		currentEntries = []
-		for x in self.newMenuEntries:
-			currentEntries.append( (x[0], x[1], value) )
-		return currentEntries
+    def showValue(self):
+        res = self.record.value(self.name)
+        if res:
+            self.uiText.setCursorPosition(0)
+            self.uiText.setText(res)
+            self.uiText.setToolTip(res)
+            self.pushOpen.setIcon(QIcon(":/images/folder.png"))
+            self.pushOpen.setToolTip(_("Open"))
+            # pushOpen will always be enabled if it has to open an existing
+            # element
+            self.pushOpen.setEnabled(True)
+        else:
+            self.uiText.clear()
+            self.uiText.setToolTip('')
+            self.pushOpen.setIcon(QIcon(":/images/find.png"))
+            self.pushOpen.setToolTip(_("Search"))
+            # pushOpen won't be enabled if it is to find an element
+            self.pushOpen.setEnabled(not self.isReadOnly())
 
-	def executeRelation(self, action):
-		id = self.record.get()[self.name]
-		group = RecordGroup( self.attrs['relation'] )
-		group.load( [id] )
-		record = group.modelByIndex( 0 )
-		# Copy action so we do not update the action, othewise, domain and context would only be
-		# evaluated fo the first record but not the following ones.
-		action = action.copy()
-		action['domain'] = record.evaluateExpression( action['domain'], checkLoad=False)
-		action['context'] = str( record.evaluateExpression( action['context'], checkLoad=False) )
-		Api.instance.executeAction( action )
+    def menuEntries(self):
+        if not self.menuLoaded:
+            related = Rpc.session.execute('/object', 'execute', 'ir.values', 'get', 'action', 'client_action_relate', [
+                                          (self.attrs['relation'], False)], False, Rpc.session.context)
+            actions = [x[2] for x in related]
+            for action in actions:
+                def f(action): return lambda: self.executeRelation(action)
+                self.newMenuEntries.append(
+                    ('... ' + action['name'], f(action), False))
+            self.menuLoaded = True
 
-	def executeAction(self, type):
-		id = self.record.get()[self.name]
-		Api.instance.executeKeyword(type, {
-			'model':self.attrs['relation'], 
-			'id': id or False, 
-			'ids':[id], 
-			'report_type': 'pdf'
-		}, Rpc.session.context)
+        # Set enabled/disabled values
+        value = self.record.value(self.name)
+        if value:
+            value = True
+        else:
+            value = False
+        currentEntries = []
+        for x in self.newMenuEntries:
+            currentEntries.append((x[0], x[1], value))
+        return currentEntries
 
-class ManyToOneFieldDelegate( AbstractFieldDelegate ):
-	def __init__(self, parent, attributes):
-		AbstractFieldDelegate.__init__(self, parent, attributes)
-		self.currentEditor = None
-		self.currentValue = None
+    def executeRelation(self, action):
+        id = self.record.get()[self.name]
+        group = RecordGroup(self.attrs['relation'])
+        group.load([id])
+        record = group.modelByIndex(0)
+        # Copy action so we do not update the action, othewise, domain and context would only be
+        # evaluated fo the first record but not the following ones.
+        action = action.copy()
+        action['domain'] = record.evaluateExpression(
+            action['domain'], checkLoad=False)
+        action['context'] = str(record.evaluateExpression(
+            action['context'], checkLoad=False))
+        Api.instance.executeAction(action)
 
-	def menuEntries(self, record):
-		self.record = record
+    def executeAction(self, type):
+        id = self.record.get()[self.name]
+        Api.instance.executeKeyword(type, {
+            'model': self.attrs['relation'],
+            'id': id or False,
+            'ids': [id],
+            'report_type': 'pdf'
+        }, Rpc.session.context)
 
-		newMenuEntries = []
-		newMenuEntries.append((_('Open'), lambda: self.open(), False))
- 		newMenuEntries.append((None, None, None))
- 		newMenuEntries.append((_('Action'), lambda: self.executeAction(record, 'client_action_multi'), False))
- 		newMenuEntries.append((_('Report'), lambda: self.executeAction(record, 'client_print_multi'), False))
- 		newMenuEntries.append((None, None, None))
-		related = Rpc.session.execute('/object', 'execute', 'ir.values', 'get', 'action', 'client_action_relate', [(self.attributes['relation'], False)], False, Rpc.session.context)
-		actions = [x[2] for x in related]
-		for action in actions:
-			f = lambda action: lambda: self.executeRelation(record, action)
-			newMenuEntries.append(('... '+ action['name'], f(action), False))
 
-		# Set enabled/disabled values
-		value = record.value(self.name)
-		if value:
-			value = True
-		else:
-			value = False
-		currentEntries = []
-		for x in newMenuEntries:
-			currentEntries.append( (x[0], x[1], value) )
-		return currentEntries
+class ManyToOneFieldDelegate(AbstractFieldDelegate):
+    def __init__(self, parent, attributes):
+        AbstractFieldDelegate.__init__(self, parent, attributes)
+        self.currentEditor = None
+        self.currentValue = None
 
-	def executeRelation(self, record, action):
-		id = record.get()[self.name]
-		group = RecordGroup( self.attributes['relation'] )
-		group.load( [id] )
-		record = group.modelByIndex( 0 )
-		action = action.copy()
-		action['domain'] = record.evaluateExpression( action['domain'], checkLoad=False)
-		action['context'] = str( record.evaluateExpression( action['context'], checkLoad=False) )
-		Api.instance.executeAction( action )
+    def menuEntries(self, record):
+        self.record = record
 
-	def executeAction(self, record, type):
-		id = record.get()[self.name]
-		Api.instance.executeKeyword(type, {
-			'model': self.attributes['relation'], 
-			'id': id or False, 
-			'ids': [id], 
-			'report_type': 'pdf'
-		}, Rpc.session.context)
+        newMenuEntries = []
+        newMenuEntries.append((_('Open'), lambda: self.open(), False))
+        newMenuEntries.append((None, None, None))
+        newMenuEntries.append((_('Action'), lambda: self.executeAction(
+            record, 'client_action_multi'), False))
+        newMenuEntries.append(
+            (_('Report'), lambda: self.executeAction(record, 'client_print_multi'), False))
+        newMenuEntries.append((None, None, None))
+        related = Rpc.session.execute('/object', 'execute', 'ir.values', 'get', 'action', 'client_action_relate', [
+                                      (self.attributes['relation'], False)], False, Rpc.session.context)
+        actions = [x[2] for x in related]
+        for action in actions:
+            def f(action): return lambda: self.executeRelation(record, action)
+            newMenuEntries.append(('... ' + action['name'], f(action), False))
 
-	def createEditor(self, parent, option, index):
-		widget = AbstractFieldDelegate.createEditor(self, parent, option, index)
-		if widget:
-			# Create shortcuts
-			self.scNew = QShortcut( widget )
-			self.scNew.setContext( Qt.WidgetShortcut )
-			self.scNew.setKey( Shortcuts.CreateInField )
-			self.connect( self.scNew, SIGNAL('activated()'), self.new )
+        # Set enabled/disabled values
+        value = record.value(self.name)
+        if value:
+            value = True
+        else:
+            value = False
+        currentEntries = []
+        for x in newMenuEntries:
+            currentEntries.append((x[0], x[1], value))
+        return currentEntries
 
-			self.scSearch = QShortcut( widget )
-			self.scSearch.setContext( Qt.WidgetShortcut )
-			self.scSearch.setKey( Shortcuts.SearchInField )
-			self.connect( self.scSearch, SIGNAL('activated()'), self.open )
-		self.currentEditor = widget
-		# We expect a KooModel here
-		self.record = index.model().recordFromIndex( index )
-		return widget
+    def executeRelation(self, record, action):
+        id = record.get()[self.name]
+        group = RecordGroup(self.attributes['relation'])
+        group.load([id])
+        record = group.modelByIndex(0)
+        action = action.copy()
+        action['domain'] = record.evaluateExpression(
+            action['domain'], checkLoad=False)
+        action['context'] = str(record.evaluateExpression(
+            action['context'], checkLoad=False))
+        Api.instance.executeAction(action)
 
-	def open(self):
-		# As the 'open' button might modify the model we need to be sure all other fields/widgets
-		# have been stored in the model. Otherwise the recordChanged() triggered by modifying
-		# the parent model could make us lose changes.
-		#self.view.store()
+    def executeAction(self, record, type):
+        id = record.get()[self.name]
+        Api.instance.executeKeyword(type, {
+            'model': self.attributes['relation'],
+            'id': id or False,
+            'ids': [id],
+            'report_type': 'pdf'
+        }, Rpc.session.context)
 
-		if self.record.value(self.name):
-			# If Control Key is pressed when the open button is clicked
-			# the record will be opened in a new tab. Otherwise it's opened
-			# in a new modal dialog.
-			if QApplication.keyboardModifiers() & Qt.ControlModifier:
-				model = self.attributes['relation']
-				id = self.record.get()[self.name]
-				Api.instance.createWindow(False, model, id, [], 'form', mode='form,tree')
-			else:	
-				dialog = ScreenDialog( self.parent() )
-				dialog.setAttributes( self.attributes )
-				dialog.setContext( self.record.fieldContext( self.name ) )
-				dialog.setDomain( self.record.domain(self.name) )
-				dialog.setup( self.attributes['relation'], self.record.get()[self.name] )
-				if dialog.exec_() == QDialog.Accepted:
-					self.record.setValue(self.name, dialog.record)
-		else:
-			self.search('')
+    def createEditor(self, parent, option, index):
+        widget = AbstractFieldDelegate.createEditor(
+            self, parent, option, index)
+        if widget:
+            # Create shortcuts
+            self.scNew = QShortcut(widget)
+            self.scNew.setContext(Qt.WidgetShortcut)
+            self.scNew.setKey(Shortcuts.CreateInField)
+            self.connect(self.scNew, SIGNAL('activated()'), self.new)
 
-	# This function searches the given name within the available records. If none or more than
-	# one possible name matches the search dialog is shown. If only one matches we set the
-	# value and don't even show the search dialog. This is also true if the function is called
-	# with "name=''" and only one record exists in the database (hence the call from open())
-	def search(self, name):
-		domain = self.record.domain( self.name )
-		context = self.record.context()
-		ids = Rpc.session.execute('/object', 'execute', self.attributes['relation'], 'name_search', name, domain, 'ilike', context, False)
-		if ids and len(ids)==1:
-			self.record.setValue( self.name, ids[0] )
-		else:
-			dialog = SearchDialog(self.attributes['relation'], sel_multi=False, ids=[x[0] for x in ids], context=context, domain=domain)
-			if dialog.exec_() == QDialog.Accepted and dialog.result:
-				id = dialog.result[0]
-				name = Rpc.session.execute('/object', 'execute', self.attributes['relation'], 'name_get', [id], Rpc.session.context)[0]
-				self.record.setValue(self.name, name)
+            self.scSearch = QShortcut(widget)
+            self.scSearch.setContext(Qt.WidgetShortcut)
+            self.scSearch.setKey(Shortcuts.SearchInField)
+            self.connect(self.scSearch, SIGNAL('activated()'), self.open)
+        self.currentEditor = widget
+        # We expect a KooModel here
+        self.record = index.model().recordFromIndex(index)
+        return widget
 
-	def new(self):
-		dialog = ScreenDialog( self.currentEditor )
-		dialog.setAttributes( self.attributes )
-		dialog.setContext( self.record.fieldContext( self.name ) )
-		dialog.setDomain( self.record.domain(self.name) )
-		dialog.setup( self.attributes['relation'] )
-		if dialog.exec_() == QDialog.Accepted:
-			self.record.setValue(self.name, dialog.record)
+    def open(self):
+        # As the 'open' button might modify the model we need to be sure all other fields/widgets
+        # have been stored in the model. Otherwise the recordChanged() triggered by modifying
+        # the parent model could make us lose changes.
+        # self.view.store()
 
-	def setModelData(self, editor, kooModel, index):
-		# We expect a KooModel here
-		model = kooModel.recordFromIndex( index )
+        if self.record.value(self.name):
+            # If Control Key is pressed when the open button is clicked
+            # the record will be opened in a new tab. Otherwise it's opened
+            # in a new modal dialog.
+            if QApplication.keyboardModifiers() & Qt.ControlModifier:
+                model = self.attributes['relation']
+                id = self.record.get()[self.name]
+                Api.instance.createWindow(
+                    False, model, id, [], 'form', mode='form,tree')
+            else:
+                dialog = ScreenDialog(self.parent())
+                dialog.setAttributes(self.attributes)
+                dialog.setContext(self.record.fieldContext(self.name))
+                dialog.setDomain(self.record.domain(self.name))
+                dialog.setup(
+                    self.attributes['relation'], self.record.get()[self.name])
+                if dialog.exec_() == QDialog.Accepted:
+                    self.record.setValue(self.name, dialog.record)
+        else:
+            self.search('')
 
-		if not unicode(editor.text()):
-			model.setValue( self.name, False )
-			return
+    # This function searches the given name within the available records. If none or more than
+    # one possible name matches the search dialog is shown. If only one matches we set the
+    # value and don't even show the search dialog. This is also true if the function is called
+    # with "name=''" and only one record exists in the database (hence the call from open())
+    def search(self, name):
+        domain = self.record.domain(self.name)
+        context = self.record.context()
+        ids = Rpc.session.execute(
+            '/object', 'execute', self.attributes['relation'], 'name_search', name, domain, 'ilike', context, False)
+        if ids and len(ids) == 1:
+            self.record.setValue(self.name, ids[0])
+        else:
+            dialog = SearchDialog(self.attributes['relation'], sel_multi=False, ids=[
+                                  x[0] for x in ids], context=context, domain=domain)
+            if dialog.exec_() == QDialog.Accepted and dialog.result:
+                id = dialog.result[0]
+                name = Rpc.session.execute(
+                    '/object', 'execute', self.attributes['relation'], 'name_get', [id], Rpc.session.context)[0]
+                self.record.setValue(self.name, name)
 
-		if unicode( kooModel.data( index, Qt.DisplayRole ).toString() ) == unicode( editor.text() ):
-			return
+    def new(self):
+        dialog = ScreenDialog(self.currentEditor)
+        dialog.setAttributes(self.attributes)
+        dialog.setContext(self.record.fieldContext(self.name))
+        dialog.setDomain(self.record.domain(self.name))
+        dialog.setup(self.attributes['relation'])
+        if dialog.exec_() == QDialog.Accepted:
+            self.record.setValue(self.name, dialog.record)
 
-		domain = model.domain( self.name )
-		context = model.context()
-		ids = Rpc.session.execute('/object', 'execute', self.attributes['relation'], 'name_search', unicode( editor.text() ), domain, 'ilike', context, False)
-		if ids and len(ids)==1:
-			model.setValue( self.name, ids[0] )
-		else:
-			dialog = SearchDialog(self.attributes['relation'], sel_multi=False, ids=[x[0] for x in ids], context=context, domain=domain)
-			if dialog.exec_() == QDialog.Accepted and dialog.result:
-				id = dialog.result[0]
-				name = Rpc.session.execute('/object', 'execute', self.attributes['relation'], 'name_get', [id], Rpc.session.context)[0]
-				
-				# Directly set the value to the model. There's no need to
-				# use setData() but we mainly want to workaround a bug in
-				# PyQt 4.4.3 and 4.4.4.
-				#value = [ QVariant( name[0] ), QVariant( name[1] ) ]
-				#kooModel.setData( index, QVariant( value ), Qt.EditRole )
-				model.setValue( self.name, name )
+    def setModelData(self, editor, kooModel, index):
+        # We expect a KooModel here
+        model = kooModel.recordFromIndex(index)
+
+        if not unicode(editor.text()):
+            model.setValue(self.name, False)
+            return
+
+        if unicode(kooModel.data(index, Qt.DisplayRole).toString()) == unicode(editor.text()):
+            return
+
+        domain = model.domain(self.name)
+        context = model.context()
+        ids = Rpc.session.execute('/object', 'execute', self.attributes['relation'], 'name_search', unicode(
+            editor.text()), domain, 'ilike', context, False)
+        if ids and len(ids) == 1:
+            model.setValue(self.name, ids[0])
+        else:
+            dialog = SearchDialog(self.attributes['relation'], sel_multi=False, ids=[
+                                  x[0] for x in ids], context=context, domain=domain)
+            if dialog.exec_() == QDialog.Accepted and dialog.result:
+                id = dialog.result[0]
+                name = Rpc.session.execute(
+                    '/object', 'execute', self.attributes['relation'], 'name_get', [id], Rpc.session.context)[0]
+
+                # Directly set the value to the model. There's no need to
+                # use setData() but we mainly want to workaround a bug in
+                # PyQt 4.4.3 and 4.4.4.
+                #value = [ QVariant( name[0] ), QVariant( name[1] ) ]
+                #kooModel.setData( index, QVariant( value ), Qt.EditRole )
+                model.setValue(self.name, name)
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:

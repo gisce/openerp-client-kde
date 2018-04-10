@@ -30,50 +30,51 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-## @brief AbstractFieldWidget is the base class for all search widgets in Koo.
-# In order to create a new search widget, that is: a widget that appears in a 
+# @brief AbstractFieldWidget is the base class for all search widgets in Koo.
+# In order to create a new search widget, that is: a widget that appears in a
 # auto-generated search form you need to inherit from this class and implement some
 # of it's functions.
+
+
 class AbstractSearchWidget(QWidget):
-	## @brief Creates a new AbstractSearchWidget and receives the following parameters
-	#
-	# Note that a class that inherits AbstractSearchWidget should set self.focusWidget
-	# which by default equals 'self'.
-	#
-	#  name:       The name of the field
-	#  parent:     The QWidget parent of this QWidget
-	#  attributes: Holds some extra attributes 
-	#
-	def __init__(self, name, parent, attrs={}):
-		QWidget.__init__(self, parent)
-		self._value = None
-		self.name = name
-		self.model = attrs.get('model', None)
-		self.attrs = attrs
-		self.focusWidget = self
+    # @brief Creates a new AbstractSearchWidget and receives the following parameters
+    #
+    # Note that a class that inherits AbstractSearchWidget should set self.focusWidget
+    # which by default equals 'self'.
+    #
+    #  name:       The name of the field
+    #  parent:     The QWidget parent of this QWidget
+    #  attributes: Holds some extra attributes
+    #
+    def __init__(self, name, parent, attrs={}):
+        QWidget.__init__(self, parent)
+        self._value = None
+        self.name = name
+        self.model = attrs.get('model', None)
+        self.attrs = attrs
+        self.focusWidget = self
 
-	def eventFilter( self, target, event ):
-		if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Down:
-			self.emit( SIGNAL('keyDownPressed()') )
-			return True
-		return False
+    def eventFilter(self, target, event):
+        if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Down:
+            self.emit(SIGNAL('keyDownPressed()'))
+            return True
+        return False
 
-	## @brief Sets the focus to the widget
-	def setFocus(self):
-		self.focusWidget.setFocus()
+    # @brief Sets the focus to the widget
+    def setFocus(self):
+        self.focusWidget.setFocus()
 
-	## @brief Clears the value of the widget
-	# New widgets should override this function.
-	def clear(self):
-		pass
-		
-	## @brief Returns a domain-like list for the current value in the widget. 
-	# New widgets should override this function.
-	def value(self):
-		return []
+    # @brief Clears the value of the widget
+    # New widgets should override this function.
+    def clear(self):
+        pass
 
-	## @brief Sets the given value in the search field.
-	# New widgets should override this function.
-	def setValue(self, value):
-		pass
+    # @brief Returns a domain-like list for the current value in the widget.
+    # New widgets should override this function.
+    def value(self):
+        return []
 
+    # @brief Sets the given value in the search field.
+    # New widgets should override this function.
+    def setValue(self, value):
+        pass

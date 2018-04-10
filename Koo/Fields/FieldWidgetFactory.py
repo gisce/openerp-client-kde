@@ -28,40 +28,40 @@
 from Koo.Common import Plugins
 import os
 
-## @brief The FieldWidgetFactory class specializes in creating the appropiate 
+# @brief The FieldWidgetFactory class specializes in creating the appropiate
 # widget for a given type.
 
+
 class FieldWidgetFactory:
-	widgets = {}
+    widgets = {}
 
-	## @brief Scans for all available widgets.
-	@staticmethod
-	def scan():
-		# Scan only once
-		if FieldWidgetFactory.widgets:
-			return
-		# Search for all available views
-		Plugins.scan( 'Koo.Fields', os.path.abspath(os.path.dirname(__file__)) )
+    # @brief Scans for all available widgets.
+    @staticmethod
+    def scan():
+        # Scan only once
+        if FieldWidgetFactory.widgets:
+            return
+        # Search for all available views
+        Plugins.scan('Koo.Fields', os.path.abspath(os.path.dirname(__file__)))
 
-	## @brief Creates a new widget given type, parent and attributes.
-	@staticmethod
-	def create(widgetType, parent, view, attributes):
-		FieldWidgetFactory.scan()
+    # @brief Creates a new widget given type, parent and attributes.
+    @staticmethod
+    def create(widgetType, parent, view, attributes):
+        FieldWidgetFactory.scan()
 
-		# We do not support relational fields treated as selection ones
-		if widgetType == 'selection' and 'relation' in attributes:
-			widgetType = 'many2one'
+        # We do not support relational fields treated as selection ones
+        if widgetType == 'selection' and 'relation' in attributes:
+            widgetType = 'many2one'
 
-		if not widgetType in FieldWidgetFactory.widgets:
-			print "Widget '%s' not available" % widgetType
-			return None
+        if not widgetType in FieldWidgetFactory.widgets:
+            print "Widget '%s' not available" % widgetType
+            return None
 
-		widgetClass = FieldWidgetFactory.widgets[ widgetType ]
-		return widgetClass(parent, view, attributes)
+        widgetClass = FieldWidgetFactory.widgets[widgetType]
+        return widgetClass(parent, view, attributes)
 
-	## @brief Registers a new widget, given it's name (or type) and reference
-	# to the class.
-	@staticmethod
-	def register(name, widget):
-		FieldWidgetFactory.widgets[ name ] = widget
-
+    # @brief Registers a new widget, given it's name (or type) and reference
+    # to the class.
+    @staticmethod
+    def register(name, widget):
+        FieldWidgetFactory.widgets[name] = widget

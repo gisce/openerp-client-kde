@@ -48,379 +48,410 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from Koo.Common.Ui import *
 
-## @brief The TreeParser class parses the arch (XML) of tree views.
+# @brief The TreeParser class parses the arch (XML) of tree views.
 #
 # In order to use this function execute the parse() function with the XML
 # data to parse as string.
-# This will fill in the title (string), toolbar (boolean) and fieldsOrder 
-# (list). 
+# This will fill in the title (string), toolbar (boolean) and fieldsOrder
+# (list).
 #
 # title contains the 'string' attribute set in the 'tree'
-# tag of the XML or 'Tree' if none was specified. The 
+# tag of the XML or 'Tree' if none was specified. The
 # same applies to the toolbar property with the 'toolbar' attribute.
 # The fieldsOrder property, is the list of field names specified in the XML
 # in the exact same order that appear there.
+
+
 class TreeParser:
-	def tagStart(self, name, attrs):
-		if name=='tree':
-			self.title = attrs.get('string',_('Tree'))
-			self.toolbar = bool(attrs.get('toolbar',False))
-		elif name=='field':
-			if 'icon' in attrs:
-				self.fieldsOrder.append(str(attrs['icon']))
-			self.fieldsOrder.append(str(attrs['name']))
-			self.fieldAttributes[attrs['name']] = attrs
-		else:
-			Debug.error( 'unknown tag: ' + str(name) )
+    def tagStart(self, name, attrs):
+        if name == 'tree':
+            self.title = attrs.get('string', _('Tree'))
+            self.toolbar = bool(attrs.get('toolbar', False))
+        elif name == 'field':
+            if 'icon' in attrs:
+                self.fieldsOrder.append(str(attrs['icon']))
+            self.fieldsOrder.append(str(attrs['name']))
+            self.fieldAttributes[attrs['name']] = attrs
+        else:
+            Debug.error('unknown tag: ' + str(name))
 
-	## @brief This function parses the xml data provided as parameter.
-	# This function fills class member properties: title, toolbar and 
-	# fieldsOrder
-	def parse(self, xmlData):
-		self.fieldsOrder = []
-		self.fieldAttributes = {}
+    # @brief This function parses the xml data provided as parameter.
+    # This function fills class member properties: title, toolbar and
+    # fieldsOrder
+    def parse(self, xmlData):
+        self.fieldsOrder = []
+        self.fieldAttributes = {}
 
-		psr = expat.ParserCreate()
-		psr.StartElementHandler = self.tagStart
-		psr.Parse(xmlData.encode('utf-8'))
-
-(TreeWidgetUi, TreeWidgetBase) = loadUiType( Common.uiPath('tree.ui') )
-
-## @brief The TreeWidget class shows main menu tree as well as other tree views.
-class TreeWidget( QWidget, TreeWidgetUi ): 
-	def __init__( self, view, model, domain=None, context=None, name=False, parent=None ):
-		QWidget.__init__(self,parent)
-		TreeWidgetUi.__init__(self)
-		self.setupUi( self )
-
-		if domain is None:
-			domain = []
-		if context is None:
-			context = {}
-
-		self.uiSplitter.setStretchFactor( 0, 0 )
-		self.uiSplitter.setStretchFactor( 1, 2 )
-
-		self.context = context
-		self.model = view['model']
-		if view.get('field_parent', False):
-			self.domain = []
-		else:
-			self.domain = domain
-		self.view = view
-
-		# Next expression sounds absurd but field_parent contains the
-		# name of the field that links to the children: 'child_id' for
-		# the ir.ui.menu for example
-		self.childrenField = self.view['field_parent']
-
-		self.handlers = {
-			'Switch': self.editCurrentItem,
-			'Print': self.printCurrent,
-			'PrintHtml': self.printHtmlCurrent,
-			'Reload': self.reload,
-			'StoreViewSettings': self.storeViewState,
-			'Export': self.export,
-		}
-
-		parser = TreeParser()
-		parser.parse( view['arch'] )
-		self.toolbar = parser.toolbar
-
-		# Get all visible fields + parent field description
-		self.fields = Rpc.session.execute('/object', 'execute', self.model, 'fields_get', parser.fieldsOrder + [self.childrenField], self.context)
-
-		self.treeModel = KooModel( self )
-		self.treeModel.setFields( self.fields )
-		self.treeModel.setFieldsOrder( parser.fieldsOrder )
-		self.treeModel.setIconForField( 'icon', 'name')
-		self.treeModel.setChildrenForField( self.childrenField, parser.fieldsOrder[0] )
-		self.treeModel.setShowBackgroundColor( False )
-		if model == 'ir.ui.menu':
-			self.treeModel.setShowToolTips( False )
-
-		self.listModel = KooModel( self )
-		self.listModel.setMode( KooModel.ListMode )
-		self.listModel.setFields( self.fields )
-		if 'name' in parser.fieldsOrder:
-			self.listModel.setFieldsOrder( ['name'] )
-		else:
-			self.listModel.setFieldsOrder( parser.fieldsOrder )
-		self.listModel.setIconForField( 'icon', 'name' )
-		self.listModel.setShowBackgroundColor( False )
-
-		self.group = RecordGroup( self.model, self.fields, context = self.context )
-		self.group.setDomain( domain )
-		if self.toolbar:
-			self.listModel.setRecordGroup( self.group )
-		else:
-			self.treeModel.setRecordGroup( self.group )
-
-		self.listModelProxy = QSortFilterProxyModel( self )
-		self.listModelProxy.setSourceModel( self.listModel )
-		self.listModelProxy.setFilterKeyColumn( 0 )
-		self.listModelProxy.setFilterCaseSensitivity( Qt.CaseInsensitive )
-		self.listModelProxy.setFilterFixedString( "partner" )
-
-		self.uiTree.setModel( self.treeModel )
-		self.uiList.setModel( self.listModel )
-
-		self.connect(self.uiTree, SIGNAL('activated( QModelIndex )'), self.open )
-
-		for column in xrange(len(parser.fieldsOrder)):
-			fieldName = parser.fieldsOrder[column]
-			fieldType = self.fields[fieldName]['type']
-			if 'widget' in parser.fieldAttributes[fieldName]:
-				fieldType = parser.fieldAttributes[fieldName]['widget']
-			delegate = FieldDelegateFactory.create( fieldType, self.uiTree, self.fields[fieldName] )
-			self.uiTree.setItemDelegateForColumn( column, delegate )
+        psr = expat.ParserCreate()
+        psr.StartElementHandler = self.tagStart
+        psr.Parse(xmlData.encode('utf-8'))
 
 
-		self.treeAllExpandedState = {}
-		self.treeState = {}
-		if self.toolbar:
-			# Save index states if we're showing uiList widget only, otherwise we don't need it.
-			self.connect(self.uiTree,SIGNAL('expanded( QModelIndex )'), self.saveIndexState )
-			self.connect(self.uiTree,SIGNAL('collapsed( QModelIndex )'), self.saveIndexState )
+(TreeWidgetUi, TreeWidgetBase) = loadUiType(Common.uiPath('tree.ui'))
 
-		self.connect(self.pushShortcuts, SIGNAL('clicked()'), self.editShortcuts)
-		self.connect(self.pushAddShortcut, SIGNAL('clicked()'), self.addShortcut)
-		self.connect(self.pushRemoveShortcut, SIGNAL('clicked()'), self.removeShortcut)
-		self.connect(self.pushExpand, SIGNAL('clicked()'), self.expand)
-		self.connect(self.uiShortcuts, SIGNAL('activated(QModelIndex)'), self.goToShortcut)
-		self.connect(self.uiList.selectionModel(),SIGNAL('currentChanged(QModelIndex, QModelIndex)'),self.mainMenuClicked)
+# @brief The TreeWidget class shows main menu tree as well as other tree views.
 
-		if name:
-			self.name = name
-		else:
-			self.name = parser.title
-		
-		# Shortcuts
-		if self.model == 'ir.ui.menu':
-			scFields = Rpc.session.execute('/object', 'execute', 'ir.ui.view_sc', 'fields_get', ['res_id', 'name'])
-			self.shortcutsGroup = RecordGroup( 'ir.ui.view_sc', scFields, context = self.context )
-			self.shortcutsGroup.setDomain( [('user_id','=',Rpc.session.uid), ('resource','=',model)] )
-			self.shortcutsModel = KooModel( self )
-			self.shortcutsModel.setMode( KooModel.ListMode )
-			self.shortcutsModel.setFields( scFields )
-			self.shortcutsModel.setFieldsOrder( ['name'] )
-			self.shortcutsModel.setRecordGroup( self.shortcutsGroup )
-			self.shortcutsModel.setShowBackgroundColor( False )
-			self.uiShortcuts.setModel( self.shortcutsModel )
-			self.uiShortcutsContainer.show()
-		else:
-			self.uiShortcutsContainer.hide()
-		
-		if not parser.toolbar:
-			self.uiList.hide()
-		else:
-			# Highlight the first element of the list and update the tree
-			self.uiList.setCurrentIndex( self.uiList.moveCursor( QAbstractItemView.MoveHome, Qt.NoModifier ) )
-			self.updateTree()
-		self.restoreViewState()
 
-	def saveIndexState(self, index):
-		mainKey = self.uiList.currentIndex().row()
-		key = ( index.row(), index.column(), index.internalPointer() )
-		if not mainKey in self.treeState:
-			self.treeState[mainKey] = {}
-		self.treeState[mainKey][ key ] = self.uiTree.isExpanded( index )
+class TreeWidget(QWidget, TreeWidgetUi):
+    def __init__(self, view, model, domain=None, context=None, name=False, parent=None):
+        QWidget.__init__(self, parent)
+        TreeWidgetUi.__init__(self)
+        self.setupUi(self)
 
-	def restoreIndexStates(self):
-		mainKey = self.uiList.currentIndex().row()
-		if not mainKey in self.treeState:
-			return
-		subtree = self.treeState[ mainKey ]
-		for key, value in subtree.iteritems():
-			index = self.treeModel.createIndex( key[0], key[1], key[2] )
-			self.uiTree.setExpanded( index, value )
+        if domain is None:
+            domain = []
+        if context is None:
+            context = {}
 
-	def updateTree(self):
-		item = self.uiList.currentIndex()
-		if not item.isValid():
-			return
-		id = item.data( Qt.UserRole ).toInt()[0]
-		if not id:
-			return
-		m = self.group[ id ]
-		group = m.value( self.childrenField )
-		group.addFields( self.group.fields )
-		self.treeModel.setRecordGroup( group )
-	
-	def mainMenuClicked( self, currentIndex, previousIndex ):
-		if self.toolbar:
-			self.treeAllExpandedState[ self.listModel.id( previousIndex ) ] = self.pushExpand.isChecked()
-		self.updateTree()
-		if self.toolbar:
-			self.setAllExpanded( self.treeAllExpandedState.get( self.listModel.id( currentIndex ), False ) )
-			self.restoreIndexStates()
+        self.uiSplitter.setStretchFactor(0, 0)
+        self.uiSplitter.setStretchFactor(1, 2)
 
-	def setAllExpanded(self, value):
-		self.pushExpand.setChecked( value )
-		if value:
-			self.uiTree.expandAll()
-			self.pushExpand.setIcon( QIcon( ':/images/up.png' ) )
-		else:
-			self.uiTree.collapseAll()
-			self.pushExpand.setIcon( QIcon( ':/images/down.png' ) )
+        self.context = context
+        self.model = view['model']
+        if view.get('field_parent', False):
+            self.domain = []
+        else:
+            self.domain = domain
+        self.view = view
 
-	def reload(self):
-		QApplication.setOverrideCursor( Qt.WaitCursor )
-		try:
-			self.group.update()
-			self.uiList.setCurrentIndex( self.uiList.moveCursor( QAbstractItemView.MoveHome, Qt.NoModifier ) )
-			self.treeAllExpandedState = {}
-			self.treeState = {}
-			self.updateTree()
-			# Reload shortcuts and emit the shortcutsChanged
-			# signal so 'Window' menu and these shortcuts can be
-			# kept in sync.
-			if self.model == 'ir.ui.menu':
-				self.shortcutsGroup.update()
-				self.emit( SIGNAL('shortcutsChanged'), self.model )
-		except Rpc.RpcException, e:
-			pass
-		QApplication.restoreOverrideCursor()
+        # Next expression sounds absurd but field_parent contains the
+        # name of the field that links to the children: 'child_id' for
+        # the ir.ui.menu for example
+        self.childrenField = self.view['field_parent']
 
-	# TODO: Look if for some menu entries this has any sense. Otherwise
-	# remove both functions. Of course we should connect the actions and
-	# add them to the handlers dict if they are necessary.
-	def printCurrent(self):
-		self.executeAction(keyword='client_print_multi', report_type='html')
+        self.handlers = {
+            'Switch': self.editCurrentItem,
+            'Print': self.printCurrent,
+            'PrintHtml': self.printHtmlCurrent,
+            'Reload': self.reload,
+            'StoreViewSettings': self.storeViewState,
+            'Export': self.export,
+        }
 
-	def printHtmlCurrent(self):
-		self.executeAction(keyword='client_print_multi')
+        parser = TreeParser()
+        parser.parse(view['arch'])
+        self.toolbar = parser.toolbar
 
-	def executeAction(self, keyword='tree_but_action', id=None, report_type='pdf'):
-		if id:
-			Api.instance.executeKeyword(keyword, {'model':self.model, 'id':id, 'report_type':report_type, 'ids': [id]}, self.context)
-		else:
-			QMessageBox.information( self, _('Information'), _('No resource selected!'))
+        # Get all visible fields + parent field description
+        self.fields = Rpc.session.execute(
+            '/object', 'execute', self.model, 'fields_get', parser.fieldsOrder + [self.childrenField], self.context)
 
-	def open(self, idx):
-		id = self.treeModel.id( idx )
-		if id:
-			self.executeAction( 'tree_but_open', id )
+        self.treeModel = KooModel(self)
+        self.treeModel.setFields(self.fields)
+        self.treeModel.setFieldsOrder(parser.fieldsOrder)
+        self.treeModel.setIconForField('icon', 'name')
+        self.treeModel.setChildrenForField(
+            self.childrenField, parser.fieldsOrder[0])
+        self.treeModel.setShowBackgroundColor(False)
+        if model == 'ir.ui.menu':
+            self.treeModel.setShowToolTips(False)
 
-	def editCurrentItem(self):
-		id = self.treeModel.id( self.uiTree.currentIndex() )
-		if id:
-			Api.instance.createWindow(None, self.model, id, self.domain)
-		else:
-			QMessageBox.information(self, _('Information'), _('No resource selected!'))
+        self.listModel = KooModel(self)
+        self.listModel.setMode(KooModel.ListMode)
+        self.listModel.setFields(self.fields)
+        if 'name' in parser.fieldsOrder:
+            self.listModel.setFieldsOrder(['name'])
+        else:
+            self.listModel.setFieldsOrder(parser.fieldsOrder)
+        self.listModel.setIconForField('icon', 'name')
+        self.listModel.setShowBackgroundColor(False)
 
-	def removeShortcut(self):
-		id = self.currentShortcutId()
-		if not id:
-			return
-		Rpc.session.execute('/object', 'execute', 'ir.ui.view_sc', 'unlink', [id], self.context)
-		self.shortcutsGroup.update()
-		self.emit(SIGNAL('shortcutsChanged'), self.model)
+        self.group = RecordGroup(self.model, self.fields, context=self.context)
+        self.group.setDomain(domain)
+        if self.toolbar:
+            self.listModel.setRecordGroup(self.group)
+        else:
+            self.treeModel.setRecordGroup(self.group)
 
-	def editShortcuts(self):
-	        domain = [('user_id', '=', Rpc.session.uid), ('resource', '=', self.model)]
-		Api.instance.createWindow(None, 'ir.ui.view_sc', domain=domain, context=self.context, mode='tree,form')
+        self.listModelProxy = QSortFilterProxyModel(self)
+        self.listModelProxy.setSourceModel(self.listModel)
+        self.listModelProxy.setFilterKeyColumn(0)
+        self.listModelProxy.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.listModelProxy.setFilterFixedString("partner")
 
-	def addShortcut(self):
-		id = self.treeModel.id( self.uiTree.currentIndex() )
-		if id == None:
-			QMessageBox.information( self, _('No item selected'), _('Please select an element from the tree to add a shortcut to it.') )
-			return
-		res = Rpc.session.execute('/object', 'execute', self.model, 'name_get', [id], Rpc.session.context)
-		for (id,name) in res:
-			uid = Rpc.session.uid
-			Rpc.session.execute('/object', 'execute', 'ir.ui.view_sc', 'create', {'resource':self.model, 'user_id':uid, 'res_id':id, 'name':name}, self.context)
-		self.shortcutsGroup.update()
-		self.emit( SIGNAL('shortcutsChanged'), self.model )
+        self.uiTree.setModel(self.treeModel)
+        self.uiList.setModel(self.listModel)
 
-	def goToShortcut(self, index):
-		id = self.currentShortcutId()
-		if not id:
-			return
-		m = self.shortcutsGroup[ id ]
-		# We need to get the value as if we were the server because we
-		# don't want the string that would be shown for the many2one field
-		# but the id.
-		id = self.shortcutsGroup.fieldObjects[ 'res_id' ].get( m )
-		if not id:
-			return
-		self.executeAction('tree_but_open', id)
+        self.connect(self.uiTree, SIGNAL(
+            'activated( QModelIndex )'), self.open)
 
-	def export(self):
-		dialog = ExportDialog(self)
-		dialog.setModel( self.model )
-		dialog.setIds( self.treeModel.recordGroup().ids() )
-		dialog.setup( ['tree', 'form'], [self.view['view_id'], False] )
-		dialog.exec_()
+        for column in xrange(len(parser.fieldsOrder)):
+            fieldName = parser.fieldsOrder[column]
+            fieldType = self.fields[fieldName]['type']
+            if 'widget' in parser.fieldAttributes[fieldName]:
+                fieldType = parser.fieldAttributes[fieldName]['widget']
+            delegate = FieldDelegateFactory.create(
+                fieldType, self.uiTree, self.fields[fieldName])
+            self.uiTree.setItemDelegateForColumn(column, delegate)
 
-	def expand(self):
-		if self.toolbar:
-			# As expandAll() and collapseAll() do not emit 
-			# a signal for each item, remove all states stored
-			# for this list index.
-			mainKey = self.uiList.currentIndex().row()
-			if mainKey in self.treeState:
-				del self.treeState[ mainKey ]
-		if self.pushExpand.isChecked():
-			self.uiTree.expandAll()
-			self.pushExpand.setIcon( QIcon( ':/images/up.png' ) )
-		else:
-			self.uiTree.collapseAll()
-			self.pushExpand.setIcon( QIcon( ':/images/down.png' ) )
+        self.treeAllExpandedState = {}
+        self.treeState = {}
+        if self.toolbar:
+            # Save index states if we're showing uiList widget only, otherwise we don't need it.
+            self.connect(self.uiTree, SIGNAL(
+                'expanded( QModelIndex )'), self.saveIndexState)
+            self.connect(self.uiTree, SIGNAL(
+                'collapsed( QModelIndex )'), self.saveIndexState)
 
-	def currentShortcutId(self):
-		item = self.uiShortcuts.currentIndex()
-		if not item.isValid():
-			return None
-		id = item.data( Qt.UserRole ).toInt()[0]
-		return id
+        self.connect(self.pushShortcuts, SIGNAL(
+            'clicked()'), self.editShortcuts)
+        self.connect(self.pushAddShortcut, SIGNAL(
+            'clicked()'), self.addShortcut)
+        self.connect(self.pushRemoveShortcut, SIGNAL(
+            'clicked()'), self.removeShortcut)
+        self.connect(self.pushExpand, SIGNAL('clicked()'), self.expand)
+        self.connect(self.uiShortcuts, SIGNAL(
+            'activated(QModelIndex)'), self.goToShortcut)
+        self.connect(self.uiList.selectionModel(), SIGNAL(
+            'currentChanged(QModelIndex, QModelIndex)'), self.mainMenuClicked)
 
-	# There's no reason why a menu can't be closed, is it?
-	def canClose(self):
-		self.storeViewState()
-		return True
-	
-	def storeViewState(self):
-		id = self.view['view_id']
-		if not id:
-			return
-		header = self.uiTree.header()
-		ViewSettings.store( id, str( header.saveState().toBase64() ) )
-		
-	def restoreViewState(self):
-		id = self.view['view_id']
-		if not id:
-			return
-		settings = ViewSettings.load( id )
-		if not settings:
-			return
-		header = self.uiTree.header()
-		header.restoreState( QByteArray.fromBase64( settings ) )
-		
-	def actions(self):
-		return []
+        if name:
+            self.name = name
+        else:
+            self.name = parser.title
 
-	def switchViewMenu(self):
-		return None
+        # Shortcuts
+        if self.model == 'ir.ui.menu':
+            scFields = Rpc.session.execute(
+                '/object', 'execute', 'ir.ui.view_sc', 'fields_get', ['res_id', 'name'])
+            self.shortcutsGroup = RecordGroup(
+                'ir.ui.view_sc', scFields, context=self.context)
+            self.shortcutsGroup.setDomain(
+                [('user_id', '=', Rpc.session.uid), ('resource', '=', model)])
+            self.shortcutsModel = KooModel(self)
+            self.shortcutsModel.setMode(KooModel.ListMode)
+            self.shortcutsModel.setFields(scFields)
+            self.shortcutsModel.setFieldsOrder(['name'])
+            self.shortcutsModel.setRecordGroup(self.shortcutsGroup)
+            self.shortcutsModel.setShowBackgroundColor(False)
+            self.uiShortcuts.setModel(self.shortcutsModel)
+            self.uiShortcutsContainer.show()
+        else:
+            self.uiShortcutsContainer.hide()
 
-	def help(self, button):
-		if self.model != 'ir.ui.menu':
-			return
+        if not parser.toolbar:
+            self.uiList.hide()
+        else:
+            # Highlight the first element of the list and update the tree
+            self.uiList.setCurrentIndex(self.uiList.moveCursor(
+                QAbstractItemView.MoveHome, Qt.NoModifier))
+            self.updateTree()
+        self.restoreViewState()
 
-		idx = self.uiTree.currentIndex()
-		record = self.treeModel.recordFromIndex( idx )
-		if not record:
-			return
+    def saveIndexState(self, index):
+        mainKey = self.uiList.currentIndex().row()
+        key = (index.row(), index.column(), index.internalPointer())
+        if not mainKey in self.treeState:
+            self.treeState[mainKey] = {}
+        self.treeState[mainKey][key] = self.uiTree.isExpanded(index)
 
-		if not Help.isHelpWidgetAvailable:
-			return
+    def restoreIndexStates(self):
+        mainKey = self.uiList.currentIndex().row()
+        if not mainKey in self.treeState:
+            return
+        subtree = self.treeState[mainKey]
+        for key, value in subtree.iteritems():
+            index = self.treeModel.createIndex(key[0], key[1], key[2])
+            self.uiTree.setExpanded(index, value)
 
-		QApplication.setOverrideCursor( Qt.WaitCursor )
-		helpWidget = Help.HelpWidget( button )
-		helpWidget.setLabel( record.value('name') )
-		helpWidget.setFilter( record.id )
-		helpWidget.setType( helpWidget.MenuType )
-		helpWidget.show()
-		QApplication.restoreOverrideCursor()
-		
+    def updateTree(self):
+        item = self.uiList.currentIndex()
+        if not item.isValid():
+            return
+        id = item.data(Qt.UserRole).toInt()[0]
+        if not id:
+            return
+        m = self.group[id]
+        group = m.value(self.childrenField)
+        group.addFields(self.group.fields)
+        self.treeModel.setRecordGroup(group)
+
+    def mainMenuClicked(self, currentIndex, previousIndex):
+        if self.toolbar:
+            self.treeAllExpandedState[self.listModel.id(
+                previousIndex)] = self.pushExpand.isChecked()
+        self.updateTree()
+        if self.toolbar:
+            self.setAllExpanded(self.treeAllExpandedState.get(
+                self.listModel.id(currentIndex), False))
+            self.restoreIndexStates()
+
+    def setAllExpanded(self, value):
+        self.pushExpand.setChecked(value)
+        if value:
+            self.uiTree.expandAll()
+            self.pushExpand.setIcon(QIcon(':/images/up.png'))
+        else:
+            self.uiTree.collapseAll()
+            self.pushExpand.setIcon(QIcon(':/images/down.png'))
+
+    def reload(self):
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            self.group.update()
+            self.uiList.setCurrentIndex(self.uiList.moveCursor(
+                QAbstractItemView.MoveHome, Qt.NoModifier))
+            self.treeAllExpandedState = {}
+            self.treeState = {}
+            self.updateTree()
+            # Reload shortcuts and emit the shortcutsChanged
+            # signal so 'Window' menu and these shortcuts can be
+            # kept in sync.
+            if self.model == 'ir.ui.menu':
+                self.shortcutsGroup.update()
+                self.emit(SIGNAL('shortcutsChanged'), self.model)
+        except Rpc.RpcException, e:
+            pass
+        QApplication.restoreOverrideCursor()
+
+    # TODO: Look if for some menu entries this has any sense. Otherwise
+    # remove both functions. Of course we should connect the actions and
+    # add them to the handlers dict if they are necessary.
+    def printCurrent(self):
+        self.executeAction(keyword='client_print_multi', report_type='html')
+
+    def printHtmlCurrent(self):
+        self.executeAction(keyword='client_print_multi')
+
+    def executeAction(self, keyword='tree_but_action', id=None, report_type='pdf'):
+        if id:
+            Api.instance.executeKeyword(keyword, {
+                                        'model': self.model, 'id': id, 'report_type': report_type, 'ids': [id]}, self.context)
+        else:
+            QMessageBox.information(
+                self, _('Information'), _('No resource selected!'))
+
+    def open(self, idx):
+        id = self.treeModel.id(idx)
+        if id:
+            self.executeAction('tree_but_open', id)
+
+    def editCurrentItem(self):
+        id = self.treeModel.id(self.uiTree.currentIndex())
+        if id:
+            Api.instance.createWindow(None, self.model, id, self.domain)
+        else:
+            QMessageBox.information(
+                self, _('Information'), _('No resource selected!'))
+
+    def removeShortcut(self):
+        id = self.currentShortcutId()
+        if not id:
+            return
+        Rpc.session.execute('/object', 'execute',
+                            'ir.ui.view_sc', 'unlink', [id], self.context)
+        self.shortcutsGroup.update()
+        self.emit(SIGNAL('shortcutsChanged'), self.model)
+
+    def editShortcuts(self):
+        domain = [('user_id', '=', Rpc.session.uid),
+                  ('resource', '=', self.model)]
+        Api.instance.createWindow(
+            None, 'ir.ui.view_sc', domain=domain, context=self.context, mode='tree,form')
+
+    def addShortcut(self):
+        id = self.treeModel.id(self.uiTree.currentIndex())
+        if id == None:
+            QMessageBox.information(self, _('No item selected'), _(
+                'Please select an element from the tree to add a shortcut to it.'))
+            return
+        res = Rpc.session.execute(
+            '/object', 'execute', self.model, 'name_get', [id], Rpc.session.context)
+        for (id, name) in res:
+            uid = Rpc.session.uid
+            Rpc.session.execute('/object', 'execute', 'ir.ui.view_sc', 'create', {
+                                'resource': self.model, 'user_id': uid, 'res_id': id, 'name': name}, self.context)
+        self.shortcutsGroup.update()
+        self.emit(SIGNAL('shortcutsChanged'), self.model)
+
+    def goToShortcut(self, index):
+        id = self.currentShortcutId()
+        if not id:
+            return
+        m = self.shortcutsGroup[id]
+        # We need to get the value as if we were the server because we
+        # don't want the string that would be shown for the many2one field
+        # but the id.
+        id = self.shortcutsGroup.fieldObjects['res_id'].get(m)
+        if not id:
+            return
+        self.executeAction('tree_but_open', id)
+
+    def export(self):
+        dialog = ExportDialog(self)
+        dialog.setModel(self.model)
+        dialog.setIds(self.treeModel.recordGroup().ids())
+        dialog.setup(['tree', 'form'], [self.view['view_id'], False])
+        dialog.exec_()
+
+    def expand(self):
+        if self.toolbar:
+            # As expandAll() and collapseAll() do not emit
+            # a signal for each item, remove all states stored
+            # for this list index.
+            mainKey = self.uiList.currentIndex().row()
+            if mainKey in self.treeState:
+                del self.treeState[mainKey]
+        if self.pushExpand.isChecked():
+            self.uiTree.expandAll()
+            self.pushExpand.setIcon(QIcon(':/images/up.png'))
+        else:
+            self.uiTree.collapseAll()
+            self.pushExpand.setIcon(QIcon(':/images/down.png'))
+
+    def currentShortcutId(self):
+        item = self.uiShortcuts.currentIndex()
+        if not item.isValid():
+            return None
+        id = item.data(Qt.UserRole).toInt()[0]
+        return id
+
+    # There's no reason why a menu can't be closed, is it?
+    def canClose(self):
+        self.storeViewState()
+        return True
+
+    def storeViewState(self):
+        id = self.view['view_id']
+        if not id:
+            return
+        header = self.uiTree.header()
+        ViewSettings.store(id, str(header.saveState().toBase64()))
+
+    def restoreViewState(self):
+        id = self.view['view_id']
+        if not id:
+            return
+        settings = ViewSettings.load(id)
+        if not settings:
+            return
+        header = self.uiTree.header()
+        header.restoreState(QByteArray.fromBase64(settings))
+
+    def actions(self):
+        return []
+
+    def switchViewMenu(self):
+        return None
+
+    def help(self, button):
+        if self.model != 'ir.ui.menu':
+            return
+
+        idx = self.uiTree.currentIndex()
+        record = self.treeModel.recordFromIndex(idx)
+        if not record:
+            return
+
+        if not Help.isHelpWidgetAvailable:
+            return
+
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        helpWidget = Help.HelpWidget(button)
+        helpWidget.setLabel(record.value('name'))
+        helpWidget.setFilter(record.id)
+        helpWidget.setType(helpWidget.MenuType)
+        helpWidget.show()
+        QApplication.restoreOverrideCursor()
+
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:

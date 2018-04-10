@@ -34,63 +34,64 @@ from Koo.Common import Common
 from Koo.Screen.Screen import Screen
 from Koo.Model.Group import RecordGroup
 
-(ScreenDialogUi, ScreenDialogBase) = loadUiType( Common.uiPath('screen_dialog.ui') ) 
+(ScreenDialogUi, ScreenDialogBase) = loadUiType(
+    Common.uiPath('screen_dialog.ui'))
 
-class ScreenDialog( QDialog, ScreenDialogUi ):
-	def __init__(self, parent):
-		QWidget.__init__( self, parent )
-		ScreenDialogUi.__init__( self )
-		self.setupUi( self )
 
-		self.setMinimumWidth( 800 )
-		self.setMinimumHeight( 600 )
+class ScreenDialog(QDialog, ScreenDialogUi):
+    def __init__(self, parent):
+        QWidget.__init__(self, parent)
+        ScreenDialogUi.__init__(self)
+        self.setupUi(self)
 
-		self.connect( self.pushOk, SIGNAL("clicked()"), self.accepted )
-		self.connect( self.pushCancel, SIGNAL("clicked()"), self.rejected )
-		self.group = None
-		self.record = None
-		self.recordId = None
-		self._recordAdded = False
-		self._context = {}
-		self._domain = []
+        self.setMinimumWidth(800)
+        self.setMinimumHeight(600)
 
-	def setup(self, model, id=None):
-		if self.group:
-			return
-		self.group = RecordGroup( model, context=self._context )
-		self.group.setDomain( self._domain )
-		self.screen.setRecordGroup( self.group )
-		self.screen.setViewTypes( ['form'] )
-		if id:
-			self._recordAdded = False 
-			self.screen.load([id])
-		else:
-			self._recordAdded = True
-			self.screen.new()
-		self.screen.display()
-		self.layout().insertWidget( 0, self.screen  )
-		self.screen.show()
+        self.connect(self.pushOk, SIGNAL("clicked()"), self.accepted)
+        self.connect(self.pushCancel, SIGNAL("clicked()"), self.rejected)
+        self.group = None
+        self.record = None
+        self.recordId = None
+        self._recordAdded = False
+        self._context = {}
+        self._domain = []
 
-	def setAttributes(self, attrs):
-		if ('string' in attrs) and attrs['string']:
-			self.setWindowTitle( self.windowTitle() + ' - ' + attrs['string'])
+    def setup(self, model, id=None):
+        if self.group:
+            return
+        self.group = RecordGroup(model, context=self._context)
+        self.group.setDomain(self._domain)
+        self.screen.setRecordGroup(self.group)
+        self.screen.setViewTypes(['form'])
+        if id:
+            self._recordAdded = False
+            self.screen.load([id])
+        else:
+            self._recordAdded = True
+            self.screen.new()
+        self.screen.display()
+        self.layout().insertWidget(0, self.screen)
+        self.screen.show()
 
-	def setContext(self, context):
-		self._context = context
+    def setAttributes(self, attrs):
+        if ('string' in attrs) and attrs['string']:
+            self.setWindowTitle(self.windowTitle() + ' - ' + attrs['string'])
 
-	def setDomain(self, domain):
-		self._domain = domain
+    def setContext(self, context):
+        self._context = context
 
-	def rejected( self ):
-		if self._recordAdded:
-			self.screen.remove()
-		self.reject()
+    def setDomain(self, domain):
+        self._domain = domain
 
-	def accepted( self ):
-		self.screen.currentView().store()
+    def rejected(self):
+        if self._recordAdded:
+            self.screen.remove()
+        self.reject()
 
-		if self.screen.save():
-			self.record = self.screen.currentRecord().name()
-			self.recordId = self.screen.currentRecord().id
-			self.accept()
+    def accepted(self):
+        self.screen.currentView().store()
 
+        if self.screen.save():
+            self.record = self.screen.currentRecord().name()
+            self.recordId = self.screen.currentRecord().id
+            self.accept()

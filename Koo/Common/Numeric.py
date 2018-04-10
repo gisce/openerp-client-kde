@@ -27,92 +27,103 @@
 
 import locale
 
-## @brief This function converts a string into an integer allowing
+# @brief This function converts a string into an integer allowing
 #  operations (+, -, /, *).
-#  
-#  The formula is calculated and the output is returned by 
-#  the function. If the formula contains floating point 
+#
+#  The formula is calculated and the output is returned by
+#  the function. If the formula contains floating point
 #  values or results they're converted into integer at the end.
+
+
 def textToInteger(text):
-	chars = ['+', '-', '/', '*', '.', '(', ')', ',']
-	chars = chars + [str(x) for x in range(10)]
-	text = text.replace(',', '.')
-	try:
-		return int(eval(text))
-	except:
-		return False
+    chars = ['+', '-', '/', '*', '.', '(', ')', ',']
+    chars = chars + [str(x) for x in range(10)]
+    text = text.replace(',', '.')
+    try:
+        return int(eval(text))
+    except:
+        return False
 
-## @brief This function converts a string into a float allowing
+# @brief This function converts a string into a float allowing
 #  operations (+, -, /, *).
-#  
-#  The formula is calculated and the output is returned by 
-#  the function. 
+#
+#  The formula is calculated and the output is returned by
+#  the function.
+
+
 def textToFloat(text):
-	chars = ['+', '-', '/', '*', '.', '(', ')', ',']
-	chars = chars + [str(x) for x in range(10)]
-	newtext = text.replace(',', '.')
-	value = False
-	try:
-		value = float(eval(newtext))
-	except:
-		if '.' in text and ',' in text:
-			if text.rindex('.') > text.rindex(','):
-				newtext = text.replace(',','')
-			else:
-				newtext = text.replace('.','')
-			newtext = newtext.replace(',','.')
-			try:
-				value = float(newtext)
-			except:
-				pass
-	return value
+    chars = ['+', '-', '/', '*', '.', '(', ')', ',']
+    chars = chars + [str(x) for x in range(10)]
+    newtext = text.replace(',', '.')
+    value = False
+    try:
+        value = float(eval(newtext))
+    except:
+        if '.' in text and ',' in text:
+            if text.rindex('.') > text.rindex(','):
+                newtext = text.replace(',', '')
+            else:
+                newtext = text.replace('.', '')
+            newtext = newtext.replace(',', '.')
+            try:
+                value = float(newtext)
+            except:
+                pass
+    return value
 
-## @brief This function converts a float into text. By default the number
+# @brief This function converts a float into text. By default the number
 # of decimal digits is 2.
+
+
 def floatToText(number, digits=None, thousands=False):
-	if isinstance(number, int):
-		number = float(number)
-	if not isinstance(number, float):
-		number = 0.0
-	if digits:
-		# Digits might come from the server as a tuple, list or a string
-		# So: (14,2), [14,2], '(14,2)' and '[14,2]' are all valid forms
-		if isinstance(digits,list) or isinstance(digits,tuple):
-			d=str(digits[1])
-		else:
-			d=digits.split(',')[1].strip(' )]')
-	else:
-		d='2'
+    if isinstance(number, int):
+        number = float(number)
+    if not isinstance(number, float):
+        number = 0.0
+    if digits:
+        # Digits might come from the server as a tuple, list or a string
+        # So: (14,2), [14,2], '(14,2)' and '[14,2]' are all valid forms
+        if isinstance(digits, list) or isinstance(digits, tuple):
+            d = str(digits[1])
+        else:
+            d = digits.split(',')[1].strip(' )]')
+    else:
+        d = '2'
 
-	if thousands:
-		return locale.format('%.' + d + 'f', number, True, True)
-	else:
-		return ('%.' + d + 'f') % number
+    if thousands:
+        return locale.format('%.' + d + 'f', number, True, True)
+    else:
+        return ('%.' + d + 'f') % number
 
 
-## @brief This function converts an integer into text. 
+# @brief This function converts an integer into text.
 def integerToText(number):
-	if isinstance(number, float):
-		number = int(number)
-	if not isinstance(number, int):
-		number = 0
-	return '%d' % number
+    if isinstance(number, float):
+        number = int(number)
+    if not isinstance(number, int):
+        number = 0
+    return '%d' % number
 
-## @brief This function returns True if the given value can be converted into
+# @brief This function returns True if the given value can be converted into
 # a float number. Otherwise it returns False.
-def isNumeric(value):
-	try:
-		return float(value) or True
-	except (ValueError, TypeError), e:
-		return False
 
-## @brief This function converts the given paramter (which should be a number) into
+
+def isNumeric(value):
+    try:
+        return float(value) or True
+    except (ValueError, TypeError), e:
+        return False
+
+# @brief This function converts the given paramter (which should be a number) into
 # a human readable storage value, ie. bytes, Kb, Mb, Gb, Tb.
+
+
 def bytesToText(number):
-	number = float(number)
-	texts = [ _('%d bytes'), _('%.2f Kb'), _('%.2f Mb'), _('%.2f Gb'), _('%.2f Tb') ]
-	i = 0
-	while number >= 1024 and i < len(texts) - 1:
-		number = number / 1024
-		i += 1
-	return texts[i] % number
+    number = float(number)
+    texts = [_('%d bytes'), _('%.2f Kb'), _(
+        '%.2f Mb'), _('%.2f Gb'), _('%.2f Tb')]
+    i = 0
+    while number >= 1024 and i < len(texts) - 1:
+        number = number / 1024
+        i += 1
+    return texts[i] % number

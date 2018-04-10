@@ -25,28 +25,28 @@
 #
 ##############################################################################
 
-## @brief The Notifications module handles warning and error notifications that 
-# some components might need to throw. 
-#  
-#  The mechanism allows KTiny components to be loosely coupled with whatever 
+# @brief The Notifications module handles warning and error notifications that
+# some components might need to throw.
+#
+#  The mechanism allows KTiny components to be loosely coupled with whatever
 #  the application programmer wants to do in these cases.
 #  The error and warning handlers should be registered:
 #
-#\code
+# \code
 #  def error(title, message, detail):
 #	print "ERROR: Title: %s, Message: %s, Detail: %s" % (title, message, detail)
 #  def warning(title, message):
 #	print "WARNING: Title: %s, Message: %s, Detail: %s" % (title, message, detail)
 #
 #  Notifications.errorHandler = error
-#  Notifications.warningHandler = warning 
-#\endcode
+#  Notifications.warningHandler = warning
+# \endcode
 #
-#  This will make that any component that needs to notify an error using 
-#  Notifications.notifyError(), the error() function will be called. The same 
+#  This will make that any component that needs to notify an error using
+#  Notifications.notifyError(), the error() function will be called. The same
 #  for warnings.
-#  
-#  If no handler is specified the notification will be ignored. The KTiny 
+#
+#  If no handler is specified the notification will be ignored. The KTiny
 #  application uses a special form for errors and a message box for warnings.
 
 errorHandler = None
@@ -54,22 +54,30 @@ warningHandler = None
 concurrencyErrorHandler = None
 lostConnectionErrorHandler = None
 
-## @brief Calls the function that has been registered to handle errors.
+# @brief Calls the function that has been registered to handle errors.
+
+
 def notifyError(title, message, detail):
-	if errorHandler:
-		errorHandler(title, message, detail)
+    if errorHandler:
+        errorHandler(title, message, detail)
 
-## @brief Calls the function that has been registered to handle warnings.
+# @brief Calls the function that has been registered to handle warnings.
+
+
 def notifyWarning(title, message):
-	if warningHandler:
-		warningHandler(title, message)
+    if warningHandler:
+        warningHandler(title, message)
 
-## @brief Calls the function that has been registered to handle concurrency errors.
+# @brief Calls the function that has been registered to handle concurrency errors.
+
+
 def notifyConcurrencyError(model, id, context):
-	if concurrencyErrorHandler:
-		return concurrencyErrorHandler(model, id, context)
+    if concurrencyErrorHandler:
+        return concurrencyErrorHandler(model, id, context)
 
-## @brief Calls the function that has been registered to handle lost connection errors.
+# @brief Calls the function that has been registered to handle lost connection errors.
+
+
 def notifyLostConnection(count):
-	if lostConnectionErrorHandler:
-		return lostConnectionErrorHandler(count)
+    if lostConnectionErrorHandler:
+        return lostConnectionErrorHandler(count)

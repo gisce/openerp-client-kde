@@ -33,57 +33,58 @@ from Koo.Common import Shortcuts
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
+
 class IntegerFieldWidget(AbstractFieldWidget):
-	def __init__(self, parent, model, attrs={}):
-		AbstractFieldWidget.__init__(self, parent, model, attrs)
-		self.widget = QLineEdit( self )
-		self.widget.setSizePolicy( QSizePolicy.Preferred, QSizePolicy.Fixed )
-		self.widget.setAlignment( Qt.AlignRight )
-		layout = QHBoxLayout( self )
-		layout.setContentsMargins( 0, 0, 0, 0 )
-		layout.addWidget( self.widget )
+    def __init__(self, parent, model, attrs={}):
+        AbstractFieldWidget.__init__(self, parent, model, attrs)
+        self.widget = QLineEdit(self)
+        self.widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        self.widget.setAlignment(Qt.AlignRight)
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.widget)
 
-		# Shortcut
-		self.scClear = QShortcut( self.widget )
-		self.scClear.setKey( Shortcuts.ClearInField )
-		self.scClear.setContext( Qt.WidgetShortcut )
-		self.connect( self.scClear, SIGNAL('activated()'), self.clear )
+        # Shortcut
+        self.scClear = QShortcut(self.widget)
+        self.scClear.setKey(Shortcuts.ClearInField)
+        self.scClear.setContext(Qt.WidgetShortcut)
+        self.connect(self.scClear, SIGNAL('activated()'), self.clear)
 
-		self.connect( self.widget, SIGNAL('editingFinished()'), self.calculate )
-		self.installPopupMenu( self.widget )
+        self.connect(self.widget, SIGNAL('editingFinished()'), self.calculate)
+        self.installPopupMenu(self.widget)
 
-	def calculate(self):
-		val = textToInteger( unicode(self.widget.text() ) )
-		self.setText( integerToText(val) )
-		self.modified()
+    def calculate(self):
+        val = textToInteger(unicode(self.widget.text()))
+        self.setText(integerToText(val))
+        self.modified()
 
-	def value(self):
-		return textToInteger( unicode(self.widget.text()) )
+    def value(self):
+        return textToInteger(unicode(self.widget.text()))
 
-	def storeValue(self):
-		self.record.setValue(self.name, self.value() )
+    def storeValue(self):
+        self.record.setValue(self.name, self.value())
 
-	def clear(self):
-		self.setText('0')
+    def clear(self):
+        self.setText('0')
 
-	def showValue(self):
-		value = self.record.value( self.name )
-		self.setText( str(value) )
+    def showValue(self):
+        value = self.record.value(self.name)
+        self.setText(str(value))
 
-	def setReadOnly(self, value):
-		AbstractFieldWidget.setReadOnly(self, value)
-		self.widget.setReadOnly( value )
+    def setReadOnly(self, value):
+        AbstractFieldWidget.setReadOnly(self, value)
+        self.widget.setReadOnly(value)
 
-	def colorWidget(self):
-		return self.widget
+    def colorWidget(self):
+        return self.widget
 
-	def setText(self, text):
-		self.widget.setCursorPosition( 0 )
-		self.widget.setText( text )
-		self.widget.setToolTip( text )
+    def setText(self, text):
+        self.widget.setCursorPosition(0)
+        self.widget.setText(text)
+        self.widget.setToolTip(text)
 
-class IntegerFieldDelegate( AbstractFieldDelegate ):
-	def setModelData(self, editor, model, index):
-		value = textToInteger( unicode( editor.text() ) )
-		model.setData( index, QVariant( value ), Qt.EditRole )
 
+class IntegerFieldDelegate(AbstractFieldDelegate):
+    def setModelData(self, editor, model, index):
+        value = textToInteger(unicode(editor.text()))
+        model.setData(index, QVariant(value), Qt.EditRole)

@@ -29,12 +29,17 @@ from Koo.Common import Api
 from Koo.Plugins import Plugins
 from Koo import Rpc
 
-## @brief Opens a new window with all labels to be translated for the current view.
-def searchModelData(model, id, ids, context):
-	domain = [
-		('model', '=', model), 
-		('res_id', 'in', ids)
-	]
-	Api.instance.createWindow( None, 'ir.model.data', mode='tree,form', domain=domain, context=context )
+# @brief Opens a new window with all labels to be translated for the current view.
 
-Plugins.register( 'SearchModelData', '.*', _('Search Model Data'), searchModelData )
+
+def searchModelData(model, id, ids, context):
+    domain = [
+        ('model', '=', model),
+        ('res_id', 'in', ids)
+    ]
+    Api.instance.createWindow(None, 'ir.model.data',
+                              mode='tree,form', domain=domain, context=context)
+
+
+Plugins.register('SearchModelData', '.*',
+                 _('Search Model Data'), searchModelData)

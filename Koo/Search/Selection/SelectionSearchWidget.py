@@ -31,39 +31,40 @@ from Koo.Search.AbstractSearchWidget import *
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
+
 class SelectionSearchWidget(AbstractSearchWidget):
-	def __init__(self, name, parent, attrs={}):
-		AbstractSearchWidget.__init__(self, name, parent, attrs)
-		self.uiCombo = QComboBox( self )
-		self.uiCombo.setEditable( False )
+    def __init__(self, name, parent, attrs={}):
+        AbstractSearchWidget.__init__(self, name, parent, attrs)
+        self.uiCombo = QComboBox(self)
+        self.uiCombo.setEditable(False)
 
-		self.layout = QHBoxLayout( self )
-		self.layout.addWidget( self.uiCombo )
-		self.layout.setSpacing( 0 )
-		self.layout.setContentsMargins( 0, 0, 0, 0 )
+        self.layout = QHBoxLayout(self)
+        self.layout.addWidget(self.uiCombo)
+        self.layout.setSpacing(0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
-		self.fill( attrs.get('selection',[] ) )
-		self.focusWidget = self.uiCombo
-		
-	def fill(self, selection):
-		# The first is a blank element
-		self.uiCombo.addItem( '' )
-		for (id,name) in selection:
-			self.uiCombo.addItem( name, QVariant(id) )
+        self.fill(attrs.get('selection', []))
+        self.focusWidget = self.uiCombo
 
-	def value( self ):
-		value = self.uiCombo.itemData( self.uiCombo.currentIndex() )
-		if value.isValid():
-			return [(self.name,'=',unicode( value.toString() ) )]
-		else:
-			return []
+    def fill(self, selection):
+        # The first is a blank element
+        self.uiCombo.addItem('')
+        for (id, name) in selection:
+            self.uiCombo.addItem(name, QVariant(id))
 
-	def setValue(self, value):
-		if not value:
-			self.uiCombo.setCurrentIndex( self.uiCombo.findText('') )
-		else:
-			self.uiCombo.setCurrentIndex( self.uiCombo.findData( QVariant(value) ) )
+    def value(self):
+        value = self.uiCombo.itemData(self.uiCombo.currentIndex())
+        if value.isValid():
+            return [(self.name, '=', unicode(value.toString()))]
+        else:
+            return []
 
-	def clear(self):
-		self.setValue( False )
+    def setValue(self, value):
+        if not value:
+            self.uiCombo.setCurrentIndex(self.uiCombo.findText(''))
+        else:
+            self.uiCombo.setCurrentIndex(
+                self.uiCombo.findData(QVariant(value)))
 
+    def clear(self):
+        self.setValue(False)
