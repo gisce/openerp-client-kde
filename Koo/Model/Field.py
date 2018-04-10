@@ -290,8 +290,9 @@ class ManyToOneField(StringField):
 
 
 class ToManyField(QObject, StringField):
-    def __init__(self, parent, attrs):
-        QObject.__init__(self)
+    def __init__(self, attrs):
+        # QObject.__init__(self)
+        super().__init__(attrs)
         self.parent = parent
         self.attrs = attrs
         self.name = attrs['name']
