@@ -27,7 +27,7 @@
 
 ## @brief KooApi class provides an interface several Koo components relay on being
 # available for their proper use. 
-class KooApi:
+class KooApi(object):
 	## @brief Executes the given actionId (which can be a report, keword, etc.).
 	def execute(self, actionId, data={}, type=None, context={}):
 		pass
