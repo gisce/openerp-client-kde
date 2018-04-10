@@ -35,6 +35,7 @@ from Koo.Common import Numeric
 
 class StringField:
     def __init__(self, parent, attrs):
+        print ("PETO")
         self.parent = parent
         self.attrs = attrs
         self.name = attrs['name']
@@ -291,11 +292,15 @@ class ManyToOneField(StringField):
 
 class ToManyField(QObject, StringField):
     def __init__(self, attrs):
+        pass
+        """
+        @xtorello 2review
         # QObject.__init__(self)
         super().__init__(attrs)
         self.parent = parent
         self.attrs = attrs
         self.name = attrs['name']
+        """
 
     def create(self, record):
         from Koo.Model.Group import RecordGroup
@@ -348,6 +353,11 @@ class ToManyField(QObject, StringField):
 
 
 class OneToManyField(ToManyField):
+
+    def __init__(self, attrs):
+        # QObject.__init__(self)
+        super().__init__(attrs)
+
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         if not record.values[self.name]:
             return []
@@ -444,6 +454,7 @@ class ReferenceField(StringField):
 #  By default some classes exist for many file types
 #  but if you create new types or want to replace current implementations you can
 #  do it too.
+# @xtorello xxx
 class FieldFactory:
     # The types property holds the class that will be called whenever a new
     #  object has to be created for a given field type.
@@ -470,8 +481,14 @@ class FieldFactory:
     @staticmethod
     def create(fieldType, parent, attributes):
         # We do not support relational fields treated as selection ones
+        print (fieldType)
+
         if fieldType == 'selection' and 'relation' in attributes:
             fieldType = 'many2one'
+
+        if fieldType == "one2many" or fieldType == "many2many":# or fieldType == "many2one":
+            print (fieldType, "MANY")
+            return FieldFactory.types[fieldType](attributes)
 
         if fieldType in FieldFactory.types:
             return FieldFactory.types[fieldType](parent, attributes)
