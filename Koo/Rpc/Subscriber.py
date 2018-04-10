@@ -77,5 +77,5 @@ class Subscriber(QThread):
                 self.result = self.session.call(
                     '/subscription', 'wait', self.expression)
                 self.emit(SIGNAL('published()'))
-            except Exception, err:
+            except Exception as err:
                 sleep(60)

@@ -25,9 +25,9 @@
 #
 ##############################################################################
 
-from DateSearchWidget import *
-from TimeSearchWidget import *
-from DateTimeSearchWidget import *
+from .DateSearchWidget import *
+from .TimeSearchWidget import *
+from .DateTimeSearchWidget import *
 from Koo.Search.SearchWidgetFactory import *
 
 SearchWidgetFactory.register('date', DateSearchWidget)

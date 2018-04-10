@@ -60,7 +60,7 @@ class BatchUpdateMessageBoxDialog(QDialog, BatchUpdateMessageBoxUi):
 
     def selectedFields(self):
         selected = []
-        for x in xrange(self.uiFields.count()):
+        for x in range(self.uiFields.count()):
             item = self.uiFields.item(x)
             if item.isSelected():
                 selected.append(self._fields[x][1])
@@ -117,7 +117,7 @@ class BatchUpdateDialog(QDialog, BatchUpdateDialogUi):
             queue.setup(viewTypes, viewIds)
             type = ''
             while type != 'form':
-                id, type = queue.next()
+                id, type = next(queue)
             self.screen.setupViews(['form'], [id])
         else:
             self.screen.setupViews(['form'], [False])

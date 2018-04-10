@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from CharFieldWidget import *
+from .CharFieldWidget import *
 from Koo.Fields.FieldWidgetFactory import *
 
 FieldWidgetFactory.register( 'char', CharFieldWidget )

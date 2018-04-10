@@ -68,7 +68,7 @@ if isWebWidgetAvailable:
             self.name = ''
             self.handlers = {
                 'Previous': self.previous,
-                'Next': self.next,
+                'Next': self.__next__,
                 'Reload': self.reload,
                 'Find': self.find,
             }
@@ -94,7 +94,7 @@ if isWebWidgetAvailable:
         def previous(self):
             self.uiWeb.back()
 
-        def next(self):
+        def __next__(self):
             self.uiWeb.forward()
 
         def reload(self):

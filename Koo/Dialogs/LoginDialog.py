@@ -30,9 +30,9 @@ from PyQt4.QtGui import *
 from Koo.Common.Ui import *
 from Koo.Common import Common
 from Koo.Common import Url
-from DatabaseDialog import *
-import ServerConfigurationDialog
-from DatabaseCreationDialog import DatabaseCreationDialog
+from .DatabaseDialog import *
+from . import ServerConfigurationDialog
+from .DatabaseCreationDialog import DatabaseCreationDialog
 
 (LoginDialogUi, LoginDialogBase) = loadUiType(Common.uiPath('login.ui'))
 
@@ -76,7 +76,7 @@ class LoginDialog(QDialog, LoginDialogUi):
         self.uiNoConnection.hide()
 
         url = QUrl(Settings.value('login.url'))
-        hasPassword = unicode(url.password()) and True or False
+        hasPassword = str(url.password()) and True or False
         self.uiUserName.setText(url.userName())
         url.setUserName('')
         self.uiPassword.setText(url.password())
@@ -139,12 +139,12 @@ class LoginDialog(QDialog, LoginDialogUi):
                 KWallet.Wallet.NetworkWallet(), self.winId())
             # If users presses 'Cancel' in KWallet's dialog it returns None
             if wallet:
-                folder = '%s/%s' % (unicode(self.uiServer.text()),
-                                    unicode(self.uiDatabase.currentText()))
+                folder = '%s/%s' % (str(self.uiServer.text()),
+                                    str(self.uiDatabase.currentText()))
                 qtValues = wallet.readMap(folder)[1]
                 values = {}
-                for key, value in qtValues.iteritems():
-                    values[unicode(key)] = unicode(value)
+                for key, value in qtValues.items():
+                    values[str(key)] = str(value)
                 if 'username' in values:
                     self.uiUserName.setText(values['username'])
                 if 'password' in values:
@@ -164,13 +164,13 @@ class LoginDialog(QDialog, LoginDialogUi):
         m.setUserName(Url.encodeForUrl(self.uiUserName.text()))
         m.setPassword(Url.encodeForUrl(self.uiPassword.text()))
         if m.isValid():
-            self.url = unicode(m.toString())
+            self.url = str(m.toString())
             if self.uiDatabase.isVisible():
-                self.databaseName = unicode(self.uiDatabase.currentText())
+                self.databaseName = str(self.uiDatabase.currentText())
             else:
-                self.databaseName = unicode(self.uiTextDatabase.text())
+                self.databaseName = str(self.uiTextDatabase.text())
             m.setPassword('')
-            Settings.setValue('login.url', unicode(m.toString()))
+            Settings.setValue('login.url', str(m.toString()))
             Settings.setValue('login.db', self.databaseName)
             Settings.saveToFile()
             self.accept()
@@ -201,11 +201,11 @@ class LoginDialog(QDialog, LoginDialogUi):
                     KWallet.Wallet.NetworkWallet()
                     wallet = KWallet.Wallet.openWallet(
                         KWallet.Wallet.NetworkWallet(), self.winId())
-                    folder = '%s/%s' % (unicode(self.uiServer.text()),
+                    folder = '%s/%s' % (str(self.uiServer.text()),
                                         self.databaseName)
                     wallet.writeMap(folder, {
-                        'username': unicode(self.uiUserName.text()),
-                        'password': unicode(self.uiPassword.text()),
+                        'username': str(self.uiUserName.text()),
+                        'password': str(self.uiPassword.text()),
                     })
         else:
             self.reject()

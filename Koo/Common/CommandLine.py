@@ -30,15 +30,15 @@ import os
 import sys
 import optparse
 
-import Debug
-from Settings import *
+from . import Debug
+from .Settings import *
 from Koo import Rpc
 
 from PyQt4.QtCore import QDir, QUrl
 
 
 def homeDirectory():
-    return unicode(QDir.toNativeSeparators(QDir.homePath()))
+    return str(QDir.toNativeSeparators(QDir.homePath()))
 
 
 def parseArguments(args):

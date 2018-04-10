@@ -28,7 +28,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from Koo.Common.Ui import *
-from ServerConfigurationDialog import *
+from .ServerConfigurationDialog import *
 from Koo.Common.Settings import *
 from Koo import Rpc
 
@@ -69,6 +69,6 @@ class AdministratorPasswordDialog(QDialog, AdministratorPasswordDialogUi):
             QMessageBox.information(self, _('Information'), _(
                 'Password changed successfully'))
             self.accept()
-        except Exception, e:
+        except Exception as e:
             QMessageBox.warning(self, _('Error'), _(
                 'Could not change administrator password. Please, check the server and password are correct.'))

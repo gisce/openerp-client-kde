@@ -51,7 +51,7 @@ class FieldPreferencesDialog(QDialog, FieldPreferencesDialogUi):
 
         self.uiFieldName.setText(name)
         self.uiDomain.setText(model)
-        self.uiDefaultValue.setText((value and unicode(value)) or '/')
+        self.uiDefaultValue.setText((value and str(value)) or '/')
 
         self.model = model
         self.field = field
@@ -60,7 +60,7 @@ class FieldPreferencesDialog(QDialog, FieldPreferencesDialogUi):
         self.widgets = {}
         for (fname, fvalue, rname, rvalue) in dependance:
             w = QCheckBox(self)
-            w.setText(fname + ' = ' + unicode(rname))
+            w.setText(fname + ' = ' + str(rname))
             self.widgets[(fvalue, rvalue)] = w
             frameLayout.addWidget(w)
         if not len(dependance):
@@ -70,7 +70,7 @@ class FieldPreferencesDialog(QDialog, FieldPreferencesDialogUi):
 
     def slotAccept(self):
         deps = False
-        for x in self.widgets.keys():
+        for x in list(self.widgets.keys()):
             if self.widgets[x].isChecked():
                 deps = x[0] + '=' + str(x[1])
                 break

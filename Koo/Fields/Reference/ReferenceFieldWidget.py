@@ -133,7 +133,7 @@ class ReferenceFieldWidget(AbstractFieldWidget, ReferenceFieldWidgetUi):
         resource = str(self.uiModel.itemData(
             self.uiModel.currentIndex()).toString())
         ids = Rpc.session.execute('/object', 'execute', resource, 'name_search',
-                                  unicode(self.uiText.text()), domain, 'ilike', context, False)
+                                  str(self.uiText.text()), domain, 'ilike', context, False)
 
         if len(ids) == 1:
             id, name = ids[0]
@@ -151,7 +151,7 @@ class ReferenceFieldWidget(AbstractFieldWidget, ReferenceFieldWidgetUi):
             self.display()
 
     def match(self):
-        name = unicode(self.uiText.text())
+        name = str(self.uiText.text())
         if name.strip() == '':
             self.record.setValue(self.name, False)
             return
@@ -162,13 +162,13 @@ class ReferenceFieldWidget(AbstractFieldWidget, ReferenceFieldWidgetUi):
         self.search()
 
     def new(self):
-        resource = unicode(self.uiModel.itemData(
+        resource = str(self.uiModel.itemData(
             self.uiModel.currentIndex()).toString())
         dialog = ScreenDialog(self)
         dialog.setup(resource)
         dialog.setAttributes(self.attrs)
         if dialog.exec_() == QDialog.Accepted:
-            resource = unicode(self.uiModel.itemData(
+            resource = str(self.uiModel.itemData(
                 self.uiModel.currentIndex()).toString())
             self.record.setValue(self.name, (resource, dialog.record))
 

@@ -50,7 +50,7 @@ class wizard_start(osv.osv_memory):
 		# Check FTS availability
 		cr.execute("SELECT 1 FROM pg_catalog.pg_type WHERE typname='tsvector'")
 		if cr.rowcount == 0:
-			print "It seems that TSearch2 is NOT installed"
+			print("It seems that TSearch2 is NOT installed")
 			return {}
 
 		# Check PL/PythonU

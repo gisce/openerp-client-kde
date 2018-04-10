@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from IntegerSearchWidget import *
+from .IntegerSearchWidget import *
 from Koo.Search.SearchWidgetFactory import *
 
 SearchWidgetFactory.register('integer', IntegerSearchWidget)

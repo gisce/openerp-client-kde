@@ -37,10 +37,10 @@
 #
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from Ui import *
+from .Ui import *
 import math
 import locale
-import Common
+from . import Common
 import re
 
 # @brief Converts a QDate object into a Python string
@@ -107,7 +107,7 @@ def dateTimeToStorage(dateTime):
 
 
 def textToDate(text):
-    text = unicode(text).strip()
+    text = str(text).strip()
     if text == '=':
         return QDate.currentDate()
 
@@ -144,7 +144,7 @@ def textToDate(text):
 
 
 def textToTime(text):
-    text = unicode(text).strip()
+    text = str(text).strip()
     if text == '=':
         return QTime.currentTime()
 
@@ -168,7 +168,7 @@ def textToTime(text):
 
 
 def textToDateTime(text):
-    text = unicode(text).strip()
+    text = str(text).strip()
     if text == '=':
         return QDateTime.currentDateTime()
 
@@ -195,7 +195,7 @@ def internalTextToFloatTime(text):
 
 
 def textToFloatTime(text):
-    text = unicode(text).strip()
+    text = str(text).strip()
     time = 0.0
     last_operation = None
     texts = re.split('(\+|-+)', text)
@@ -272,7 +272,7 @@ class PopupCalendarWidget(QWidget, PopupCalendarUi):
         self.showTime = showTime
         if self.showTime:
             self.uiTime.setText(textToDateTime(
-                unicode(parent.text())).time().toString())
+                str(parent.text())).time().toString())
             self.connect(self.uiTime, SIGNAL(
                 'returnPressed()'), self.storeOnParent)
         else:

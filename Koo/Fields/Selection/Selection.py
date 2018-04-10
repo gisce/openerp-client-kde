@@ -88,7 +88,7 @@ class SelectionFieldWidget(AbstractFieldWidget):
                 self.widget.currentText(), Qt.MatchContains))
         if value.isValid():
             if value.typeName() == 'QString':
-                return unicode(value.toString())
+                return str(value.toString())
             else:
                 return value.toLongLong()[0]
         else:

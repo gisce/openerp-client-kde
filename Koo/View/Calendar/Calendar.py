@@ -145,7 +145,7 @@ class GraphicsDayItem(QGraphicsItemGroup):
         return self._date
 
     def addModelIndex(self, index):
-        if index in self._tasks.keys():
+        if index in list(self._tasks.keys()):
             return
         task = GraphicsTaskItem(self)
         task.setZValue(1)
@@ -156,7 +156,7 @@ class GraphicsDayItem(QGraphicsItemGroup):
         self.updateData()
 
     def removeModelIndex(self, index):
-        if not index in self._tasks.keys():
+        if not index in list(self._tasks.keys()):
             return
         task = self._tasks[index]
         self.removeFromGroup(task)
@@ -169,9 +169,9 @@ class GraphicsDayItem(QGraphicsItemGroup):
         self._tasks = {}
 
     def updateData(self):
-        title = '<center>%s</center>' % (unicode(self._date.toString()))
+        title = '<center>%s</center>' % (str(self._date.toString()))
         self._title.setHtml(title)
-        for index in self._tasks.keys():
+        for index in list(self._tasks.keys()):
             task = self._tasks[index]
             model = index.model()
             titleIdx = model.index(
@@ -212,7 +212,7 @@ class GraphicsDayItem(QGraphicsItemGroup):
             y = secs * height / 86400.0
             task.setSize(QSize(self._size.width(), y))
 
-            title = unicode(titleIdx.data().toString())
+            title = str(titleIdx.data().toString())
 
     def taskFromIndex(self, index):
         return self._tasks.get(index, None)
@@ -305,7 +305,7 @@ class GraphicsCalendarItem(QGraphicsItemGroup):
         if self._modelTitleColumn >= self._model.columnCount():
             return
 
-        for x in self._days.values():
+        for x in list(self._days.values()):
             x.clear()
 
         #
@@ -362,7 +362,7 @@ class GraphicsCalendarItem(QGraphicsItemGroup):
         return QDateTime()
 
     def clear(self):
-        for item in self._days.keys():
+        for item in list(self._days.keys()):
             self._days[item].setParentItem(None)
             del self._days[item]
         self._days = {}
@@ -402,7 +402,7 @@ class GraphicsCalendarItem(QGraphicsItemGroup):
 
     def tasksFromIndex(self, index):
         tasks = []
-        for item in self._days.values():
+        for item in list(self._days.values()):
             task = item.taskFromIndex(index)
             if task:
                 tasks.append(task)

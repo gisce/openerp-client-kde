@@ -34,6 +34,7 @@ from Koo import Rpc
 import datetime
 import time
 import locale
+from functools import reduce
 
 DT_FORMAT = '%Y-%m-%d'
 DHM_FORMAT = '%Y-%m-%d %H:%M:%S'
@@ -90,7 +91,7 @@ class ChartGraphicsView(QGraphicsView):
             if isinstance(x, bool):
                 newList.append('-')
             else:
-                newList.append(unicode(x))
+                newList.append(str(x))
         return newList
 
     def display(self, models):
@@ -119,7 +120,7 @@ class ChartGraphicsView(QGraphicsView):
             # }
             for m in models:
                 res = {}
-                for x in self._axisData.keys():
+                for x in list(self._axisData.keys()):
                     type = self._fields[x]['type']
                     if type in ('many2one', 'char', 'time', 'text'):
                         res[x] = m.value(x)
@@ -127,7 +128,7 @@ class ChartGraphicsView(QGraphicsView):
                         res[x] = ''
                         for y in self._fields[x]['selection']:
                             if y[0] == m.value(x):
-                                res[x] = unicode(y[1])
+                                res[x] = str(y[1])
                                 break
                     elif type == 'date':
                         if m.value(x):
@@ -197,7 +198,7 @@ class ChartGraphicsView(QGraphicsView):
                 else:
                     data[d[self._axis[0]]][groupEval] = d[field]
             aggRecords.append(data)
-        groups = groups.keys()
+        groups = list(groups.keys())
         groups.sort()
 
         fields = set()
@@ -215,8 +216,8 @@ class ChartGraphicsView(QGraphicsView):
         categories.sort()
 
         if self._type == 'pie':
-            categories = data.keys()
-            values = [reduce(lambda x, y=0: x + y, data[x].values(), 0)
+            categories = list(data.keys())
+            values = [reduce(lambda x, y=0: x + y, list(data[x].values()), 0)
                       for x in categories]
             self.chart.setValues(values)
             # Ensure all categories are strings

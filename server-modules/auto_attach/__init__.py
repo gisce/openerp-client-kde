@@ -25,5 +25,5 @@
 #
 ##############################################################################
 
-import auto_attach
-import wizard
+from . import auto_attach
+from . import wizard

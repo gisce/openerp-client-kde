@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from LinkFieldWidget import *
+from .LinkFieldWidget import *
 from Koo.Fields.FieldWidgetFactory import *
 
 FieldWidgetFactory.register( 'link', LinkFieldWidget )

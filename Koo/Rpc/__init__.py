@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from Rpc import *
-from Cache import *
-from Subscriber import *
+from .Rpc import *
+from .Cache import *
+from .Subscriber import *
 

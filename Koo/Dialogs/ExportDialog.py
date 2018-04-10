@@ -43,14 +43,15 @@ import types
 import os
 import codecs
 
-from ImportExportCommon import *
+from .ImportExportCommon import *
 
 
 def exportHtml(fname, fields, result, writeTitle):
     QApplication.setOverrideCursor(Qt.WaitCursor)
     try:
         f = codecs.open(fname, 'wb+', 'utf8')
-    except IOError, (errno, strerror):
+    except IOError as xxx_todo_changeme:
+        (errno, strerror) = xxx_todo_changeme.args
         QApplication.restoreOverrideCursor()
         QMessageBox.warning(None, _('Error'), _(
             "Operation failed !\nI/O error (%s)") % (errno))
@@ -63,13 +64,13 @@ def exportHtml(fname, fields, result, writeTitle):
         if writeTitle:
             f.write('<tr>')
             for x in fields:
-                x = unicode(x)
+                x = str(x)
                 f.write('<th>%s</th>' % x)
             f.write('</tr>')
         for x in result:
             row = []
             for y in x:
-                y = unicode(y)
+                y = str(y)
                 y = y.replace('\n', '<br/>').replace('\t', '&nbsp;')
                 y = y.replace('<', '&lt;').replace(
                     '>', '&gt;').replace('&', '&amp;')
@@ -80,7 +81,8 @@ def exportHtml(fname, fields, result, writeTitle):
         QApplication.restoreOverrideCursor()
         QMessageBox.information(None, _('Information'), _(
             '%s record(s) saved!') % (str(len(result))))
-    except IOError, (errno, strerror):
+    except IOError as xxx_todo_changeme1:
+        (errno, strerror) = xxx_todo_changeme1.args
         QApplication.restoreOverrideCursor()
         QMessageBox.warning(None, _('Error'), _(
             "Operation failed !\nI/O error (%s)") % (errno))
@@ -96,7 +98,8 @@ def exportCsv(fname, fields, result, writeTitle):
     QApplication.setOverrideCursor(Qt.WaitCursor)
     try:
         fp = codecs.open(fname, 'wb+', 'utf8')
-    except IOError, (errno, strerror):
+    except IOError as xxx_todo_changeme2:
+        (errno, strerror) = xxx_todo_changeme2.args
         QApplication.restoreOverrideCursor()
         QMessageBox.warning(None, _('Data Export'), _(
             "Operation failed !\nI/O error (%s)") % (errno))
@@ -109,22 +112,23 @@ def exportCsv(fname, fields, result, writeTitle):
             for d in data:
                 if isinstance(d, str):
                     row.append(textToCsv(d))
-                elif not isinstance(d, unicode):
-                    row.append(textToCsv(unicode(d)))
+                elif not isinstance(d, str):
+                    row.append(textToCsv(str(d)))
                 else:
                     row.append(textToCsv(d))
             fp.write(','.join(row) + '\n')
         QApplication.restoreOverrideCursor()
         QMessageBox.information(None, _('Data Export'), _(
             '%s record(s) saved!') % (str(len(result))))
-    except IOError, (errno, strerror):
+    except IOError as xxx_todo_changeme3:
+        (errno, strerror) = xxx_todo_changeme3.args
         QApplication.restoreOverrideCursor()
         QMessageBox.warning(None, _('Data Export'), _(
             "Operation failed !\nI/O error (%s)") % (errno))
-    except Exception, e:
+    except Exception as e:
         QApplication.restoreOverrideCursor()
         QMessageBox.warning(None, _('Data Export'), _(
-            "Error exporting data:\n%s") % unicode(e.args))
+            "Error exporting data:\n%s") % str(e.args))
     finally:
         fp.close()
 
@@ -168,10 +172,10 @@ def openExcel(fields, fieldsType, result, writeTitle):
 
         application.Visible = 1
         QApplication.restoreOverrideCursor()
-    except Exception, e:
+    except Exception as e:
         QApplication.restoreOverrideCursor()
         QMessageBox.warning(None, _('Error'), _(
-            'Error opening Excel:\n%s') % unicode(e.args))
+            'Error opening Excel:\n%s') % str(e.args))
 
 # Based on code by Dukai Gabor posted in openobject-client bugs:
 # https://bugs.launchpad.net/openobject-client/+bug/399278
@@ -195,7 +199,7 @@ def openOpenOffice(fields, fieldsType, result, writeTitle):
 
         row = 0
         if writeTitle:
-            for col in xrange(len(fields)):
+            for col in range(len(fields)):
                 cell = sheet.getCellByPosition(col, row)
                 cell.String = fields[col]
             row += 1
@@ -207,10 +211,10 @@ def openOpenOffice(fields, fieldsType, result, writeTitle):
             0, row, len(fields) - 1, row + len(result) - 1)
         cellrange.setDataArray(result)
         QApplication.restoreOverrideCursor()
-    except Exception, e:
+    except Exception as e:
         QApplication.restoreOverrideCursor()
         QMessageBox.warning(None, _('Error'), _(
-            'Error Opening OpenOffice.org:\n%s') % unicode(e.args))
+            'Error Opening OpenOffice.org:\n%s') % str(e.args))
 
 
 def exportData(ids, model, fields, importCompatible):
@@ -275,15 +279,15 @@ class ExportDialog(QDialog, ExportDialogUi):
             queue = ViewQueue()
             queue.setup(self.viewTypes, self.viewIds)
             while not queue.isEmpty():
-                id, type = queue.next()
+                id, type = next(queue)
                 view = Rpc.session.execute(
                     '/object', 'execute', self.model, 'fields_view_get', id, type, Rpc.session.context)
                 self.fields.update(view['fields'])
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             QApplication.restoreOverrideCursor()
             return
 
-        for key, export in ExportDialog.exports.iteritems():
+        for key, export in ExportDialog.exports.items():
             self.uiFormat.addItem(export['label'], QVariant(key))
 
         self.fieldsInfo = {}
@@ -320,7 +324,7 @@ class ExportDialog(QDialog, ExportDialogUi):
         if len(idx) != 1:
             return
         idx = idx[0]
-        id = int(unicode(self.storedModel.itemFromIndex(idx).text()))
+        id = int(str(self.storedModel.itemFromIndex(idx).text()))
         ir_export = Rpc.RpcProxy('ir.exports')
         ir_export.unlink([id])
         self.storedModel.load(self.model, self.fieldsInfo)
@@ -330,13 +334,13 @@ class ExportDialog(QDialog, ExportDialogUi):
         if len(idx) != 1:
             return
         idx = idx[0]
-        fields = unicode(self.storedModel.itemFromIndex(idx).text())
+        fields = str(self.storedModel.itemFromIndex(idx).text())
         fields = fields.split(', ')
         if self.selectedModel.rowCount() > 0:
             self.selectedModel.removeRows(0, self.selectedModel.rowCount())
         for x in fields:
             newItem = QStandardItem()
-            newItem.setText(unicode(self.fieldsInfo[x]['string']))
+            newItem.setText(str(self.fieldsInfo[x]['string']))
             newItem.setData(QVariant(x))
             self.selectedModel.appendRow(newItem)
 
@@ -345,9 +349,9 @@ class ExportDialog(QDialog, ExportDialogUi):
         fieldTitles = []
         for x in range(0, self.selectedModel.rowCount()):
             fields.append(
-                unicode(self.selectedModel.item(x).data().toString()))
-            fieldTitles.append(unicode(self.selectedModel.item(x).text()))
-        action = unicode(self.uiFormat.itemData(
+                str(self.selectedModel.item(x).data().toString()))
+            fieldTitles.append(str(self.selectedModel.item(x).text()))
+        action = str(self.uiFormat.itemData(
             self.uiFormat.currentIndex()).toString())
         importCompatible = self.uiImportCompatible.isChecked()
         result = exportData(self.ids, self.model, fields, importCompatible)
@@ -358,7 +362,7 @@ class ExportDialog(QDialog, ExportDialogUi):
         result = result['data']
         export = ExportDialog.exports[action]
         if export['requiresFileName']:
-            fileName = unicode(
+            fileName = str(
                 QFileDialog.getSaveFileName(self, _('Export Data')))
             export['function'](fileName, fieldTitles, result,
                                self.uiAddFieldNames.isChecked())
@@ -390,14 +394,14 @@ class ExportDialog(QDialog, ExportDialogUi):
             self.selectedModel.removeRows(0, self.selectedModel.rowCount())
 
     def fullPathText(self, item):
-        path = unicode(item.text())
+        path = str(item.text())
         while item.parent() != None:
             item = item.parent()
             path = item.text() + "/" + path
         return path
 
     def fullPathData(self, item):
-        path = unicode(item.data().toString())
+        path = str(item.data().toString())
         while item.parent() != None:
             item = item.parent()
             path = item.data().toString() + "/" + path
@@ -412,10 +416,10 @@ class ExportDialog(QDialog, ExportDialogUi):
         fields = []
         for x in range(0, self.selectedModel.rowCount()):
             fields.append(
-                unicode(self.selectedModel.item(x).data().toString()))
+                str(self.selectedModel.item(x).data().toString()))
 
         ir_export.create({
-            'name': unicode(name),
+            'name': str(name),
             'resource': self.model,
             'export_fields': [(0, 0, {'name': f}) for f in fields]
         })

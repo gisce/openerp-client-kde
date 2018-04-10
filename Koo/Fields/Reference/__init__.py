@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from ReferenceFieldWidget import *
+from .ReferenceFieldWidget import *
 from Koo.Fields.FieldWidgetFactory import *
 
 FieldWidgetFactory.register( 'reference', ReferenceFieldWidget )

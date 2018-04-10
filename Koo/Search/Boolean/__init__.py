@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from BooleanSearchWidget import *
+from .BooleanSearchWidget import *
 from Koo.Search.SearchWidgetFactory import *
 
 SearchWidgetFactory.register('boolean', BooleanSearchWidget)

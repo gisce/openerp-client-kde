@@ -31,8 +31,8 @@ from xml.dom.minidom import getDOMImplementation
 import xml.dom.minidom
 import codecs
 
-from JasperReport import *
-from AbstractDataGenerator import *
+from .JasperReport import *
+from .AbstractDataGenerator import *
 
 class CsvRecordDataGenerator(AbstractDataGenerator):
 	def __init__(self, report, records):
@@ -58,13 +58,13 @@ class CsvRecordDataGenerator(AbstractDataGenerator):
 				for field in record:
 					if field not in self.report.fields():
 						if not field in error_reported_fields:
-							print "FIELD '%s' NOT FOUND IN REPORT." % field 
+							print("FIELD '%s' NOT FOUND IN REPORT." % field) 
 							error_reported_fields.append( field )
 						continue
 					value = record.get(field, False)
 					if value == False:
 						value = ''
-					elif isinstance(value, unicode):
+					elif isinstance(value, str):
 						value = value.encode('utf-8')
 					elif isinstance(value, float):
 						value = '%.10f' % value
@@ -86,18 +86,18 @@ class XmlRecordDataGenerator(AbstractDataGenerator):
 		for record in self.data['records']:
 			recordNode = self.document.createElement('record')
 			topNode.appendChild( recordNode )
-			for field, value in record.iteritems():
+			for field, value in record.items():
 				fieldNode = self.document.createElement( field )
 				recordNode.appendChild( fieldNode )
 				# The rest of field types must be converted into str
 				if value == False:
 					value = ''
 				elif isinstance(value, str):
-					value = unicode(value, 'utf-8')
+					value = str(value, 'utf-8')
 				elif isinstance(value, float):
 					value = '%.10f' % value
-				elif not isinstance(value, unicode):
-					value = unicode(value)
+				elif not isinstance(value, str):
+					value = str(value)
 				valueNode = self.document.createTextNode( value )
 				fieldNode.appendChild( valueNode )
 		# Once created, the only missing step is to store the XML into a file

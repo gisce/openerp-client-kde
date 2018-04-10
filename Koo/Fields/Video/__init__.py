@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from VideoFieldWidget import *
+from .VideoFieldWidget import *
 from Koo.Fields.FieldWidgetFactory import *
 
 FieldWidgetFactory.register( 'video', VideoFieldWidget )

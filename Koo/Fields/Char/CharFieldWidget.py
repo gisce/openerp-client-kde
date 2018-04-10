@@ -81,7 +81,7 @@ class CharFieldWidget(AbstractFieldWidget):
             QMessageBox.information(self, _('Translation dialog'), _(
                 'You must save the resource before adding translations'))
             return
-        dialog = TranslationDialog(self.record.id, self.record.group.resource, self.attrs['name'], unicode(
+        dialog = TranslationDialog(self.record.id, self.record.group.resource, self.attrs['name'], str(
             self.widget.text()), TranslationDialog.LineEdit, self)
         if dialog.exec_() == QDialog.Accepted:
             self.setText(dialog.result)
@@ -91,7 +91,7 @@ class CharFieldWidget(AbstractFieldWidget):
         # record is set.
         if not self.record:
             return
-        self.record.setValue(self.name, unicode(self.widget.text()) or False)
+        self.record.setValue(self.name, str(self.widget.text()) or False)
 
     def clear(self):
         self.widget.clear()

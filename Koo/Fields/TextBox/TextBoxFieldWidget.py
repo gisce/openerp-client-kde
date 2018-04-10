@@ -71,7 +71,7 @@ class TextBoxFieldWidget(AbstractFieldWidget):
             QMessageBox.information(self, _('Translation dialog'), _(
                 'You must save the resource before adding translations'))
             return
-        dialog = TranslationDialog(self.record.id, self.record.group.resource, self.attrs['name'], unicode(
+        dialog = TranslationDialog(self.record.id, self.record.group.resource, self.attrs['name'], str(
             self.uiText.toPlainText()), TranslationDialog.TextEdit, self)
         if dialog.exec_() == QDialog.Accepted:
             self.uiText.setPlainText(dialog.result)
@@ -85,7 +85,7 @@ class TextBoxFieldWidget(AbstractFieldWidget):
         return self.uiText
 
     def storeValue(self):
-        self.record.setValue(self.name, unicode(
+        self.record.setValue(self.name, str(
             self.uiText.document().toPlainText()) or False)
 
     def clear(self):

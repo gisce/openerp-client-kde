@@ -36,7 +36,7 @@ from Koo.Common import Api
 from Koo.Common import Help
 from Koo.Common import Common
 from Koo.Common.Settings import *
-from FieldPreferencesDialog import *
+from .FieldPreferencesDialog import *
 
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
@@ -208,7 +208,7 @@ class AbstractFieldWidget(QWidget):
             return
         deps = []
         wid = self.view.widgets
-        for wname, wview in self.view.widgets.items():
+        for wname, wview in list(self.view.widgets.items()):
             if wview.attrs.get('change_default', False):
                 value = wview.record.value(wview.name)
                 deps.append((wname, wname, value, value))

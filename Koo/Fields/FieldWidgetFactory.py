@@ -54,7 +54,7 @@ class FieldWidgetFactory:
             widgetType = 'many2one'
 
         if not widgetType in FieldWidgetFactory.widgets:
-            print "Widget '%s' not available" % widgetType
+            print("Widget '%s' not available" % widgetType)
             return None
 
         widgetClass = FieldWidgetFactory.widgets[widgetType]

@@ -49,7 +49,7 @@ class SearchWidgetFactory:
     def create(widgetType, name, parent, attributes):
         SearchWidgetFactory.scan()
         if not widgetType in SearchWidgetFactory.widgets:
-            print "Search widget '%s' not available" % widgetType
+            print("Search widget '%s' not available" % widgetType)
             return None
 
         widgetClass = SearchWidgetFactory.widgets[widgetType]

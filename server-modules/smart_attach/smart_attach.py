@@ -39,7 +39,7 @@ import re
 import threading
 import pooler
 
-import ocr
+from . import ocr
 from PyQt4.QtCore import *
 
 # This class overrides the default ir_attachment class and adds the ability to
@@ -167,7 +167,7 @@ class ir_attachment(osv.osv):
 				#r['language']
 
 		if isinstance( metaInfo, str ):
-			metaInfo = unicode( metaInfo, 'utf-8', errors='ignore' )
+			metaInfo = str( metaInfo, 'utf-8', errors='ignore' )
 		shutil.rmtree( dir, True )
 		return metaInfo
 

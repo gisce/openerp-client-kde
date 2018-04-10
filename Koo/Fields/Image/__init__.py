@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from ImageFieldWidget import *
+from .ImageFieldWidget import *
 from Koo.Fields.FieldWidgetFactory import *
 
 FieldWidgetFactory.register( 'image', ImageFieldWidget )

@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from RichTextFieldWidget import *
+from .RichTextFieldWidget import *
 from Koo.Fields.FieldWidgetFactory import *
 
 FieldWidgetFactory.register( 'text_tag', RichTextFieldWidget )

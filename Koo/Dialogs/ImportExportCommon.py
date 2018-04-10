@@ -65,7 +65,7 @@ class FieldsModel(QStandardItemModel):
             'string': _('Database ID'),
             'type': 'integer',
         }
-        fields_order = fields.keys()
+        fields_order = list(fields.keys())
         fields_order.sort(
             lambda x, y: -cmp(fields[x].get('string', ''), fields[y].get('string', '')))
         if prefix == None:

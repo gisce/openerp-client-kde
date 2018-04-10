@@ -72,10 +72,10 @@ class MenuDialog(QDialog):
         self.group = RecordGroup(model, self.fields, ids)
         #mt = tracker.ObjectTracker()
         iterations = 0
-        for x in xrange(iterations):
+        for x in range(iterations):
             # print "NUM OBJECTS: ", len(gc.get_objects())
             self.group = RecordGroup(model, self.fields, ids)
-            print "GC 0: ", len(gc.get_referrers(self.group))
+            print("GC 0: ", len(gc.get_referrers(self.group)))
             # for x in gc.get_referrers(self.group):
             #	print "REF: ", x
             #	print "--------"
@@ -108,11 +108,11 @@ class MenuDialog(QDialog):
             #self.group = None
             gc.collect()
             # mt.print_diff()
-            print "NUM OBJECTS: ", len(gc.get_objects())
+            print("NUM OBJECTS: ", len(gc.get_objects()))
             # print "----"
             # print "GC: ", gc.get_referrers(self.group)
-            print "GC: ", len(gc.get_referrers(self.group))
-        print "AFD"
+            print("GC: ", len(gc.get_referrers(self.group)))
+        print("AFD")
 
         # Setup Qt Model
         self.model = KooModel(self)

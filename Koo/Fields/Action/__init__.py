@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from ActionFieldWidget import *
+from .ActionFieldWidget import *
 from Koo.Fields.FieldWidgetFactory import *
 
 FieldWidgetFactory.register( 'action', ActionFieldWidget )

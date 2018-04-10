@@ -139,7 +139,7 @@ class FormContainer(QWidget):
 
         if labelText:
             label = QLabel(self)
-            label.setText(unicode(Common.normalizeLabel(labelText)))
+            label.setText(str(Common.normalizeLabel(labelText)))
             label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
             label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
 
@@ -152,7 +152,7 @@ class FormContainer(QWidget):
             else:
                 color = 'black'
 
-            label.setText(unicode(
+            label.setText(str(
                 '<small><a style="color: %s" href="help">?</a></small> %s' % (color, labelText)))
             self.connect(label, SIGNAL(
                 'linkActivated(QString)'), widget.showHelp)
@@ -226,7 +226,7 @@ class FormView(AbstractView):
                 self.widgets[name].store()
             else:
                 # TODO: Why should this happen?
-                print "NO MODEL SET FOR WIDGET: ", name
+                print("NO MODEL SET FOR WIDGET: ", name)
 
     def selectedRecords(self):
         if self.record:
@@ -234,7 +234,7 @@ class FormView(AbstractView):
         return []
 
     def reset(self):
-        for name, widget in self.widgets.items():
+        for name, widget in list(self.widgets.items()):
             widget.reset()
 
     def display(self, currentRecord, records):
@@ -260,7 +260,7 @@ class FormView(AbstractView):
         self.updateDisplay(self.record)
 
     def setFieldFocus(self, fieldName):
-        fieldName = unicode(fieldName)
+        fieldName = str(fieldName)
         if not fieldName in self.widgets:
             return
         self.widgets[fieldName].setFocus()
@@ -280,7 +280,7 @@ class FormView(AbstractView):
             widgetGui = widget['widget']
 
             # Consider 'attrs' attribute
-            for attribute, condition in widget['attributes'].iteritems():
+            for attribute, condition in widget['attributes'].items():
                 if self.record:
                     value = self.record.evaluateCondition(condition)
                 else:

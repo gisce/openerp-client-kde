@@ -29,7 +29,7 @@ from threading import Thread, Semaphore, Lock
 import netsvc
 import time
 from workflow.wkf_service import workflow_service
-import SimpleXMLRPCServer
+import xmlrpc.server
 import release
 
 class new_workflow_service(workflow_service):
@@ -124,6 +124,6 @@ class subscription_services(netsvc_service):
 
 subscription_services()
 
-paths = list(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler.rpc_paths) + ['/xmlrpc/subscription' ]
-SimpleXMLRPCServer.SimpleXMLRPCRequestHandler.rpc_paths = tuple(paths)
+paths = list(xmlrpc.server.SimpleXMLRPCRequestHandler.rpc_paths) + ['/xmlrpc/subscription' ]
+xmlrpc.server.SimpleXMLRPCRequestHandler.rpc_paths = tuple(paths)
 

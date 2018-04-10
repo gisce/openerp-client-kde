@@ -30,9 +30,9 @@
 from Koo.Common import Api
 from Koo.Common import Common
 from Koo.Common import Debug
-from FormWidget import *
-from TreeWidget import *
-from WebWidget import *
+from .FormWidget import *
+from .TreeWidget import *
+from .WebWidget import *
 
 from Koo import Rpc
 
@@ -51,7 +51,7 @@ def createWindow(view_ids, model, res_id=False, domain=None,
             widget = FormWidget(model, res_id, domain, view_type=mode,
                                 view_ids=(view_ids or []),
                                 context=context, name=name)
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             QApplication.restoreOverrideCursor()
             return
         if target == 'new':
@@ -75,7 +75,7 @@ def createWindow(view_ids, model, res_id=False, domain=None,
                 view = Rpc.session.execute('/object', 'execute', model,
                                            'fields_view_get', False, view_type, context)
             win = TreeWidget(view, model, domain, context, name=name)
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             QApplication.restoreOverrideCursor()
             return
         QApplication.restoreOverrideCursor()

@@ -199,7 +199,7 @@ class KooModel(QAbstractItemModel):
 	# and child fields are excluded if they have been specified.
 	def updateVisibleFields(self):
 		if not self.visibleFields:
-			self.visibleFields = self.fields.keys()[:]
+			self.visibleFields = list(self.fields.keys())[:]
 		if self.icon in self.visibleFields:
 			del self.visibleFields[self.visibleFields.index(self.icon)]
 		if self.child in self.visibleFields:
@@ -320,13 +320,13 @@ class KooModel(QAbstractItemModel):
 		elif fieldType == 'integer':
 			model.setValue( field, value.toInt()[0] )
 		elif fieldType == 'selection':
-			value = unicode( value.toString() )
+			value = str( value.toString() )
 			modelField = self.fields[self.field( index.column() )]
 			for x in modelField['selection']:
 				if x[1] == value:
 					model.setValue( field, x[0] )
 		elif fieldType in ('char', 'text'):
-			model.setValue( field, unicode( value.toString() ) )
+			model.setValue( field, str( value.toString() ) )
 		elif fieldType == 'date':
 			model.setValue( field, Calendar.dateToStorage( value.toDate() ) )
 		elif fieldType == 'datetime' and value:
@@ -341,10 +341,10 @@ class KooModel(QAbstractItemModel):
 		elif fieldType == 'many2one':
 			value = value.toList()
 			if value:
-				value = [ int(value[0].toInt()[0]), unicode(value[1].toString()) ]
+				value = [ int(value[0].toInt()[0]), str(value[1].toString()) ]
 			model.setValue( field, value )
 		else:
-			print "Unable to store value of type: ", fieldType
+			print("Unable to store value of type: ", fieldType)
 
 		return True
 
@@ -360,7 +360,7 @@ class KooModel(QAbstractItemModel):
 				field = self.fields[self.field( index.column() )]
 				for x in field['selection']:
 					if x[0] == value:
-						return QVariant( unicode(x[1]) )
+						return QVariant( str(x[1]) )
 				return QVariant()
 			elif fieldType == 'date' and value:
 				return QVariant( Calendar.dateToText( Calendar.storageToDate( value ) ) )
@@ -397,7 +397,7 @@ class KooModel(QAbstractItemModel):
 					return QVariant()
 				else:
 					# If the text has several lines put them all in a single one
-					return QVariant( unicode(value).replace('\n', ' ') )
+					return QVariant( str(value).replace('\n', ' ') )
 		elif role == Qt.DecorationRole:
 			fieldType = self.fieldType( index.column(), index.internalPointer() )
 			if fieldType == 'button':
@@ -476,7 +476,7 @@ class KooModel(QAbstractItemModel):
 				field = self.fields[self.field( index.column() )]
 				for x in field['selection']:
 					if x[0] == value:
-						return QVariant( unicode(x[1]) )
+						return QVariant( str(x[1]) )
 				return QVariant()
 			elif fieldType == 'date' and value:
 				return QVariant( Calendar.storageToDate( value ) )
@@ -501,7 +501,7 @@ class KooModel(QAbstractItemModel):
 				if value == False or value == None:
 					return QVariant()
 				else:
-					return QVariant( unicode(value) )
+					return QVariant( str(value) )
 		else:
 			return QVariant()
 
@@ -547,7 +547,7 @@ class KooModel(QAbstractItemModel):
 			return QModelIndex()
 
 		row = parent.indexOfRecord( model )
-		for x, y in model.values.items():
+		for x, y in list(model.values.items()):
 			if y == group:
 				field = x
 				break
@@ -601,7 +601,7 @@ class KooModel(QAbstractItemModel):
 		group.records.insert( group.records.index(record), movedRecord )
 
 		if group.count():
-			for idx in xrange(len(group.records)):
+			for idx in range(len(group.records)):
 				if group.sortedOrder is None or group.sortedOrder == Qt.AscendingOrder:
 					seq = idx + 1
 				else:
@@ -619,7 +619,7 @@ class KooModel(QAbstractItemModel):
 		QApplication.setOverrideCursor( Qt.WaitCursor )
 		try:
 			self.group.sort( self.field( column ), order )
-		except Rpc.RpcException, e:
+		except Rpc.RpcException as e:
 			pass
 		QApplication.restoreOverrideCursor()
 
@@ -630,7 +630,7 @@ class KooModel(QAbstractItemModel):
 			field = self.fields.get( self.field( section ) )
 			if not field:
 				field = self.buttons.get( self.field( section ) )
-			return QVariant( Common.normalizeLabel( unicode( field['string'] ) ) )
+			return QVariant( Common.normalizeLabel( str( field['string'] ) ) )
 		elif role == Qt.FontRole and not self._readOnly:
 			fieldName = self.field( section )
 			if self.group.fieldExists( fieldName ) and self.group.isFieldRequired( fieldName ):
@@ -774,7 +774,7 @@ class KooGroupedModel( QAbstractProxyModel ):
 		model = self.sourceModel()
 		newRow = 0
 		previous = False
-		for y in xrange(0, index.row()):
+		for y in range(0, index.row()):
 			value = model.value( y, 0, self.group)
 			if value != previous:
 				newRow += 1
@@ -785,7 +785,7 @@ class KooGroupedModel( QAbstractProxyModel ):
 		model = self.sourceModel()
 		previous = None
 		newRow = 0
-		for y in xrange(0, self.group.count()):
+		for y in range(0, self.group.count()):
 			value = model.value( y, 0, self.group)
 			if value != previous:
 				newRow += 1
@@ -806,7 +806,7 @@ class KooGroupedModel( QAbstractProxyModel ):
 		model = self.sourceModel()
 		newRow = 0
 		previous = None
-		for y in xrange(0, self.group.count()):
+		for y in range(0, self.group.count()):
 			value = model.value( y, 0, self.group )
 			if value != previous:
 				newRow += 1

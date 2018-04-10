@@ -104,7 +104,7 @@ class ViewQueue:
     # @brief Returns the next element of the queue.
     #
     # If the queue is already empty, it will rise an exception.
-    def next(self):
+    def __next__(self):
         self._views.pop(0)
         return self._mixed.pop(0)
 

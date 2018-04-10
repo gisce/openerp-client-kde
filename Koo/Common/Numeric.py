@@ -111,7 +111,7 @@ def integerToText(number):
 def isNumeric(value):
     try:
         return float(value) or True
-    except (ValueError, TypeError), e:
+    except (ValueError, TypeError) as e:
         return False
 
 # @brief This function converts the given paramter (which should be a number) into

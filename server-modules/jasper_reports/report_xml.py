@@ -30,7 +30,7 @@ import os
 import csv
 import copy
 import base64
-import report
+from . import report
 import pooler
 from osv import orm, osv, fields
 import tools
@@ -38,7 +38,7 @@ import tempfile
 import codecs
 import sql_db
 import netsvc
-import jasper_report
+from . import jasper_report
 from tools.translate import _
 
 import string
@@ -46,9 +46,9 @@ import unicodedata
 from xml.dom.minidom import getDOMImplementation
 
 src_chars = """ '"()/*-+?¿!&$[]{}@#`'^:;<>=~%,\\""" 
-src_chars = unicode( src_chars, 'iso-8859-1' )
+src_chars = str( src_chars, 'iso-8859-1' )
 dst_chars = """________________________________"""
-dst_chars = unicode( dst_chars, 'iso-8859-1' )
+dst_chars = str( dst_chars, 'iso-8859-1' )
 
 
 class report_xml_file(osv.osv):
@@ -159,15 +159,15 @@ class report_xml(osv.osv):
 		return path
 
 	def normalize(self, text):
-		if isinstance( text, unicode ):
+		if isinstance( text, str ):
 			text = text.encode('utf-8')
 		return text
 
 	def unaccent(self, text):
 		if isinstance( text, str ):
-			text = unicode( text, 'utf-8' )
+			text = str( text, 'utf-8' )
 		output = text
-		for c in xrange(len(src_chars)):
+		for c in range(len(src_chars)):
 			if c >= len(dst_chars):
 				break
 			output = output.replace( src_chars[c], dst_chars[c] )
@@ -186,8 +186,8 @@ class report_xml(osv.osv):
 
 		# Then add all fields in alphabetical order
 		model = pool.get(modelName)
-		fields = model._columns.keys()
-		fields += model._inherit_fields.keys()
+		fields = list(model._columns.keys())
+		fields += list(model._inherit_fields.keys())
 		# Remove duplicates because model may have fields with the 
 		# same name as it's parent
 		fields = sorted( list( set( fields ) ) )
@@ -198,7 +198,7 @@ class report_xml(osv.osv):
 				name = pool.get('ir.translation')._get_source(cr, uid, modelName + ',' + field, 'field', language)
 			if not name:
 				# If there's not description in user's language, use default (english) one.
-				if field  in model._columns.keys():
+				if field  in list(model._columns.keys()):
 					name = model._columns[field].string
 				else:
 					name = model._inherit_fields[field][2].string

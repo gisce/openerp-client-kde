@@ -73,7 +73,7 @@ class LinkFieldWidget(AbstractFieldWidget, LinkFieldWidgetUi):
             self, _('Select the file to link to'))
         if filename.isNull():
             return
-        self.record.setValue(self.name, unicode(filename))
+        self.record.setValue(self.name, str(filename))
 
     def showValue(self):
         value = self.record.value(self.name)

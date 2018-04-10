@@ -27,7 +27,7 @@
 
 from Koo.Model.KooModel import *
 from Koo.View.AbstractParser import *
-from Calendar import *
+from .Calendar import *
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *

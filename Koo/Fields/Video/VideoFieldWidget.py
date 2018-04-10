@@ -76,11 +76,11 @@ class VideoFieldWidget(AbstractFieldWidget, VideoFieldWidgetUi):
             if filename.isNull():
                 return
             if self.isBinary():
-                filename = unicode(filename)
+                filename = str(filename)
                 value = file(filename).read()
                 self.record.setValue(self.name, value)
             else:
-                self.record.setValue(self.name, unicode(filename))
+                self.record.setValue(self.name, str(filename))
         except:
             QMessageBox.information(
                 self, _('Error'), _('Error reading the file'))

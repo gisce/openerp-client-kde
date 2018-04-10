@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from SvgView import SvgView
+from .SvgView import SvgView
 from Koo.View.AbstractParser import *
 from Koo.Fields.FieldWidgetFactory import *
 from PyQt4.QtCore import *

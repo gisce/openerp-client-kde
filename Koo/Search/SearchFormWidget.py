@@ -32,10 +32,10 @@ from xml.parsers import expat
 import sys
 import gettext
 
-from CustomSearchFormWidget import *
-from SearchViewWidget import *
-from SearchWidgetFactory import *
-from AbstractSearchWidget import *
+from .CustomSearchFormWidget import *
+from .SearchViewWidget import *
+from .SearchWidgetFactory import *
+from .AbstractSearchWidget import *
 from Koo.Common import Common
 from Koo.Common import Api
 from Koo import Rpc
@@ -241,7 +241,7 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
         if not ok or not name:
             return
         Rpc.session.execute('/object', 'execute', 'ir.filters', 'create_or_replace', {
-            'name': unicode(name),
+            'name': str(name),
             'user_id': Rpc.session.uid,
             'model_id': self.model,
             'domain': str(self.value()),
@@ -255,7 +255,7 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
                 ('user_id', 'in', [Rpc.session.uid, False]),
                 ('model_id', '=', self.model)
             ], 0, False, False, Rpc.session.context)
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             # If server version is 5.0 and koo module is not installed ir.filters will not be
             # available
             return
@@ -291,7 +291,7 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
         self.model = model
 
         self.widgets = parser.parse(xml)
-        for widget in self.widgets.values():
+        for widget in list(self.widgets.values()):
             self.connect(widget, SIGNAL('keyDownPressed()'),
                          self, SIGNAL('keyDownPressed()'))
 
@@ -302,7 +302,7 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
         # Don't show expander button unless there are widgets in the
         # second row
         self.pushExpander.hide()
-        for x in self.widgets.values():
+        for x in list(self.widgets.values()):
             if x.gridLine > 0:
                 self.pushExpander.show()
                 break
@@ -330,7 +330,7 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
             proxy = Rpc.RpcProxy(self.model, useExecute=False)
             try:
                 proxy.search(value, 0, False, False, Rpc.session.context)
-            except Rpc.RpcException, e:
+            except Rpc.RpcException as e:
                 number = 0
                 for item in value:
                     if not isinstance(item, tuple):
@@ -341,7 +341,7 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
                         self.uiCustomContainer.setItemValid
                         proxy.search([item], 0, False, False,
                                      Rpc.session.context)
-                    except Rpc.RpcException, e:
+                    except Rpc.RpcException as e:
                         valid = False
 
                     self.uiCustomContainer.setItemValid(number, valid)
@@ -406,7 +406,7 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
         if self.pushSwitchView.isChecked():
             return self.uiCustomContainer.clear()
 
-        for x in self.widgets.values():
+        for x in list(self.widgets.values()):
             x.clear()
 
     # @brief Returns a domain-like list for the current search parameters.

@@ -66,7 +66,7 @@ if isNanScanAvailable:
                 return
 
             id = Rpc.session.execute('/object', 'execute', 'nan.document', 'create', {
-                'name': unicode(self.item.name),
+                'name': str(self.item.name),
                 'datas': base64.encodestring(str(image.buffer())),
                 'filename': _('document.png'),
             }, self.context)

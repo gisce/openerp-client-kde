@@ -32,8 +32,8 @@ errors = {}
 import locale
 from Koo.Common import Common
 
-from ChartView import *
-from ChartGraphicsView import *
+from .ChartView import *
+from .ChartGraphicsView import *
 
 import sys
 

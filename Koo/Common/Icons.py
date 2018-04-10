@@ -112,7 +112,7 @@ def kdeIcon(icon):
         return QIcon(':/images/' + mapIcons[icon])
     else:
         if icon:
-            print "KDE ICON '%s' NOT FOUND" % icon
+            print("KDE ICON '%s' NOT FOUND" % icon)
         return QIcon()
 
 # @brief Returns a QPixmap given an icon name. The name of the icon is usually
@@ -124,7 +124,7 @@ def kdePixmap(icon):
         return QPixmap(':/images/' + mapIcons[icon])
     else:
         if icon:
-            print "KDE ICON '%s' NOT FOUND" % icon
+            print("KDE ICON '%s' NOT FOUND" % icon)
         return QPixmap()
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:

@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from OneToMany import *
+from .OneToMany import *
 from Koo.Fields.FieldWidgetFactory import *
 from Koo.Fields.FieldDelegateFactory import *
 

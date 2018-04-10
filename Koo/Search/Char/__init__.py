@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from CharSearchWidget import *
+from .CharSearchWidget import *
 from Koo.Search.SearchWidgetFactory import *
 
 SearchWidgetFactory.register('char', CharSearchWidget)

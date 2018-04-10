@@ -26,7 +26,7 @@
 ##############################################################################
 
 import socket
-import cPickle
+import pickle
 import sys
 
 DNS_CACHE = {}
@@ -65,7 +65,7 @@ class mysocket:
         self.sock.close()
 
     def mysend(self, msg, exception=False, traceback=None):
-        msg = cPickle.dumps([msg, traceback])
+        msg = pickle.dumps([msg, traceback])
         size = len(msg)
         self.sock.send('%8d' % size)
         self.sock.send(exception and "1" or "0")
@@ -73,7 +73,7 @@ class mysocket:
         while totalsent < size:
             sent = self.sock.send(msg[totalsent:])
             if sent == 0:
-                raise RuntimeError, "socket connection broken"
+                raise RuntimeError("socket connection broken")
             totalsent = totalsent + sent
 
     def myreceive(self):
@@ -81,7 +81,7 @@ class mysocket:
         while len(buf) < 8:
             chunk = self.sock.recv(8 - len(buf))
             if chunk == '':
-                raise RuntimeError, "socket connection broken"
+                raise RuntimeError("socket connection broken")
             buf += chunk
         size = int(buf)
         buf = self.sock.recv(1)
@@ -93,12 +93,12 @@ class mysocket:
         while len(msg) < size:
             chunk = self.sock.recv(size - len(msg))
             if chunk == '':
-                raise RuntimeError, "socket connection broken"
+                raise RuntimeError("socket connection broken")
             msg = msg + chunk
-        res = cPickle.loads(msg)
+        res = pickle.loads(msg)
         if isinstance(res[0], Exception):
             if exception:
-                raise Myexception(unicode(res[0]), unicode(res[1]))
+                raise Myexception(str(res[0]), str(res[1]))
             raise res[0]
         else:
             return res[0]

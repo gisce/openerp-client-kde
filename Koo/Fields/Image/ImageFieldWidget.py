@@ -129,7 +129,7 @@ class ImageFieldWidget(AbstractFieldWidget, ImageFieldWidgetUi):
         if name.isNull():
             return
         try:
-            fp = file(unicode(name), 'wb')
+            fp = file(str(name), 'wb')
             fp.write(self.getImage())
             fp.close()
         except:
@@ -144,7 +144,7 @@ class ImageFieldWidget(AbstractFieldWidget, ImageFieldWidgetUi):
         name = QFileDialog.getOpenFileName(
             self, _('Open image file...'), QDir.homePath(), fileTypes)
         if not name.isNull():
-            image = file(unicode(name), 'rb').read()
+            image = file(str(name), 'rb').read()
             self.setImage(image)
             self.update()
             self.modified()

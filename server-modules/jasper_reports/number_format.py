@@ -34,99 +34,99 @@ import math
 SUPPORTED_LANGS = ('en_US', 'es_ES', 'ca_ES')
 
 TENS_UNITS_SEP = {
-    'en_US': u"-",
-    'es_ES': u" y ", 
-    'ca_ES': u"-",
+    'en_US': "-",
+    'es_ES': " y ", 
+    'ca_ES': "-",
 }
 CURRENCY_DECIMALS_SEP = {
-    'en_US': u"with", 
-    'es_ES': u"con", 
-    'ca_ES': u"amb",
+    'en_US': "with", 
+    'es_ES': "con", 
+    'ca_ES': "amb",
 }
 NOT_CURRENCY_DECIMALS_SEP = {
-    'en_US': u"dot", 
-    'es_ES': u"coma", 
-    'ca_ES': u"coma",
+    'en_US': "dot", 
+    'es_ES': "coma", 
+    'ca_ES': "coma",
 }
 
 CURRENCY_INTEGER_NAME = {
-    0: {'en_US': u"Euros", 'es_ES': u"Euros", 'ca_ES': u"Euros"},
-    1: {'en_US': u"Euro", 'es_ES': u"Euro", 'ca_ES': u"Euro"},
-    2: {'en_US': u"Euros", 'es_ES': u"Euros", 'ca_ES': u"Euros"},
+    0: {'en_US': "Euros", 'es_ES': "Euros", 'ca_ES': "Euros"},
+    1: {'en_US': "Euro", 'es_ES': "Euro", 'ca_ES': "Euro"},
+    2: {'en_US': "Euros", 'es_ES': "Euros", 'ca_ES': "Euros"},
 }
 CURRENCY_DECIMALS_NAME = {
-    0: {'en_US': u"Cents", 'es_ES': u"Céntimos", 'ca_ES': u"Cèntims"},
-    1: {'en_US': u"Cent", 'es_ES': u"Céntimo", 'ca_ES': u"Cèntim"},
-    2: {'en_US': u"Cents", 'es_ES': u"Céntimos", 'ca_ES': u"Cèntims"},
+    0: {'en_US': "Cents", 'es_ES': "Céntimos", 'ca_ES': "Cèntims"},
+    1: {'en_US': "Cent", 'es_ES': "Céntimo", 'ca_ES': "Cèntim"},
+    2: {'en_US': "Cents", 'es_ES': "Céntimos", 'ca_ES': "Cèntims"},
 }
 
 TENS = {
-    20: {'en_US': u"Twenty", 'es_ES': u"Venti", 'ca_ES': u"Vint"},
-    30: {'en_US': u"Thirty", 'es_ES': u"Treinta", 'ca_ES': u"Trenta"},
-    40: {'en_US': u"Forty", 'es_ES': u"Cuarenta", 'ca_ES': u"Quaranta"},
-    50: {'en_US': u"Fifty", 'es_ES': u"Cincuenta", 'ca_ES': u"Cinquanta"},
-    60: {'en_US': u"Sixty", 'es_ES': u"Sesenta", 'ca_ES': u"Seixanta"},
-    70: {'en_US': u"Seventy", 'es_ES': u"Setenta", 'ca_ES': u"Setanta"},
-    80: {'en_US': u"Eighty", 'es_ES': u"Ochenta", 'ca_ES': u"Vuitanta"},
-    90: {'en_US': u"Ninety", 'es_ES': u"Noventa", 'ca_ES': u"Noranta"},
+    20: {'en_US': "Twenty", 'es_ES': "Venti", 'ca_ES': "Vint"},
+    30: {'en_US': "Thirty", 'es_ES': "Treinta", 'ca_ES': "Trenta"},
+    40: {'en_US': "Forty", 'es_ES': "Cuarenta", 'ca_ES': "Quaranta"},
+    50: {'en_US': "Fifty", 'es_ES': "Cincuenta", 'ca_ES': "Cinquanta"},
+    60: {'en_US': "Sixty", 'es_ES': "Sesenta", 'ca_ES': "Seixanta"},
+    70: {'en_US': "Seventy", 'es_ES': "Setenta", 'ca_ES': "Setanta"},
+    80: {'en_US': "Eighty", 'es_ES': "Ochenta", 'ca_ES': "Vuitanta"},
+    90: {'en_US': "Ninety", 'es_ES': "Noventa", 'ca_ES': "Noranta"},
 }
 
 HUNDREDS = {
-    100: {'en_US': u"One Hundred", 'es_ES': u"Ciento", 'ca_ES': u"Cent"},
-    200: {'en_US': u"Two Hundred", 'es_ES': u"Doscientos", 'ca_ES': u"Dos-cents"},
-    300: {'en_US': u"Three Hundred", 'es_ES': u"Trescientos", 'ca_ES': u"Tres-ents"},
-    400: {'en_US': u"Four Hundred", 'es_ES': u"Cuatrocientos", 'ca_ES': u"Quatre-cents"},
-    500: {'en_US': u"Five Hundred", 'es_ES': u"Quinientos", 'ca_ES': u"Cinc-cents"},
-    600: {'en_US': u"Six Hundred", 'es_ES': u"Seiscientos", 'ca_ES': u"Sis-cents"},
-    700: {'en_US': u"Seven Hundred", 'es_ES': u"Setecientos", 'ca_ES': u"Set-cents"},
-    800: {'en_US': u"Eight Hundred", 'es_ES': u"Ochocientos", 'ca_ES': u"Vuit-cents"},
-    900: {'en_US': u"Nine Hundred", 'es_ES': u"Novecientos", 'ca_ES': u"Nou-cents"},
+    100: {'en_US': "One Hundred", 'es_ES': "Ciento", 'ca_ES': "Cent"},
+    200: {'en_US': "Two Hundred", 'es_ES': "Doscientos", 'ca_ES': "Dos-cents"},
+    300: {'en_US': "Three Hundred", 'es_ES': "Trescientos", 'ca_ES': "Tres-ents"},
+    400: {'en_US': "Four Hundred", 'es_ES': "Cuatrocientos", 'ca_ES': "Quatre-cents"},
+    500: {'en_US': "Five Hundred", 'es_ES': "Quinientos", 'ca_ES': "Cinc-cents"},
+    600: {'en_US': "Six Hundred", 'es_ES': "Seiscientos", 'ca_ES': "Sis-cents"},
+    700: {'en_US': "Seven Hundred", 'es_ES': "Setecientos", 'ca_ES': "Set-cents"},
+    800: {'en_US': "Eight Hundred", 'es_ES': "Ochocientos", 'ca_ES': "Vuit-cents"},
+    900: {'en_US': "Nine Hundred", 'es_ES': "Novecientos", 'ca_ES': "Nou-cents"},
 }
 
 GREATER = {
-    1000: {'en_US': u"One Thousand", 'es_ES': u"Mil", 'ca_ES': u"Mil"},
-    1000000: {'en_US': u"One Million", 'es_ES': u"Millones", 'ca_ES': u"Milions"},
+    1000: {'en_US': "One Thousand", 'es_ES': "Mil", 'ca_ES': "Mil"},
+    1000000: {'en_US': "One Million", 'es_ES': "Millones", 'ca_ES': "Milions"},
 }
 
 UNITS = TENS.copy()
 UNITS.update(HUNDREDS)
 UNITS.update(GREATER)
 UNITS.update({
-    0: {'en_US': u"Zero", 'es_ES': u"Cero", 'ca_ES': u"Zero"},
-    1: {'en_US': u"One", 'es_ES': u"Un", 'ca_ES': u"Un"},
-    2: {'en_US': u"Two",'es_ES': u"Dos", 'ca_ES': u"Dos"},
-    3: {'en_US': u"Three",'es_ES': u"Tres", 'ca_ES': u"Tres"},
-    4: {'en_US': u"Four",'es_ES': u"Cuatro", 'ca_ES': u"Quatre"},
-    5: {'en_US': u"Five",'es_ES': u"Cinco", 'ca_ES': u"Cinc"},
-    6: {'en_US': u"Six",'es_ES': u"Seis", 'ca_ES': u"Sis"},
-    7: {'en_US': u"Seven",'es_ES': u"Siete", 'ca_ES': u"Set"},
-    8: {'en_US': u"Eight",'es_ES': u"Ocho", 'ca_ES': u"Vuit"},
-    9: {'en_US': u"Nine",'es_ES': u"Nueve", 'ca_ES': u"Nou"},
-    10: {'en_US': u"Ten",'es_ES': u"Diez", 'ca_ES': u"Deu"},
-    11: {'en_US': u"Eleven",'es_ES': u"Once", 'ca_ES': u"Onze"},
-    12: {'en_US': u"Twelve",'es_ES': u"Doce", 'ca_ES': u"Dotze"},
-    13: {'en_US': u"Thirteen",'es_ES': u"Trece", 'ca_ES': u"Tretze"},
-    14: {'en_US': u"Fourteen",'es_ES': u"Catorce", 'ca_ES': u"Catorze"},
-    15: {'en_US': u"Fifteen",'es_ES': u"Quince", 'ca_ES': u"Quinze"},
-    16: {'en_US': u"Sixteen",'es_ES': u"Dieciséis", 'ca_ES': u"Setze"},
-    17: {'en_US': u"Seventeen",'es_ES': u"Diecisiete", 'ca_ES': u"Disset"},
-    18: {'en_US': u"Eighteen",'es_ES': u"Dieciocho", 'ca_ES': u"Divuit"},
-    19: {'en_US': u"Nineteen",'es_ES': u"Diecinueve", 'ca_ES': u"Dinou"},
+    0: {'en_US': "Zero", 'es_ES': "Cero", 'ca_ES': "Zero"},
+    1: {'en_US': "One", 'es_ES': "Un", 'ca_ES': "Un"},
+    2: {'en_US': "Two",'es_ES': "Dos", 'ca_ES': "Dos"},
+    3: {'en_US': "Three",'es_ES': "Tres", 'ca_ES': "Tres"},
+    4: {'en_US': "Four",'es_ES': "Cuatro", 'ca_ES': "Quatre"},
+    5: {'en_US': "Five",'es_ES': "Cinco", 'ca_ES': "Cinc"},
+    6: {'en_US': "Six",'es_ES': "Seis", 'ca_ES': "Sis"},
+    7: {'en_US': "Seven",'es_ES': "Siete", 'ca_ES': "Set"},
+    8: {'en_US': "Eight",'es_ES': "Ocho", 'ca_ES': "Vuit"},
+    9: {'en_US': "Nine",'es_ES': "Nueve", 'ca_ES': "Nou"},
+    10: {'en_US': "Ten",'es_ES': "Diez", 'ca_ES': "Deu"},
+    11: {'en_US': "Eleven",'es_ES': "Once", 'ca_ES': "Onze"},
+    12: {'en_US': "Twelve",'es_ES': "Doce", 'ca_ES': "Dotze"},
+    13: {'en_US': "Thirteen",'es_ES': "Trece", 'ca_ES': "Tretze"},
+    14: {'en_US': "Fourteen",'es_ES': "Catorce", 'ca_ES': "Catorze"},
+    15: {'en_US': "Fifteen",'es_ES': "Quince", 'ca_ES': "Quinze"},
+    16: {'en_US': "Sixteen",'es_ES': "Dieciséis", 'ca_ES': "Setze"},
+    17: {'en_US': "Seventeen",'es_ES': "Diecisiete", 'ca_ES': "Disset"},
+    18: {'en_US': "Eighteen",'es_ES': "Dieciocho", 'ca_ES': "Divuit"},
+    19: {'en_US': "Nineteen",'es_ES': "Diecinueve", 'ca_ES': "Dinou"},
     # When the values is exactly '20', is so called
-    20: {'es_ES': u"Veinte", 'ca_ES': u"Vint"},
-    21: {'es_ES': u"Veintiún", 'ca_ES': u"Vint-i-un"},
-    22: {'es_ES': u"Veintidós", 'ca_ES': u"Vint-i-dos"},
-    23: {'es_ES': u"Veintitrés", 'ca_ES': u"Vint-i-tres"},
-    24: {'es_ES': u"Veinticuatro", 'ca_ES': u"Vint-i-quatre"},
-    25: {'es_ES': u"Veinticinco", 'ca_ES': u"Vint-i-cinc"},
-    26: {'es_ES': u"Veintiséis", 'ca_ES': u"Vint-i-sis"},
-    27: {'es_ES': u"Veintisiete", 'ca_ES': u"Vint-i-set"},
-    28: {'es_ES': u"Veintiocho", 'ca_ES': u"Vint-i-vuit"},
-    29: {'es_ES': u"Veintinueve", 'ca_ES': u"Vint-i-nou"},
+    20: {'es_ES': "Veinte", 'ca_ES': "Vint"},
+    21: {'es_ES': "Veintiún", 'ca_ES': "Vint-i-un"},
+    22: {'es_ES': "Veintidós", 'ca_ES': "Vint-i-dos"},
+    23: {'es_ES': "Veintitrés", 'ca_ES': "Vint-i-tres"},
+    24: {'es_ES': "Veinticuatro", 'ca_ES': "Vint-i-quatre"},
+    25: {'es_ES': "Veinticinco", 'ca_ES': "Vint-i-cinc"},
+    26: {'es_ES': "Veintiséis", 'ca_ES': "Vint-i-sis"},
+    27: {'es_ES': "Veintisiete", 'ca_ES': "Vint-i-set"},
+    28: {'es_ES': "Veintiocho", 'ca_ES': "Vint-i-vuit"},
+    29: {'es_ES': "Veintinueve", 'ca_ES': "Vint-i-nou"},
     # When the values is exactly '100', is so called
-    100: {'en_US': u"Hundred", 'es_ES': u"Cien", 'ca_ES': u"Cent"},
-    1000: {'en_US': u"Thousand", 'es_ES': u"Mil", 'ca_ES': u"Mil"},
-    1000000: {'en_US': u"Million", 'es_ES': u"Un Millón", 'ca_ES': u"Un Milió"},
+    100: {'en_US': "Hundred", 'es_ES': "Cien", 'ca_ES': "Cent"},
+    1000: {'en_US': "Thousand", 'es_ES': "Mil", 'ca_ES': "Mil"},
+    1000000: {'en_US': "Million", 'es_ES': "Un Millón", 'ca_ES': "Un Milió"},
 })
 
 
@@ -201,7 +201,7 @@ def integer_to_literal(input_int, lang_code):
     if hundreds:
         # exactly 100 is already contempleted
         converted += __convert_hundreds(hundreds)
-    return u" ".join(converted)
+    return " ".join(converted)
 
 
 def number_to_literal(input_number, lang_code, rounding=0.01, is_currency=True):

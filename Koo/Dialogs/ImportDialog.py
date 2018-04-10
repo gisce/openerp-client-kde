@@ -37,7 +37,7 @@ from Koo.Screen.ViewQueue import *
 from Koo import Rpc
 
 import csv
-import StringIO
+import io
 
 try:
     import xlrd
@@ -54,7 +54,7 @@ except:
     isOdsAvailable = False
 
 
-from ImportExportCommon import *
+from .ImportExportCommon import *
 
 
 def executeImport(datas, model, fields):
@@ -65,7 +65,7 @@ def executeImport(datas, model, fields):
             'Imported %d objects !') % (res[0]))
     else:
         d = ''
-        for key, val in res[1].items():
+        for key, val in list(res[1].items()):
             d += ('\t%s: %s\n' % (str(key), str(val)))
         error = _('Error trying to import this record:\n%(record)s\nError Message:\n%(error1)s\n\n%(error2)s') % {
             'record': d,
@@ -81,22 +81,22 @@ def importCsv(csv_data, fields, model):
     fname = csv_data['fname']
     try:
         content = file(fname, 'rb').read()
-    except Exception, e:
+    except Exception as e:
         QMessageBox.information(None, _('Error'), _(
-            'Error opening file: %s') % unicode(e.args))
+            'Error opening file: %s') % str(e.args))
         return False
     try:
-        input = StringIO.StringIO(content)
+        input = io.StringIO(content)
         data = list(csv.reader(input, quotechar=csv_data['del'], delimiter=csv_data['sep']))[
             int(csv_data['skip']):]
 
         datas = []
         for line in data:
-            datas.append(map(lambda x: x.decode(
-                csv_data['encoding']).encode('utf-8'), line))
-    except Exception, e:
+            datas.append([x.decode(
+                csv_data['encoding']).encode('utf-8') for x in line])
+    except Exception as e:
         QMessageBox.information(None, _('Error'), _(
-            'Error reading file: %s') % unicode(e.args))
+            'Error reading file: %s') % str(e.args))
         return False
 
     return executeImport(datas, model, fields)
@@ -136,7 +136,7 @@ class ImportDialog(QDialog, ImportDialogUi):
 
     def fileFormat(self):
         index = self.uiFileFormat.currentIndex()
-        return unicode(self.uiFileFormat.itemData(index).toString())
+        return str(self.uiFileFormat.itemData(index).toString())
 
     def updateFileFormat(self):
         if self.fileFormat() == 'csv':
@@ -152,7 +152,7 @@ class ImportDialog(QDialog, ImportDialogUi):
             self.updateOdsFields()
 
     def updateXlsFields(self):
-        fileName = unicode(self.uiFileName.text())
+        fileName = str(self.uiFileName.text())
         if not fileName:
             QMessageBox.information(
                 self, _('Sheet List Error'), 'You must select an import file first !')
@@ -163,7 +163,7 @@ class ImportDialog(QDialog, ImportDialogUi):
         self.uiSpreadSheetSheet.setCurrentIndex(0)
 
     def updateOdsFields(self):
-        fileName = unicode(self.uiFileName.text())
+        fileName = str(self.uiFileName.text())
         if not fileName:
             QMessageBox.information(
                 self, _('Sheet List Error'), 'You must select an import file first !')
@@ -189,11 +189,11 @@ class ImportDialog(QDialog, ImportDialogUi):
             queue = ViewQueue()
             queue.setup(self.viewTypes, self.viewIds)
             while not queue.isEmpty():
-                id, type = queue.next()
+                id, type = next(queue)
                 view = Rpc.session.execute(
                     '/object', 'execute', self.model, 'fields_view_get', id, type, Rpc.session.context)
                 self.fields.update(view['fields'])
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             QApplication.restoreOverrideCursor()
             return
 
@@ -215,7 +215,7 @@ class ImportDialog(QDialog, ImportDialogUi):
             return
         self.uiFileName.setText(fileName)
         index = self.uiFileFormat.currentIndex()
-        fileName = unicode(fileName)
+        fileName = str(fileName)
         if fileName.lower().endswith('.csv'):
             index = self.uiFileFormat.findData('csv')
         if isXlsAvailable:
@@ -250,30 +250,30 @@ class ImportDialog(QDialog, ImportDialogUi):
             self.selectedModel.removeRows(0, self.selectedModel.rowCount())
 
     def fullPathText(self, item):
-        path = unicode(item.text())
+        path = str(item.text())
         while item.parent() != None:
             item = item.parent()
             path = item.text() + "/" + path
         return path
 
     def fullPathData(self, item):
-        path = unicode(item.data().toString())
+        path = str(item.data().toString())
         while item.parent() != None:
             item = item.parent()
             path = item.data().toString() + "/" + path
         return path
 
     def csvAutoDetect(self):
-        fileName = unicode(self.uiFileName.text())
+        fileName = str(self.uiFileName.text())
         if not fileName:
             QMessageBox.information(
                 self, _('Auto-detect error'), 'You must select an import file first !')
             return
-        separator = unicode(self.uiFieldSeparator.text()
+        separator = str(self.uiFieldSeparator.text()
                             ).encode('ascii', 'ignore').strip()
-        delimiter = unicode(self.uiTextDelimiter.text()).encode(
+        delimiter = str(self.uiTextDelimiter.text()).encode(
             'ascii', 'ignore').strip()
-        encoding = unicode(self.uiEncoding.currentText()) or 'UTF-8'
+        encoding = str(self.uiEncoding.currentText()) or 'UTF-8'
 
         self.uiLinesToSkip.setValue(1)
         if len(separator) != 1:
@@ -297,7 +297,7 @@ class ImportDialog(QDialog, ImportDialogUi):
             for record in records:
                 for field in record:
                     if encoding:
-                        field = unicode(field, encoding, errors='replace')
+                        field = str(field, encoding, errors='replace')
                     self.selectedModel.addField(
                         field, self.fieldsInvertedInfo[field])
                 break
@@ -310,12 +310,12 @@ class ImportDialog(QDialog, ImportDialogUi):
     def odsRecords(self, fileName, sheet):
         try:
             doc = odf.opendocument.load(fileName)
-        except Exception, e:
+        except Exception as e:
             QMessageBox.information(None, _('Error'), _(
-                'Error reading file: %s') % unicode(e.args))
+                'Error reading file: %s') % str(e.args))
             return []
 
-        key = ('urn:oasis:names:tc:opendocument:xmlns:table:1.0', u'name')
+        key = ('urn:oasis:names:tc:opendocument:xmlns:table:1.0', 'name')
         for x in doc.getElementsByType(odf.table.Table):
             if key in x.attributes and x.attributes[key] == sheet:
                 #d = doc.spreadsheet
@@ -327,7 +327,7 @@ class ImportDialog(QDialog, ImportDialogUi):
                     for cell in cells:
                         tps = cell.getElementsByType(odf.text.P)
                         for x in tps:
-                            record.append(unicode(x.firstChild))
+                            record.append(str(x.firstChild))
                     if record:
                         records.append(record)
                 break
@@ -336,11 +336,11 @@ class ImportDialog(QDialog, ImportDialogUi):
     def odsSheets(self, fileName):
         try:
             doc = odf.opendocument.load(fileName)
-        except Exception, e:
+        except Exception as e:
             QMessageBox.information(None, _('Error'), _(
-                'Error reading file: %s') % unicode(e.args))
+                'Error reading file: %s') % str(e.args))
             return []
-        key = ('urn:oasis:names:tc:opendocument:xmlns:table:1.0', u'name')
+        key = ('urn:oasis:names:tc:opendocument:xmlns:table:1.0', 'name')
         sheets = []
         for x in doc.getElementsByType(odf.table.Table):
             if key in x.attributes:
@@ -350,16 +350,16 @@ class ImportDialog(QDialog, ImportDialogUi):
     def xlsRecords(self, fileName, sheet):
         try:
             book = xlrd.open_workbook(fileName)
-        except Exception, e:
+        except Exception as e:
             QMessageBox.information(None, _('Error'), _(
-                'Error reading file: %s') % unicode(e.args))
+                'Error reading file: %s') % str(e.args))
             return []
         sheet = book.sheet_by_name(sheet)
         if sheet.nrows == 0:
             return []
         header = sheet.row_values(0)
         records = []
-        for row in xrange(sheet.nrows):
+        for row in range(sheet.nrows):
             record = []
             for column in sheet.row_values(row):
                 record.append(column)
@@ -369,22 +369,22 @@ class ImportDialog(QDialog, ImportDialogUi):
     def xlsSheets(self, fileName):
         try:
             book = xlrd.open_workbook(fileName)
-        except Exception, e:
+        except Exception as e:
             QMessageBox.information(None, _('Error'), _(
-                'Error reading file: %s') % unicode(e.args))
+                'Error reading file: %s') % str(e.args))
             return []
         sheets = []
-        for i in xrange(book.nsheets):
+        for i in range(book.nsheets):
             sheets.append(book.sheet_by_index(i).name)
         return sheets
 
     def xlsAutoDetect(self):
-        fileName = unicode(self.uiFileName.text())
+        fileName = str(self.uiFileName.text())
         if not fileName:
             QMessageBox.information(
                 self, _('Auto-detect error'), 'You must select an import file first !')
             return
-        sheet = unicode(self.uiSpreadSheetSheet.currentText())
+        sheet = str(self.uiSpreadSheetSheet.currentText())
         records = self.xlsRecords(fileName, sheet)
         if records:
             record = records[0]
@@ -399,12 +399,12 @@ class ImportDialog(QDialog, ImportDialogUi):
                 self.uiSpreadSheetLinesToSkip.setValue(1)
 
     def odsAutoDetect(self):
-        fileName = unicode(self.uiFileName.text())
+        fileName = str(self.uiFileName.text())
         if not fileName:
             QMessageBox.information(
                 self, _('Auto-detect error'), 'You must select an import file first !')
             return
-        sheet = unicode(self.uiSpreadSheetSheet.currentText())
+        sheet = str(self.uiSpreadSheetSheet.currentText())
         records = self.odsRecords(fileName, sheet)
         if records:
             record = records[0]
@@ -430,11 +430,11 @@ class ImportDialog(QDialog, ImportDialogUi):
     def importCsv(self):
         self.uiLinesToSkip.setValue(1)
         csv = {
-            'fname': unicode(self.uiFileName.text()).strip(),
-            'sep': unicode(self.uiFieldSeparator.text()).encode('ascii', 'ignore').strip(),
-            'del': unicode(self.uiTextDelimiter.text()).encode('ascii', 'ignore').strip(),
+            'fname': str(self.uiFileName.text()).strip(),
+            'sep': str(self.uiFieldSeparator.text()).encode('ascii', 'ignore').strip(),
+            'del': str(self.uiTextDelimiter.text()).encode('ascii', 'ignore').strip(),
             'skip': self.uiLinesToSkip.value(),
-            'encoding': unicode(self.uiEncoding.currentText())
+            'encoding': str(self.uiEncoding.currentText())
         }
         if csv['fname'] == '':
             QMessageBox.warning(self, _('Import error'),
@@ -451,7 +451,7 @@ class ImportDialog(QDialog, ImportDialogUi):
         fieldsData = []
         for x in range(0, self.selectedModel.rowCount()):
             fieldsData.append(
-                unicode(self.selectedModel.item(x).data().toString()))
+                str(self.selectedModel.item(x).data().toString()))
 
         if csv['fname']:
             if not importCsv(csv, fieldsData, self.model):
@@ -459,19 +459,19 @@ class ImportDialog(QDialog, ImportDialogUi):
         self.accept()
 
     def importXls(self):
-        fileName = unicode(self.uiFileName.text())
+        fileName = str(self.uiFileName.text())
         if not fileName:
             QMessageBox.information(
                 self, _('Import Error'), 'You must select an import file first !')
             return
-        sheet = unicode(self.uiSpreadSheetSheet.currentText())
+        sheet = str(self.uiSpreadSheetSheet.currentText())
 
         linesToSkip = self.uiSpreadSheetLinesToSkip.value()
 
         fieldsData = []
         for x in range(0, self.selectedModel.rowCount()):
             fieldsData.append(
-                unicode(self.selectedModel.item(x).data().toString()))
+                str(self.selectedModel.item(x).data().toString()))
 
         records = self.xlsRecords(fileName, sheet)
         records = records[linesToSkip:]
@@ -479,19 +479,19 @@ class ImportDialog(QDialog, ImportDialogUi):
         return records
 
     def importOds(self):
-        fileName = unicode(self.uiFileName.text())
+        fileName = str(self.uiFileName.text())
         if not fileName:
             QMessageBox.information(
                 self, _('Import Error'), 'You must select an import file first !')
             return
-        sheet = unicode(self.uiSpreadSheetSheet.currentText())
+        sheet = str(self.uiSpreadSheetSheet.currentText())
 
         linesToSkip = self.uiSpreadSheetLinesToSkip.value()
 
         fieldsData = []
         for x in range(0, self.selectedModel.rowCount()):
             fieldsData.append(
-                unicode(self.selectedModel.item(x).data().toString()))
+                str(self.selectedModel.item(x).data().toString()))
 
         records = self.odsRecords(fileName, sheet)
         records = records[linesToSkip:]

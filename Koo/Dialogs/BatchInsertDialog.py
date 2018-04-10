@@ -76,7 +76,7 @@ class BatchInsertDialog(QDialog, BatchInsertDialogUi):
             '/object', 'execute', self.model, 'fields_view_get', False, 'form', Rpc.session.context)
         fields = fields['fields']
         if self.availableFields:
-            for field in fields.keys():
+            for field in list(fields.keys()):
                 if not field in self.availableFields:
                     del fields[field]
 
@@ -123,7 +123,7 @@ class BatchInsertDialog(QDialog, BatchInsertDialogUi):
             queue.setup(self.viewTypes, self.viewIds)
             type = ''
             while type != 'form':
-                id, type = queue.next()
+                id, type = next(queue)
             screen.setupViews(['form'], [id])
         else:
             screen.setupViews(['form'], [False])

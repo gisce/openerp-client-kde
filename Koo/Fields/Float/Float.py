@@ -66,12 +66,12 @@ class FloatFieldWidget(AbstractFieldWidget):
         self.widget.setReadOnly(value)
 
     def calculate(self):
-        val = textToFloat(unicode(self.widget.text()))
+        val = textToFloat(str(self.widget.text()))
         self.setText(val)
         self.modified()
 
     def value(self):
-        return textToFloat(unicode(self.widget.text()))
+        return textToFloat(str(self.widget.text()))
 
     def storeValue(self):
         self.record.setValue(self.name, self.value())
@@ -100,5 +100,5 @@ class FloatFieldWidget(AbstractFieldWidget):
 
 class FloatFieldDelegate(AbstractFieldDelegate):
     def setModelData(self, editor, model, index):
-        value = textToFloat(unicode(editor.text()))
+        value = textToFloat(str(editor.text()))
         model.setData(index, QVariant(value), Qt.EditRole)

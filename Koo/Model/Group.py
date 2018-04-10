@@ -29,8 +29,8 @@
 from Koo.Rpc import RpcProxy
 from Koo import Rpc
 from Koo.Common.Settings import *
-from Record import Record
-import Field
+from .Record import Record
+from . import Field
 
 
 from PyQt4.QtCore import *
@@ -101,7 +101,7 @@ class RecordGroup(QObject):
         else:
             self.fields = fields
         self.fieldObjects = {}
-        self.loadFieldObjects(self.fields.keys())
+        self.loadFieldObjects(list(self.fields.keys()))
 
         self.records = []
 
@@ -468,10 +468,10 @@ class RecordGroup(QObject):
             self.removeRecord(record)
 
     def binaryFieldNames(self):
-        return [x[:-5] for x in self.fieldObjects.keys() if x.endswith('.size')]
+        return [x[:-5] for x in list(self.fieldObjects.keys()) if x.endswith('.size')]
 
     def allFieldNames(self):
-        return [x for x in self.fieldObjects.keys() if not x.endswith('.size')]
+        return [x for x in list(self.fieldObjects.keys()) if not x.endswith('.size')]
 
     def createAllFields(self):
         if self._allFieldsLoaded:
@@ -487,7 +487,7 @@ class RecordGroup(QObject):
     # server function.
     def addFields(self, fields):
         to_add = []
-        for f in fields.keys():
+        for f in list(fields.keys()):
             if not f in self.fields:
                 self.fields[f] = fields[f]
                 self.fields[f]['name'] = f
@@ -505,7 +505,7 @@ class RecordGroup(QObject):
         c = Rpc.session.context.copy()
         c.update(self.context())
         c['bin_size'] = True
-        values = self.rpc.read(ids, self.fields.keys(), c)
+        values = self.rpc.read(ids, list(self.fields.keys()), c)
         if values:
             for v in values:
                 #self.recordById( v['id'] ).set(v, signal=False)
@@ -633,7 +633,7 @@ class RecordGroup(QObject):
 
         newRecord = self.create()
         newRecord.values = record.values.copy()
-        for field in newRecord.values.keys():
+        for field in list(newRecord.values.keys()):
             if self.fieldType(field) in ('one2many'):
                 del newRecord.values[field]
         newRecord.modified = True
@@ -803,7 +803,7 @@ class RecordGroup(QObject):
             # the model will actually not exist in the server and would raise
             # an exception.
             ids = []
-        elif not field in self.fields.keys():
+        elif not field in list(self.fields.keys()):
             # If the field doesn't exist use default sorting. Usually this will
             # happen when we update and haven't selected a field to sort by.
             ids = self.rpc.search(
@@ -897,7 +897,7 @@ class RecordGroup(QObject):
             # We need this function here as we use the 'field' variable
             def ignoreCase(record):
                 v = record.value(field)
-                if isinstance(v, unicode) or isinstance(v, str):
+                if isinstance(v, str) or isinstance(v, str):
                     return v.lower()
                 else:
                     return v
@@ -971,7 +971,7 @@ class RecordGroup(QObject):
         required = self.fields[fieldName].get('required', False)
         if isinstance(required, bool):
             return required
-        if isinstance(required, str) or isinstance(required, unicode):
+        if isinstance(required, str) or isinstance(required, str):
             if required.lower() == 'true':
                 return True
             if required.lower() == 'false':

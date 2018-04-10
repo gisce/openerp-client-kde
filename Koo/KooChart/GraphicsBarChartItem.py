@@ -17,7 +17,7 @@
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from AbstractGraphicsChartItem import *
+from .AbstractGraphicsChartItem import *
 
 
 class BarChartBar(QGraphicsRectItem):
@@ -311,7 +311,7 @@ class GraphicsBarChartItem(AbstractGraphicsChartItem):
         if data:
             for x in data:
                 categories.append(x['name'])
-            for y in data[0].keys():
+            for y in list(data[0].keys()):
                 labels.append(y)
             categories.sort()
         self.setCategories(categories)

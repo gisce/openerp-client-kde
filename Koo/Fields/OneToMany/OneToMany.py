@@ -87,7 +87,7 @@ class OneToManyDialog(QDialog, OneToManyDialogUi):
         self.connect(self.pushCancel, SIGNAL("clicked()"), self.rejected)
         self.connect(self, SIGNAL('reject()'), self.cleanup)
         self.connect(self.pushPrevious, SIGNAL('clicked()'), self.previous)
-        self.connect(self.pushNext, SIGNAL('clicked()'), self.next)
+        self.connect(self.pushNext, SIGNAL('clicked()'), self.__next__)
 
         if not self._recordAdded:
             # If the user is modifying an existing record, he won't be
@@ -142,7 +142,7 @@ class OneToManyDialog(QDialog, OneToManyDialogUi):
         self.screen.displayPrevious()
         self.updatePosition()
 
-    def next(self):
+    def __next__(self):
         self.screen.currentView().store()
         self.screen.displayNext()
         self.updatePosition()
@@ -200,7 +200,7 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
         self.connect(self.pushEdit, SIGNAL("clicked()"), self.edit)
         self.connect(self.pushRemove, SIGNAL("clicked()"), self.remove)
         self.connect(self.pushBack, SIGNAL("clicked()"), self.previous)
-        self.connect(self.pushForward, SIGNAL("clicked()"), self.next)
+        self.connect(self.pushForward, SIGNAL("clicked()"), self.__next__)
         self.connect(self.pushSwitchView, SIGNAL("clicked()"), self.switchView)
 
         self.connect(self.screen, SIGNAL(
@@ -377,7 +377,7 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
         dialog.exec_()
         self.screen.display()
 
-    def next(self):
+    def __next__(self):
         self.screen.displayNext()
 
     def previous(self):

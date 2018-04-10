@@ -51,14 +51,14 @@ def scan(model, id, ids, context):
         return
 
     if result == Directories:
-        directory = unicode(QFileDialog.getExistingDirectory())
+        directory = str(QFileDialog.getExistingDirectory())
         if not directory:
             return
         fileNames = QDir(directory).entryList()
-        fileNames = [os.path.join(directory, unicode(x)) for x in fileNames]
+        fileNames = [os.path.join(directory, str(x)) for x in fileNames]
     else:
         fileNames = QFileDialog.getOpenFileNames()
-        fileNames = [unicode(x) for x in fileNames]
+        fileNames = [str(x) for x in fileNames]
 
     for fileName in fileNames:
         try:

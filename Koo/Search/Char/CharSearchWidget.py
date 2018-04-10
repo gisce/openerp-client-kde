@@ -44,7 +44,7 @@ class CharSearchWidget(AbstractSearchWidget):
         self.focusWidget.installEventFilter(self)
 
     def value(self):
-        s = unicode(self.uiText.text())
+        s = str(self.uiText.text())
         if s:
             return [(self.name, self.attrs.get('comparator', 'ilike'), s)]
         else:

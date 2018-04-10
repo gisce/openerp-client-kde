@@ -104,7 +104,7 @@ class RichTextFieldWidget(AbstractFieldWidget, RichTextFieldWidgetUi):
         dialog = TranslationDialog(self.record.id, self.record.group.resource,
                                    self.attrs['name'], html, TranslationDialog.RichEdit, self)
         if dialog.exec_() == QDialog.Accepted:
-            self.record.setValue(self.name, unicode(dialog.result) or False)
+            self.record.setValue(self.name, str(dialog.result) or False)
 
     def updateCurrentColors(self):
         cursor = self.uiText.textCursor()

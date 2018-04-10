@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from BinaryFieldWidget import *
+from .BinaryFieldWidget import *
 from Koo.Fields.FieldWidgetFactory import *
 
 FieldWidgetFactory.register( 'binary', BinaryFieldWidget )

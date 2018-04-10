@@ -29,7 +29,7 @@ import os
 import csv
 import copy
 import base64
-import report
+from . import report
 import pooler
 from osv import orm, osv, fields
 import tools
@@ -39,7 +39,7 @@ import sql_db
 import netsvc
 import release
 
-from JasperReports import *
+from .JasperReports import *
 
 # Determines the port where the JasperServer process should listen with its XML-RPC server for incomming calls
 tools.config['jasperport'] = tools.config.get('jasperport', 8090)
@@ -161,7 +161,7 @@ class Report:
 			for file in self.temporaryFiles:
 				try:
 					os.unlink( file )
-				except os.error, e:
+				except os.error as e:
 					logger = netsvc.Logger()
 					logger.notifyChannel("jasper_reports", netsvc.LOG_WARNING, "Could not remove file '%s'." % file )
 		self.temporaryFiles = []
@@ -263,7 +263,7 @@ if release.major_version == '5.0':
 
 	# Ugly hack to avoid developers the need to register reports
 	import pooler
-	import report
+	from . import report
 
 	def register_jasper_report(name, model):
 		name = 'report.%s' % name

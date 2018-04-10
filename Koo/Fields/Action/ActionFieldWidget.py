@@ -54,7 +54,7 @@ class ActionFieldWidget(AbstractFieldWidget, ActionFieldWidgetUi):
         res = Rpc.session.execute('/object', 'execute', 'ir.actions.actions',
                                   'read', [self.act_id], ['type'], Rpc.session.context)
         if not res:
-            raise Exception, 'ActionNotFound'
+            raise Exception('ActionNotFound')
         type = res[0]['type']
 
         self.action = Rpc.session.execute(
@@ -116,7 +116,7 @@ class ActionFieldWidget(AbstractFieldWidget, ActionFieldWidgetUi):
             self.connect(self.pushOpen, SIGNAL('clicked()'), self.slotOpen)
 
             self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             pass
         QApplication.restoreOverrideCursor()
 

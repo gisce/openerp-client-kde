@@ -55,7 +55,7 @@ class SelectionSearchWidget(AbstractSearchWidget):
     def value(self):
         value = self.uiCombo.itemData(self.uiCombo.currentIndex())
         if value.isValid():
-            return [(self.name, '=', unicode(value.toString()))]
+            return [(self.name, '=', str(value.toString()))]
         else:
             return []
 

@@ -32,18 +32,18 @@ import sql_db
 import pooler
 import release
 from psycopg2.extensions import adapt as sql_quote
-import SimpleXMLRPCServer
+import xmlrpc.server
 from operator import itemgetter
 
 
 def quote(value):
-	return unicode( sql_quote(value.encode('utf-8')).getquoted(), 'utf-8' )
+	return str( sql_quote(value.encode('utf-8')).getquoted(), 'utf-8' )
 
 def isInteger(value):
 	try:
-		long(value)
+		int(value)
 		return True
-	except ValueError, e:
+	except ValueError as e:
 		return False
 
 def isFloat(value):
@@ -54,17 +54,17 @@ def isFloat(value):
 	try:
 		float(value)
 		return True
-	except ValueError, e:
+	except ValueError as e:
 		return False
 
 def noneToFalse(value):
 	if type(value)==type([]):
-		return map(noneToFalse, value)
+		return list(map(noneToFalse, value))
 	elif type(value)==type(()):
-		return map(noneToFalse, value)
+		return list(map(noneToFalse, value))
 	elif type(value)==type({}):
 		newval = {}
-		for i in value.keys():
+		for i in list(value.keys()):
 			newval[i] = noneToFalse(value[i])
 		return newval 
 	elif value == None:
@@ -98,7 +98,7 @@ class fulltextsearch_services(netsvc_service):
 	def dispatch(self, method, auth, params):
 		if not method in self.exportedMethods:
 			raise KeyError("Method not found: %s" % method)
-		print "METHOD: ", method, auth, params
+		print("METHOD: ", method, auth, params)
 		return self.common_dispatch(method, auth, params)
 
 	# This method should not be exported
@@ -117,11 +117,11 @@ class fulltextsearch_services(netsvc_service):
 				self.hasIntegratedTs = False
 		
 			if self.hasIntegratedTs:
-				self.postgresKeyWords[ 'ts_rank' ] = u'ts_rank'
-				self.postgresKeyWords[ 'ts_headline' ] = u'ts_headline'
+				self.postgresKeyWords[ 'ts_rank' ] = 'ts_rank'
+				self.postgresKeyWords[ 'ts_headline' ] = 'ts_headline'
 			else:
-				self.postgresKeyWords[ 'ts_rank' ] = u'rank'
-				self.postgresKeyWords[ 'ts_headline' ] = u'headline'
+				self.postgresKeyWords[ 'ts_rank' ] = 'rank'
+				self.postgresKeyWords[ 'ts_headline' ] = 'headline'
 
 	# This method should not be exported
 	def headline( self, pool, cr, uid, text, id, model_id, model_name, context ):
@@ -196,7 +196,7 @@ class fulltextsearch_services(netsvc_service):
 			# if the user doesn't have access to it
 			try:
 				pool.get('ir.model.access').check(cr, uid, x[2], 'read')
-			except except_orm, e:
+			except except_orm as e:
 				continue
 
 			# Search for the translation of the model
@@ -232,8 +232,8 @@ class fulltextsearch_services(netsvc_service):
 		cr = conn.cursor()
 		try:
 			return self.exp_search(cr, uid, text, limit, offset, model, context)
-		except Exception, e:
-			print "EX: ", str(e)
+		except Exception as e:
+			print("EX: ", str(e))
 		finally:
 			cr.close()
 
@@ -246,9 +246,9 @@ class fulltextsearch_services(netsvc_service):
 		self.checkPostgresVersion(cr)
 
 		if isinstance( text, str ):
-			text = unicode( text, 'utf-8', 'ignore' )
-		elif not isinstance( text, unicode ):
-			text = unicode( text )
+			text = str( text, 'utf-8', 'ignore' )
+		elif not isinstance( text, str ):
+			text = str( text )
 
 		# If text is empty return nothing. Trying to continue makes PostgreSQL
 		# complain because GIN indexes don't support search with void query
@@ -260,19 +260,19 @@ class fulltextsearch_services(netsvc_service):
 		# Parse text query so we convert dates into SQL dates (::DATE) and other 
 		# types if necessary too.
 		tsQuery = []
-		for x in text.split(u' '):
+		for x in text.split(' '):
 			if isFloat(x):
-				tsQuery.append( u"to_tsquery( 'default', %s::TEXT )" % float(x) )
+				tsQuery.append( "to_tsquery( 'default', %s::TEXT )" % float(x) )
 			elif isInteger(x):
-				tsQuery.append( u"to_tsquery( 'default', %s::TEXT )" % long(x) )
+				tsQuery.append( "to_tsquery( 'default', %s::TEXT )" % int(x) )
 			else:
-				tsQuery.append( u"to_tsquery( 'default', %s::TEXT )" % quote(x) )
-		tsQuery = u' && '.join(tsQuery)
+				tsQuery.append( "to_tsquery( 'default', %s::TEXT )" % quote(x) )
+		tsQuery = ' && '.join(tsQuery)
 
 		if model:
-			filterModel = u' AND m.id = %s ' % int(model)
+			filterModel = ' AND m.id = %s ' % int(model)
 		else:
-			filterModel = u''
+			filterModel = ''
 
 		# Note on limit & offset: Given that we might restrict some models due
 		# to the user not having permissions to access them we can't use PostgreSQL
@@ -284,7 +284,7 @@ class fulltextsearch_services(netsvc_service):
 		# we think it can bring a performance gain, but OFFSET specified by the user 
 		# can never be used in the query directly.
 		try:
-			cr.execute( u"""
+			cr.execute( """
 				SELECT
 					fts.model,
 					fts.reference,
@@ -324,14 +324,14 @@ class fulltextsearch_services(netsvc_service):
 			try:
 				if not pool.get(model_name).search(cr, uid, [('id','=',id)], context=context):
 					continue
-			except except_orm, e:
+			except except_orm as e:
 				continue
 			# Check read permissions using because 'search' is not enough and using 'read' 
 			# alone is not enough either. For example, it can allow searching
 			# menu entries restricted to that user.
 			try:
 				pool.get('ir.model.access').check(cr, uid, model_name, 'read')
-			except except_orm, e:
+			except except_orm as e:
 				continue
 			if model_name == 'ir.attachment':
 				attachment = pool.get(model_name).browse(cr, uid, id, context)
@@ -363,8 +363,8 @@ class fulltextsearch_services(netsvc_service):
 		return noneToFalse( ret )
 
 fulltextsearch_services()
-paths = list(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler.rpc_paths) + ['/xmlrpc/fulltextsearch' ]
-SimpleXMLRPCServer.SimpleXMLRPCRequestHandler.rpc_paths = tuple(paths)
+paths = list(xmlrpc.server.SimpleXMLRPCRequestHandler.rpc_paths) + ['/xmlrpc/fulltextsearch' ]
+xmlrpc.server.SimpleXMLRPCRequestHandler.rpc_paths = tuple(paths)
 
 
 # vim:noexpandtab

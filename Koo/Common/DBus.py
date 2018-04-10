@@ -1,4 +1,4 @@
-import Debug
+from . import Debug
 
 try:
     import dbus.mainloop.qt

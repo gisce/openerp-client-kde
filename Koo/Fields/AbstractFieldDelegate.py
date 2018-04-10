@@ -26,7 +26,7 @@
 ##############################################################################
 
 from Koo import Rpc
-from FieldPreferencesDialog import *
+from .FieldPreferencesDialog import *
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 

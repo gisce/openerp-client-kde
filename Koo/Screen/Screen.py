@@ -44,9 +44,9 @@ from PyQt4.QtGui import *
 
 from Koo.Search import SearchFormWidget
 from Koo.Plugins import *
-from ToolBar import ToolBar
-from Action import *
-from ViewQueue import *
+from .ToolBar import ToolBar
+from .Action import *
+from .ViewQueue import *
 
 
 # @brief The Screen class is a widget that provides an easy way of handling multiple views.
@@ -343,7 +343,7 @@ class Screen(QScrollArea):
             else:
                 self.setCurrentRecord(None)
             self.display()
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             pass
         QApplication.restoreOverrideCursor()
 
@@ -563,8 +563,8 @@ class Screen(QScrollArea):
                     try:
                         fields[attrs['name']].update(attrs)
                     except:
-                        print "-" * 30, "\n malformed tag for :", attrs
-                        print "-" * 30
+                        print("-" * 30, "\n malformed tag for :", attrs)
+                        print("-" * 30)
                         raise
             for node2 in node.childNodes:
                 _parse_fields(node2, fields)
@@ -903,7 +903,7 @@ class Screen(QScrollArea):
 
     # @brief Stores settings of all opened views
     def storeViewSettings(self):
-        for view in self.views.values():
+        for view in list(self.views.values()):
             ViewSettings.store(view.id, view.viewSettings())
 
 # vim:noexpandtab:

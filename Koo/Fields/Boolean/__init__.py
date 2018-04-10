@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from Boolean import *
+from .Boolean import *
 from Koo.Fields.FieldWidgetFactory import *
 from Koo.Fields.FieldDelegateFactory import *
 

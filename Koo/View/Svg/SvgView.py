@@ -63,7 +63,7 @@ class SvgView(AbstractView):
         self.svg = QGraphicsSvgItem(file)
         self.scene.addItem(self.svg)
 
-        for name in self.widgets.keys():
+        for name in list(self.widgets.keys()):
             if not self.svg.renderer().elementExists(name):
                 continue
             r = self.svg.renderer().boundsOnElement(name)

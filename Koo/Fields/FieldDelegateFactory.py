@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from AbstractFieldDelegate import *
+from .AbstractFieldDelegate import *
 from Koo.Common import Plugins
 import os
 

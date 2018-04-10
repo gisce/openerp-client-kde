@@ -46,13 +46,13 @@ class PyroDaemon(Thread):
 			def dispatch(self, obj, methodName, *args):
 				try:
 					return netsvc.OpenERPDispatcher.dispatch(self, obj, methodName, args)
-				except netsvc.OpenERPDispatcherException, e:
+				except netsvc.OpenERPDispatcherException as e:
             				raise Pyro.core.PyroError(tools.exception_to_unicode(e.exception), e.traceback)
 
 		Pyro.core.initServer(storageCheck=0)
 		try:
 			if self.__settings is not False:
-				for k,v in self.__settings.items():
+				for k,v in list(self.__settings.items()):
 					setattr(Pyro.config,k,v)
 			logger.notifyChannel("web-services", netsvc.LOG_INFO, "starting Pyro %s services, host %s, port %s" % (Pyro.core.Pyro.constants.VERSION, self.__host, self.__port))
 			if self.__ssl is True:
@@ -61,7 +61,7 @@ class PyroDaemon(Thread):
 				daemon=Pyro.core.Daemon(host=self.__host, port=self.__port)
 			uri=daemon.connectPersistent( RpcDispatcher(), "rpc" )
 			daemon.requestLoop()
-		except Exception, e:
+		except Exception as e:
 			import traceback
 			logger.notifyChannel("web-services", netsvc.LOG_ERROR, "Pyro exception: %s\n%s" % (e, traceback.format_exc()))
 			raise
@@ -78,7 +78,7 @@ try:
 		else:
 			try:
 				import M2Crypto
-			except Exception, e:
+			except Exception as e:
 				tools.config['pyrossl'] =  False
 				logger.notifyChannel("init", netsvc.LOG_ERROR, "M2Crypto could not be imported, SSL will not work: %s" % (e.args) )
 			else:
@@ -101,7 +101,7 @@ try:
 					pyrod_ssl = PyroDaemon(tools.config['pyrohost'], pyrossl_port, True, settings)
 					pyrod_ssl.start()
 	
-except Exception, e:
+except Exception as e:
 	import traceback
 	logger.notifyChannel("web-services", netsvc.LOG_ERROR, "Pyro exception: %s\n%s" % (e, traceback.format_exc()))
 

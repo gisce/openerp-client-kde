@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from ProgressBar import *
+from .ProgressBar import *
 from Koo.Fields.FieldWidgetFactory import *
 from Koo.Fields.FieldDelegateFactory import *
 

@@ -29,8 +29,8 @@
 
 from xml.parsers import expat
 
-from SearchWidgetFactory import *
-from AbstractSearchWidget import *
+from .SearchWidgetFactory import *
+from .AbstractSearchWidget import *
 from Koo.Common import Common
 from Koo.Common import Api
 from Koo import Rpc
@@ -193,7 +193,7 @@ class SearchViewWidget(AbstractSearchWidget):
     #
     # Calling 'value()' after this function should return an empty list.
     def clear(self, force=False):
-        for x in self.widgets.values():
+        for x in list(self.widgets.values()):
             x.clear()
 
     # @brief Returns a domain-like list for the current search parameters.

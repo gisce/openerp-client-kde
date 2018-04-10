@@ -168,10 +168,10 @@ class ActionFactory:
                 actions.append(action)
 
         plugs = Plugins.list(model)
-        for p in sorted(plugs.keys(), key=lambda x: plugs[x].get('string', '')):
+        for p in sorted(list(plugs.keys()), key=lambda x: plugs[x].get('string', '')):
             action = Action(parent)
             action.setIcon(QIcon(":/images/exec.png"))
-            action.setText(unicode(plugs[p]['string']))
+            action.setText(str(plugs[p]['string']))
             action.setData(p)
             action.setType('plugin')
             action.setModel(model)

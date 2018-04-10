@@ -259,7 +259,7 @@ class ManyToOneField(StringField):
         return False
 
     def set(self, record, value, test_state=False, modified=False):
-        if value and isinstance(value, (int, str, unicode, long)):
+        if value and isinstance(value, (int, str)):
             Rpc2 = RpcProxy(self.attrs['relation'])
             result = Rpc2.name_get([value], Rpc.session.context)
 
@@ -377,7 +377,7 @@ class OneToManyField(ToManyField):
         if value and len(value):
             context = self.context(record)
             Rpc2 = RpcProxy(self.attrs['relation'])
-            fields = Rpc2.fields_get(value[0].keys(), context)
+            fields = Rpc2.fields_get(list(value[0].keys()), context)
             group.addFields(fields)
 
         for recordData in (value or []):

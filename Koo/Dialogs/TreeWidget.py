@@ -30,7 +30,7 @@
 import gettext
 from xml.parsers import expat
 
-from ExportDialog import *
+from .ExportDialog import *
 
 from Koo.Common import Api
 from Koo.Common import Common
@@ -175,7 +175,7 @@ class TreeWidget(QWidget, TreeWidgetUi):
         self.connect(self.uiTree, SIGNAL(
             'activated( QModelIndex )'), self.open)
 
-        for column in xrange(len(parser.fieldsOrder)):
+        for column in range(len(parser.fieldsOrder)):
             fieldName = parser.fieldsOrder[column]
             fieldType = self.fields[fieldName]['type']
             if 'widget' in parser.fieldAttributes[fieldName]:
@@ -250,7 +250,7 @@ class TreeWidget(QWidget, TreeWidgetUi):
         if not mainKey in self.treeState:
             return
         subtree = self.treeState[mainKey]
-        for key, value in subtree.iteritems():
+        for key, value in subtree.items():
             index = self.treeModel.createIndex(key[0], key[1], key[2])
             self.uiTree.setExpanded(index, value)
 
@@ -300,7 +300,7 @@ class TreeWidget(QWidget, TreeWidgetUi):
             if self.model == 'ir.ui.menu':
                 self.shortcutsGroup.update()
                 self.emit(SIGNAL('shortcutsChanged'), self.model)
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             pass
         QApplication.restoreOverrideCursor()
 
