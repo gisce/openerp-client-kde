@@ -27,11 +27,12 @@
 ##############################################################################
 
 import os
+from PyQt5.QtWidgets import *
 import tempfile
 
 from Koo.Fields.AbstractFieldWidget import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo.Common import Common
@@ -82,7 +83,7 @@ class BinaryFieldWidget(AbstractFieldWidget, BinaryFieldWidgetUi):
         self.fileNameField = attrs.get('filename')
         self.baseDirectory = str(QDir.homePath())
 
-        self.connect(self.pushRemove, SIGNAL('clicked()'), self.remove)
+        self.pushRemove.clicked.connect(self.remove)
 
         self.actionNew = QAction(self)
         self.actionNew.setText(_('&New'))
@@ -116,14 +117,12 @@ class BinaryFieldWidget(AbstractFieldWidget, BinaryFieldWidgetUi):
         self.pushSave.setMenu(self.saveMenu)
         self.pushSave.setDefaultAction(self.actionSave)
 
-        self.connect(self.actionNew, SIGNAL('triggered()'), self.new)
-        self.connect(self.actionScan, SIGNAL('triggered()'), self.scan)
-        self.connect(self.actionSave, SIGNAL('triggered()'), self.save)
-        self.connect(self.actionOpen, SIGNAL('triggered()'), self.open)
-        self.connect(self.actionShowImage, SIGNAL(
-            'triggered()'), self.showImage)
-        self.connect(self.saveMenu, SIGNAL('aboutToShow()'),
-                     self.updateShowImageAction)
+        self.actionNew.triggered.connect(self.new)
+        self.actionScan.triggered.connect(self.scan)
+        self.actionSave.triggered.connect(self.save)
+        self.actionOpen.triggered.connect(self.open)
+        self.actionShowImage.triggered.connect(self.showImage)
+        self.saveMenu.aboutToShow.connect(self.updateShowImageAction)
 
         self.uiBinary.setAcceptDrops(True)
         self.installPopupMenu(self.uiBinary)
@@ -228,7 +227,7 @@ class BinaryFieldWidget(AbstractFieldWidget, BinaryFieldWidgetUi):
 
     def new(self):
         filename = QFileDialog.getOpenFileName(
-            self, _('Select the file to attach'), self.baseDirectory, self.filters)
+            self, _('Select the file to attach'), self.baseDirectory, self.filters)[0]
         if filename.isNull():
             return
         filename = str(filename)
@@ -265,7 +264,7 @@ class BinaryFieldWidget(AbstractFieldWidget, BinaryFieldWidgetUi):
     def save(self):
         directory = '%s/%s' % (self.baseDirectory, str(self.fileName()))
         filename = QFileDialog.getSaveFileName(
-            self, _('Save as...'), directory, self.filters)
+            self, _('Save as...'), directory, self.filters)[0]
         if filename.isNull():
             return
         filename = str(filename)

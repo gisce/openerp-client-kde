@@ -74,7 +74,7 @@ def initializeTranslations(language=None):
 
 
 def initializeQtTranslations(language=None):
-    from PyQt4.QtCore import QTranslator, QCoreApplication, QLocale
+    from PyQt5.QtCore import QTranslator, QCoreApplication, QLocale
     if not language:
         language = str(QLocale.system().name())
 

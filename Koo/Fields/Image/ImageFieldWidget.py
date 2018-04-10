@@ -27,6 +27,7 @@
 ##############################################################################
 
 import os
+from PyQt5.QtWidgets import *
 import base64
 import binascii
 import tempfile
@@ -36,8 +37,8 @@ from Koo.Common import Icons
 from Koo.Common import Semantic
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 (ImageFieldWidgetUi, ImageFieldWidgetBase) = loadUiType(Common.uiPath('image.ui'))
@@ -53,9 +54,9 @@ class ImageFieldWidget(AbstractFieldWidget, ImageFieldWidgetUi):
         self.width = int(attrs.get('img_width', 300))
         self.height = int(attrs.get('img_height', 100))
         self.installPopupMenu(self.uiImage)
-        self.connect(self.pushLoad, SIGNAL('clicked()'), self.loadImage)
-        self.connect(self.pushSave, SIGNAL('clicked()'), self.saveImage)
-        self.connect(self.pushRemove, SIGNAL('clicked()'), self.removeImage)
+        self.pushLoad.clicked.connect(self.loadImage)
+        self.pushSave.clicked.connect(self.saveImage)
+        self.pushRemove.clicked.connect(self.removeImage)
         self.pushSave.setEnabled(False)
 
     # This function is overriden in picture widget
@@ -125,7 +126,7 @@ class ImageFieldWidget(AbstractFieldWidget, ImageFieldWidgetUi):
         self.modified()
 
     def saveImage(self):
-        name = QFileDialog.getSaveFileName(self, _('Save image as...'))
+        name = QFileDialog.getSaveFileName(self, _('Save image as...'))[0]
         if name.isNull():
             return
         try:
@@ -142,7 +143,7 @@ class ImageFieldWidget(AbstractFieldWidget, ImageFieldWidgetUi):
         fileTypes = "*.png *.jpg *.jpeg *.gif *.tif *.xpm *.bmp"
         fileTypes = _('Image files (%s)') % fileTypes
         name = QFileDialog.getOpenFileName(
-            self, _('Open image file...'), QDir.homePath(), fileTypes)
+            self, _('Open image file...'), QDir.homePath(), fileTypes)[0]
         if not name.isNull():
             image = file(str(name), 'rb').read()
             self.setImage(image)

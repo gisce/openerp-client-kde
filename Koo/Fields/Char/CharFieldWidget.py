@@ -27,12 +27,13 @@
 ##############################################################################
 
 from Koo.Common import Common
+from PyQt5.QtWidgets import *
 from Koo.Common import Shortcuts
 
 from Koo.Fields.TranslationDialog import *
 from Koo.Fields.AbstractFieldWidget import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 
 class CharFieldWidget(AbstractFieldWidget):
@@ -59,22 +60,21 @@ class CharFieldWidget(AbstractFieldWidget):
         self.scClear = QShortcut(self.widget)
         self.scClear.setKey(Shortcuts.ClearInField)
         self.scClear.setContext(Qt.WidgetShortcut)
-        self.connect(self.scClear, SIGNAL('activated()'), self.clear)
+        self.scClear.activated.connect(self.clear)
 
         if attrs.get('translate', False):
             pushTranslate = QToolButton(self)
             pushTranslate.setIcon(QIcon(':/images/locale.png'))
             pushTranslate.setFocusPolicy(Qt.NoFocus)
             layout.addWidget(pushTranslate)
-            self.connect(pushTranslate, SIGNAL('clicked()'), self.translate)
+            pushTranslate.clicked.connect(self.translate)
 
             self.scTranslate = QShortcut(self.widget)
             self.scTranslate.setKey(Shortcuts.SearchInField)
             self.scTranslate.setContext(Qt.WidgetShortcut)
-            self.connect(self.scTranslate, SIGNAL(
-                'activated()'), self.translate)
+            self.scTranslate.activated.connect(self.translate)
 
-        self.connect(self.widget, SIGNAL('editingFinished()'), self.store)
+        self.widget.editingFinished.connect(self.store)
 
     def translate(self):
         if not self.record.id:

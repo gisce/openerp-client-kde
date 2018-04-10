@@ -25,13 +25,20 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 
 from Koo.Common import Common
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
 
+
+try:
+    QString = unicode
+except NameError:
+    # Python 3
+    QString = str
 
 class ProgressBarFieldWidget(AbstractFieldWidget):
     def __init__(self, parent, view, attrs={}):

@@ -31,6 +31,7 @@
 
 # Added so py2exe properly packs xml.etree.ElementTree
 from xml.etree.ElementTree import parse, SubElement
+from PyQt5.QtWidgets import *
 
 import sys
 import os
@@ -69,8 +70,8 @@ Localization.initializeTranslations(Settings.value('client.language'))
 
 imports = {}
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common import Notifier, Common
 from Koo.Common import DBus
 
@@ -126,7 +127,7 @@ class PosMessageBox(QWidget):
         self.pushOk = QPushButton(self)
         self.pushOk.setText(_('Ok'))
         self.pushOk.setIcon(QIcon(':/images/ok.png'))
-        self.connect(self.pushOk, SIGNAL('clicked()'), self.accepted)
+        self.pushOk.clicked.connect(self.accepted)
 
         self.layout = QVBoxLayout(self)
         self.layout.setAlignment(Qt.AlignCenter)

@@ -27,8 +27,9 @@
 ##############################################################################
 
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 from Koo.Common import Common
 from Koo.Common import Shortcuts
@@ -49,26 +50,19 @@ class RichTextFieldWidget(AbstractFieldWidget, RichTextFieldWidgetUi):
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         self.installPopupMenu(self.uiText)
 
-        self.connect(self.pushBold, SIGNAL('clicked()'), self.bold)
-        self.connect(self.pushItalic, SIGNAL('clicked()'), self.italic)
-        self.connect(self.pushUnderline, SIGNAL('clicked()'), self.underline)
-        self.connect(self.pushStrike, SIGNAL('clicked()'), self.strike)
-        self.connect(self.pushLeftJustify, SIGNAL(
-            'clicked()'), self.leftJustify)
-        self.connect(self.pushCenter, SIGNAL('clicked()'), self.center)
-        self.connect(self.pushRightJustify, SIGNAL(
-            'clicked()'), self.rightJustify)
-        self.connect(self.pushJustify, SIGNAL('clicked()'), self.justify)
-        self.connect(self.pushForegroundColor, SIGNAL(
-            'clicked()'), self.foregroundColor)
-        self.connect(self.pushBackgroundColor, SIGNAL(
-            'clicked()'), self.backgroundColor)
-        self.connect(self.uiFont, SIGNAL(
-            'currentFontChanged(QFont)'), self.font)
-        self.connect(self.uiFontSize, SIGNAL(
-            'valueChanged(int)'), self.fontSize)
-        self.connect(self.uiText, SIGNAL(
-            'cursorPositionChanged()'), self.cursorPosition)
+        self.pushBold.clicked.connect(self.bold)
+        self.pushItalic.clicked.connect(self.italic)
+        self.pushUnderline.clicked.connect(self.underline)
+        self.pushStrike.clicked.connect(self.strike)
+        self.pushLeftJustify.clicked.connect(self.leftJustify)
+        self.pushCenter.clicked.connect(self.center)
+        self.pushRightJustify.clicked.connect(self.rightJustify)
+        self.pushJustify.clicked.connect(self.justify)
+        self.pushForegroundColor.clicked.connect(self.foregroundColor)
+        self.pushBackgroundColor.clicked.connect(self.backgroundColor)
+        self.uiFont.currentFontChanged[QFont].connect(self.font)
+        self.uiFontSize.valueChanged[int].connect(self.fontSize)
+        self.uiText.cursorPositionChanged.connect(self.cursorPosition)
 
         self.updateFont = True
         font = self.uiText.document().defaultFont()
@@ -76,14 +70,12 @@ class RichTextFieldWidget(AbstractFieldWidget, RichTextFieldWidgetUi):
         self.fontSize(font.pointSize())
 
         if attrs.get('translate', False):
-            self.connect(self.pushTranslate, SIGNAL(
-                'clicked()'), self.translate)
+            self.pushTranslate.clicked.connect(self.translate)
 
             self.scTranslate = QShortcut(self.uiText)
             self.scTranslate.setKey(Shortcuts.SearchInField)
             self.scTranslate.setContext(Qt.WidgetShortcut)
-            self.connect(self.scTranslate, SIGNAL(
-                'activated()'), self.translate)
+            self.scTranslate.activated.connect(self.translate)
         else:
             self.pushTranslate.setVisible(False)
 

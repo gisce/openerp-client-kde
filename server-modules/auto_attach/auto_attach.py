@@ -45,7 +45,7 @@ from NanScan.Document import *
 from NanScan.Recognizer import *
 from NanScan.Ocr import *
 
-from PyQt4.QtCore import *
+from PyQt5.QtCore import *
 
 
 class nan_template(osv.osv):

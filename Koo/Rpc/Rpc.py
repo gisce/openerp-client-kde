@@ -26,9 +26,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
+from PyQt5.QtCore import *
 try:
-    from PyQt4.QtNetwork import *
+    from PyQt5.QtNetwork import *
     isQtNetworkAvailable = True
 except:
     isQtNetworkAvailable = False
@@ -333,6 +333,9 @@ def createConnection(url):
 
 
 class AsynchronousSessionCall(QThread):
+    exception = pyqtSignal('PyQt_PyObject')
+    called = pyqtSignal('PyQt_PyObject')
+
     def __init__(self, session, parent=None):
         QThread.__init__(self, parent)
         self.session = session.copy()
@@ -356,7 +359,7 @@ class AsynchronousSessionCall(QThread):
         self.obj = obj
         self.method = method
         self.args = args
-        self.connect(self, SIGNAL('finished()'), self.hasFinished)
+        self.finished.connect(self.hasFinished)
         self.start()
 
     def call(self, callback, obj, method, *args):
@@ -366,7 +369,7 @@ class AsynchronousSessionCall(QThread):
         self.obj = obj
         self.method = method
         self.args = args
-        self.connect(self, SIGNAL('finished()'), self.hasFinished)
+        self.finished.connect(self.hasFinished)
         self.start()
 
     def hasFinished(self):
@@ -380,9 +383,9 @@ class AsynchronousSessionCall(QThread):
                     Notifier.notifyWarning(*self.warning)
                 else:
                     raise self.exception
-            self.emit(SIGNAL('exception(PyQt_PyObject)'), self.exception)
+            self.exception.emit(self.exception)
         else:
-            self.emit(SIGNAL('called(PyQt_PyObject)'), self.result)
+            self.called.emit(self.result)
 
         if self.callback:
             self.callback(self.result, self.exception)

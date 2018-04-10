@@ -27,12 +27,13 @@
 ##############################################################################
 
 from Koo.Common import Common
+from PyQt5.QtWidgets import *
 from Koo.Common import Shortcuts
 
 from Koo.Common.Calendar import *
 from Koo.Search.AbstractSearchWidget import *
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from Koo.Common.Ui import *
 
 (DateTimeSearchWidgetUi, DateTimeSearchWidgetBase) = loadUiType(
@@ -53,20 +54,17 @@ class DateTimeSearchWidget(AbstractSearchWidget, DateTimeSearchWidgetUi):
         self.scStartSearch = QShortcut(self.uiStart)
         self.scStartSearch.setKey(Shortcuts.SearchInField)
         self.scStartSearch.setContext(Qt.WidgetShortcut)
-        self.connect(self.scStartSearch, SIGNAL(
-            'activated()'), self.showStartCalendar)
+        self.scStartSearch.activated.connect(self.showStartCalendar)
 
         self.scEndSearch = QShortcut(self.uiEnd)
         self.scEndSearch.setKey(Shortcuts.SearchInField)
         self.scEndSearch.setContext(Qt.WidgetShortcut)
-        self.connect(self.scEndSearch, SIGNAL(
-            'activated()'), self.showEndCalendar)
+        self.scEndSearch.activated.connect(self.showEndCalendar)
 
         self.widget = self
         self.focusWidget = self.uiStart
-        self.connect(self.pushStart, SIGNAL(
-            'clicked()'), self.showStartCalendar)
-        self.connect(self.pushEnd, SIGNAL('clicked()'), self.showEndCalendar)
+        self.pushStart.clicked.connect(self.showStartCalendar)
+        self.pushEnd.clicked.connect(self.showEndCalendar)
 
     def showStartCalendar(self):
         PopupCalendarWidget(self.uiStart)

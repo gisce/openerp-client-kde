@@ -28,11 +28,12 @@
 ##############################################################################
 
 from Koo.Model import KooModel
+from PyQt5.QtWidgets import *
 from Koo.Model.Group import RecordGroup
 from Koo.View.AbstractView import *
 from Koo.Fields.AbstractFieldDelegate import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common import Numeric
 from Koo import Rpc
 
@@ -119,6 +120,9 @@ class KooTreeView(QTreeView):
 
 
 class TreeView(AbstractView):
+    statusMessage = pyqtSignal('QString')
+    activated = pyqtSignal()
+    currentChanged = pyqtSignal('PyQt_PyObject')
 
     def __init__(self, parent, widgetType='tree'):
         AbstractView.__init__(self, parent)
@@ -174,8 +178,7 @@ class TreeView(AbstractView):
 
         self.setAllowMultipleSelection(True)
 
-        self.connect(self.widget, SIGNAL(
-            'activated(QModelIndex)'), self.activated)
+        self.widget.activated[QModelIndex].connect(self.activated)
 
         self.currentRecord = None
 
@@ -206,29 +209,24 @@ class TreeView(AbstractView):
         self.currentRecord = None
         self.treeModel = model
         self.widget.setModel(self.treeModel)
-        self.connect(self.widget.selectionModel(), SIGNAL(
-            'currentChanged(QModelIndex, QModelIndex)'), self.currentChanged)
-        self.connect(self.treeModel, SIGNAL(
-            'rowsInserted(const QModelIndex &,int,int)'), self.updateAggregates)
-        self.connect(self.treeModel, SIGNAL(
-            'rowsRemoved(const QModelIndex &,int,int)'), self.updateAggregates)
-        self.connect(self.treeModel, SIGNAL(
-            'modelReset()'), self.updateAggregates)
-        self.connect(self.treeModel.recordGroup(),
-                     SIGNAL('sorting'), self.sorting)
+        self.widget.selectionModel().currentChanged[QModelIndex, QModelIndex].connect(self.currentChanged)
+        self.treeModel.rowsInserted[QModelIndex, int, int].connect(self.updateAggregates)
+        self.treeModel.rowsRemoved[QModelIndex, int, int].connect(self.updateAggregates)
+        self.treeModel.modelReset.connect(self.updateAggregates)
+        self.treeModel.recordGroup().sorting.connect(self.sorting)
 
     def sorting(self, value):
         if value == RecordGroup.SortingNotPossible:
-            self.emit(SIGNAL('statusMessage(QString)'), _(
+            self.statusMessage.emit(_(
                 "<font color='red'>Sorting not possible.</font>"))
         elif value == RecordGroup.SortingOnlyGroups:
-            self.emit(SIGNAL('statusMessage(QString)'), _(
+            self.statusMessage.emit(_(
                 "<font color='red'>Sorting only groups.</font>"))
         elif value == RecordGroup.SortingNotPossibleModified:
-            self.emit(SIGNAL('statusMessage(QString)'), _(
+            self.statusMessage.emit(_(
                 "<font color='red'>Save changes before sorting.</font>"))
         else:
-            self.emit(SIGNAL('statusMessage(QString)'), '')
+            self.statusMessage.emit('')
 
     def addAggregate(self, name, label, bold, digits):
         aggLabel = QLabel(label + ':', self.aggregatesContainer)
@@ -255,8 +253,7 @@ class TreeView(AbstractView):
             _('<a href="update">Update totals</a>'), self.aggregatesContainer)
         self.uiUpdateAggregates.setSizePolicy(
             QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.connect(self.uiUpdateAggregates, SIGNAL(
-            'linkActivated(QString)'), self.forceAggregatesUpdate)
+        self.uiUpdateAggregates.linkActivated['QString'].connect(self.forceAggregatesUpdate)
         self.aggregatesLayout.addWidget(self.uiUpdateAggregates)
         self.aggregatesLayout.addStretch(0)
 
@@ -276,7 +273,7 @@ class TreeView(AbstractView):
     # Screen to switch view
     def activated(self, index):
         if self._readOnly:
-            self.emit(SIGNAL('activated()'))
+            self.activated.emit()
 
     def currentChanged(self, current, previous):
         if self.selecting:
@@ -284,7 +281,7 @@ class TreeView(AbstractView):
         self.currentRecord = self.treeModel.recordFromIndex(current)
         # We send the current record. Previously we sent only the id of the model, but
         # new models have id=None
-        self.emit(SIGNAL("currentChanged(PyQt_PyObject)"), self.currentRecord)
+        self.currentChanged.emit(self.currentRecord)
         self.updateAggregates()
 
     def store(self):

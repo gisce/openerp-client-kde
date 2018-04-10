@@ -40,7 +40,7 @@ import threading
 import pooler
 
 from . import ocr
-from PyQt4.QtCore import *
+from PyQt5.QtCore import *
 
 # This class overrides the default ir_attachment class and adds the ability to
 # obtain text from the file. Text is extracted using strigi and if it fails

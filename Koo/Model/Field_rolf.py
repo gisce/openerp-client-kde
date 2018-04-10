@@ -291,11 +291,7 @@ class ManyToOneField(StringField):
 
 class ToManyField(QObject, StringField):
     def __init__(self, parent, attrs):
-        print (QObject)
-        print (attrs)
-        #QObject.__init__(self, parent)
-        #StringField.__init__(self, attrs)
-        super().__init__(self)
+        QObject.__init__(self)
         self.parent = parent
         self.attrs = attrs
         self.name = attrs['name']
@@ -351,10 +347,6 @@ class ToManyField(QObject, StringField):
 
 
 class OneToManyField(ToManyField):
-    def __init__(self, parent, attrs):
-        print ("OneToManyField")
-        super().__init__(self, parent, attrs)
-
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         if not record.values[self.name]:
             return []
@@ -481,7 +473,6 @@ class FieldFactory:
             fieldType = 'many2one'
 
         if fieldType in FieldFactory.types:
-            print ( fieldType, (parent, attributes) )
             return FieldFactory.types[fieldType](parent, attributes)
         else:
             return FieldFactory.types['char'](parent, attributes)

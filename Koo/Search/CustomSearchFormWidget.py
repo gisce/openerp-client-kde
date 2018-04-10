@@ -27,6 +27,7 @@
 ##############################################################################
 
 from xml.parsers import expat
+from PyQt5.QtWidgets import *
 
 import sys
 import gettext
@@ -40,8 +41,8 @@ from Koo.Common import Numeric
 from Koo.Common.Ui import *
 from Koo import Rpc
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 
 class SearchFormContainer(QWidget):
@@ -88,6 +89,8 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
     #   2) Label shown to the user
     #   3) Field types in which the operator should be shown
     #   4) Whether the user should be able to input a text to search for or not.
+    newItem = pyqtSignal()
+    removeItem = pyqtSignal()
     operators = (
         ('is empty', _('is empty'), ('char', 'text', 'many2one',
                                      'date', 'time', 'datetime', 'float_time'), False),
@@ -125,12 +128,9 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
         self.setupUi(self)
 
         self.uiRelatedField.setVisible(False)
-        self.connect(self.uiField, SIGNAL(
-            'currentIndexChanged(int)'), self.updateRelatedAndOperators)
-        self.connect(self.uiRelatedField, SIGNAL(
-            'currentIndexChanged(int)'), self.updateOperators)
-        self.connect(self.uiOperator, SIGNAL(
-            'currentIndexChanged(int)'), self.updateValue)
+        self.uiField.currentIndexChanged[int].connect(self.updateRelatedAndOperators)
+        self.uiRelatedField.currentIndexChanged[int].connect(self.updateOperators)
+        self.uiOperator.currentIndexChanged[int].connect(self.updateValue)
 
         self.fields = None
         self.andOr = 'and'
@@ -159,15 +159,11 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
 
         self.setAndSelected()
 
-        self.connect(self.scNew, SIGNAL('activated()'),
-                     self, SIGNAL('newItem()'))
-        self.connect(self.pushNew, SIGNAL('clicked()'),
-                     self, SIGNAL('newItem()'))
-        self.connect(self.pushAndOr, SIGNAL('clicked()'), self.toggleAndOr)
-        self.connect(self.scRemove, SIGNAL('activated()'),
-                     self, SIGNAL('removeItem()'))
-        self.connect(self.pushRemove, SIGNAL('clicked()'),
-                     self, SIGNAL('removeItem()'))
+        self.scNew.activated.connect(self.newItem)
+        self.pushNew.clicked.connect(self.newItem)
+        self.pushAndOr.clicked.connect(self.toggleAndOr)
+        self.scRemove.activated.connect(self.removeItem)
+        self.pushRemove.clicked.connect(self.removeItem)
 
     def setValid(self, valid):
         if valid:
@@ -494,8 +490,8 @@ class CustomSearchFormWidget(AbstractSearchWidget):
         else:
             self.layout.addWidget(filterItem)
             self.widgets.append(filterItem)
-        self.connect(filterItem, SIGNAL('newItem()'), self.newItem)
-        self.connect(filterItem, SIGNAL('removeItem()'), self.removeItem)
+        filterItem.newItem.connect(self.newItem)
+        filterItem.removeItem.connect(self.removeItem)
         return filterItem
 
     def dropItem(self, item, force=False):

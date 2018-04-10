@@ -26,9 +26,10 @@
 ##############################################################################
 
 from Koo.View.AbstractView import *
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
-from PyQt4.QtSvg import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtSvg import *
 
 
 class SvgView(AbstractView):
@@ -88,12 +89,10 @@ class SvgView(AbstractView):
         # be reset to its previous state. Take a look at OneToMany implementation to see what's needed
         # in such buttons.
         if self.record:
-            self.disconnect(self.record, SIGNAL(
-                'recordChanged(PyQt_PyObject)'), self.updateDisplay)
+            self.record.recordChanged['PyQt_PyObject'].disconnect(self.updateDisplay)
         self.record = currentRecord
         if self.record:
-            self.connect(self.record, SIGNAL(
-                'recordChanged(PyQt_PyObject)'), self.updateDisplay)
+            self.record.recordChanged['PyQt_PyObject'].connect(self.updateDisplay)
         self.updateDisplay(self.record)
 
     def updateDisplay(self, record):

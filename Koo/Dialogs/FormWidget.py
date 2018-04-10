@@ -27,6 +27,7 @@
 ##############################################################################
 
 import types
+from PyQt5.QtWidgets import *
 import gettext
 
 from Koo import Rpc
@@ -46,8 +47,8 @@ import copy
 
 from Koo.Screen.Screen import *
 from Koo.Model.Group import RecordGroup
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 (FormWidgetUi, FormWidgetBase) = loadUiType(Common.uiPath('formcontainer.ui'))
@@ -63,6 +64,8 @@ class FormWidget(QWidget, FormWidgetUi):
     # context -> Context for the current data set
     # parent -> Parent widget of the form
     # name -> User visible title of the form
+    closed = pyqtSignal()
+
     def __init__(self, model, res_id=False, domain=None, view_type=None, view_ids=None, context=None, parent=None, name=False):
         QWidget.__init__(self, parent)
         FormWidgetUi.__init__(self)
@@ -116,7 +119,7 @@ class FormWidget(QWidget, FormWidgetUi):
             action = ViewFactory.viewAction(view, self)
             if not action:
                 continue
-            self.connect(action, SIGNAL('triggered()'), self.switchView)
+            action.triggered.connect(self.switchView)
             self._switchViewMenu.addAction(action)
             self._viewActionGroup.addAction(action)
 
@@ -124,18 +127,15 @@ class FormWidget(QWidget, FormWidgetUi):
         if Settings.value('koo.sort_mode') == 'visible_items':
             self.group.setSortMode(RecordGroup.SortVisibleItems)
         self.group.setDomain(domain)
-        self.connect(self.group, SIGNAL('modified'), self.notifyRecordModified)
+        self.group.modified.connect(self.notifyRecordModified)
 
         self.screen.setRecordGroup(self.group)
         self.screen.setEmbedded(False)
-        self.connect(self.screen, SIGNAL('activated()'), self.switchToForm)
-        self.connect(self.screen, SIGNAL(
-            'currentChanged()'), self.updateStatus)
-        self.connect(self.screen, SIGNAL('closed()'), self.closeWidget)
-        self.connect(self.screen, SIGNAL(
-            'recordMessage(int,int,int)'), self.updateRecordStatus)
-        self.connect(self.screen, SIGNAL(
-            'statusMessage(QString)'), self.updateStatus)
+        self.screen.activated.connect(self.switchToForm)
+        self.screen.currentChanged.connect(self.updateStatus)
+        self.screen.closed.connect(self.closeWidget)
+        self.screen.recordMessage[int, int, int].connect(self.updateRecordStatus)
+        self.screen.statusMessage['QString'].connect(self.updateStatus)
 
         self._allowOpenInNewWindow = True
 
@@ -180,7 +180,7 @@ class FormWidget(QWidget, FormWidgetUi):
         self.updateSwitchView()
 
         self.reloadTimer = QTimer(self)
-        self.connect(self.reloadTimer, SIGNAL('timeout()'), self.autoReload)
+        self.reloadTimer.timeout.connect(self.autoReload)
         self.pendingReload = False
 
         # We always use the Subscriber as the class itself will handle
@@ -239,8 +239,7 @@ class FormWidget(QWidget, FormWidgetUi):
                 QApplication.setOverrideCursor(Qt.WaitCursor)
                 try:
                     window = AttachmentDialog(self.model, id, self)
-                    self.connect(window, SIGNAL('destroyed()'),
-                                 self.attachmentsClosed)
+                    window.destroyed.connect(self.attachmentsClosed)
                 except Rpc.RpcException as e:
                     QApplication.restoreOverrideCursor()
                     return
@@ -632,7 +631,7 @@ class FormWidget(QWidget, FormWidgetUi):
         self.screen.storeViewSettings()
         self.reloadTimer.stop()
         self.subscriber.unsubscribe()
-        self.emit(SIGNAL('closed()'))
+        self.closed.emit()
 
     def canClose(self, urgent=False):
         if self.modifiedSave():

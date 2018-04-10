@@ -31,6 +31,7 @@
 
 
 import time
+from PyQt5.QtWidgets import *
 import os
 import gettext
 import base64
@@ -46,8 +47,8 @@ from .DatabaseCreationDialog import DatabaseCreationDialog
 from .DatabaseDialog import *
 from .TipOfTheDayDialog import *
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 from .LoginDialog import *
@@ -67,6 +68,8 @@ from Koo.Plugins import *
 
 
 class MainTabWidget(QTabWidget):
+    middleClicked = pyqtSignal(int)
+
     def __init__(self, parent=None):
         QTabWidget.__init__(self, parent)
         self.pressedAt = -1
@@ -83,12 +86,12 @@ class MainTabWidget(QTabWidget):
             if tab != self.pressedAt:
                 self.pressedAt = -1
                 return
-            self.emit(SIGNAL('middleClicked(int)'), tab)
+            self.middleClicked.emit(tab)
 
     def wheelEvent(self, event):
         if not self.tabBar().underMouse():
             return
-        degrees = event.delta() / 8
+        degrees = event.angleDelta().y() / 8
         steps = degrees / 15
         self.setCurrentIndex((self.currentIndex() + steps) % self.count())
 
@@ -116,19 +119,16 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
         self.uiServerInformation.setText(_('Press Ctrl+O to login'))
 
         self.tabWidget = MainTabWidget(self. centralWidget())
-        self.connect(self.tabWidget, SIGNAL(
-            "currentChanged(int)"), self.currentChanged)
-        self.connect(self.tabWidget, SIGNAL(
-            "middleClicked(int)"), self.closeTab)
-        self.connect(self.tabWidget, SIGNAL(
-            "tabCloseRequested(int)"), self.closeTab)
+        self.tabWidget.currentChanged[int].connect(self.currentChanged)
+        self.tabWidget.middleClicked[int].connect(self.closeTab)
+        self.tabWidget.tabCloseRequested[int].connect(self.closeTab)
 
         self.pushClose = QToolButton(self.tabWidget)
         self.pushClose.setIcon(QIcon(':/images/close_tab.png'))
         self.pushClose.setAutoRaise(True)
         self.pushClose.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.pushClose.setToolTip(_('Close tab'))
-        self.connect(self.pushClose, SIGNAL('clicked()'), self.closeCurrentTab)
+        self.pushClose.clicked.connect(self.closeCurrentTab)
 
         self.tabWidget.setCornerWidget(self.pushClose, Qt.TopRightCorner)
 
@@ -139,67 +139,41 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
 
         self.actionFullTextSearch.setShortcuts(['Ctrl+T', 'Ctrl+Alt+T'])
 
-        self.connect(self.actionClose, SIGNAL(
-            "triggered()"), self.closeCurrentTab)
-        self.connect(self.actionConnect, SIGNAL(
-            "triggered()"), self.showLoginDialog)
-        self.connect(self.actionDisconnect, SIGNAL("triggered()"), self.logout)
-        self.connect(self.actionSendRequest, SIGNAL(
-            "triggered()"), self.newRequest)
-        self.connect(self.actionReadMyRequest, SIGNAL(
-            "triggered()"), self.pendingRequests)
-        self.connect(self.actionWaitingRequests, SIGNAL(
-            "triggered()"), self.waitingRequests)
-        self.connect(self.actionNewDatabase, SIGNAL(
-            "triggered()"), self.createDatabase)
-        self.connect(self.actionExit, SIGNAL("triggered()"), self.close)
-        self.connect(self.actionFullTextSearch, SIGNAL(
-            "triggered()"), self.fullTextSearch)
-        self.connect(self.actionNextTab, SIGNAL("triggered()"), self.nextTab)
-        self.connect(self.actionPreviousTab, SIGNAL(
-            "triggered()"), self.previousTab)
-        self.connect(self.actionBackupDatabase, SIGNAL(
-            'triggered()'), self.backupDatabase)
-        self.connect(self.actionRestoreDatabase, SIGNAL(
-            'triggered()'), self.restoreDatabase)
-        self.connect(self.actionDropDatabase, SIGNAL(
-            'triggered()'), self.dropDatabase)
-        self.connect(self.actionAdminPassword, SIGNAL(
-            'triggered()'), self.changeAdministratorPassword)
-        self.connect(self.actionPreferences, SIGNAL(
-            'triggered()'), self.userPreferences)
-        self.connect(self.actionOpenMenuTab, SIGNAL(
-            'triggered()'), self.openMenuTab)
-        self.connect(self.actionOpenHomeTab, SIGNAL(
-            'triggered()'), self.openHomeTab)
-        self.connect(self.actionClearCache, SIGNAL(
-            'triggered()'), self.clearCache)
+        self.actionClose.triggered.connect(self.closeCurrentTab)
+        self.actionConnect.triggered.connect(self.showLoginDialog)
+        self.actionDisconnect.triggered.connect(self.logout)
+        self.actionSendRequest.triggered.connect(self.newRequest)
+        self.actionReadMyRequest.triggered.connect(self.pendingRequests)
+        self.actionWaitingRequests.triggered.connect(self.waitingRequests)
+        self.actionNewDatabase.triggered.connect(self.createDatabase)
+        self.actionExit.triggered.connect(self.close)
+        self.actionFullTextSearch.triggered.connect(self.fullTextSearch)
+        self.actionNextTab.triggered.connect(self.nextTab)
+        self.actionPreviousTab.triggered.connect(self.previousTab)
+        self.actionBackupDatabase.triggered.connect(self.backupDatabase)
+        self.actionRestoreDatabase.triggered.connect(self.restoreDatabase)
+        self.actionDropDatabase.triggered.connect(self.dropDatabase)
+        self.actionAdminPassword.triggered.connect(self.changeAdministratorPassword)
+        self.actionPreferences.triggered.connect(self.userPreferences)
+        self.actionOpenMenuTab.triggered.connect(self.openMenuTab)
+        self.actionOpenHomeTab.triggered.connect(self.openHomeTab)
+        self.actionClearCache.triggered.connect(self.clearCache)
 
-        self.connect(self.actionHtmlManual, SIGNAL(
-            'triggered()'), self.openHtmlManual)
-        self.connect(self.actionPdfManual, SIGNAL(
-            'triggered()'), self.openPdfManual)
-        self.connect(self.actionDocOpenErpCom, SIGNAL(
-            'triggered()'), self.openDocOpenErpCom)
-        self.connect(self.actionTips, SIGNAL(
-            'triggered()'), self.showTipOfTheDay)
-        self.connect(self.actionShortcuts, SIGNAL(
-            'triggered()'), self.showShortcuts)
-        self.connect(self.actionLicense, SIGNAL(
-            'triggered()'), self.showLicense)
-        self.connect(self.actionAbout, SIGNAL(
-            'triggered()'), self.showAboutDialog)
+        self.actionHtmlManual.triggered.connect(self.openHtmlManual)
+        self.actionPdfManual.triggered.connect(self.openPdfManual)
+        self.actionDocOpenErpCom.triggered.connect(self.openDocOpenErpCom)
+        self.actionTips.triggered.connect(self.showTipOfTheDay)
+        self.actionShortcuts.triggered.connect(self.showShortcuts)
+        self.actionLicense.triggered.connect(self.showLicense)
+        self.actionAbout.triggered.connect(self.showAboutDialog)
 
-        self.connect(self.actionFormDesigner, SIGNAL(
-            'triggered()'), self.formDesigner)
+        self.actionFormDesigner.triggered.connect(self.formDesigner)
 
         # Connect request buttons
-        self.connect(self.pushReadRequests, SIGNAL(
-            'clicked()'), self.pendingRequests)
-        self.connect(self.pushSendRequest, SIGNAL(
-            'clicked()'), self.newRequest)
+        self.pushReadRequests.clicked.connect(self.pendingRequests)
+        self.pushSendRequest.clicked.connect(self.newRequest)
 
-        self.connect(self.pushHelp, SIGNAL('clicked()'), self.help)
+        self.pushHelp.clicked.connect(self.help)
 
         if Settings.value('koo.enable_batch_update_field'):
             self.actionBatchUpdateField.setVisible(True)
@@ -216,7 +190,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
         ]
         for x in self.actions:
             action = eval('self.action' + x)
-            self.connect(action, SIGNAL('triggered()'), self.callChildView)
+            action.triggered.connect(self.callChildView)
 
         self.pushSwitchView = self.uiToolBar.widgetForAction(self.actionSwitch)
         self.pushSwitchView.setPopupMode(QToolButton.MenuButtonPopup)
@@ -233,8 +207,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
         # Update the number of pending requests in the status bar using a timer but also
         # subscribing to model changes if 'koo' module is installed in the server.
         self.requestsTimer = QTimer()
-        self.connect(self.requestsTimer, SIGNAL(
-            'timeout()'), self.updateRequestsStatus)
+        self.requestsTimer.timeout.connect(self.updateRequestsStatus)
         self.pendingRequests = -1
         # Subscriber will be used to update requests status too. Only if 'koo' model is installed
         # on the server.
@@ -244,14 +217,12 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
         self.actionOpenPartnersTab = QAction(self)
         self.actionOpenPartnersTab.setIcon(QIcon(':/images/partner.png'))
         self.actionOpenPartnersTab.setText(_('Open partners tab'))
-        self.connect(self.actionOpenPartnersTab, SIGNAL(
-            'triggered()'), self.openPartnersTab)
+        self.actionOpenPartnersTab.triggered.connect(self.openPartnersTab)
 
         self.actionOpenProductsTab = QAction(self)
         self.actionOpenProductsTab.setIcon(QIcon(':/images/product.png'))
         self.actionOpenProductsTab.setText(_('Open products tab'))
-        self.connect(self.actionOpenProductsTab, SIGNAL(
-            'triggered()'), self.openProductsTab)
+        self.actionOpenProductsTab.triggered.connect(self.openProductsTab)
 
         self.systemTrayMenu = QMenu()
         self.systemTrayMenu.addAction(self.actionFullTextSearch)
@@ -268,22 +239,19 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
         self.systemTrayIcon = QSystemTrayIcon(self)
         self.systemTrayIcon.setIcon(QIcon(":/images/koo-icon.png"))
         self.systemTrayIcon.setContextMenu(self.systemTrayMenu)
-        self.connect(self.systemTrayIcon, SIGNAL(
-            'activated(QSystemTrayIcon::ActivationReason)'), self.systemTrayIconActivated)
+        self.systemTrayIcon.activated[QSystemTrayIcon.ActivationReason].connect(self.systemTrayIconActivated)
 
         if RemoteHelp.isRemoteHelpAvailable():
             # Add Remote Help menu option under Windows platforms only.
             self.actionRemoteHelp = QAction(self)
             self.actionRemoteHelp.setIcon(QIcon(':/images/partner.png'))
             self.actionRemoteHelp.setText(_('Remote Help'))
-            QObject.connect(self.actionRemoteHelp, SIGNAL(
-                'triggered()'), self.remoteHelp)
+            self.actionRemoteHelp.triggered.connect(self.remoteHelp)
             self.menuHelp.addAction(self.actionRemoteHelp)
 
         self.companyMenu = QMenu(self)
         self.pushCompany.setMenu(self.companyMenu)
-        self.connect(self.companyMenu, SIGNAL(
-            'aboutToShow()'), self.updateCompanyList)
+        self.companyMenu.aboutToShow.connect(self.updateCompanyList)
 
         # Initialize plugins: This allows some plugins (such as SerialBarcodeScanner)
         # to be available in the LoginDialog.
@@ -435,7 +403,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
             action = QAction(self)
             action.setText(record['name'])
             action.setData(record['id'])
-            self.connect(action, SIGNAL('triggered()'), self.changeCompany)
+            action.triggered.connect(self.changeCompany)
             self.companyMenu.addAction(action)
 
     def changeCompany(self):
@@ -695,7 +663,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
             action.setObjectName(str(record.id))
             action.setText(record.value('name'))
             action.setIcon(QIcon(':/images/relate.png'))
-            self.connect(action, SIGNAL('triggered()'), self.executeShortcut)
+            action.triggered.connect(self.executeShortcut)
             self.menuWindow.addAction(action)
             self.shortcutActions.append(action)
 
@@ -797,9 +765,8 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
 
     def addWindow(self, win, target):
         if target in ('current', 'background'):
-            self.connect(win, SIGNAL('closed()'), self.closeTabForced)
-            self.connect(win, SIGNAL('shortcutsChanged'),
-                         self.shortcutsChanged)
+            win.closed.connect(self.closeTabForced)
+            win.shortcutsChanged.connect(self.shortcutsChanged)
             self.tabWidget.addTab(win, win.name)
             # If shift key is pressed do not show the added tab
             if target != 'background':
@@ -818,7 +785,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
             layout.setContentsMargins(0, 0, 0, 0)
             layout.addWidget(win)
             win.setParent(dialog)
-            self.connect(win, SIGNAL('closed()'), dialog.accept)
+            win.closed.connect(dialog.accept)
             win.show()
             dialog.exec_()
 

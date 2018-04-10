@@ -31,6 +31,7 @@
 
 # Added so py2exe properly packs xml.etree.ElementTree
 from xml.etree.ElementTree import parse, SubElement
+from PyQt5.QtWidgets import *
 
 import sys
 import os
@@ -69,8 +70,8 @@ Localization.initializeTranslations(Settings.value('client.language'))
 
 imports = {}
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common import Notifier, Common
 from Koo.Common import DBus
 

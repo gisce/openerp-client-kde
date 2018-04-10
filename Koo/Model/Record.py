@@ -36,7 +36,7 @@ from .Field import ToManyField
 import gettext
 from Koo.Common import Debug
 
-from PyQt4.QtCore import *
+from PyQt5.QtCore import *
 
 #ConcurrencyCheckField = '__last_update'
 ConcurrencyCheckField = 'read_delta'
@@ -62,6 +62,10 @@ class EvalEnvironment(object):
 
 
 class Record(QObject):
+    recordChanged = pyqtSignal('PyQt_PyObject')
+    recordModified = pyqtSignal('PyQt_PyObject')
+    setFocus = pyqtSignal('QString')
+
     def __init__(self, id, group, parent=None, new=False):
         QObject.__init__(self, group)
         self.rpc = group.rpc
@@ -323,7 +327,7 @@ class Record(QObject):
             change = change or not self.isFieldValid(fname)
             self.setFieldValid(fname, True)
         if change:
-            self.emit(SIGNAL('recordChanged( PyQt_PyObject )'), self)
+            self.recordChanged.emit(self)
         return change
 
     # @brief Returns True if all fields are valid. Otherwise it returns False.
@@ -364,8 +368,8 @@ class Record(QObject):
                 continue
             self.group.fieldObjects[fieldname].setDefault(self, value)
         self._loaded = True
-        self.emit(SIGNAL('recordChanged( PyQt_PyObject )'), self)
-        self.emit(SIGNAL('recordModified( PyQt_PyObject )'), self)
+        self.recordChanged.emit(self)
+        self.recordModified.emit(self)
 
     # This functions simply emits a signal indicating that
     # the model has changed. This is mainly used by fields
@@ -373,8 +377,8 @@ class Record(QObject):
     # model emiting it itself.
     def changed(self):
         self.updateAttributes()
-        self.emit(SIGNAL('recordChanged( PyQt_PyObject )'), self)
-        self.emit(SIGNAL('recordModified( PyQt_PyObject )'), self)
+        self.recordChanged.emit(self)
+        self.recordModified.emit(self)
 
     def set(self, val, modified=False, signal=True):
         # Ensure there are values for all fields in the group
@@ -399,9 +403,9 @@ class Record(QObject):
         self.modified = modified
         if not self.modified:
             self.modified_fields = {}
-        self.emit(SIGNAL('recordChanged( PyQt_PyObject )'), self)
+        self.recordChanged.emit(self)
         if signal:
-            self.emit(SIGNAL('recordModified( PyQt_PyObject )'), self)
+            self.recordModified.emit(self)
 
     def reload(self):
         if not self.id:
@@ -534,7 +538,7 @@ class Record(QObject):
             if warning:
                 Notifier.notifyWarning(warning['title'], warning['message'])
             if 'focus' in response:
-                self.emit(SIGNAL('setFocus(QString)'), response['focus'])
+                self.setFocus.emit(response['focus'])
 
     # This functions is called whenever a field with 'change_default'
     # attribute set to True is modified. The function sets all conditional

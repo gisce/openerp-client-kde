@@ -27,6 +27,7 @@
 ##############################################################################
 
 import gettext
+from PyQt5.QtWidgets import *
 
 from Koo.Common import Api
 from Koo.Common import Common
@@ -41,8 +42,8 @@ from Koo import Rpc
 
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 
@@ -57,10 +58,10 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
         self.setupUi(self)
 
         self.uiText.installEventFilter(self)
-        self.connect(self.uiText, SIGNAL("editingFinished()"), self.match)
-        self.connect(self.pushNew, SIGNAL("clicked()"), self.new)
-        self.connect(self.pushOpen, SIGNAL("clicked()"), self.open)
-        self.connect(self.pushClear, SIGNAL("clicked()"), self.clear)
+        self.uiText.editingFinished.connect(self.match)
+        self.pushNew.clicked.connect(self.new)
+        self.pushOpen.clicked.connect(self.open)
+        self.pushClear.clicked.connect(self.clear)
 
         self.setFocusProxy(self.uiText)
 
@@ -68,17 +69,17 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
         self.scNew = QShortcut(self.uiText)
         self.scNew.setKey(Shortcuts.CreateInField)
         self.scNew.setContext(Qt.WidgetShortcut)
-        self.connect(self.scNew, SIGNAL('activated()'), self.new)
+        self.scNew.activated.connect(self.new)
 
         self.scSearch = QShortcut(self.uiText)
         self.scSearch.setKey(Shortcuts.SearchInField)
         self.scSearch.setContext(Qt.WidgetShortcut)
-        self.connect(self.scSearch, SIGNAL('activated()'), self.open)
+        self.scSearch.activated.connect(self.open)
 
         self.scClear = QShortcut(self.uiText)
         self.scClear.setKey(Shortcuts.ClearInField)
         self.scClear.setContext(Qt.WidgetShortcut)
-        self.connect(self.scClear, SIGNAL('activated()'), self.clear)
+        self.scClear.activated.connect(self.clear)
 
         self.searching = False
 
@@ -112,8 +113,7 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
         self.completer = QCompleter()
         self.completer.setCaseSensitivity(Qt.CaseInsensitive)
         self.completer.setCompletionMode(QCompleter.UnfilteredPopupCompletion)
-        self.connect(self.completer, SIGNAL(
-            'activated(QModelIndex)'), self.completerActivated)
+        self.completer.activated[QModelIndex].connect(self.completerActivated)
         self.uiText.setCompleter(self.completer)
 
         model = QStandardItemModel(self)
@@ -398,12 +398,12 @@ class ManyToOneFieldDelegate(AbstractFieldDelegate):
             self.scNew = QShortcut(widget)
             self.scNew.setContext(Qt.WidgetShortcut)
             self.scNew.setKey(Shortcuts.CreateInField)
-            self.connect(self.scNew, SIGNAL('activated()'), self.new)
+            self.scNew.activated.connect(self.new)
 
             self.scSearch = QShortcut(widget)
             self.scSearch.setContext(Qt.WidgetShortcut)
             self.scSearch.setKey(Shortcuts.SearchInField)
-            self.connect(self.scSearch, SIGNAL('activated()'), self.open)
+            self.scSearch.activated.connect(self.open)
         self.currentEditor = widget
         # We expect a KooModel here
         self.record = index.model().recordFromIndex(index)

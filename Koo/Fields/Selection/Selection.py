@@ -27,10 +27,11 @@
 ##############################################################################
 
 from Koo.Common import Common
+from PyQt5.QtWidgets import *
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 
 class SelectionFieldWidget(AbstractFieldWidget):
@@ -56,9 +57,8 @@ class SelectionFieldWidget(AbstractFieldWidget):
 
         self.installPopupMenu(self.widget)
 
-        self.connect(self.widget, SIGNAL('activated(int)'), self.activated)
-        self.connect(self.widget, SIGNAL(
-            'editTextChanged(QString)'), self.changed)
+        self.widget.activated[int].connect(self.activated)
+        self.widget.editTextChanged['QString'].connect(self.changed)
         self.fill(attrs.get('selection') or [])
 
     def fill(self, selection):

@@ -27,8 +27,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 import gettext
@@ -249,16 +250,14 @@ class ExportDialog(QDialog, ExportDialogUi):
         self.ids = []
         self.model = None
         self.fields = None
-        self.connect(self.pushAccept, SIGNAL('clicked()'), self.export)
-        self.connect(self.pushCancel, SIGNAL('clicked()'), self.reject)
-        self.connect(self.pushAdd, SIGNAL('clicked()'), self.add)
-        self.connect(self.pushRemove, SIGNAL('clicked()'), self.remove)
-        self.connect(self.pushRemoveAll, SIGNAL('clicked()'), self.removeAll)
-        self.connect(self.pushSave, SIGNAL('clicked()'), self.save)
-        self.connect(self.pushRemoveExport, SIGNAL(
-            'clicked()'), self.removeExport)
-        self.connect(self.uiPredefined, SIGNAL(
-            'activated(const QModelIndex&)'), self.loadCurrentStored)
+        self.pushAccept.clicked.connect(self.export)
+        self.pushCancel.clicked.connect(self.reject)
+        self.pushAdd.clicked.connect(self.add)
+        self.pushRemove.clicked.connect(self.remove)
+        self.pushRemoveAll.clicked.connect(self.removeAll)
+        self.pushSave.clicked.connect(self.save)
+        self.pushRemoveExport.clicked.connect(self.removeExport)
+        self.uiPredefined.activated[QModelIndex].connect(self.loadCurrentStored)
 
     def setModel(self, model):
         self.model = model
@@ -363,7 +362,7 @@ class ExportDialog(QDialog, ExportDialogUi):
         export = ExportDialog.exports[action]
         if export['requiresFileName']:
             fileName = str(
-                QFileDialog.getSaveFileName(self, _('Export Data')))
+                QFileDialog.getSaveFileName(self, _('Export Data')))[0]
             export['function'](fileName, fieldTitles, result,
                                self.uiAddFieldNames.isChecked())
         else:

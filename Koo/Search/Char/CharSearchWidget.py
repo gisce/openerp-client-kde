@@ -28,7 +28,8 @@
 ##############################################################################
 
 from Koo.Search.AbstractSearchWidget import *
-from PyQt4.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 
 
 class CharSearchWidget(AbstractSearchWidget):

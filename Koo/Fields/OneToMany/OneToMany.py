@@ -26,8 +26,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo.Dialogs.BatchUpdateDialog import *
@@ -83,11 +84,11 @@ class OneToManyDialog(QDialog, OneToManyDialogUi):
 
         self.screen.display()
 
-        self.connect(self.pushOk, SIGNAL("clicked()"), self.accepted)
-        self.connect(self.pushCancel, SIGNAL("clicked()"), self.rejected)
-        self.connect(self, SIGNAL('reject()'), self.cleanup)
-        self.connect(self.pushPrevious, SIGNAL('clicked()'), self.previous)
-        self.connect(self.pushNext, SIGNAL('clicked()'), self.__next__)
+        self.pushOk.clicked.connect(self.accepted)
+        self.pushCancel.clicked.connect(self.rejected)
+        self.reject.connect(self.cleanup)
+        self.pushPrevious.clicked.connect(self.previous)
+        self.pushNext.clicked.connect(self.__next__)
 
         if not self._recordAdded:
             # If the user is modifying an existing record, he won't be
@@ -164,27 +165,23 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
         self.actionDuplicate = QAction(self)
         self.actionDuplicate.setText(_('&Duplicate Selected Records'))
         self.actionDuplicate.setIcon(QIcon(':/images/duplicate.png'))
-        self.connect(self.actionDuplicate, SIGNAL(
-            'triggered()'), self.duplicate)
+        self.actionDuplicate.triggered.connect(self.duplicate)
 
         self.actionBatchInsert = QAction(self)
         self.actionBatchInsert.setText(_('&Insert Several Records at Once'))
         self.actionBatchInsert.setIcon(QIcon(':/images/new.png'))
-        self.connect(self.actionBatchInsert, SIGNAL(
-            'triggered()'), self.batchInsert)
+        self.actionBatchInsert.triggered.connect(self.batchInsert)
 
         self.actionBatchUpdate = QAction(self)
         self.actionBatchUpdate.setText(_('&Modify All Selected Records'))
         self.actionBatchUpdate.setIcon(QIcon(':/images/edit.png'))
-        self.connect(self.actionBatchUpdate, SIGNAL(
-            'triggered()'), self.batchUpdate)
+        self.actionBatchUpdate.triggered.connect(self.batchUpdate)
 
         self.actionBatchUpdateField = QAction(self)
         self.actionBatchUpdateField.setText(
             _('&Modify Field of Selected Records'))
         self.actionBatchUpdateField.setIcon(QIcon(':/images/colorpicker.png'))
-        self.connect(self.actionBatchUpdateField, SIGNAL(
-            'triggered()'), self.batchUpdateField)
+        self.actionBatchUpdateField.triggered.connect(self.batchUpdateField)
 
         self.actionsMenu = QMenu(self)
         self.actionsMenu.addAction(self.actionDuplicate)
@@ -196,37 +193,36 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
 
         #self.colors['normal'] = self.palette().color( self.backgroundRole() )
 
-        self.connect(self.pushNew, SIGNAL("clicked()"), self.new)
-        self.connect(self.pushEdit, SIGNAL("clicked()"), self.edit)
-        self.connect(self.pushRemove, SIGNAL("clicked()"), self.remove)
-        self.connect(self.pushBack, SIGNAL("clicked()"), self.previous)
-        self.connect(self.pushForward, SIGNAL("clicked()"), self.__next__)
-        self.connect(self.pushSwitchView, SIGNAL("clicked()"), self.switchView)
+        self.pushNew.clicked.connect(self.new)
+        self.pushEdit.clicked.connect(self.edit)
+        self.pushRemove.clicked.connect(self.remove)
+        self.pushBack.clicked.connect(self.previous)
+        self.pushForward.clicked.connect(self.__next__)
+        self.pushSwitchView.clicked.connect(self.switchView)
 
-        self.connect(self.screen, SIGNAL(
-            'recordMessage(int,int,int)'), self.setLabel)
-        self.connect(self.screen, SIGNAL('activated()'), self.edit)
+        self.screen.recordMessage[int, int, int].connect(self.setLabel)
+        self.screen.activated.connect(self.edit)
 
         # Create shortcuts
         self.scNew = QShortcut(self)
         self.scNew.setKey(Shortcuts.NewInOneToMany)
         self.scNew.setContext(Qt.WidgetWithChildrenShortcut)
-        self.connect(self.scNew, SIGNAL('activated()'), self.new)
+        self.scNew.activated.connect(self.new)
 
         self.scEdit = QShortcut(self)
         self.scEdit.setKey(Shortcuts.EditInOneToMany)
         self.scEdit.setContext(Qt.WidgetWithChildrenShortcut)
-        self.connect(self.scEdit, SIGNAL('activated()'), self.edit)
+        self.scEdit.activated.connect(self.edit)
 
         self.scDelete = QShortcut(self)
         self.scDelete.setKey(Shortcuts.DeleteInOneToMany)
         self.scDelete.setContext(Qt.WidgetWithChildrenShortcut)
-        self.connect(self.scDelete, SIGNAL('activated()'), self.remove)
+        self.scDelete.activated.connect(self.remove)
 
         self.scSwitchView = QShortcut(self)
         self.scSwitchView.setKey(Shortcuts.SwitchViewInOneToMany)
         self.scSwitchView.setContext(Qt.WidgetWithChildrenShortcut)
-        self.connect(self.scSwitchView, SIGNAL('activated()'), self.switchView)
+        self.scSwitchView.activated.connect(self.switchView)
 
         # remove default menu entries because setting and getting default values
         # is not supported for OneToMany fields. However, other options such as

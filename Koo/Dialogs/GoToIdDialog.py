@@ -25,8 +25,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 from Koo.Common import Common
 
@@ -40,7 +41,7 @@ class GoToIdDialog(QDialog, GoToIdDialogUi):
         self.setupUi(self)
         self.uiId.selectAll()
 
-        self.connect(self.pushAccept, SIGNAL('clicked()'), self.slotAccept)
+        self.pushAccept.clicked.connect(self.slotAccept)
 
     def slotAccept(self):
         self.result = self.uiId.value()

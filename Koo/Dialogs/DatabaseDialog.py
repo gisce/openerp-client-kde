@@ -26,8 +26,9 @@
 ##############################################################################
 
 import base64
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 from . import ServerConfigurationDialog
 from Koo.Common import Common
@@ -63,9 +64,9 @@ class DatabaseDialog(QDialog, DatabaseDialogUi):
         self.uiTitle.setText(title)
         self.setModal(True)
         self.uiInformation.setVisible(False)
-        self.connect(self.pushChange, SIGNAL('clicked()'), self.slotChange)
-        self.connect(self.pushAccept, SIGNAL('clicked()'), self.slotAccept)
-        self.connect(self.pushCancel, SIGNAL('clicked()'), self.reject)
+        self.pushChange.clicked.connect(self.slotChange)
+        self.pushAccept.clicked.connect(self.slotAccept)
+        self.pushCancel.clicked.connect(self.reject)
         self.refreshList()
 
     def refreshList(self):
@@ -110,7 +111,7 @@ class DatabaseDialog(QDialog, DatabaseDialogUi):
 
 
 def restoreDatabase(parent):
-    fileName = QFileDialog.getOpenFileName(parent, _('Open backup file...'))
+    fileName = QFileDialog.getOpenFileName(parent, _('Open backup file...'))[0]
     if fileName.isNull():
         return
     dialog = DatabaseDialog(DatabaseDialog.TypeEdit,
@@ -145,7 +146,7 @@ def backupDatabase(parent):
     r = dialog.exec_()
     if r == QDialog.Rejected:
         return
-    fileName = QFileDialog.getSaveFileName(parent, _('Save as...'))
+    fileName = QFileDialog.getSaveFileName(parent, _('Save as...'))[0]
     if fileName.isNull():
         return
     parent.setCursor(Qt.WaitCursor)

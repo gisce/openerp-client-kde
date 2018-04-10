@@ -25,8 +25,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo.Common.Settings import *
@@ -84,9 +85,9 @@ class TipOfTheDayDialog(QDialog, TipOfTheDayDialogUi):
         except:
             self.number = 0
 
-        self.connect(self.pushNext, SIGNAL('clicked()'), self.nextTip)
-        self.connect(self.pushPrevious, SIGNAL('clicked()'), self.previousTip)
-        self.connect(self.pushClose, SIGNAL('clicked()'), self.closeTip)
+        self.pushNext.clicked.connect(self.nextTip)
+        self.pushPrevious.clicked.connect(self.previousTip)
+        self.pushClose.clicked.connect(self.closeTip)
         self.uiShowNextTime.setChecked(Settings.value('tip.autostart'))
         self.showTip()
 

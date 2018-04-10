@@ -26,8 +26,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo.Common import Common
@@ -55,22 +56,21 @@ class ReferenceFieldWidget(AbstractFieldWidget, ReferenceFieldWidgetUi):
         ReferenceFieldWidgetUi.__init__(self)
         self.setupUi(self)
 
-        self.connect(self.pushNew, SIGNAL('clicked()'), self.new)
-        self.connect(self.pushOpen, SIGNAL('clicked()'), self.open)
-        self.connect(self.pushClear, SIGNAL('clicked()'), self.clear)
+        self.pushNew.clicked.connect(self.new)
+        self.pushOpen.clicked.connect(self.open)
+        self.pushClear.clicked.connect(self.clear)
         self.setPopdown(attrs.get('selection', []))
-        self.connect(self.uiModel, SIGNAL(
-            'currentIndexChanged(int)'), self.recordChanged)
-        self.connect(self.uiText, SIGNAL("editingFinished()"), self.match)
+        self.uiModel.currentIndexChanged[int].connect(self.recordChanged)
+        self.uiText.editingFinished.connect(self.match)
         self.scNew = QShortcut(self.uiText)
         self.scNew.setContext(Qt.WidgetShortcut)
         self.scNew.setKey(Shortcuts.CreateInField)
-        self.connect(self.scNew, SIGNAL('activated()'), self.new)
+        self.scNew.activated.connect(self.new)
 
         self.scSearch = QShortcut(self.uiText)
         self.scSearch.setContext(Qt.WidgetShortcut)
         self.scSearch.setKey(Shortcuts.SearchInField)
-        self.connect(self.scSearch, SIGNAL('activated()'), self.open)
+        self.scSearch.activated.connect(self.open)
 
         self.uiModel.setEditable(False)
         self.installPopupMenu(self.uiText)

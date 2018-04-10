@@ -29,7 +29,7 @@
 import karamba
 
 from Koo import Rpc
-from PyQt4.QtGui import *
+from PyQt5.QtGui import *
 
 def initWidget(widget):
 	global text

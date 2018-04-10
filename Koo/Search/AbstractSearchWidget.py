@@ -27,8 +27,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 
 # @brief AbstractFieldWidget is the base class for all search widgets in Koo.
 # In order to create a new search widget, that is: a widget that appears in a
@@ -46,6 +47,8 @@ class AbstractSearchWidget(QWidget):
     #  parent:     The QWidget parent of this QWidget
     #  attributes: Holds some extra attributes
     #
+    keyDownPressed = pyqtSignal()
+
     def __init__(self, name, parent, attrs={}):
         QWidget.__init__(self, parent)
         self._value = None
@@ -56,7 +59,7 @@ class AbstractSearchWidget(QWidget):
 
     def eventFilter(self, target, event):
         if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Down:
-            self.emit(SIGNAL('keyDownPressed()'))
+            self.keyDownPressed.emit()
             return True
         return False
 

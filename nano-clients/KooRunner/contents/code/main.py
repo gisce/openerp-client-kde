@@ -26,7 +26,7 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
+from PyQt5.QtCore import *
 from PyKDE4.kdecore import *
 from PyKDE4.kdeui import *
 from PyKDE4.plasma import *
@@ -41,6 +41,12 @@ import re
 import math
 import subprocess
 
+
+try:
+    QString = unicode
+except NameError:
+    # Python 3
+    QString = str
 
 class KooRunner(Runner):
     def __init__(self, parent, args=None):

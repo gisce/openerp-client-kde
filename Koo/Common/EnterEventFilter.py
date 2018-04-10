@@ -15,8 +15,9 @@
 #   Free Software Foundation, Inc.,
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 
 # @brief The EnterEventFilter class provides an eventFilter that treats
 # Enter key events as if they were Tab Key hits. Exceptions are buttons

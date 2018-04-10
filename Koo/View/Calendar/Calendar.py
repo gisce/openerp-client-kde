@@ -25,8 +25,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 from Koo.Common import Common
 from Koo.Common import Calendar
@@ -410,6 +411,9 @@ class GraphicsCalendarItem(QGraphicsItemGroup):
 
 
 class GraphicsCalendarScene(QGraphicsScene):
+    currentChanged = pyqtSignal('PyQt_PyObject')
+    activated = pyqtSignal()
+
     def __init__(self, parent=None):
         QGraphicsScene.__init__(self, parent)
         self._calendar = GraphicsCalendarItem()
@@ -424,8 +428,7 @@ class GraphicsCalendarScene(QGraphicsScene):
                 self._activeIndex = item.index()
                 break
         self.setActiveIndex(True)
-        self.emit(SIGNAL("currentChanged(PyQt_PyObject)"),
-                  self._calendar.model().recordFromIndex(self._activeIndex))
+        self.currentChanged.emit(self._calendar.model().recordFromIndex(self._activeIndex))
 
     def setActiveIndex(self, active):
         if not self._activeIndex.isValid():
@@ -441,9 +444,8 @@ class GraphicsCalendarScene(QGraphicsScene):
                 self._activeIndex = item.index()
                 break
         self.setActiveIndex(True)
-        self.emit(SIGNAL("currentChanged(PyQt_PyObject)"),
-                  self._calendar.model().recordFromIndex(self._activeIndex))
-        self.emit(SIGNAL('activated()'))
+        self.currentChanged.emit(self._calendar.model().recordFromIndex(self._activeIndex))
+        self.activated.emit()
 
     def setSize(self, size):
         self._calendar.setSize(size)
@@ -519,25 +521,22 @@ class GraphicsCalendarView(QGraphicsView):
 
 
 class CalendarView(AbstractView, CalendarViewUi):
+    currentChanged = pyqtSignal('PyQt_PyObject')
+    activated = pyqtSignal()
+
     def __init__(self, parent):
         AbstractView.__init__(self, parent)
         CalendarViewUi.__init__(self)
         self.setupUi(self)
-        self.connect(self.calendarWidget, SIGNAL(
-            'selectionChanged()'), self.updateCalendarView)
-        self.connect(self.pushMonthlyView, SIGNAL(
-            'clicked()'), self.updateCalendarView)
-        self.connect(self.pushWeeklyView, SIGNAL(
-            'clicked()'), self.updateCalendarView)
-        self.connect(self.pushDailyView, SIGNAL(
-            'clicked()'), self.updateCalendarView)
+        self.calendarWidget.selectionChanged.connect(self.updateCalendarView)
+        self.pushMonthlyView.clicked.connect(self.updateCalendarView)
+        self.pushWeeklyView.clicked.connect(self.updateCalendarView)
+        self.pushDailyView.clicked.connect(self.updateCalendarView)
         self.setReadOnly(True)
         self.title = ""
         self.updateCalendarView()
-        self.connect(self.calendarView.scene(), SIGNAL(
-            'currentChanged(PyQt_PyObject)'), self.currentChanged)
-        self.connect(self.calendarView.scene(),
-                     SIGNAL('activated()'), self.activated)
+        self.calendarView.scene().currentChanged['PyQt_PyObject'].connect(self.currentChanged)
+        self.calendarView.scene().activated.connect(self.activated)
 
     def viewType(self):
         return 'calendar'
@@ -575,7 +574,7 @@ class CalendarView(AbstractView, CalendarViewUi):
         self.calendarView.updateData()
 
     def currentChanged(self, obj):
-        self.emit(SIGNAL('currentChanged(PyQt_PyObject)'), obj)
+        self.currentChanged.emit(obj)
 
     def activated(self):
-        self.emit(SIGNAL('activated()'))
+        self.activated.emit()

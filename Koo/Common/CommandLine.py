@@ -34,7 +34,7 @@ from . import Debug
 from .Settings import *
 from Koo import Rpc
 
-from PyQt4.QtCore import QDir, QUrl
+from PyQt5.QtCore import QDir, QUrl
 
 
 def homeDirectory():

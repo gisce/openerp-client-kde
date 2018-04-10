@@ -25,8 +25,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 from . import ServerConfigurationDialog
 from Koo.Common import Common
@@ -44,8 +45,8 @@ class CreationOkDialog(QDialog, CreationOkDialogUi):
         CreationOkDialogUi.__init__(self)
         self.setupUi(self)
 
-        self.connect(self.pushConnect, SIGNAL('clicked()'), self.connectNow)
-        self.connect(self.pushLater, SIGNAL('clicked()'), self.connectLater)
+        self.pushConnect.clicked.connect(self.connectNow)
+        self.pushLater.clicked.connect(self.connectLater)
 
         self.textEdit.setPlainText(_('The following users have been installed on your database:\n\n' +
                                      passwordList + '\n\n' + _('You can now connect to the database as an administrator.')))
@@ -69,7 +70,7 @@ class ProgressBar(QDialog, ProgressBarUi):
 
         self.setModal(True)
         self.timer = QTimer(self)
-        self.connect(self.timer, SIGNAL("timeout()"), self.timeout)
+        self.timer.timeout.connect(self.timeout)
         self.url = ""
         self.databaseName = ""
         self.demoData = ""
@@ -138,9 +139,9 @@ class DatabaseCreationDialog(QDialog, DatabaseCreationDialogUi):
         DatabaseCreationDialogUi.__init__(self)
         self.setupUi(self)
 
-        self.connect(self.pushCancel, SIGNAL("clicked()"), self.cancelled)
-        self.connect(self.pushAccept, SIGNAL("clicked()"), self.accepted)
-        self.connect(self.pushChange, SIGNAL("clicked()"), self.changeServer)
+        self.pushCancel.clicked.connect(self.cancelled)
+        self.pushAccept.clicked.connect(self.accepted)
+        self.pushChange.clicked.connect(self.changeServer)
 
         url = QUrl(Settings.value('login.url'))
         url.setUserName('')

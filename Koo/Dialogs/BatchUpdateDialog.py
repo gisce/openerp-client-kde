@@ -25,8 +25,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 from Koo import Rpc
 from Koo.Common import Common
@@ -77,8 +78,8 @@ class BatchUpdateDialog(QDialog, BatchUpdateDialogUi):
         BatchUpdateDialogUi.__init__(self)
         self.setupUi(self)
 
-        self.connect(self.pushAccept, SIGNAL('clicked()'), self.save)
-        self.connect(self.pushCancel, SIGNAL('clicked()'), self.cancelled)
+        self.pushAccept.clicked.connect(self.save)
+        self.pushCancel.clicked.connect(self.cancelled)
 
         self.ids = []
         self.model = None

@@ -26,7 +26,7 @@
 ##############################################################################
 
 from Koo.Search.AbstractSearchWidget import *
-from PyQt4.QtGui import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 from Koo.Common import Common
 

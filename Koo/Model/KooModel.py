@@ -25,8 +25,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 
 from Koo.Common import Icons
 from Koo.Common import Calendar
@@ -50,9 +51,14 @@ from Koo.Rpc import Rpc
 # Then it's ready to be used in any Qt model/view enabled widget such as 
 # QTreeView or QListView.
 # Note that by default KooModel is read-only.
+QStringList = list
+
 class KooModel(QAbstractItemModel):
 	
 	# Modes
+	modelAboutToBeReset = pyqtSignal()
+	modelReset = pyqtSignal()
+	dataChanged = pyqtSignal(QModelIndex, QModelIndex)
 	TreeMode = 1
 	ListMode = 2
 
@@ -93,21 +99,21 @@ class KooModel(QAbstractItemModel):
 	# Fields should already be set and can't be added after this 
 	# call
 	def setRecordGroup(self, group):
-		self.emit( SIGNAL('modelAboutToBeReset()') )
+		self.modelAboutToBeReset.emit()
 		if self.group:
-			self.disconnect( self.group, SIGNAL('recordsInserted(int,int)'), self.recordsInserted )
-			self.disconnect( self.group, SIGNAL('recordChanged(PyQt_PyObject)'), self.recordChanged )
-			self.disconnect( self.group, SIGNAL('recordsRemoved(int,int)'), self.recordsRemoved )
+			self.group.recordsInserted[int, int].disconnect(self.recordsInserted)
+			self.group.recordChanged['PyQt_PyObject'].disconnect(self.recordChanged)
+			self.group.recordsRemoved[int, int].disconnect(self.recordsRemoved)
 			
 		self.group = group
 		if self.group:
-			self.connect( self.group, SIGNAL('recordsInserted(int,int)'), self.recordsInserted )
-			self.connect( self.group, SIGNAL('recordChanged(PyQt_PyObject)'), self.recordChanged )
-			self.connect( self.group, SIGNAL('recordsRemoved(int,int)'), self.recordsRemoved )
+			self.group.recordsInserted[int, int].connect(self.recordsInserted)
+			self.group.recordChanged['PyQt_PyObject'].connect(self.recordChanged)
+			self.group.recordsRemoved[int, int].connect(self.recordsRemoved)
 			
 		# We emit modelReset() so widgets will be notified that 
 		# they need to be updated
-		self.emit( SIGNAL('modelReset()') )
+		self.modelReset.emit()
 		self.updateVisibleFields()
 
 	## @brief Returns the current RecordGroup associated with this Qt Model
@@ -136,7 +142,7 @@ class KooModel(QAbstractItemModel):
 			self.reset()
 			return
 		rightIndex = self.index( leftIndex.row(), self.columnCount() - 1 )
-		self.emit( SIGNAL('dataChanged(QModelIndex,QModelIndex)'), leftIndex, rightIndex )
+		self.dataChanged.emit(leftIndex, rightIndex)
 
 	def recordsRemoved(self, start, end):
 		if self._updatesEnabled:

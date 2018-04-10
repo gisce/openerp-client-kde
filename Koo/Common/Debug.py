@@ -26,7 +26,7 @@
 ##############################################################################
 
 import gc
-from PyQt4.QtCore import *
+from PyQt5.QtCore import *
 
 
 def printObjects():
@@ -107,7 +107,7 @@ if 'frozen' in dir(sys) and sys.frozen == "windows_exe":
 
 
 def exceptionHook(type, value, backtrace):
-    from PyQt4.QtGui import QApplication
+    from PyQt5.QtWidgets import QApplication
     cursor = QApplication.overrideCursor()
     if cursor:
         QApplication.restoreOverrideCursor()
@@ -128,7 +128,7 @@ def installExceptionHook():
 def debug_trace():
     '''Set a tracepoint in the Python debugger that works with Qt.
     Removes "QCoreApplication::exec: The event loop is already running" messages while in pdb'''
-    from PyQt4.QtCore import pyqtRemoveInputHook
+    from PyQt5.QtCore import pyqtRemoveInputHook
     from pdb import set_trace
     pyqtRemoveInputHook()
     set_trace()

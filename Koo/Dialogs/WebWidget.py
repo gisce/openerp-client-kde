@@ -27,19 +27,20 @@
 ##############################################################################
 
 from Koo import Rpc
+from PyQt5.QtWidgets import *
 
 from Koo.Common import Common
 from Koo.Common.Settings import *
 from Koo.Common import Help
 
 try:
-    from PyQt4.QtWebKit import *
+    from PyQt5.QtWebKit import *
     isWebWidgetAvailable = True
 except:
     isWebWidgetAvailable = False
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 if isWebWidgetAvailable:
@@ -56,6 +57,8 @@ if isWebWidgetAvailable:
         # context -> Context for the current data set
         # parent -> Parent widget of the form
         # name -> User visible title of the form
+        closed = pyqtSignal()
+
         def __init__(self, parent=None):
             QWidget.__init__(self, parent)
             WebWidgetUi.__init__(self)
@@ -105,7 +108,7 @@ if isWebWidgetAvailable:
 
         def closeWidget(self):
             self.screen.storeViewSettings()
-            self.emit(SIGNAL('closed()'))
+            self.closed.emit()
 
         def canClose(self, urgent=False):
             # Store settings of all opened views before closing the tab.

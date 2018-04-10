@@ -25,8 +25,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 from Koo.Common import Api
 from Koo.Common import Common
 from Koo.Plugins import *

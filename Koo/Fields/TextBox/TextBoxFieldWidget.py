@@ -27,12 +27,13 @@
 ##############################################################################
 
 from Koo.Common import Shortcuts
+from PyQt5.QtWidgets import *
 from Koo.Common.SpellChecker import *
 
 from Koo.Fields.TranslationDialog import *
 from Koo.Fields.AbstractFieldWidget import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 
 class TextBoxFieldWidget(AbstractFieldWidget):
@@ -51,13 +52,12 @@ class TextBoxFieldWidget(AbstractFieldWidget):
             pushTranslate.setIcon(QIcon(':/images/locale.png'))
             pushTranslate.setFocusPolicy(Qt.NoFocus)
             layout.addWidget(pushTranslate)
-            self.connect(pushTranslate, SIGNAL('clicked()'), self.translate)
+            pushTranslate.clicked.connect(self.translate)
 
             self.scTranslate = QShortcut(self.uiText)
             self.scTranslate.setKey(Shortcuts.SearchInField)
             self.scTranslate.setContext(Qt.WidgetShortcut)
-            self.connect(self.scTranslate, SIGNAL(
-                'activated()'), self.translate)
+            self.scTranslate.activated.connect(self.translate)
 
         # Activate Spell Checker
         language = str(Rpc.session.context.get('lang', 'en_US'))

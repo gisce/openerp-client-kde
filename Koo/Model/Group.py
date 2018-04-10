@@ -33,8 +33,8 @@ from .Record import Record
 from . import Field
 
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 try:
     set()
@@ -68,6 +68,11 @@ except NameError:
 
 
 class RecordGroup(QObject):
+    recordsInserted = pyqtSignal(int, int)
+    recordsRemoved = pyqtSignal(int, int)
+    recordChanged = pyqtSignal('PyQt_PyObject')
+    modified = pyqtSignal()
+    sorting = pyqtSignal()
 
     SortVisibleItems = 1
     SortAllItems = 2
@@ -161,8 +166,7 @@ class RecordGroup(QObject):
 
     def __del__(self):
         if self.parent:
-            self.disconnect(self, SIGNAL('modified'),
-                            self.tomanyfield.groupModified)
+            self.modified.disconnect(self.tomanyfield.groupModified)
             self.tomanyfield = None
         self.rpc = None
         self.parent = None
@@ -172,10 +176,8 @@ class RecordGroup(QObject):
         for r in self.records:
             if not isinstance(r, Record):
                 continue
-            self.disconnect(
-                r, SIGNAL('recordChanged( PyQt_PyObject )'), self.recordChanged)
-            self.disconnect(
-                r, SIGNAL('recordModified( PyQt_PyObject )'), self.recordModified)
+            r.recordChanged['PyQt_PyObject'].disconnect(self.recordChanged)
+            r.recordModified['PyQt_PyObject'].disconnect(self.recordModified)
             r.__del__()
         self.records = []
         for f in self.fieldObjects:
@@ -255,10 +257,8 @@ class RecordGroup(QObject):
             # TODO: Should we reconsider this? Do we need/want to reload. Probably we
             # only want to add the id to the list.
             record = Record(id, self, parent=self.parent)
-            self.connect(record, SIGNAL(
-                'recordChanged( PyQt_PyObject )'), self.recordChanged)
-            self.connect(record, SIGNAL(
-                'recordModified( PyQt_PyObject )'), self.recordModified)
+            record.recordChanged['PyQt_PyObject'].connect(self.recordChanged)
+            record.recordModified['PyQt_PyObject'].connect(self.recordModified)
             record.reload()
             if not result:
                 result = record
@@ -267,8 +267,7 @@ class RecordGroup(QObject):
             indexes.append(newIndex)
 
         if indexes:
-            self.emit(SIGNAL('recordsInserted(int,int)'),
-                      min(indexes), max(indexes))
+            self.recordsInserted.emit(min(indexes), max(indexes))
         return result
 
     # @brief Adds a list of records as specified by 'values'.
@@ -281,12 +280,10 @@ class RecordGroup(QObject):
             record = Record(value['id'], self, parent=self.parent)
             record.set(value)
             self.records.append(record)
-            self.connect(record, SIGNAL(
-                'recordChanged( PyQt_PyObject )'), self.recordChanged)
-            self.connect(record, SIGNAL(
-                'recordModified( PyQt_PyObject )'), self.recordModified)
+            record.recordChanged['PyQt_PyObject'].connect(self.recordChanged)
+            record.recordModified['PyQt_PyObject'].connect(self.recordModified)
         end = len(self.records) - 1
-        self.emit(SIGNAL('recordsInserted(int,int)'), start, end)
+        self.recordsInserted.emit(start, end)
 
     # @brief Creates as many records as len(ids) with the ids[x] as id.
     #
@@ -322,20 +319,18 @@ class RecordGroup(QObject):
         # force an update() which would cause one2many relations to load elements
         # when we only want to know how many are there.
         self.updated = True
-        self.emit(SIGNAL('recordsInserted(int,int)'), start, end)
+        self.recordsInserted.emit(start, end)
 
     # @brief Clears the list of records. It doesn't remove them.
     def clear(self):
         for record in self.records:
             if isinstance(record, Record):
-                self.disconnect(record, SIGNAL(
-                    'recordChanged( PyQt_PyObject )'), self.recordChanged)
-                self.disconnect(record, SIGNAL(
-                    'recordModified( PyQt_PyObject )'), self.recordModified)
+                record.recordChanged['PyQt_PyObject'].disconnect(self.recordChanged)
+                record.recordModified['PyQt_PyObject'].disconnect(self.recordModified)
         last = len(self.records) - 1
         self.records = []
         self.removedRecords = []
-        self.emit(SIGNAL('recordsRemoved(int,int)'), 0, last)
+        self.recordsRemoved.emit(0, last)
 
     # @brief Returns a copy of the current context
     def context(self):
@@ -363,10 +358,8 @@ class RecordGroup(QObject):
         else:
             self.records.insert(position, record)
         record.parent = self.parent
-        self.connect(record, SIGNAL(
-            'recordChanged( PyQt_PyObject )'), self.recordChanged)
-        self.connect(record, SIGNAL(
-            'recordModified( PyQt_PyObject )'), self.recordModified)
+        record.recordChanged['PyQt_PyObject'].connect(self.recordChanged)
+        record.recordModified['PyQt_PyObject'].connect(self.recordModified)
         return record
 
     # @brief Creates a new record of the same type of the records in the group.
@@ -390,7 +383,7 @@ class RecordGroup(QObject):
             start = len(self.records) - 1
         else:
             start = position
-        self.emit(SIGNAL('recordsInserted(int,int)'), start, start)
+        self.recordsInserted.emit(start, start)
         return record
 
     def disableSignals(self):
@@ -401,11 +394,11 @@ class RecordGroup(QObject):
 
     def recordChanged(self, record):
         if self._signalsEnabled:
-            self.emit(SIGNAL('recordChanged(PyQt_PyObject)'), record)
+            self.recordChanged.emit(record)
 
     def recordModified(self, record):
         if self._signalsEnabled:
-            self.emit(SIGNAL('modified'))
+            self.modified.emit()
 
     # @brief Removes a record from the record group but not from the server.
     #
@@ -425,8 +418,8 @@ class RecordGroup(QObject):
             if record.parent:
                 record.parent.modified = True
         self.freeRecord(record)
-        self.emit(SIGNAL('modified'))
-        self.emit(SIGNAL('recordsRemoved(int,int)'), idx, idx)
+        self.modified.emit()
+        self.recordsRemoved.emit(idx, idx)
 
     # @brief Remove a list of records from the record group but not from the server.
     #
@@ -456,8 +449,8 @@ class RecordGroup(QObject):
                 if record.parent:
                     record.parent.modified = True
             self.freeRecord(record)
-        self.emit(SIGNAL('modified'))
-        self.emit(SIGNAL('recordsRemoved(int,int)'), firstIdx, lastIdx)
+        self.modified.emit()
+        self.recordsRemoved.emit(firstIdx, lastIdx)
 
     # @brief Removes a record from the record group but not from the server.
     #
@@ -619,10 +612,8 @@ class RecordGroup(QObject):
             elif record == id:
                 idx = self.records.index(id)
                 record = Record(id, self, parent=self.parent)
-                self.connect(record, SIGNAL(
-                    'recordChanged( PyQt_PyObject )'), self.recordChanged)
-                self.connect(record, SIGNAL(
-                    'recordModified( PyQt_PyObject )'), self.recordModified)
+                record.recordChanged['PyQt_PyObject'].connect(self.recordChanged)
+                record.recordModified['PyQt_PyObject'].connect(self.recordModified)
                 self.records[idx] = record
                 return record
 
@@ -648,10 +639,8 @@ class RecordGroup(QObject):
             return record
         else:
             record = Record(record, self, parent=self.parent)
-            self.connect(record, SIGNAL(
-                'recordChanged( PyQt_PyObject )'), self.recordChanged)
-            self.connect(record, SIGNAL(
-                'recordModified( PyQt_PyObject )'), self.recordModified)
+            record.recordChanged['PyQt_PyObject'].connect(self.recordChanged)
+            record.recordModified['PyQt_PyObject'].connect(self.recordModified)
             self.records[row] = record
             return record
 
@@ -783,7 +772,7 @@ class RecordGroup(QObject):
         # we won't sort as it means reloading data from the server
         # and we'd loose current changes.
         if self.isModified():
-            self.emit(SIGNAL("sorting"), self.SortingNotPossibleModified)
+            self.sorting.emit(self.SortingNotPossibleModified)
             return
 
         oldSortedField = self.sortedField
@@ -874,7 +863,7 @@ class RecordGroup(QObject):
             # The load function will be in charge of loading and sorting elements
             self.load(ids)
 
-        self.emit(SIGNAL("sorting"), sortingResult)
+        self.sorting.emit(sortingResult)
 
     # Sorts the records of the group taking into account only loaded fields.
     def sortVisible(self, field, order):
@@ -920,9 +909,9 @@ class RecordGroup(QObject):
         self.updated = True
 
         # Emit recordsInserted() to ensure KooModel is updated.
-        self.emit(SIGNAL('recordsInserted(int,int)'), 0, len(self.records) - 1)
+        self.recordsInserted.emit(0, len(self.records) - 1)
 
-        self.emit(SIGNAL("sorting"), self.SortingPossible)
+        self.sorting.emit(self.SortingPossible)
 
     # @brief Removes all new records and marks all modified ones as not loaded.
     def cancel(self):
@@ -942,10 +931,8 @@ class RecordGroup(QObject):
     def freeRecord(self, record):
         self.records.remove(record)
         if isinstance(record, Record):
-            self.disconnect(record, SIGNAL(
-                'recordChanged( PyQt_PyObject )'), self.recordChanged)
-            self.disconnect(record, SIGNAL(
-                'recordModified( PyQt_PyObject )'), self.recordModified)
+            record.recordChanged['PyQt_PyObject'].disconnect(self.recordChanged)
+            record.recordModified['PyQt_PyObject'].disconnect(self.recordModified)
 
     # @brief Returns True if any of the records in the group has been modified.
     def isModified(self):

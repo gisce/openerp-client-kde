@@ -27,6 +27,7 @@
 ##############################################################################
 
 from Koo.Common import Common
+from PyQt5.QtWidgets import *
 from Koo.Common import Icons
 from Koo.Common.Settings import *
 from Koo import Rpc
@@ -35,8 +36,8 @@ from .FormView import FormView, FormContainer, FormTabWidget
 from Koo.View.AbstractParser import *
 from Koo.Fields.FieldWidgetFactory import *
 from Koo.Fields.AbstractFieldWidget import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 
 class FormParser(AbstractParser):

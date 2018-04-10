@@ -28,6 +28,7 @@
 ##############################################################################
 
 from xml.parsers import expat
+from PyQt5.QtWidgets import *
 
 import sys
 import gettext
@@ -40,8 +41,8 @@ from Koo.Common import Common
 from Koo.Common import Api
 from Koo import Rpc
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from Koo.Common.Ui import *
 
 
@@ -154,6 +155,9 @@ class SearchFormParser(object):
 
 class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
     # @brief Constructs a new SearchFormWidget.
+    search = pyqtSignal()
+    keyDownPressed = pyqtSignal()
+
     def __init__(self, parent=None):
         AbstractSearchWidget.__init__(self, '', parent)
         SearchFormWidgetUi.__init__(self)
@@ -191,15 +195,13 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
         self.pushSave.hide()
         self.uiStoredFilters.hide()
 
-        self.connect(self.pushExpander, SIGNAL(
-            'clicked()'), self.toggleExpansion)
-        self.connect(self.pushClear, SIGNAL('clicked()'), self.clear)
-        self.connect(self.pushSearch, SIGNAL('clicked()'), self.search)
-        self.connect(self.pushSwitchView, SIGNAL('clicked()'), self.toggleView)
-        self.connect(self.actionSave, SIGNAL('triggered()'), self.save)
-        self.connect(self.actionManage, SIGNAL('triggered()'), self.manage)
-        self.connect(self.uiStoredFilters, SIGNAL(
-            'currentIndexChanged(int)'), self.setStoredFilter)
+        self.pushExpander.clicked.connect(self.toggleExpansion)
+        self.pushClear.clicked.connect(self.clear)
+        self.pushSearch.clicked.connect(self.search)
+        self.pushSwitchView.clicked.connect(self.toggleView)
+        self.actionSave.triggered.connect(self.save)
+        self.actionManage.triggered.connect(self.manage)
+        self.uiStoredFilters.currentIndexChanged[int].connect(self.setStoredFilter)
 
     def setStoredFilter(self, index):
         if index >= 0:
@@ -292,8 +294,7 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
 
         self.widgets = parser.parse(xml)
         for widget in list(self.widgets.values()):
-            self.connect(widget, SIGNAL('keyDownPressed()'),
-                         self, SIGNAL('keyDownPressed()'))
+            widget.keyDownPressed.connect(self.keyDownPressed)
 
         for x in domain:
             if len(x) >= 2 and x[0] in self.widgets and x[1] == '=':
@@ -353,7 +354,7 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
 
             self.uiCustomContainer.setAllItemsValid(True)
 
-        self.emit(SIGNAL('search()'))
+        self.search.emit()
 
     # @brief Shows Search and Clear buttons.
     def showButtons(self):

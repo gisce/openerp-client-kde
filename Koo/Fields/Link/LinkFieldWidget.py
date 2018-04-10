@@ -27,12 +27,13 @@
 ##############################################################################
 
 import base64
+from PyQt5.QtWidgets import *
 import os
 import tempfile
 
 from Koo.Fields.AbstractFieldWidget import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo.Common import Common
@@ -45,7 +46,7 @@ class LinkFieldWidget(AbstractFieldWidget, LinkFieldWidgetUi):
         AbstractFieldWidget.__init__(self, parent, model, attrs)
         LinkFieldWidgetUi.__init__(self)
         self.setupUi(self)
-        self.connect(self.pushOpen, SIGNAL('clicked()'), self.open)
+        self.pushOpen.clicked.connect(self.open)
         self.installPopupMenu(self.uiText)
 
     def setReadOnly(self, value):
@@ -70,7 +71,7 @@ class LinkFieldWidget(AbstractFieldWidget, LinkFieldWidgetUi):
 
     def open(self):
         filename = QFileDialog.getOpenFileName(
-            self, _('Select the file to link to'))
+            self, _('Select the file to link to'))[0]
         if filename.isNull():
             return
         self.record.setValue(self.name, str(filename))

@@ -28,6 +28,7 @@
 ##############################################################################
 
 import gettext
+from PyQt5.QtWidgets import *
 import re
 from Koo.Common import Common
 from Koo.Common import Numeric
@@ -37,13 +38,13 @@ from Koo.Common.Settings import *
 from Koo import Rpc
 from Koo.Model.Group import RecordGroup
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from Koo.Common.Ui import *
 
 try:
-    from PyQt4.QtWebKit import *
-    from PyQt4.QtNetwork import *
+    from PyQt5.QtWebKit import *
+    from PyQt5.QtNetwork import *
     isWebKitAvailable = True
 except:
     isWebKitAvailable = False
@@ -74,7 +75,7 @@ if isWebKitAvailable:
 
             self.setWindowTitle(self.title)
             self.uiWeb.page().setLinkDelegationPolicy(QWebPage.DelegateAllLinks)
-            self.connect(self.uiWeb, SIGNAL('linkClicked(QUrl)'), self.open)
+            self.uiWeb.linkClicked[QUrl].connect(self.open)
 
             self.shortcuts = {}
             self.related = []
@@ -84,16 +85,14 @@ if isWebKitAvailable:
             self.pushNext.setEnabled(False)
             self.pushPrevious.setEnabled(False)
 
-            self.connect(self.uiHelp, SIGNAL(
-                'linkActivated(QString)'), self.showHelp)
-            self.connect(self.pushClose, SIGNAL("clicked()"), self.accept)
-            self.connect(self.pushFind, SIGNAL("clicked()"), self.find)
-            self.connect(self.pushPrevious, SIGNAL("clicked()"), self.previous)
-            self.connect(self.pushNext, SIGNAL("clicked()"), self.__next__)
-            self.connect(self, SIGNAL('accept()'), self.accepted)
+            self.uiHelp.linkActivated['QString'].connect(self.showHelp)
+            self.pushClose.clicked.connect(self.accept)
+            self.pushFind.clicked.connect(self.find)
+            self.pushPrevious.clicked.connect(self.previous)
+            self.pushNext.clicked.connect(self.__next__)
+            self.accept.connect(self.accepted)
             if Settings.value('koo.fts_instant', True):
-                self.connect(self.uiText, SIGNAL(
-                    'textEdited(QString)'), self.find)
+                self.uiText.textEdited['QString'].connect(self.find)
             self.show()
 
             QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -218,8 +217,7 @@ if isWebKitAvailable:
                     self.shortcut = QShortcut(self)
                     self.shortcut.setKey('Ctrl+%s' % number)
                     self.shortcut.setContext(Qt.WidgetWithChildrenShortcut)
-                    self.connect(self.shortcut, SIGNAL(
-                        'activated()'), self.openShortcut)
+                    self.shortcut.activated.connect(self.openShortcut)
                     self.shortcuts[self.shortcut] = url
                     shortcut = ' - <span style="color: green; font-size: medium">[Ctrl+%d]</span>' % (
                         number % 10)

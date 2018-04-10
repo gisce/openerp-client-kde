@@ -28,6 +28,7 @@
 ##############################################################################
 
 import gettext
+from PyQt5.QtWidgets import *
 from Koo.Common import Common
 from Koo.Common.Settings import *
 
@@ -37,8 +38,8 @@ from Koo.Screen import Screen
 from Koo.Screen.ScreenDialog import ScreenDialog
 from Koo.Model.Group import RecordGroup
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from Koo.Common.Ui import *
 
 (SearchDialogUi, SearchDialogBase) = loadUiType(Common.uiPath('win_search.ui'))
@@ -79,7 +80,7 @@ class SearchDialog(QDialog, SearchDialogUi):
         self.view = self.screen.currentView()
         self.view.setAllowMultipleSelection(self.allowMultipleSelection)
         self.view.setReadOnly(True)
-        self.connect(self.view, SIGNAL('activated()'), self.accepted)
+        self.view.activated.connect(self.accepted)
 
         self.model = model
 
@@ -87,8 +88,7 @@ class SearchDialog(QDialog, SearchDialogUi):
             '/object', 'execute', self.model, 'fields_view_get', False, 'form', self.context)
         self.form.setup(view_form['arch'], view_form['fields'], model, domain)
         self.form.hideButtons()
-        self.connect(self.form, SIGNAL(
-            'keyDownPressed()'), self.setFocusToList)
+        self.form.keyDownPressed.connect(self.setFocusToList)
 
         self.title = _('Search: %s') % self.form.name
         self.titleResults = _('Search: %s (%%d result(s))') % self.form.name
@@ -102,11 +102,11 @@ class SearchDialog(QDialog, SearchDialogUi):
 
         self.form.setFocus()
 
-        self.connect(self.pushNew, SIGNAL("clicked()"), self.new)
-        self.connect(self.pushAccept, SIGNAL("clicked()"), self.accepted)
-        self.connect(self.pushCancel, SIGNAL("clicked()"), self.reject)
-        self.connect(self.pushFind, SIGNAL("clicked()"), self.find)
-        self.connect(self.form, SIGNAL("search()"), self.find)
+        self.pushNew.clicked.connect(self.new)
+        self.pushAccept.clicked.connect(self.accepted)
+        self.pushCancel.clicked.connect(self.reject)
+        self.pushFind.clicked.connect(self.find)
+        self.form.search.connect(self.find)
 
         # Selects all items
         self.select()

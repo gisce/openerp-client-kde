@@ -28,11 +28,12 @@
 ##############################################################################
 
 import gettext
+from PyQt5.QtWidgets import *
 from Koo.Common import Common
 from Koo import Rpc
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 (FieldPreferencesDialogUi, FieldPreferencesDialogBase) = loadUiType(
@@ -66,7 +67,7 @@ class FieldPreferencesDialog(QDialog, FieldPreferencesDialogUi):
         if not len(dependance):
             frameLayout.addWidget(
                 QLabel(_('<center>Always applicable!</center>'), self))
-        self.connect(self.pushAccept, SIGNAL('clicked()'), self.slotAccept)
+        self.pushAccept.clicked.connect(self.slotAccept)
 
     def slotAccept(self):
         deps = False

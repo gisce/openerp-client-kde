@@ -29,6 +29,7 @@
 
 
 from Koo.Common import Localization
+from PyQt5.QtWidgets import *
 Localization.initializeTranslations()
 
 from Koo import Rpc
@@ -39,7 +40,7 @@ from Koo.Model.Group import *
 from Koo.Model.KooModel import *
 
 import sys
-from PyQt4.QtGui import *
+from PyQt5.QtGui import *
 
 class RequestsDialog(QDialog):
 	def __init__(self,parent=None):
@@ -48,7 +49,7 @@ class RequestsDialog(QDialog):
 		tree = QTreeView(self)
 		tree.setRootIsDecorated( False )
 		layout.addWidget(tree)
-		layout.setMargin( 0 )
+		layout.setContentsMargins(0, 0, 0, 0)
 		self.resize(600, 300)
 
 		Rpc.session.login( 'http://admin:admin@127.0.0.1:8069', 'semantic' )

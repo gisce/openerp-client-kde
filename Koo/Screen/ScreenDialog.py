@@ -26,8 +26,9 @@
 ##############################################################################
 
 from Koo.Common.Ui import *
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 from Koo.Common import Common
 
@@ -47,8 +48,8 @@ class ScreenDialog(QDialog, ScreenDialogUi):
         self.setMinimumWidth(800)
         self.setMinimumHeight(600)
 
-        self.connect(self.pushOk, SIGNAL("clicked()"), self.accepted)
-        self.connect(self.pushCancel, SIGNAL("clicked()"), self.rejected)
+        self.pushOk.clicked.connect(self.accepted)
+        self.pushCancel.clicked.connect(self.rejected)
         self.group = None
         self.record = None
         self.recordId = None

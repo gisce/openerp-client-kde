@@ -28,8 +28,8 @@
 
 import base64
 from Koo import Rpc
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from Koo.Common.Ui import *
 from Koo.Plugins import Plugins
 

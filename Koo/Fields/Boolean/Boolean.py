@@ -26,7 +26,8 @@
 #
 ##############################################################################
 
-from PyQt4.QtGui import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
@@ -44,8 +45,7 @@ class BooleanFieldWidget(AbstractFieldWidget):
         layout.addWidget(self.widget)
         layout.setAlignment(Qt.AlignLeft)
         self.installPopupMenu(self.widget)
-        self.connect(self.widget, SIGNAL(
-            'stateChanged(int)'), self.callModified)
+        self.widget.stateChanged[int].connect(self.callModified)
 
     def callModified(self, value):
         self.modified()

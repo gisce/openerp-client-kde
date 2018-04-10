@@ -27,8 +27,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo import Rpc
@@ -61,7 +62,7 @@ class WizardPage(QDialog):
             if len(x) >= 4 and x[3]:
                 but.setDefault(True)
             self.buttonsLayout.addWidget(but)
-            self.connect(but, SIGNAL('clicked()'), self.slotPush)
+            but.clicked.connect(self.slotPush)
 
         val = {}
         for f in fields:

@@ -27,6 +27,7 @@
 ##############################################################################
 
 import xml.dom.minidom
+from PyQt5.QtWidgets import *
 
 from Koo.Rpc import RpcProxy
 from Koo import Rpc
@@ -39,8 +40,8 @@ from Koo.Common import Common
 from Koo.Common.Settings import *
 from Koo.Common.ViewSettings import *
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 from Koo.Search import SearchFormWidget
 from Koo.Plugins import *
@@ -67,6 +68,11 @@ from .ViewQueue import *
 #   currentChanged() -> Emited when the current record has been modified.
 #   recordMessage(int,int,int) -> Emited each time the current record changes (such as moving to previous or next).
 class Screen(QScrollArea):
+    activated = pyqtSignal()
+    closed = pyqtSignal()
+    currentChanged = pyqtSignal()
+    recordMessage = pyqtSignal(int, int, int)
+    statusMessage = pyqtSignal('QString')
 
     def __init__(self, parent=None):
         QScrollArea.__init__(self, parent)
@@ -81,9 +87,8 @@ class Screen(QScrollArea):
         self.container.show()
 
         self.searchForm = SearchFormWidget(self.container)
-        self.connect(self.searchForm, SIGNAL('search()'), self.search)
-        self.connect(self.searchForm, SIGNAL(
-            'keyDownPressed()'), self.setFocusToView)
+        self.searchForm.search.connect(self.search)
+        self.searchForm.keyDownPressed.connect(self.setFocusToView)
         self.searchForm.hide()
         self.containerView = None
 
@@ -293,12 +298,9 @@ class Screen(QScrollArea):
     # @brief Sets the current widget of the Screen
     def setView(self, widget):
         if self.containerView:
-            self.disconnect(self.containerView, SIGNAL(
-                "activated()"), self.activate)
-            self.disconnect(self.containerView, SIGNAL(
-                "currentChanged(PyQt_PyObject)"), self.currentChanged)
-            self.disconnect(self.containerView, SIGNAL(
-                "statusMessage(QString)"), self, SIGNAL("statusMessage(QString)"))
+            self.containerView.activated.disconnect(self.activate)
+            self.containerView.currentChanged['PyQt_PyObject'].disconnect(self.currentChanged)
+            self.containerView.statusMessage['QString'].disconnect(self.statusMessage['QString'])
             self.containerView.hide()
 
         self.containerView = widget
@@ -307,11 +309,9 @@ class Screen(QScrollArea):
         # form it produces an ugly flickering.
         self.loadSearchForm()
         self.containerView.show()
-        self.connect(widget, SIGNAL("activated()"), self.activate)
-        self.connect(widget, SIGNAL(
-            "currentChanged(PyQt_PyObject)"), self.currentChanged)
-        self.connect(widget, SIGNAL("statusMessage(QString)"),
-                     self, SIGNAL("statusMessage(QString)"))
+        widget.activated.connect(self.activate)
+        widget.currentChanged['PyQt_PyObject'].connect(self.currentChanged)
+        widget.statusMessage['QString'].connect(self.statusMessage['QString'])
 
         # Set focus proxy so other widgets can try to setFocus to us
         # and the focus is set to the expected widget.
@@ -321,10 +321,10 @@ class Screen(QScrollArea):
         self.updateGeometry()
 
     def activate(self):
-        self.emit(SIGNAL('activated()'))
+        self.activated.emit()
 
     def close(self):
-        self.emit(SIGNAL('closed()'))
+        self.closed.emit()
 
     # @brief Searches with the current parameters of the search form and loads the
     # models that fit the criteria.
@@ -358,7 +358,7 @@ class Screen(QScrollArea):
     # Slot to recieve the signal from a view when the current item changes
     def currentChanged(self, model):
         self.setCurrentRecord(model)
-        self.emit(SIGNAL('currentChanged()'))
+        self.currentChanged.emit()
         self.updateSearchFormStatus()
 
     # @brief Sets the RecordGroup this Screen should show.
@@ -446,7 +446,7 @@ class Screen(QScrollArea):
             count = self.group.count()
         else:
             count = 0
-        self.emit(SIGNAL('recordMessage(int,int,int)'), pos, count, id)
+        self.recordMessage.emit(pos, count, id)
         if self._currentRecord:
             if self.currentView():
                 self.currentView().setSelected(self._currentRecord)
@@ -603,7 +603,7 @@ class Screen(QScrollArea):
         self.actions = ActionFactory.create(self, actions, self.resource)
         if self.actions:
             for action in self.actions:
-                self.connect(action, SIGNAL('triggered()'), self.triggerAction)
+                action.triggered.connect(self.triggerAction)
             # If there's only one action it will be the 'Print Screen' action
             # that is added "manually" by ActionFactory. In those cases in which
             # Print Screen is the only action we won't show it in the toolbar. We

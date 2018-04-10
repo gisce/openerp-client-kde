@@ -16,7 +16,8 @@
 #   Free Software Foundation, Inc.,
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from PyQt4.QtCore import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 from .KeyboardWidget import *
 from .KeypadWidget import *
 
@@ -62,8 +63,7 @@ class PosEventFilter(QObject):
             self.keyboard = KeypadWidget(obj)
         else:
             self.keyboard = KeyboardWidget(obj)
-        self.connect(self.keyboard, SIGNAL(
-            'tabKeyPressed'), self.tabKeyPressed)
+        self.keyboard.tabKeyPressed.connect(self.tabKeyPressed)
 
     def closeKeyboard(self):
         if self.keyboard:

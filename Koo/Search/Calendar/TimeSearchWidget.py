@@ -27,11 +27,12 @@
 ##############################################################################
 
 from Koo.Common import Common
+from PyQt5.QtWidgets import *
 
 from Koo.Common.Calendar import *
 from Koo.Search.AbstractSearchWidget import *
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from Koo.Common.Ui import *
 
 

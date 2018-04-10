@@ -28,6 +28,7 @@
 ##############################################################################
 
 import os
+from PyQt5.QtWidgets import *
 import re
 import tempfile
 
@@ -38,8 +39,8 @@ from Koo.Common import Common
 from Koo.Common.Settings import *
 from .FieldPreferencesDialog import *
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 
 # @brief AbstractFieldWidget is the base class for all field widgets in Koo.
@@ -105,7 +106,7 @@ class AbstractFieldWidget(QWidget):
         if not keys:
             return
         shortcut = QShortcut(QKeySequence(keys), self)
-        self.connect(shortcut, SIGNAL('activated()'), self.setFocus)
+        shortcut.activated.connect(self.setFocus)
 
     def initialize(self):
         self.addShortcut(eval(self.attrs.get('use', '{}')).get('shortcut', ''))
@@ -312,7 +313,7 @@ class AbstractFieldWidget(QWidget):
             if title:
                 item = QAction(title, menu)
                 if slot:
-                    self.connect(item, SIGNAL("triggered()"), slot)
+                    item.triggered.connect(slot)
                 item.setEnabled(enabled)
                 menu.addAction(item)
             else:
