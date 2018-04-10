@@ -89,7 +89,8 @@ class ColorManager:
     @staticmethod
     def pickColors(n):
         if n:
-            return ColorManager.colorList[0:-1:len(ColorManager.colorList) / (n + 1)]
+            color_pos = int(len(ColorManager.colorList) / (n + 1))
+            return ColorManager.colorList[0:-1:color_pos]
         else:
             return []
 
