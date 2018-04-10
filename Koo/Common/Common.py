@@ -29,19 +29,19 @@
 
 import gettext
 
-from . import Api
-from .Settings import *
+from Koo.Common import Api
+from Koo.Common.Settings import *
 from Koo import Rpc
 
 import os
 import sys
-from . import Debug
+from Koo.Common import Debug
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from .Ui import *
+from Koo.Common.Ui import *
 
-from .Paths import *
+from Koo.Common.Paths import *
 
 try:
     if Settings.value('kde.enabled'):
@@ -62,7 +62,7 @@ serverMajorVersion = None
 
 
 # Load Resource
-from . import common_rc
+from Koo.Common import common_rc
 # When using loadUiType(), the generated (and executed) code will try to import
 # common_rc and it will crash if we don't ensure it's available in PYTHONPATH
 # so by no we have to add Koo/Common to sys.path
@@ -191,7 +191,7 @@ def concurrencyError(model, id, context):
     if result == 0:
         return True
     if result == 1:
-        Api.instance.createWindow(False, model, id, context=context)
+        Api_instance.createWindow(False, model, id, context=context)
 
     return False
 
