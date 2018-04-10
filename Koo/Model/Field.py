@@ -303,13 +303,19 @@ class ToManyField(QObject, StringField):
         """
 
     def create(self, record):
+        pass
+        # @xtorello toreview
+        """
         from Koo.Model.Group import RecordGroup
-        group = RecordGroup(resource=self.attrs['relation'], fields={
-        }, parent=record, context=self.context(record, eval=False))
+        group = RecordGroup(
+            resource=self.attrs['relation'], fields={}, parent=record,
+            context=self.context(record, eval=False)
+        )
         group.setDomainForEmptyGroup()
         group.tomanyfield = self
         group.modified.connect(self.groupModified)
         return group
+        """
 
     def groupModified(self):
         p = self.sender().parent
@@ -322,6 +328,10 @@ class ToManyField(QObject, StringField):
         pass
 
     def set(self, record, value, test_state=False, modified=False):
+        pass
+        # @xtorello toreview
+        """
+
         from Koo.Model.Group import RecordGroup
         # We can't add the context here as it might cause an infinite loop in some cases where
         # a field of the parent appears in the context, and the parent is just being loaded.
@@ -336,6 +346,7 @@ class ToManyField(QObject, StringField):
         record.values[self.name] = group
         if modified:
             self.changed(record)
+        """
 
     def set_client(self, record, value, test_state=False):
         self.set(record, value, test_state=test_state)
@@ -353,6 +364,9 @@ class ToManyField(QObject, StringField):
 
 
 class OneToManyField(ToManyField):
+    # @xtorello toreview
+    pass
+    """
 
     def __init__(self, attrs):
         # QObject.__init__(self)
@@ -399,9 +413,13 @@ class OneToManyField(ToManyField):
 
     def default(self, record):
         return [x.defaults() for x in record.values[self.name]]
+    """
 
 
 class ManyToManyField(ToManyField):
+    # @xtorello toreview
+    pass
+    """
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         if not record.values[self.name]:
             return []
@@ -411,6 +429,7 @@ class ManyToManyField(ToManyField):
         if not record.values[self.name]:
             return []
         return record.values[self.name].ids()
+    """
 
 
 class ReferenceField(StringField):
@@ -469,8 +488,10 @@ class FieldFactory:
         'integer': IntegerField,
         'float': FloatField,
         'many2one': ManyToOneField,
-        'many2many': ManyToManyField,
-        'one2many': OneToManyField,
+        # 'many2many': ManyToManyField,
+        # 'one2many': OneToManyField,
+        'many2many': ManyToOneField,
+        'one2many': ManyToOneField,
         'reference': ReferenceField,
         'selection': SelectionField,
         'boolean': IntegerField,

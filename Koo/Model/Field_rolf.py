@@ -304,8 +304,10 @@ class ToManyField(QObject, StringField):
 
     def create(self, record):
         from Koo.Model.Group import RecordGroup
-        group = RecordGroup(resource=self.attrs['relation'], fields={
-        }, parent=record, context=self.context(record, eval=False))
+        group = RecordGroup(
+            resource=self.attrs['relation'], fields={}, parent=record,
+            context=self.context(record, eval=False)
+        )
         group.setDomainForEmptyGroup()
         group.tomanyfield = self
         group.modified.connect(self.groupModified)

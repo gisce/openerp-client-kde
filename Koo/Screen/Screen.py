@@ -310,9 +310,10 @@ class Screen(QScrollArea):
         # form it produces an ugly flickering.
         self.loadSearchForm()
         self.containerView.show()
-        widget.activated.connect(self.activate)
-        widget.currentChanged['PyQt_PyObject'].connect(self.currentChanged)
-        widget.statusMessage['QString'].connect(self.statusMessage['QString'])
+        # @xtorello toreview
+        ## widget.activated.connect(self.activate)
+        ## widget.currentChanged['PyQt_PyObject'].connect(self.currentChanged)
+        ## widget.statusMessage['QString'].connect(self.statusMessage['QString'])
 
         # Set focus proxy so other widgets can try to setFocus to us
         # and the focus is set to the expected widget.

@@ -82,6 +82,8 @@ class Record(QObject):
         self.new = new
 
     def __del__(self):
+        # @xtorello toreview
+        """
         self.rpc = None
         self.modified_fields = None
         self.parent = None
@@ -91,11 +93,13 @@ class Record(QObject):
             if isinstance(value, RecordGroup):
                 #value.parent.fieldObjects[key].disconnect( SIGNAL('modified'), value )
                 value.__del__()
+
         self.values = {}
         self.invalidFields = []
         if self.id == 2:
             Debug.printReferrers(self)
         self.group = None
+        """
 
     def _getModified(self):
         return self._modified
@@ -121,7 +125,10 @@ class Record(QObject):
     def value(self, fieldName):
         if not fieldName in self.values:
             self.group.ensureRecordLoaded(self)
-        return self.group.fieldObjects[fieldName].get_client(self)
+        # @xtorello toreview
+        if fieldName in self.group.fieldObjects:
+            return self.group.fieldObjects[fieldName].get_client(self)
+        return ""
 
     # @brief Establishes the default value for a given field
     def setDefault(self, fieldName, value):
@@ -155,13 +162,16 @@ class Record(QObject):
     def stateAttributes(self, fieldName):
         if fieldName not in self._stateAttributes:
             if fieldName in self.group.fieldObjects:
-                self._stateAttributes[fieldName] = self.group.fieldObjects[fieldName].attrs.copy(
-                )
+                # @xtorello toreview
+                ## self._stateAttributes[fieldName] = self.group.fieldObjects[fieldName].attrs.copy()
+                self._stateAttributes[fieldName] = {}
             else:
                 self._stateAttributes[fieldName] = {}
         return self._stateAttributes[fieldName]
 
     def setStateAttributes(self, fieldName, state='draft'):
+        # @xtorello 2review
+        """
         field = self.group.fieldObjects[fieldName]
         stateChanges = dict(field.attrs.get('states', {}).get(state, []))
         for key in ('readonly', 'required'):
@@ -170,6 +180,7 @@ class Record(QObject):
             else:
                 self.stateAttributes(fieldName)[
                     key] = field.attrs.get(key, False)
+        """
 
     def updateStateAttributes(self):
         state = self.values.get('state', 'draft')
@@ -179,8 +190,13 @@ class Record(QObject):
     def updateAttributes(self):
         self.updateStateAttributes()
         for fieldName in self.group.fieldObjects:
+            # @xtorello toreview
+            pass
+            """
             attributes = self.group.fieldObjects[fieldName].attrs.get(
-                'attrs', '{}')
+                'attrs', '{}'
+            )
+
             try:
                 attributeChanges = eval(attributes)
             except:
@@ -195,6 +211,7 @@ class Record(QObject):
                 value = self.evaluateCondition(condition)
                 if value:
                     self.stateAttributes(fieldName)[attribute] = value
+            """
 
     def isFieldReadOnly(self, fieldName):
         readOnly = self.stateAttributes(fieldName).get('readonly', False)
