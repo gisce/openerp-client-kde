@@ -70,7 +70,7 @@ from .ViewQueue import *
 class Screen(QScrollArea):
     activated = pyqtSignal()
     closed = pyqtSignal()
-    currentChanged = pyqtSignal()
+    currentChangedSignal = pyqtSignal()
     recordMessage = pyqtSignal(int, int, int)
     statusMessage = pyqtSignal('QString')
 
@@ -358,6 +358,7 @@ class Screen(QScrollArea):
             self.searchForm.setEnabled(True)
 
     # Slot to recieve the signal from a view when the current item changes
+    @pyqtSlot()
     def currentChanged(self, model):
         self.setCurrentRecord(model)
         self.currentChanged.emit()
