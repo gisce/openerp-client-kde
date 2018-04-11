@@ -158,6 +158,8 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
     performSearch = pyqtSignal()
     keyDownPressed = pyqtSignal()
 
+    # @xtorello 2review slot?
+    @pyqtSlot()
     def search(self):
         if self.isCustomSearch():
             # Do not emit the signal if the server raises an exception with the search
