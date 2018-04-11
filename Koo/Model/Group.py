@@ -112,6 +112,7 @@ class RecordGroup(QObject):
 
         self.records = []
 
+        # @xtorello toreview signal to method integration
         self.recordChangedSignal.connect(self.recordChanged)
 
         self.enableSignals()
@@ -170,8 +171,6 @@ class RecordGroup(QObject):
 
     def __del__(self):
         # @xtorello toreview
-        pass
-        """
         if self.parent:
             self.modified.disconnect(self.tomanyfield.groupModified)
             self.tomanyfield = None
@@ -189,13 +188,13 @@ class RecordGroup(QObject):
         self.records = []
         for f in self.fieldObjects:
             self.fieldObjects[f].parent = None
-            self.fieldObjects[f].setParent(None)
+            # @xtorello toreview
+            ## self.fieldObjects[f].setParent(None)
             # self.fieldObjects[f].__del__()
             #self.disconnect( self.fieldObjects[f], None, 0, 0 )
             #self.fieldObjects[f] = None
             #del self.fieldObjects[f]
         self.fieldObjects = {}
-        """
 
     # @brief Returns a string with the name of the type of a given field. Such as 'char'.
     def fieldType(self, fieldName):
@@ -402,7 +401,10 @@ class RecordGroup(QObject):
     def enableSignals(self):
         self._signalsEnabled = True
 
+    # @xtorello toreview or True
+    @pyqtSlot('PyQt_PyObject')
     def recordChanged(self, record):
+        # @xtorello toreview or True
         if self._signalsEnabled:
             self.recordChanged.emit(record)
 
@@ -874,7 +876,7 @@ class RecordGroup(QObject):
             self.load(ids)
 
         # @xtorello toreview
-        ## self.sorting.emit(sortingResult)
+        self.sorting.emit(sortingResult)
 
     # Sorts the records of the group taking into account only loaded fields.
     def sortVisible(self, field, order):

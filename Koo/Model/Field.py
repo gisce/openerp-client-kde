@@ -294,7 +294,7 @@ class ToManyField(QObject, StringField):
     def __init__(self, attrs):
         pass
         """
-        @xtorello 2review
+        #@xtorello toreview
         # QObject.__init__(self)
         super().__init__(attrs)
         self.parent = parent

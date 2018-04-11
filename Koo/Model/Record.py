@@ -67,6 +67,7 @@ class Record(QObject):
     setFocus = pyqtSignal('QString')
 
     def __init__(self, id, group, parent=None, new=False):
+        print ("xxx record",type(self))
         QObject.__init__(self, group)
         self.rpc = group.rpc
         self.id = id
@@ -100,6 +101,7 @@ class Record(QObject):
             Debug.printReferrers(self)
         self.group = None
         """
+        pass
 
     def _getModified(self):
         return self._modified
@@ -128,7 +130,7 @@ class Record(QObject):
         # @xtorello toreview
         if fieldName in self.group.fieldObjects:
             return self.group.fieldObjects[fieldName].get_client(self)
-        return ""
+        return None
 
     # @brief Establishes the default value for a given field
     def setDefault(self, fieldName, value):
@@ -163,15 +165,14 @@ class Record(QObject):
         if fieldName not in self._stateAttributes:
             if fieldName in self.group.fieldObjects:
                 # @xtorello toreview
-                ## self._stateAttributes[fieldName] = self.group.fieldObjects[fieldName].attrs.copy()
-                self._stateAttributes[fieldName] = {}
+                # self._stateAttributes[fieldName] = {}
+                self._stateAttributes[fieldName] = self.group.fieldObjects[fieldName].attrs.copy()
             else:
                 self._stateAttributes[fieldName] = {}
         return self._stateAttributes[fieldName]
 
     def setStateAttributes(self, fieldName, state='draft'):
-        # @xtorello 2review
-        """
+        # @xtorello toreview
         field = self.group.fieldObjects[fieldName]
         stateChanges = dict(field.attrs.get('states', {}).get(state, []))
         for key in ('readonly', 'required'):
@@ -180,7 +181,6 @@ class Record(QObject):
             else:
                 self.stateAttributes(fieldName)[
                     key] = field.attrs.get(key, False)
-        """
 
     def updateStateAttributes(self):
         state = self.values.get('state', 'draft')
