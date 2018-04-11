@@ -27,80 +27,83 @@
 
 import copy
 
+
 class AbstractCache:
-	def exists( self, obj, method, *args ):
-		pass
-	def get( self, obj, method, *args ):
-		pass
+    def exists(self, obj, method, *args):
+        pass
+
+    def get(self, obj, method, *args):
+        pass
+
 
 class ViewCache(AbstractCache):
-	exceptions = []
+    exceptions = []
 
-	def __init__(self):
-		self.cache = {}
+    def __init__(self):
+        self.cache = {}
 
-	def exists(self, obj, method, *args):
-		if method != 'execute' or len(args) < 2 or args[1] != 'fields_view_get':
-			return False
-		return (obj, method, str(args)) in self.cache
-			
-	def get(self, obj, method, *args):
-		return copy.deepcopy( self.cache[(obj, method, str(args))] )
+    def exists(self, obj, method, *args):
+        if method != 'execute' or len(args) < 2 or args[1] != 'fields_view_get':
+            return False
+        return (obj, method, str(args)) in self.cache
 
-	def add(self, value, obj, method, *args):
-		if method != 'execute' or len(args) < 2 or args[1] != 'fields_view_get':
-			return
-		# Don't cache models configured in the exception list of the server module 'koo'.
-		if args[0] in ViewCache.exceptions:
-			return False
-		self.cache[(obj,method,str(args))] = copy.deepcopy( value )
+    def get(self, obj, method, *args):
+        return copy.deepcopy(self.cache[(obj, method, str(args))])
 
-	def clear(self):
-		self.cache = {}
+    def add(self, value, obj, method, *args):
+        if method != 'execute' or len(args) < 2 or args[1] != 'fields_view_get':
+            return
+        # Don't cache models configured in the exception list of the server module 'koo'.
+        if args[0] in ViewCache.exceptions:
+            return False
+        self.cache[(obj, method, str(args))] = copy.deepcopy(value)
+
+    def clear(self):
+        self.cache = {}
+
 
 class ActionViewCache(AbstractCache):
-	exceptions = []
+    exceptions = []
 
-	def __init__(self):
-		self.cache = {}
+    def __init__(self):
+        self.cache = {}
 
-	def exists(self, obj, method, *args):
-		if method == 'execute' and len(args) >= 3 and args[1] == 'search':
-			# In cases where search filter only is equal to [('id','in',[])] we will optimize and return
-			# an empty list. This is a usual call produced by empty many2many or one2many relations so it's
-			# worth the taking it into account.
-			if isinstance(args[2],list) and len(args[2]) > 0 and ( args[2][0] == ('id','in',[]) or args[2][0] == ['id','in',[]] ):
-				return True
-		if method == 'execute' and len(args) >= 2 and args[1] == 'fields_view_get':
-			return (obj, method, str(args)) in self.cache
-		elif method == 'execute' and len(args) >= 2 and args[0] == 'ir.values' and args[1] == 'get':
-			return (obj, method, str(args)) in self.cache
-		elif obj == '/fulltextsearch' and method == 'indexedModels':
-			return (obj, method, str(args)) in self.cache
-		else:
-			return False
-			
-	def get(self, obj, method, *args):
-		if method == 'execute' and len(args) >= 3 and args[1] == 'search':
-			# In cases where search filter only is equal to [('id','in',[])] we will optimize and return
-			# an empty list. This is a usual call produced by empty many2many or one2many relations so it's
-			# worth the taking it into account.
-			if isinstance(args[2],list) and len(args[2]) > 0 and ( args[2][0] == ('id','in',[]) or args[2][0] == ['id','in',[]] ):
-				return []
-		return copy.deepcopy( self.cache[(obj, method, str(args))] )
-		
-	def add(self, value, obj, method, *args):
-		# No need to consider 'search' with [('id','in',[])] here given that we don't have to store anything
-		if method == 'execute' and len(args) >= 2 and args[1] == 'fields_view_get':
-			# Don't cache models configured in the exception list of the server module 'koo'.
-			if args[0] in ViewCache.exceptions:
-				return 
-			self.cache[(obj,method,str(args))] = copy.deepcopy( value )
-		elif method == 'execute' and len(args) >= 2 and args[0] == 'ir.values' and args[1] == 'get':
-			self.cache[(obj,method,str(args))] = copy.deepcopy( value )
-		elif obj == '/fulltextsearch' and method == 'indexedModels':
-			self.cache[(obj,method,str(args))] = copy.deepcopy( value )
+    def exists(self, obj, method, *args):
+        if method == 'execute' and len(args) >= 3 and args[1] == 'search':
+            # In cases where search filter only is equal to [('id','in',[])] we will optimize and return
+            # an empty list. This is a usual call produced by empty many2many or one2many relations so it's
+            # worth the taking it into account.
+            if isinstance(args[2], list) and len(args[2]) > 0 and (args[2][0] == ('id', 'in', []) or args[2][0] == ['id', 'in', []]):
+                return True
+        if method == 'execute' and len(args) >= 2 and args[1] == 'fields_view_get':
+            return (obj, method, str(args)) in self.cache
+        elif method == 'execute' and len(args) >= 2 and args[0] == 'ir.values' and args[1] == 'get':
+            return (obj, method, str(args)) in self.cache
+        elif obj == '/fulltextsearch' and method == 'indexedModels':
+            return (obj, method, str(args)) in self.cache
+        else:
+            return False
 
-	def clear(self):
-		self.cache = {}
+    def get(self, obj, method, *args):
+        if method == 'execute' and len(args) >= 3 and args[1] == 'search':
+            # In cases where search filter only is equal to [('id','in',[])] we will optimize and return
+            # an empty list. This is a usual call produced by empty many2many or one2many relations so it's
+            # worth the taking it into account.
+            if isinstance(args[2], list) and len(args[2]) > 0 and (args[2][0] == ('id', 'in', []) or args[2][0] == ['id', 'in', []]):
+                return []
+        return copy.deepcopy(self.cache[(obj, method, str(args))])
 
+    def add(self, value, obj, method, *args):
+        # No need to consider 'search' with [('id','in',[])] here given that we don't have to store anything
+        if method == 'execute' and len(args) >= 2 and args[1] == 'fields_view_get':
+            # Don't cache models configured in the exception list of the server module 'koo'.
+            if args[0] in ViewCache.exceptions:
+                return
+            self.cache[(obj, method, str(args))] = copy.deepcopy(value)
+        elif method == 'execute' and len(args) >= 2 and args[0] == 'ir.values' and args[1] == 'get':
+            self.cache[(obj, method, str(args))] = copy.deepcopy(value)
+        elif obj == '/fulltextsearch' and method == 'indexedModels':
+            self.cache[(obj, method, str(args))] = copy.deepcopy(value)
+
+    def clear(self):
+        self.cache = {}

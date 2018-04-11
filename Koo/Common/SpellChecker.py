@@ -32,40 +32,40 @@ from PyQt4.QtCore import *
 import Debug
 
 try:
-	from enchant.checker import SpellChecker
-	import enchant
+    from enchant.checker import SpellChecker
+    import enchant
 
-	enchantAvailable = True
+    enchantAvailable = True
 except:
-	Debug.info(_('Enchant spell checker library not found. Consider installing it if you want Koo to spell check your text boxes.'))
-	enchantAvailable = False
-	
+    Debug.info(_('Enchant spell checker library not found. Consider installing it if you want Koo to spell check your text boxes.'))
+    enchantAvailable = False
 
-## @brief The SpellCheckHighlighter class highlights invalid words for a given language using
+
+# @brief The SpellCheckHighlighter class highlights invalid words for a given language using
 # enchant spell checker library.
 class SpellCheckHighlighter(QSyntaxHighlighter):
-	def __init__(self, parent, language):
-		QSyntaxHighlighter.__init__(self, parent)
-		self._language = language
-		if not enchantAvailable:
-			self._checker = None
-			return
-		try:
-			self._checker = SpellChecker(self._language)
-		except enchant.DictNotFoundError: 
-			self._checker = None
-			Debug.info(_('SpellChecking: No dictionary available for language "%s"') % self._language)
+    def __init__(self, parent, language):
+        QSyntaxHighlighter.__init__(self, parent)
+        self._language = language
+        if not enchantAvailable:
+            self._checker = None
+            return
+        try:
+            self._checker = SpellChecker(self._language)
+        except enchant.DictNotFoundError:
+            self._checker = None
+            Debug.info(
+                _('SpellChecking: No dictionary available for language "%s"') % self._language)
 
-		self._format = QTextCharFormat()
-		self._format.setUnderlineColor(QColor(Qt.red));
-		self._format.setUnderlineStyle(QTextCharFormat.SpellCheckUnderline);
+        self._format = QTextCharFormat()
+        self._format.setUnderlineColor(QColor(Qt.red))
+        self._format.setUnderlineStyle(QTextCharFormat.SpellCheckUnderline)
 
-	def highlightBlock(self, text):
-		if not enchantAvailable or not self._checker:
-			return
+    def highlightBlock(self, text):
+        if not enchantAvailable or not self._checker:
+            return
 
-		text = unicode(text)
-		self._checker.set_text( text )
-		for error in self._checker:
-			self.setFormat(error.wordpos, len(error.word), self._format)
-
+        text = unicode(text)
+        self._checker.set_text(text)
+        for error in self._checker:
+            self.setFormat(error.wordpos, len(error.word), self._format)

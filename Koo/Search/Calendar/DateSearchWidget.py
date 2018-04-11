@@ -35,66 +35,71 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from Koo.Common.Ui import *
 
-(DateSearchWidgetUi, DateSearchWidgetBase) = loadUiType( Common.uiPath('search_date.ui') )
+(DateSearchWidgetUi, DateSearchWidgetBase) = loadUiType(
+    Common.uiPath('search_date.ui'))
+
 
 class DateSearchWidget(AbstractSearchWidget, DateSearchWidgetUi):
-	def __init__(self, name, parent, attrs={}):
-		AbstractSearchWidget.__init__(self, name, parent, attrs)
-		DateSearchWidgetUi.__init__(self)
-		self.setupUi( self )
+    def __init__(self, name, parent, attrs={}):
+        AbstractSearchWidget.__init__(self, name, parent, attrs)
+        DateSearchWidgetUi.__init__(self)
+        self.setupUi(self)
 
-		# Catch keyDownPressed
-		self.uiStart.installEventFilter( self )
-		self.uiEnd.installEventFilter( self )
+        # Catch keyDownPressed
+        self.uiStart.installEventFilter(self)
+        self.uiEnd.installEventFilter(self)
 
-		# Add shortcuts
-		self.scStartSearch = QShortcut( self.uiStart )
-		self.scStartSearch.setKey( Shortcuts.SearchInField )
-		self.scStartSearch.setContext( Qt.WidgetShortcut )
-		self.connect( self.scStartSearch, SIGNAL('activated()'), self.showStartCalendar )
+        # Add shortcuts
+        self.scStartSearch = QShortcut(self.uiStart)
+        self.scStartSearch.setKey(Shortcuts.SearchInField)
+        self.scStartSearch.setContext(Qt.WidgetShortcut)
+        self.connect(self.scStartSearch, SIGNAL(
+            'activated()'), self.showStartCalendar)
 
-		self.scEndSearch = QShortcut( self.uiEnd )
-		self.scEndSearch.setKey( Shortcuts.SearchInField )
-		self.scEndSearch.setContext( Qt.WidgetShortcut )
-		self.connect( self.scEndSearch, SIGNAL('activated()'), self.showEndCalendar )
+        self.scEndSearch = QShortcut(self.uiEnd)
+        self.scEndSearch.setKey(Shortcuts.SearchInField)
+        self.scEndSearch.setContext(Qt.WidgetShortcut)
+        self.connect(self.scEndSearch, SIGNAL(
+            'activated()'), self.showEndCalendar)
 
-		self.widget = self
-		self.focusWidget = self.uiStart
-		self.connect( self.pushStart, SIGNAL('clicked()'), self.showStartCalendar )
-		self.connect( self.pushEnd, SIGNAL('clicked()'), self.showEndCalendar )
+        self.widget = self
+        self.focusWidget = self.uiStart
+        self.connect(self.pushStart, SIGNAL(
+            'clicked()'), self.showStartCalendar)
+        self.connect(self.pushEnd, SIGNAL('clicked()'), self.showEndCalendar)
 
-	def showStartCalendar(self):
-		PopupCalendarWidget( self.uiStart )
+    def showStartCalendar(self):
+        PopupCalendarWidget(self.uiStart)
 
-	def showEndCalendar(self):
-		PopupCalendarWidget( self.uiEnd )
+    def showEndCalendar(self):
+        PopupCalendarWidget(self.uiEnd)
 
-	def value(self):
-		res = []
-		date = textToDate( self.uiStart.text() )
-		val = dateToStorage( date )
- 		if val:
-			self.uiStart.setText( dateToText( date ) )
-			res.append((self.name, '>=', val ))
-		else:
-			self.uiStart.clear()
-		date = textToDate( self.uiEnd.text() )
-		val = dateToStorage( date )
-	 	if val:
-			self.uiEnd.setText( dateToText( date ) )
-			res.append((self.name, '<=', val ))
-		else:
-			self.uiEnd.clear()
-		return res
+    def value(self):
+        res = []
+        date = textToDate(self.uiStart.text())
+        val = dateToStorage(date)
+        if val:
+            self.uiStart.setText(dateToText(date))
+            res.append((self.name, '>=', val))
+        else:
+            self.uiStart.clear()
+        date = textToDate(self.uiEnd.text())
+        val = dateToStorage(date)
+        if val:
+            self.uiEnd.setText(dateToText(date))
+            res.append((self.name, '<=', val))
+        else:
+            self.uiEnd.clear()
+        return res
 
-	def clear(self):
-		self.uiStart.clear()
-		self.uiEnd.clear()
+    def clear(self):
+        self.uiStart.clear()
+        self.uiEnd.clear()
 
-	def setValue(self, value):
-		if value:
-			self.uiStart.setText( unicode(value) )
-			self.uiEnd.setText( unicode(value) )
-		else:
-			self.uiStart.clear()
-			self.uiEnd.clear()
+    def setValue(self, value):
+        if value:
+            self.uiStart.setText(unicode(value))
+            self.uiEnd.setText(unicode(value))
+        else:
+            self.uiStart.clear()
+            self.uiEnd.clear()

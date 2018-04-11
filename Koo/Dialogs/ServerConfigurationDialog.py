@@ -34,67 +34,75 @@ from Koo.Common.Settings import *
 from Koo import Rpc
 
 # Searches the list of available databases in the server
+
+
 def refreshDatabaseList(widget, url, dbtoload=None):
-	if not dbtoload:
-		dbtoload = Settings.value('login.db')
-	index = 0
-	widget.clear()
-		
-	result = Rpc.database.list(url)
-	if result == False:
-		return -2
-	if result == -1:
-		return -1
-	if result:
-		for db_num, db_name in enumerate(result):
-			widget.addItem( db_name )
-			if db_name == dbtoload:
-				index = db_num
-	widget.setCurrentIndex(index)
-	return widget.count()
+    if not dbtoload:
+        dbtoload = Settings.value('login.db')
+    index = 0
+    widget.clear()
 
-(ServerConfigurationDialogUi, ServerConfigurationDialogBase) = loadUiType( Common.uiPath('change_server.ui') )
+    result = Rpc.database.list(url)
+    if result == False:
+        return -2
+    if result == -1:
+        return -1
+    if result:
+        for db_num, db_name in enumerate(result):
+            widget.addItem(db_name)
+            if db_name == dbtoload:
+                index = db_num
+    widget.setCurrentIndex(index)
+    return widget.count()
 
-class ServerConfigurationDialog( QDialog, ServerConfigurationDialogUi ):
-	url = ''
 
-	def __init__(self, parent=None):
-		QDialog.__init__(self, parent)
-		ServerConfigurationDialogUi.__init__(self)
-		self.setupUi(self)
+(ServerConfigurationDialogUi, ServerConfigurationDialogBase) = loadUiType(
+    Common.uiPath('change_server.ui'))
 
-		if Rpc.isNetRpcAvailable:
-			self.uiConnection.addItem( _("NET-RPC"), QVariant( 'socket' ) )
-		self.uiConnection.addItem( _("XML-RPC"), QVariant( 'http' ) )
-		self.uiConnection.addItem( _("Secure XML-RPC"), QVariant( 'https' ) )
-		if Rpc.isPyroAvailable:
-			self.uiConnection.addItem( _("Pyro (faster)"), QVariant( 'PYROLOC' ) )
-		if Rpc.isPyroSslAvailable:
-			self.uiConnection.addItem( _("Pyro SSL (faster)"), QVariant( 'PYROLOCSSL' ) )
-		result = False
-		self.connect(self.pushCancel,SIGNAL("clicked()"),self.reject )
-		self.connect(self.pushAccept,SIGNAL("clicked()"),self.slotAccept )
 
-	def setUrl( self, url ):
-		self.url = url
-		url = QUrl( url )
-		if url.isValid():
-			self.uiConnection.setCurrentIndex( self.uiConnection.findData( QVariant( url.scheme() ) ) )
-			self.uiServer.setText( url.host() )
-			self.uiPort.setText( unicode( url.port() ) )
+class ServerConfigurationDialog(QDialog, ServerConfigurationDialogUi):
+    url = ''
 
-	def slotAccept(self):
-		url = QUrl( self.url )
-		protocol = unicode( self.uiConnection.itemData( self.uiConnection.currentIndex() ).toString() )
-		url.setScheme( protocol )
-		url.setHost( self.uiServer.text() )
-		url.setPort( int( self.uiPort.text().toInt()[0] ) )
-		if url.isValid():
-			# Store default settings
-			Settings.setValue('login.url', unicode( url.toString() ) )
-			Settings.saveToFile()
-		url.setUserName( '' )
-		self.url = unicode( url.toString() )
-		self.accept()
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        ServerConfigurationDialogUi.__init__(self)
+        self.setupUi(self)
+
+        if Rpc.isNetRpcAvailable:
+            self.uiConnection.addItem(_("NET-RPC"), QVariant('socket'))
+        self.uiConnection.addItem(_("XML-RPC"), QVariant('http'))
+        self.uiConnection.addItem(_("Secure XML-RPC"), QVariant('https'))
+        if Rpc.isPyroAvailable:
+            self.uiConnection.addItem(_("Pyro (faster)"), QVariant('PYROLOC'))
+        if Rpc.isPyroSslAvailable:
+            self.uiConnection.addItem(
+                _("Pyro SSL (faster)"), QVariant('PYROLOCSSL'))
+        result = False
+        self.connect(self.pushCancel, SIGNAL("clicked()"), self.reject)
+        self.connect(self.pushAccept, SIGNAL("clicked()"), self.slotAccept)
+
+    def setUrl(self, url):
+        self.url = url
+        url = QUrl(url)
+        if url.isValid():
+            self.uiConnection.setCurrentIndex(
+                self.uiConnection.findData(QVariant(url.scheme())))
+            self.uiServer.setText(url.host())
+            self.uiPort.setText(unicode(url.port()))
+
+    def slotAccept(self):
+        url = QUrl(self.url)
+        protocol = unicode(self.uiConnection.itemData(
+            self.uiConnection.currentIndex()).toString())
+        url.setScheme(protocol)
+        url.setHost(self.uiServer.text())
+        url.setPort(int(self.uiPort.text().toInt()[0]))
+        if url.isValid():
+            # Store default settings
+            Settings.setValue('login.url', unicode(url.toString()))
+            Settings.saveToFile()
+        url.setUserName('')
+        self.url = unicode(url.toString())
+        self.accept()
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:

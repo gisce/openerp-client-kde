@@ -30,61 +30,66 @@ from PyQt4.QtGui import *
 from Koo import Rpc
 from Koo.Common import Common
 
-class FieldsModel( QStandardItemModel ):
-	def __init__(self):
-		QStandardItemModel.__init__(self)
-		self.rootItem = self.invisibleRootItem()
-		self.setColumnCount( 1 )
-		self.setHeaderData( 0, Qt.Horizontal, QVariant( _('Fields') ) )
 
-	def addField(self, text, data):
-		item = QStandardItem( text )		
-		item.setData( QVariant(data) )
-		self.rootItem.appendRow( item )
+class FieldsModel(QStandardItemModel):
+    def __init__(self):
+        QStandardItemModel.__init__(self)
+        self.rootItem = self.invisibleRootItem()
+        self.setColumnCount(1)
+        self.setHeaderData(0, Qt.Horizontal, QVariant(_('Fields')))
 
-	def load(self, fields, fieldsInfo = None, fieldsInvertedInfo = None):
-		if fieldsInfo is None:
-			fieldsInfo = {}
-		if fieldsInvertedInfo is None:
-			fieldsInvertedInfo = {}
-		self.fieldsInfo = fieldsInfo
-		self.fieldsInvertedInfo = fieldsInvertedInfo
-		self.populate(fields)
+    def addField(self, text, data):
+        item = QStandardItem(text)
+        item.setData(QVariant(data))
+        self.rootItem.appendRow(item)
 
-	def populate(self, fields, prefix_node='', prefix=None, prefix_value='', level=2):
-		fields['id'] = {
-			'string': _('ID'),
-			'type': 'integer',
-		}
-		if Common.serverMajorVersion == '5':
-			db_id_key = 'db_id'
-		else:
-			db_id_key = '.id'
-		fields[db_id_key] = {
-			'string': _('Database ID'),
-			'type': 'integer',
-		}
-		fields_order = fields.keys()
-		fields_order.sort(lambda x,y: -cmp(fields[x].get('string', ''), fields[y].get('string', '')))
-		if prefix == None:
-			prefix = self.rootItem
-		for field in fields_order:
-			st_name = fields[field]['string'] or field 
-			node = QStandardItem(st_name) 
-			node.setData( QVariant(field) )
-			if fields[field].get('required', False):
-				font = node.font()
-				font.setBold( True )
-				node.setFont( font )
-			prefix.appendRow( node )
+    def load(self, fields, fieldsInfo=None, fieldsInvertedInfo=None):
+        if fieldsInfo is None:
+            fieldsInfo = {}
+        if fieldsInvertedInfo is None:
+            fieldsInvertedInfo = {}
+        self.fieldsInfo = fieldsInfo
+        self.fieldsInvertedInfo = fieldsInvertedInfo
+        self.populate(fields)
 
-			# Fill in cache structures
-			self.fieldsInvertedInfo[prefix_value+st_name] = prefix_node+field
-			self.fieldsInfo[prefix_node+field] = fields[field]
-			if prefix_node:
-				self.fieldsInfo[prefix_node + field]['string'] = '%s%s' % (prefix_value, self.fieldsInfo[prefix_node + field]['string'])
-			# If it's a relation look at the children
-			if fields[field].get('relation', False) and level>0:
-				fields2 = Rpc.session.execute('/object', 'execute', fields[field]['relation'], 'fields_get', False, Rpc.session.context)
-				self.populate(fields2, prefix_node+field+'/', node, st_name+'/', level-1)
+    def populate(self, fields, prefix_node='', prefix=None, prefix_value='', level=2):
+        fields['id'] = {
+            'string': _('ID'),
+            'type': 'integer',
+        }
+        if Common.serverMajorVersion == '5':
+            db_id_key = 'db_id'
+        else:
+            db_id_key = '.id'
+        fields[db_id_key] = {
+            'string': _('Database ID'),
+            'type': 'integer',
+        }
+        fields_order = fields.keys()
+        fields_order.sort(
+            lambda x, y: -cmp(fields[x].get('string', ''), fields[y].get('string', '')))
+        if prefix == None:
+            prefix = self.rootItem
+        for field in fields_order:
+            st_name = fields[field]['string'] or field
+            node = QStandardItem(st_name)
+            node.setData(QVariant(field))
+            if fields[field].get('required', False):
+                font = node.font()
+                font.setBold(True)
+                node.setFont(font)
+            prefix.appendRow(node)
 
+            # Fill in cache structures
+            self.fieldsInvertedInfo[prefix_value +
+                                    st_name] = prefix_node + field
+            self.fieldsInfo[prefix_node + field] = fields[field]
+            if prefix_node:
+                self.fieldsInfo[prefix_node + field]['string'] = '%s%s' % (
+                    prefix_value, self.fieldsInfo[prefix_node + field]['string'])
+            # If it's a relation look at the children
+            if fields[field].get('relation', False) and level > 0:
+                fields2 = Rpc.session.execute(
+                    '/object', 'execute', fields[field]['relation'], 'fields_get', False, Rpc.session.context)
+                self.populate(fields2, prefix_node + field + '/',
+                              node, st_name + '/', level - 1)

@@ -41,104 +41,106 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from Koo.Common.Ui import *
 
-(SearchDialogUi, SearchDialogBase) = loadUiType( Common.uiPath('win_search.ui') )
-
-class SearchDialog( QDialog, SearchDialogUi ):
-	def __init__(self, model, sel_multi=True, ids=None, context=None, domain = None, parent = None):
-		QDialog.__init__( self, parent )
-		SearchDialogUi.__init__( self )
-		self.setupUi( self )
-
-		if ids is None:
-			ids = []
-		if context is None:
-			context = {}
-		if domain is None:
-			domain = []
-
-		self.setModal( True )
-
-		self.ids = ids
-		self.result = None
-		self.context = context
-		self.context.update(Rpc.session.context)
-		self.allowMultipleSelection = sel_multi
-
-		self.modelGroup = RecordGroup( model, context=self.context )
-		if Settings.value('koo.sort_mode') == 'visible_items':
-			self.modelGroup.setSortMode( RecordGroup.SortVisibleItems )
-		self.modelGroup.setDomain( domain )
-		if self.ids:
-			self.modelGroup.setFilter( [('id','in',ids)] )
-			#self.reload()
-
-		self.screen.setRecordGroup( self.modelGroup )
-		self.screen.setViewTypes( ['tree'] )
-
-		self.view = self.screen.currentView()
-		self.view.setAllowMultipleSelection( self.allowMultipleSelection )
-		self.view.setReadOnly( True )
-		self.connect( self.view, SIGNAL('activated()'), self.accepted )
-
-		self.model = model
-
-		view_form = Rpc.session.execute('/object', 'execute', self.model, 'fields_view_get', False, 'form', self.context)
-		self.form.setup( view_form['arch'], view_form['fields'], model, domain )
-		self.form.hideButtons()
-		self.connect( self.form, SIGNAL('keyDownPressed()'), self.setFocusToList )
-
-		self.title = _('Search: %s') % self.form.name
-		self.titleResults = _('Search: %s (%%d result(s))') % self.form.name
-
-		self.setWindowTitle( self.title )
+(SearchDialogUi, SearchDialogBase) = loadUiType(Common.uiPath('win_search.ui'))
 
 
-		# TODO: Use Designer Widget Promotion instead
-		layout = self.layout()
-		layout.insertWidget(0, self.screen )
-		layout.insertWidget(0, self.form )
+class SearchDialog(QDialog, SearchDialogUi):
+    def __init__(self, model, sel_multi=True, ids=None, context=None, domain=None, parent=None):
+        QDialog.__init__(self, parent)
+        SearchDialogUi.__init__(self)
+        self.setupUi(self)
 
-		self.form.setFocus()
+        if ids is None:
+            ids = []
+        if context is None:
+            context = {}
+        if domain is None:
+            domain = []
 
-		self.connect( self.pushNew, SIGNAL( "clicked()"), self.new )
-		self.connect( self.pushAccept, SIGNAL( "clicked()"), self.accepted )
-		self.connect( self.pushCancel , SIGNAL( "clicked()"), self.reject )
-		self.connect( self.pushFind, SIGNAL( "clicked()"), self.find )
-		self.connect( self.form, SIGNAL( "search()" ), self.find )
+        self.setModal(True)
 
-		# Selects all items
-		self.select()
+        self.ids = ids
+        self.result = None
+        self.context = context
+        self.context.update(Rpc.session.context)
+        self.allowMultipleSelection = sel_multi
 
-	def setFocusToList(self):
-		self.screen.setFocus()
+        self.modelGroup = RecordGroup(model, context=self.context)
+        if Settings.value('koo.sort_mode') == 'visible_items':
+            self.modelGroup.setSortMode(RecordGroup.SortVisibleItems)
+        self.modelGroup.setDomain(domain)
+        if self.ids:
+            self.modelGroup.setFilter([('id', 'in', ids)])
+            # self.reload()
 
-	def find(self):
-		self.modelGroup.setFilter( self.form.value() )
-		self.reload()
+        self.screen.setRecordGroup(self.modelGroup)
+        self.screen.setViewTypes(['tree'])
 
-	def reload(self):
-		self.modelGroup.update()
-		self.select()
+        self.view = self.screen.currentView()
+        self.view.setAllowMultipleSelection(self.allowMultipleSelection)
+        self.view.setReadOnly(True)
+        self.connect(self.view, SIGNAL('activated()'), self.accepted)
 
-	def select(self):
-		if self.allowMultipleSelection:
-			self.view.selectAll()
-		self.setWindowTitle( self.titleResults % self.modelGroup.count() )
+        self.model = model
 
-	def accepted( self ):
-		self.result = self.screen.selectedIds() or self.ids
-		self.accept()
+        view_form = Rpc.session.execute(
+            '/object', 'execute', self.model, 'fields_view_get', False, 'form', self.context)
+        self.form.setup(view_form['arch'], view_form['fields'], model, domain)
+        self.form.hideButtons()
+        self.connect(self.form, SIGNAL(
+            'keyDownPressed()'), self.setFocusToList)
 
-	def new(self):
-		self.hide()
-		dialog = ScreenDialog( self )
-		dialog.setContext( self.context )
-		dialog.setDomain( self.modelGroup.domain() )
-		dialog.setup( self.model )
-		if dialog.exec_() == QDialog.Accepted:
-			self.result = [dialog.recordId]
-			self.accept()
-		else:
-			self.reject()
+        self.title = _('Search: %s') % self.form.name
+        self.titleResults = _('Search: %s (%%d result(s))') % self.form.name
+
+        self.setWindowTitle(self.title)
+
+        # TODO: Use Designer Widget Promotion instead
+        layout = self.layout()
+        layout.insertWidget(0, self.screen)
+        layout.insertWidget(0, self.form)
+
+        self.form.setFocus()
+
+        self.connect(self.pushNew, SIGNAL("clicked()"), self.new)
+        self.connect(self.pushAccept, SIGNAL("clicked()"), self.accepted)
+        self.connect(self.pushCancel, SIGNAL("clicked()"), self.reject)
+        self.connect(self.pushFind, SIGNAL("clicked()"), self.find)
+        self.connect(self.form, SIGNAL("search()"), self.find)
+
+        # Selects all items
+        self.select()
+
+    def setFocusToList(self):
+        self.screen.setFocus()
+
+    def find(self):
+        self.modelGroup.setFilter(self.form.value())
+        self.reload()
+
+    def reload(self):
+        self.modelGroup.update()
+        self.select()
+
+    def select(self):
+        if self.allowMultipleSelection:
+            self.view.selectAll()
+        self.setWindowTitle(self.titleResults % self.modelGroup.count())
+
+    def accepted(self):
+        self.result = self.screen.selectedIds() or self.ids
+        self.accept()
+
+    def new(self):
+        self.hide()
+        dialog = ScreenDialog(self)
+        dialog.setContext(self.context)
+        dialog.setDomain(self.modelGroup.domain())
+        dialog.setup(self.model)
+        if dialog.exec_() == QDialog.Accepted:
+            self.result = [dialog.recordId]
+            self.accept()
+        else:
+            self.reject()
 
 # vim:noexpandtab:

@@ -37,56 +37,57 @@ from Koo.Common.Ui import *
 
 from Koo.Common import Common
 
-(LinkFieldWidgetUi, LinkFieldWidgetBase) = loadUiType( Common.uiPath('link.ui') ) 
+(LinkFieldWidgetUi, LinkFieldWidgetBase) = loadUiType(Common.uiPath('link.ui'))
+
 
 class LinkFieldWidget(AbstractFieldWidget, LinkFieldWidgetUi):
-	def __init__(self, parent, model, attrs={}):
-		AbstractFieldWidget.__init__(self, parent, model, attrs)
-		LinkFieldWidgetUi.__init__(self)
-		self.setupUi(self)
-		self.connect( self.pushOpen, SIGNAL('clicked()'), self.open )
-		self.installPopupMenu( self.uiText )
-		
-	def setReadOnly(self, value):
-		AbstractFieldWidget.setReadOnly(self, value)
-		self.uiText.setReadOnly( value )
-		self.pushOpen.setEnabled( not value )
+    def __init__(self, parent, model, attrs={}):
+        AbstractFieldWidget.__init__(self, parent, model, attrs)
+        LinkFieldWidgetUi.__init__(self)
+        self.setupUi(self)
+        self.connect(self.pushOpen, SIGNAL('clicked()'), self.open)
+        self.installPopupMenu(self.uiText)
 
-	def menuEntries(self):
-		pix = QPixmap()
-		if self.record.value(self.name):
-			enableApplication = True
-		else:
-			enableApplication = False
+    def setReadOnly(self, value):
+        AbstractFieldWidget.setReadOnly(self, value)
+        self.uiText.setReadOnly(value)
+        self.pushOpen.setEnabled(not value)
 
-		return [ (_('Open...'), self.openApplication, enableApplication) ]
+    def menuEntries(self):
+        pix = QPixmap()
+        if self.record.value(self.name):
+            enableApplication = True
+        else:
+            enableApplication = False
 
-	def openApplication(self):
-		fileName = self.record.value(self.name)
-		if not fileName:
-			return
-		Common.openFile( fileName )
+        return [(_('Open...'), self.openApplication, enableApplication)]
 
-	def open(self):
-		filename = QFileDialog.getOpenFileName(self, _('Select the file to link to'))
-		if filename.isNull():
-			return
-		self.record.setValue(self.name, unicode(filename) )
+    def openApplication(self):
+        fileName = self.record.value(self.name)
+        if not fileName:
+            return
+        Common.openFile(fileName)
 
-	def showValue(self):
-		value = self.record.value( self.name )
-		if value:
-			self.uiText.setText( value )
-		else:
-			self.clear()
+    def open(self):
+        filename = QFileDialog.getOpenFileName(
+            self, _('Select the file to link to'))
+        if filename.isNull():
+            return
+        self.record.setValue(self.name, unicode(filename))
 
-	def clear(self):
-		self.uiText.clear()
+    def showValue(self):
+        value = self.record.value(self.name)
+        if value:
+            self.uiText.setText(value)
+        else:
+            self.clear()
 
-	# Value is stored when selected
-	def storeValue(self):
-		pass
+    def clear(self):
+        self.uiText.clear()
 
-	def colorWidget(self):
-		return self.uiText
+    # Value is stored when selected
+    def storeValue(self):
+        pass
 
+    def colorWidget(self):
+        return self.uiText

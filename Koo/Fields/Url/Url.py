@@ -34,68 +34,71 @@ from Koo.Common import Common
 from Koo.Common import Shortcuts
 from Koo.Fields.AbstractFieldWidget import *
 
-(UrlFieldWidgetUi, UrlFieldWidgetBase ) = loadUiType( Common.uiPath('url.ui') ) 
+(UrlFieldWidgetUi, UrlFieldWidgetBase) = loadUiType(Common.uiPath('url.ui'))
+
 
 class UrlFieldWidget(AbstractFieldWidget, UrlFieldWidgetUi):
-	def __init__(self, parent, model, attrs={}):
-		AbstractFieldWidget.__init__(self, parent, model, attrs)
-		UrlFieldWidgetUi.__init__(self)
-		self.setupUi(self)
+    def __init__(self, parent, model, attrs={}):
+        AbstractFieldWidget.__init__(self, parent, model, attrs)
+        UrlFieldWidgetUi.__init__(self)
+        self.setupUi(self)
 
-		# Add shortcut
-		self.scSearch = QShortcut( self.uiUrl )
-		self.scSearch.setKey( Shortcuts.SearchInField )
-		self.scSearch.setContext( Qt.WidgetShortcut )
-		self.connect( self.scSearch, SIGNAL('activated()'), self.openUrl )
+        # Add shortcut
+        self.scSearch = QShortcut(self.uiUrl)
+        self.scSearch.setKey(Shortcuts.SearchInField)
+        self.scSearch.setContext(Qt.WidgetShortcut)
+        self.connect(self.scSearch, SIGNAL('activated()'), self.openUrl)
 
-		self.scClear = QShortcut( self.uiUrl )
-		self.scClear.setKey( Shortcuts.ClearInField )
-		self.scClear.setContext( Qt.WidgetShortcut )
-		self.connect( self.scClear, SIGNAL('activated()'), self.clear )
+        self.scClear = QShortcut(self.uiUrl)
+        self.scClear.setKey(Shortcuts.ClearInField)
+        self.scClear.setContext(Qt.WidgetShortcut)
+        self.connect(self.scClear, SIGNAL('activated()'), self.clear)
 
-		self.uiUrl.setMaxLength( int( attrs.get('size',16)))
-		self.connect( self.pushOpenUrl, SIGNAL('clicked()'), self.openUrl )
-		self.connect( self.uiUrl, SIGNAL('editingFinished()'), self.modified )
-		self.installPopupMenu( self.uiUrl )
+        self.uiUrl.setMaxLength(int(attrs.get('size', 16)))
+        self.connect(self.pushOpenUrl, SIGNAL('clicked()'), self.openUrl)
+        self.connect(self.uiUrl, SIGNAL('editingFinished()'), self.modified)
+        self.installPopupMenu(self.uiUrl)
 
-	def storeValue(self):
-		return self.record.setValue(self.name, unicode( self.uiUrl.text() ) or False)
+    def storeValue(self):
+        return self.record.setValue(self.name, unicode(self.uiUrl.text()) or False)
 
-	def clear( self ):
-		self.uiUrl.clear()
-		self.uiUrl.setToolTip('')
+    def clear(self):
+        self.uiUrl.clear()
+        self.uiUrl.setToolTip('')
 
-	def showValue(self):
-		self.uiUrl.setCursorPosition( 0 )
-		self.uiUrl.setText(self.record.value(self.name) or '')
-		self.uiUrl.setToolTip(self.record.value(self.name) or '')
+    def showValue(self):
+        self.uiUrl.setCursorPosition(0)
+        self.uiUrl.setText(self.record.value(self.name) or '')
+        self.uiUrl.setToolTip(self.record.value(self.name) or '')
 
-	def setReadOnly(self, value):
-		AbstractFieldWidget.setReadOnly(self, value)
-		self.uiUrl.setReadOnly( value )
+    def setReadOnly(self, value):
+        AbstractFieldWidget.setReadOnly(self, value)
+        self.uiUrl.setReadOnly(value)
 
-	def openUrl(self):
-		value =  unicode(self.uiUrl.text()).strip()
-		if value != '':
-			Api.instance.createWebWindow( value, value )
+    def openUrl(self):
+        value = unicode(self.uiUrl.text()).strip()
+        if value != '':
+            Api.instance.createWebWindow(value, value)
+
 
 class EMailFieldWidget(UrlFieldWidget):
-	def openUrl(self):
-		value =  unicode(self.uiUrl.text()).strip()
-		if value != '':
-			QDesktopServices.openUrl( QUrl('mailto:' + value) )
+    def openUrl(self):
+        value = unicode(self.uiUrl.text()).strip()
+        if value != '':
+            QDesktopServices.openUrl(QUrl('mailto:' + value))
+
 
 class CallToFieldWidget(UrlFieldWidget):
-	def openUrl(self):
-		value = unicode(self.uiUrl.text()).strip()
-		if value != '':
-			QDesktopServices.openUrl( QUrl('callto:%s' + value) )
+    def openUrl(self):
+        value = unicode(self.uiUrl.text()).strip()
+        if value != '':
+            QDesktopServices.openUrl(QUrl('callto:%s' + value))
+
 
 class SipFieldWidget(UrlFieldWidget):
-	def openUrl(self):
-		value = unicode(self.uiUrl.text()).strip()
-		if value != '':
-			QDesktopServices.openUrl( QUrl('sip:%s' + value) )
+    def openUrl(self):
+        value = unicode(self.uiUrl.text()).strip()
+        if value != '':
+            QDesktopServices.openUrl(QUrl('sip:%s' + value))
 
 # vim:noexpandtab:
-

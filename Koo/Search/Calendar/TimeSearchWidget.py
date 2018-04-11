@@ -34,55 +34,55 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from Koo.Common.Ui import *
 
+
 class TimeSearchWidget(AbstractSearchWidget):
-	def __init__(self, name, parent, attrs={}):
-		AbstractSearchWidget.__init__(self, name, parent, attrs)
-		self.uiStart = QLineEdit( self )
-		label = QLabel( "-", self)
-		self.uiEnd = QLineEdit( self )
-		layout = QHBoxLayout( self )
-		layout.setContentsMargins( 0, 0, 0, 0 )
-		layout.setSpacing( 0 )
-		layout.addWidget(self.uiStart)
-		layout.addWidget(label)
-		layout.addWidget(self.uiEnd)
+    def __init__(self, name, parent, attrs={}):
+        AbstractSearchWidget.__init__(self, name, parent, attrs)
+        self.uiStart = QLineEdit(self)
+        label = QLabel("-", self)
+        self.uiEnd = QLineEdit(self)
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(self.uiStart)
+        layout.addWidget(label)
+        layout.addWidget(self.uiEnd)
 
-		# Catch keyDownPressed
-		self.uiStart.installEventFilter( self )
-		self.uiEnd.installEventFilter( self )
+        # Catch keyDownPressed
+        self.uiStart.installEventFilter(self)
+        self.uiEnd.installEventFilter(self)
 
-		self.focusWidget = self.uiStart
+        self.focusWidget = self.uiStart
 
-	def _getTime(self, text):
-		time = textToTime( text )
-		if time.isValid():
-			return str( time.toString( 'hh:mm:ss' ) )
-		else:
-			return False
+    def _getTime(self, text):
+        time = textToTime(text)
+        if time.isValid():
+            return str(time.toString('hh:mm:ss'))
+        else:
+            return False
 
-	def value(self):
-		res = []
-		val = self._getTime( str( self.uiStart.text() ) )
- 		if val:
-			res.append((self.name, '>=', val ))
-		else:
-			self.uiStart.clear()
-		val = self._getTime( str( self.uiEnd.text()) )
-	 	if val:
-			res.append((self.name, '<=', val ))
-		else:
-			self.uiEnd.clear()
-		return res
+    def value(self):
+        res = []
+        val = self._getTime(str(self.uiStart.text()))
+        if val:
+            res.append((self.name, '>=', val))
+        else:
+            self.uiStart.clear()
+        val = self._getTime(str(self.uiEnd.text()))
+        if val:
+            res.append((self.name, '<=', val))
+        else:
+            self.uiEnd.clear()
+        return res
 
-	def clear(self):
-		self.uiStart.clear()
-		self.uiEnd.clear()
+    def clear(self):
+        self.uiStart.clear()
+        self.uiEnd.clear()
 
-	def setValue(self, value):
-		if value:
-			self.uiStart.setText( unicode(value) )
-			self.uiEnd.setText( unicode(value) )
-		else:
-			self.uiStart.clear()
-			self.uiEnd.clear()
-
+    def setValue(self, value):
+        if value:
+            self.uiStart.setText(unicode(value))
+            self.uiEnd.setText(unicode(value))
+        else:
+            self.uiStart.clear()
+            self.uiEnd.clear()

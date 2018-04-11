@@ -32,100 +32,104 @@ from Koo.Fields.AbstractFieldDelegate import *
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+
 class SelectionFieldWidget(AbstractFieldWidget):
-	def __init__(self, parent, view, attrs={}):
-		AbstractFieldWidget.__init__(self, parent, view, attrs)
+    def __init__(self, parent, view, attrs={}):
+        AbstractFieldWidget.__init__(self, parent, view, attrs)
 
-		self.widget =  QComboBox( self )
-		self.widget.setFrame( True )
-		self.widget.setEditable( True )
-		self.widget.setInsertPolicy( QComboBox.NoInsert )
-		self.widget.setSizePolicy( QSizePolicy.Preferred, QSizePolicy.Fixed )
+        self.widget = QComboBox(self)
+        self.widget.setFrame(True)
+        self.widget.setEditable(True)
+        self.widget.setInsertPolicy(QComboBox.NoInsert)
+        self.widget.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
 
-		# As there's no sense in this widget to handle focus
-		# we set QComboBox as the proxy widget. Without this
-		# editable lists don't work properly.
-		self.setFocusProxy( self.widget )
+        # As there's no sense in this widget to handle focus
+        # we set QComboBox as the proxy widget. Without this
+        # editable lists don't work properly.
+        self.setFocusProxy(self.widget)
 
-		layout = QHBoxLayout( self )
-		layout.setContentsMargins( 0, 0, 0, 0 )
-		layout.addWidget( self.widget )
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.widget)
 
-		self._changed = False
+        self._changed = False
 
-		self.installPopupMenu( self.widget )
+        self.installPopupMenu(self.widget)
 
-		self.connect( self.widget, SIGNAL('activated(int)'), self.activated )
-		self.connect( self.widget, SIGNAL('editTextChanged(QString)'), self.changed )
-		self.fill( attrs.get('selection') or [] )
+        self.connect(self.widget, SIGNAL('activated(int)'), self.activated)
+        self.connect(self.widget, SIGNAL(
+            'editTextChanged(QString)'), self.changed)
+        self.fill(attrs.get('selection') or [])
 
-	def fill(self, selection):
-		for (id,name) in selection:
-			self.widget.addItem( name, None )
+    def fill(self, selection):
+        for (id, name) in selection:
+            self.widget.addItem(name, None)
 
-	def setReadOnly(self, value):
-		AbstractFieldWidget.setReadOnly(self, value)
-		self.widget.setEnabled(not value)
+    def setReadOnly(self, value):
+        AbstractFieldWidget.setReadOnly(self, value)
+        self.widget.setEnabled(not value)
 
-	def changed(self, text):
-		self._changed = True
+    def changed(self, text):
+        self._changed = True
 
-	def value(self):
-		if not self._changed:
-			return self.record.value(self.name)
+    def value(self):
+        if not self._changed:
+            return self.record.value(self.name)
 
-		# If we checked with MatchContains directly, we might find incorrect values when 
-		# the user clicked the item instead of writting it.
-		value = self.widget.itemData( self.widget.findText( self.widget.currentText(), Qt.MatchExactly | Qt.MatchCaseSensitive) )
-		if not value.isValid():
-			value = self.widget.itemData( self.widget.findText( self.widget.currentText(), Qt.MatchExactly ) )
-		if not value.isValid():	
-			value = self.widget.itemData( self.widget.findText( self.widget.currentText(), Qt.MatchContains ) )
-		if value.isValid():
-			if value.typeName() == 'QString':
-				return unicode( value.toString() )
-			else:
-				return value.toLongLong()[0]
-		else:
-			return False
+        # If we checked with MatchContains directly, we might find incorrect values when
+        # the user clicked the item instead of writting it.
+        value = self.widget.itemData(self.widget.findText(
+            self.widget.currentText(), Qt.MatchExactly | Qt.MatchCaseSensitive))
+        if not value.isValid():
+            value = self.widget.itemData(self.widget.findText(
+                self.widget.currentText(), Qt.MatchExactly))
+        if not value.isValid():
+            value = self.widget.itemData(self.widget.findText(
+                self.widget.currentText(), Qt.MatchContains))
+        if value.isValid():
+            if value.typeName() == 'QString':
+                return unicode(value.toString())
+            else:
+                return value.toLongLong()[0]
+        else:
+            return False
 
-	def storeValue(self):
-		self.record.setValue(self.name, self.value())
+    def storeValue(self):
+        self.record.setValue(self.name, self.value())
 
-	def clear(self):
-		self.widget.setCurrentIndex( self.widget.findText('') )
-		
-	def showValue(self):
-		value = self.record.value(self.name)
-		if not value:
-			self.widget.setCurrentIndex( self.widget.findText( '') )
-		else:
-			self.widget.setCurrentIndex( self.widget.findData( QVariant(value) ) )
-		self._changed = False
+    def clear(self):
+        self.widget.setCurrentIndex(self.widget.findText(''))
 
-	def activated(self, idx):
-		self.store()
+    def showValue(self):
+        value = self.record.value(self.name)
+        if not value:
+            self.widget.setCurrentIndex(self.widget.findText(''))
+        else:
+            self.widget.setCurrentIndex(self.widget.findData(QVariant(value)))
+        self._changed = False
 
-	def colorWidget(self):
-		return self.widget
+    def activated(self, idx):
+        self.store()
 
-class SelectionFieldDelegate( AbstractFieldDelegate ):
-	def createEditor(self, parent, option, index):
-		widget = QComboBox( parent )
-		widget.setEditable( False )
-		widget.setInsertPolicy( QComboBox.InsertAtTop )
-		for (id,name) in self.attributes.get('selection',[]):
-			widget.addItem( name, QVariant(id) )
-		return widget
-	
-	def setEditorData(self, editor, index):
-		value = index.data(Qt.EditRole).toString()
-		editor.setCurrentIndex( editor.findText( value ) )
-
-	def setModelData(self, editor, model, index):
-		model.setData( index, QVariant( editor.currentText() ), Qt.EditRole )
-
-	#def sizeHint(self, option, index):
-	#	return QSize(30, 30)
+    def colorWidget(self):
+        return self.widget
 
 
+class SelectionFieldDelegate(AbstractFieldDelegate):
+    def createEditor(self, parent, option, index):
+        widget = QComboBox(parent)
+        widget.setEditable(False)
+        widget.setInsertPolicy(QComboBox.InsertAtTop)
+        for (id, name) in self.attributes.get('selection', []):
+            widget.addItem(name, QVariant(id))
+        return widget
+
+    def setEditorData(self, editor, index):
+        value = index.data(Qt.EditRole).toString()
+        editor.setCurrentIndex(editor.findText(value))
+
+    def setModelData(self, editor, model, index):
+        model.setData(index, QVariant(editor.currentText()), Qt.EditRole)
+
+    # def sizeHint(self, option, index):
+    #	return QSize(30, 30)

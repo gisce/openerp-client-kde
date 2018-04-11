@@ -32,59 +32,64 @@ from PyQt4.QtGui import *
 
 
 try:
-	import serial
-	isSerialAvailable = True
+    import serial
+    isSerialAvailable = True
 except:
-	isSerialAvailable = False
-	Debug.info('PySerial not found. Serial Barcode Scanners will not be available.')
+    isSerialAvailable = False
+    Debug.info(
+        'PySerial not found. Serial Barcode Scanners will not be available.')
 
 
-## @brief This class reads from a Barcode Scanner connected to the serial port and sends
+# @brief This class reads from a Barcode Scanner connected to the serial port and sends
 # its input as key events to the application.
 class SerialBarcodeScanner(QThread):
-	Keys = {
-		'-': 'Minus',
-		'+': 'Plus',
-		'.': 'Period',
-		'/': 'Slash',
-		',': 'Comma',
-		'*': 'Asterisk',
-		'%': 'Percent',
-		' ': 'Space',
-	}
-	def __init__(self, parent=None):
-		QThread.__init__(self, parent)
+    Keys = {
+        '-': 'Minus',
+        '+': 'Plus',
+        '.': 'Period',
+        '/': 'Slash',
+        ',': 'Comma',
+        '*': 'Asterisk',
+        '%': 'Percent',
+        ' ': 'Space',
+    }
 
-	def run(self):
-		try:
-			device = serial.Serial(0)
-		except:
-			Debug.info('Could not open Serial device. Serial Barcode Scanners will not be available.')
-			return
+    def __init__(self, parent=None):
+        QThread.__init__(self, parent)
 
-		while True:
-			try:
-				data = device.read()
-			except:
-				Debug.error('Could not read from serial device. Serial Barcode Scanner stopped.')
-				return
-			# In some cases (application lost focus, for example), QApplication.focusWidget()
-			# may return None. In those cases we simple ignore barcode input.
-			if not QApplication.focusWidget():
-				continue
-			if data:
-				char = data[0]
-				try:
-					key = char.upper()
-					key = SerialBarcodeScanner.Keys.get( key, key )
-					key = eval('Qt.Key_%s' % key)
-				except:
-					Debug.warning('Could not find key for char "%s".' % char )
-					continue
-				# Send Key Press
-				event = QKeyEvent( QEvent.KeyPress, key, QApplication.keyboardModifiers(), char )
-				QApplication.postEvent( QApplication.focusWidget(), event )
-				# Send Key Release
-				event = QKeyEvent( QEvent.KeyRelease, key, QApplication.keyboardModifiers(), char )
-				QApplication.postEvent( QApplication.focusWidget(), event )
+    def run(self):
+        try:
+            device = serial.Serial(0)
+        except:
+            Debug.info(
+                'Could not open Serial device. Serial Barcode Scanners will not be available.')
+            return
 
+        while True:
+            try:
+                data = device.read()
+            except:
+                Debug.error(
+                    'Could not read from serial device. Serial Barcode Scanner stopped.')
+                return
+            # In some cases (application lost focus, for example), QApplication.focusWidget()
+            # may return None. In those cases we simple ignore barcode input.
+            if not QApplication.focusWidget():
+                continue
+            if data:
+                char = data[0]
+                try:
+                    key = char.upper()
+                    key = SerialBarcodeScanner.Keys.get(key, key)
+                    key = eval('Qt.Key_%s' % key)
+                except:
+                    Debug.warning('Could not find key for char "%s".' % char)
+                    continue
+                # Send Key Press
+                event = QKeyEvent(QEvent.KeyPress, key,
+                                  QApplication.keyboardModifiers(), char)
+                QApplication.postEvent(QApplication.focusWidget(), event)
+                # Send Key Release
+                event = QKeyEvent(QEvent.KeyRelease, key,
+                                  QApplication.keyboardModifiers(), char)
+                QApplication.postEvent(QApplication.focusWidget(), event)

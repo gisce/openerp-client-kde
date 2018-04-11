@@ -28,5 +28,5 @@
 from Parser import *
 from Koo.View.ViewFactory import *
 
-ViewFactory.register( ChartParser, 'graph', _('Chart View'), ':/images/chart.png' )
-
+ViewFactory.register(ChartParser, 'graph', _(
+    'Chart View'), ':/images/chart.png')

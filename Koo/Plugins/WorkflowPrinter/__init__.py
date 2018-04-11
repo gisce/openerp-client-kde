@@ -31,33 +31,40 @@ from Koo.Common import Api
 from Koo.Common import Common
 from Koo.Plugins import Plugins
 
-## @brief Executes the workflow graph report 'workflow.instance.graph'
+# @brief Executes the workflow graph report 'workflow.instance.graph'
 # including subworkflows.
+
+
 def printWorkflow(model, id, ids, context):
-	# Plugins might be called with no record selected but that doesn't
-	# make sense for this plugin so simply return.
-	if not id:
-		return
-	Api.instance.executeReport('workflow.instance.graph', {
-		'id' : id,
-		'ids' : ids,
-		'model' : model,
-		'nested' : True,
-	}, context=context)
+    # Plugins might be called with no record selected but that doesn't
+    # make sense for this plugin so simply return.
+    if not id:
+        return
+    Api.instance.executeReport('workflow.instance.graph', {
+        'id': id,
+        'ids': ids,
+        'model': model,
+        'nested': True,
+    }, context=context)
 
-## @brief Executes the workflow graph report 'workflow.instance.graph' without
+# @brief Executes the workflow graph report 'workflow.instance.graph' without
 # subworkflows.
-def printSimpleWorkflow(model, id, ids, context):
-	# Plugins might be called with no record selected but that doesn't
-	# make sense for this plugin so simply return.
-	if not id:
-		return
-	Api.instance.executeReport('workflow.instance.graph', {
-		'id' : id,
-		'ids' : ids,
-		'model' : model,
-		'nested' : False,
-	}, context=context)
 
-Plugins.register( 'SimpleWorkflowPrinter', '.*', _('Print Workflow'), printSimpleWorkflow )
-Plugins.register( 'WorkflowPrinter', '.*', _('Print Workflow (Complex)'), printWorkflow )
+
+def printSimpleWorkflow(model, id, ids, context):
+    # Plugins might be called with no record selected but that doesn't
+    # make sense for this plugin so simply return.
+    if not id:
+        return
+    Api.instance.executeReport('workflow.instance.graph', {
+        'id': id,
+        'ids': ids,
+        'model': model,
+        'nested': False,
+    }, context=context)
+
+
+Plugins.register('SimpleWorkflowPrinter', '.*',
+                 _('Print Workflow'), printSimpleWorkflow)
+Plugins.register('WorkflowPrinter', '.*',
+                 _('Print Workflow (Complex)'), printWorkflow)

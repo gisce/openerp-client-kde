@@ -25,19 +25,20 @@
 #
 ##############################################################################
 
+
 def encodeForUrl(text):
-	result = text[:]
-	reserved = ('$', '&', '+', ',', '/', ':', ';', '=', '?', '@')	
-	for invalid in reserved:
-		valid = '%%%x' % ord(invalid)
-		result = result.replace( invalid, valid )
-	return result
+    result = text[:]
+    reserved = ('$', '&', '+', ',', '/', ':', ';', '=', '?', '@')
+    for invalid in reserved:
+        valid = '%%%x' % ord(invalid)
+        result = result.replace(invalid, valid)
+    return result
+
 
 def decodeFromUrl(text):
-	result = text[:]
-	reserved = ('$', '&', '+', ',', '/', ':', ';', '=', '?', '@')	
-	for invalid in reserved:
-		valid = '%%%x' % ord(invalid)
-		result = result.replace( valid, invalid )
-	return result
-
+    result = text[:]
+    reserved = ('$', '&', '+', ',', '/', ':', ';', '=', '?', '@')
+    for invalid in reserved:
+        valid = '%%%x' % ord(invalid)
+        result = result.replace(valid, invalid)
+    return result

@@ -33,28 +33,29 @@ from Koo.Search.AbstractSearchWidget import *
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
+
 class BooleanSearchWidget(AbstractSearchWidget):
-	def __init__(self, name, parent, attrs={}):
-		AbstractSearchWidget.__init__(self, name, parent, attrs)
-		self.uiCombo = QComboBox( self )
-		self.uiCombo.setEditable( False )
-		self.uiCombo.addItem( '', QVariant() )
-		self.uiCombo.addItem( _('Yes'), QVariant( True ) )
-		self.uiCombo.addItem( _('No'), QVariant( False ) )
-		layout = QVBoxLayout( self )
-		layout.addWidget( self.uiCombo )
-		layout.setSpacing( 0 )
-		layout.setContentsMargins( 0, 0, 0, 0 )
-		self.focusWidget = self.uiCombo
+    def __init__(self, name, parent, attrs={}):
+        AbstractSearchWidget.__init__(self, name, parent, attrs)
+        self.uiCombo = QComboBox(self)
+        self.uiCombo.setEditable(False)
+        self.uiCombo.addItem('', QVariant())
+        self.uiCombo.addItem(_('Yes'), QVariant(True))
+        self.uiCombo.addItem(_('No'), QVariant(False))
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.uiCombo)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.focusWidget = self.uiCombo
 
-	def value(self):
-		value = self.uiCombo.itemData( self.uiCombo.currentIndex() )
-		if value.type() == QVariant.Bool:
-			return [(self.name,'=',int(value.toBool()))]
-		return []
+    def value(self):
+        value = self.uiCombo.itemData(self.uiCombo.currentIndex())
+        if value.type() == QVariant.Bool:
+            return [(self.name, '=', int(value.toBool()))]
+        return []
 
-	def clear(self):
-		self.uiCombo.setCurrentIndex( self.uiCombo.findText('') )
+    def clear(self):
+        self.uiCombo.setCurrentIndex(self.uiCombo.findText(''))
 
-	def setValue(self, value):
-		self.uiCombo.setCurrentIndex( self.uiCombo.findData( QVariant(value) ) )
+    def setValue(self, value):
+        self.uiCombo.setCurrentIndex(self.uiCombo.findData(QVariant(value)))

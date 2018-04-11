@@ -35,51 +35,52 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from Koo.Common.Ui import *
 
+
 class IntegerSearchWidget(AbstractSearchWidget):
-	def __init__(self, name, parent, attrs={}):
-		AbstractSearchWidget.__init__(self, name, parent, attrs)
-		layout = QHBoxLayout( self )
-		layout.setSpacing( 0 )
-		layout.setContentsMargins( 0, 0, 0, 0 )
-		self.uiStart = QLineEdit( self )
-		label = QLabel( '-', self )
-		self.uiEnd = QLineEdit( self )
-		layout.addWidget( self.uiStart )
-		layout.addWidget( label )
-		layout.addWidget( self.uiEnd )
-		self.connect( self.uiStart, SIGNAL('returnPressed()'), self.calculate )
-		self.connect( self.uiEnd, SIGNAL('returnPressed()'), self.calculate )
-		self.focusWidget = self.uiStart
+    def __init__(self, name, parent, attrs={}):
+        AbstractSearchWidget.__init__(self, name, parent, attrs)
+        layout = QHBoxLayout(self)
+        layout.setSpacing(0)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.uiStart = QLineEdit(self)
+        label = QLabel('-', self)
+        self.uiEnd = QLineEdit(self)
+        layout.addWidget(self.uiStart)
+        layout.addWidget(label)
+        layout.addWidget(self.uiEnd)
+        self.connect(self.uiStart, SIGNAL('returnPressed()'), self.calculate)
+        self.connect(self.uiEnd, SIGNAL('returnPressed()'), self.calculate)
+        self.focusWidget = self.uiStart
 
-	def calculate(self):
-		widget = self.sender()
-		val = textToInteger( str(widget.text() ) )
-		if val:
-			widget.setText( str(val) )
-		else:
-			widget.clear()
+    def calculate(self):
+        widget = self.sender()
+        val = textToInteger(str(widget.text()))
+        if val:
+            widget.setText(str(val))
+        else:
+            widget.clear()
 
-	def value(self):
-		res = []
-		start = textToInteger( str(self.uiStart.text()) )
-		end = textToInteger( str(self.uiEnd.text()) )
-		if start and not end:
-			res.append((self.name, '=', start))
-			return res
-		if start:
-			res.append((self.name, '>=', start))
-		if end:
-			res.append((self.name, '<=', end))
-		return res
+    def value(self):
+        res = []
+        start = textToInteger(str(self.uiStart.text()))
+        end = textToInteger(str(self.uiEnd.text()))
+        if start and not end:
+            res.append((self.name, '=', start))
+            return res
+        if start:
+            res.append((self.name, '>=', start))
+        if end:
+            res.append((self.name, '<=', end))
+        return res
 
-	def clear(self):
-		self.uiStart.clear()
-		self.uiEnd.clear()
+    def clear(self):
+        self.uiStart.clear()
+        self.uiEnd.clear()
 
-	def setValue(self, value):
-		if value:
-			self.uiStart.setText( unicode(value) )
-			self.uiEnd.setText( unicode(value) )
-		else:
-			self.uiStart.clear()
-			self.uiEnd.clear()
+    def setValue(self, value):
+        if value:
+            self.uiStart.setText(unicode(value))
+            self.uiEnd.setText(unicode(value))
+        else:
+            self.uiStart.clear()
+            self.uiEnd.clear()

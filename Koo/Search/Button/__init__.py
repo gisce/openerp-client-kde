@@ -28,4 +28,4 @@
 from ButtonSearchWidget import *
 from Koo.Search.SearchWidgetFactory import *
 
-SearchWidgetFactory.register( 'button', ButtonSearchWidget )
+SearchWidgetFactory.register('button', ButtonSearchWidget)

@@ -27,47 +27,48 @@
 
 import os
 
-## @brief The PluggableFields class specializes in scanning for available
-# widgets and delegates. 
+# @brief The PluggableFields class specializes in scanning for available
+# widgets and delegates.
 #
-# To add a new widget or delegate, simply create a new directory and put a 
+# To add a new widget or delegate, simply create a new directory and put a
 # __terp__.py file that looks like this:
 #
-# [ 
+# [
 # 	{ 'name': 'char', 'type': 'widget', 'class': 'WidgetClass' }
-# ] 
-# 
+# ]
+#
 # Use 'delegate' for Delegates.
 # Each directory can handle as many widgets and delegates as you may need.
 
-class PluggableFields:
-	imports = {}
-	widgets = {}
-	delegates = {}
 
-	@staticmethod
-	def scan():
-		# Scan only once
-		if PluggableFields.imports:
-			return
-		dir=os.path.abspath(os.path.dirname(__file__))
-		for i in os.listdir(dir):
-			path = os.path.join( dir, i, '__terp__.py' )
-			if os.path.isfile( path ):
-				#try:
-				moduleDicts = eval( file(path).read() )
-				moduleDelegates = {}
-				moduleWidgets = {}
-				for w in moduleDicts:
-					if w['type'] == 'widget':
-						moduleWidgets[ w['name'] ] = w['class']
-					elif w['type'] == 'delegate':
-						moduleDelegates[ w['name'] ] = w['class']
-					else:
-						print "Invalid type: %s" % w['type']
-				PluggableFields.widgets.update( moduleWidgets )
-				PluggableFields.delegates.update( moduleDelegates )
-				for w in moduleDicts:
-					PluggableFields.imports[ w['class'] ] = i
-				#except:
-					#print "Error importing widget: ", i
+class PluggableFields:
+    imports = {}
+    widgets = {}
+    delegates = {}
+
+    @staticmethod
+    def scan():
+        # Scan only once
+        if PluggableFields.imports:
+            return
+        dir = os.path.abspath(os.path.dirname(__file__))
+        for i in os.listdir(dir):
+            path = os.path.join(dir, i, '__terp__.py')
+            if os.path.isfile(path):
+                # try:
+                moduleDicts = eval(file(path).read())
+                moduleDelegates = {}
+                moduleWidgets = {}
+                for w in moduleDicts:
+                    if w['type'] == 'widget':
+                        moduleWidgets[w['name']] = w['class']
+                    elif w['type'] == 'delegate':
+                        moduleDelegates[w['name']] = w['class']
+                    else:
+                        print "Invalid type: %s" % w['type']
+                PluggableFields.widgets.update(moduleWidgets)
+                PluggableFields.delegates.update(moduleDelegates)
+                for w in moduleDicts:
+                    PluggableFields.imports[w['class']] = i
+                # except:
+                    # print "Error importing widget: ", i

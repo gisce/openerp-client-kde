@@ -31,63 +31,65 @@ from PyQt4.QtGui import *
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
 
+
 class CheckBoxFormWidget(AbstractFieldWidget):
-	def __init__(self, parent, model, attrs={}):
-		AbstractFormWidget.__init__(self, parent, model, attrs)
-		self.setSizePolicy( QSizePolicy.Preferred, QSizePolicy.Fixed )
-		self.widget = QCheckBox( self )
-		self.widget.setSizePolicy( QSizePolicy.Fixed, QSizePolicy.Fixed )
-		layout = QHBoxLayout( self )
-		layout.setContentsMargins( 0, 0, 0, 0 )
-		layout.setSpacing( 0 )
-		layout.addWidget( self.widget )
-		# Adding the stretch ensures the Widget will be placed on the left, just
-		# after the label while allowing other widgets in the same column of the grid
-		# occupy the space they need.
-		layout.addStretch()
-		self.installPopupMenu( self.widget )
-		self.connect( self.widget, SIGNAL('stateChanged(int)'), self.callModified )
+    def __init__(self, parent, model, attrs={}):
+        AbstractFormWidget.__init__(self, parent, model, attrs)
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        self.widget = QCheckBox(self)
+        self.widget.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(self.widget)
+        # Adding the stretch ensures the Widget will be placed on the left, just
+        # after the label while allowing other widgets in the same column of the grid
+        # occupy the space they need.
+        layout.addStretch()
+        self.installPopupMenu(self.widget)
+        self.connect(self.widget, SIGNAL(
+            'stateChanged(int)'), self.callModified)
 
-	def callModified(self, value):
-		self.modified()
+    def callModified(self, value):
+        self.modified()
 
-	def setReadOnly(self, value):
-		self.widget.setEnabled( not value )
+    def setReadOnly(self, value):
+        self.widget.setEnabled(not value)
 
-	def store(self):
-		self.model.setValue(self.name, self.widget.isChecked())
+    def store(self):
+        self.model.setValue(self.name, self.widget.isChecked())
 
-	def clear(self):
-		self.widget.setChecked(False)
+    def clear(self):
+        self.widget.setChecked(False)
 
-	def showValue(self):
-		self.widget.setChecked(self.model.value(self.name))
+    def showValue(self):
+        self.widget.setChecked(self.model.value(self.name))
 
-	def colorWidget(self):
-		return self.widget
+    def colorWidget(self):
+        return self.widget
 
-class BooleanFieldDelegate( AbstractFieldDelegate ):
-	def createEditor(self, parent, option, index):
-		return QCheckBox(parent)
-	
-	def setEditorData(self, editor, index):
-		editor.setChecked( index.data(Qt.EditRole).toBool() )
 
-	def setModelData(self, editor, model, index):
-		model.setData( index, QVariant( editor.isChecked() ), Qt.EditRole )
+class BooleanFieldDelegate(AbstractFieldDelegate):
+    def createEditor(self, parent, option, index):
+        return QCheckBox(parent)
 
-	def paint(self, painter, option, index):
-		# Paint background
-		itemOption = QStyleOptionViewItemV4(option)
-		QApplication.style().drawControl(QStyle.CE_ItemViewItem, itemOption, painter)
+    def setEditorData(self, editor, index):
+        editor.setChecked(index.data(Qt.EditRole).toBool())
 
-		# Paint CheckBox
-		op = QStyleOptionButton()
-		op.rect = option.rect
-		value = index.data(Qt.DisplayRole).toBool()
-		if value:
-			op.state = QStyle.State_On
-		else:
-			op.state = QStyle.State_Off
-		QApplication.style().drawControl(QStyle.CE_CheckBox, op, painter)
+    def setModelData(self, editor, model, index):
+        model.setData(index, QVariant(editor.isChecked()), Qt.EditRole)
 
+    def paint(self, painter, option, index):
+        # Paint background
+        itemOption = QStyleOptionViewItemV4(option)
+        QApplication.style().drawControl(QStyle.CE_ItemViewItem, itemOption, painter)
+
+        # Paint CheckBox
+        op = QStyleOptionButton()
+        op.rect = option.rect
+        value = index.data(Qt.DisplayRole).toBool()
+        if value:
+            op.state = QStyle.State_On
+        else:
+            op.state = QStyle.State_Off
+        QApplication.style().drawControl(QStyle.CE_CheckBox, op, painter)

@@ -32,39 +32,43 @@ from ServerConfigurationDialog import *
 from Koo.Common.Settings import *
 from Koo import Rpc
 
-(AdministratorPasswordDialogUi, AdministratorPasswordDialogBase) = loadUiType( Common.uiPath('admin_passwd.ui') )
+(AdministratorPasswordDialogUi, AdministratorPasswordDialogBase) = loadUiType(
+    Common.uiPath('admin_passwd.ui'))
 
-class AdministratorPasswordDialog( QDialog, AdministratorPasswordDialogUi ):
-	def __init__(self, parent=None):
-		QDialog.__init__(self, parent)
-		AdministratorPasswordDialogUi.__init__(self)
-		self.setupUi( self )
 
-		self.connect( self.pushChange, SIGNAL('clicked()'), self.slotChange )	
-		self.connect( self.pushAccept, SIGNAL('clicked()'), self.slotAccept )
-		self.connect( self.pushCancel, SIGNAL('clicked()'), self.reject )
+class AdministratorPasswordDialog(QDialog, AdministratorPasswordDialogUi):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        AdministratorPasswordDialogUi.__init__(self)
+        self.setupUi(self)
 
-		url = QUrl( Settings.value( 'login.url' ) )
-		url.setUserName( '' )
-		self.uiServer.setText( url.toString() )
+        self.connect(self.pushChange, SIGNAL('clicked()'), self.slotChange)
+        self.connect(self.pushAccept, SIGNAL('clicked()'), self.slotAccept)
+        self.connect(self.pushCancel, SIGNAL('clicked()'), self.reject)
 
-	def slotChange(self):
-		dialog = ServerConfigurationDialog( self )
-		dialog.setDefault( str( self.uiServer.text() ) )
-		dialog.exec_()
-		self.uiServer.setText( dialog.url )
+        url = QUrl(Settings.value('login.url'))
+        url.setUserName('')
+        self.uiServer.setText(url.toString())
 
-	def slotAccept(self):
-		if self.uiNewPassword.text() != self.uiConfirmationPassword.text():
-			QMessageBox.warning(self, _('Validation Error'), _('Confirmation password does not match new password.') )
-			return
-		try:
-			url = str(self.uiServer.text())
-			old = str(self.uiOldPassword.text())
-			new = str(self.uiNewPassword.text())
-			Rpc.database.call(url, 'change_admin_password', old, new)
-			QMessageBox.information(self, _('Information'), _('Password changed successfully') )
-			self.accept()
-		except Exception,e:
-			QMessageBox.warning(self,_('Error'), _('Could not change administrator password. Please, check the server and password are correct.'))
+    def slotChange(self):
+        dialog = ServerConfigurationDialog(self)
+        dialog.setDefault(str(self.uiServer.text()))
+        dialog.exec_()
+        self.uiServer.setText(dialog.url)
 
+    def slotAccept(self):
+        if self.uiNewPassword.text() != self.uiConfirmationPassword.text():
+            QMessageBox.warning(self, _('Validation Error'), _(
+                'Confirmation password does not match new password.'))
+            return
+        try:
+            url = str(self.uiServer.text())
+            old = str(self.uiOldPassword.text())
+            new = str(self.uiNewPassword.text())
+            Rpc.database.call(url, 'change_admin_password', old, new)
+            QMessageBox.information(self, _('Information'), _(
+                'Password changed successfully'))
+            self.accept()
+        except Exception, e:
+            QMessageBox.warning(self, _('Error'), _(
+                'Could not change administrator password. Please, check the server and password are correct.'))

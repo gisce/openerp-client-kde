@@ -38,34 +38,35 @@ import os
 
 class SvgParser(AbstractParser):
 
-	def create(self, viewId, parent, viewModel, rootNode, fields, filter=None):
-		self.viewModel = viewModel
-		self.filter = filter
-		self.widgetList = []
-		# Create the view
-		self.view = SvgView( parent )
-		self.view.id = viewId
-		self.view
-		directory = os.path.abspath(os.path.dirname(__file__))
+    def create(self, viewId, parent, viewModel, rootNode, fields, filter=None):
+        self.viewModel = viewModel
+        self.filter = filter
+        self.widgetList = []
+        # Create the view
+        self.view = SvgView(parent)
+        self.view.id = viewId
+        self.view
+        directory = os.path.abspath(os.path.dirname(__file__))
 
-		for node in rootNode.childNodes:
-			if node.localName == 'field':
-				attributes = Common.nodeAttributes(node)
-				name = attributes['name']
-				type = attributes.get('widget', fields[name]['type'])
-				fields[name].update(attributes)
-				fields[name]['model'] = viewModel
+        for node in rootNode.childNodes:
+            if node.localName == 'field':
+                attributes = Common.nodeAttributes(node)
+                name = attributes['name']
+                type = attributes.get('widget', fields[name]['type'])
+                fields[name].update(attributes)
+                fields[name]['model'] = viewModel
 
-				# Create the appropiate widget for the given field type
-				widget = FieldWidgetFactory.create( type, None, self.view, fields[name] )
-				if not widget:
-					continue
-				self.view.widgets[name] = widget
+                # Create the appropiate widget for the given field type
+                widget = FieldWidgetFactory.create(
+                    type, None, self.view, fields[name])
+                if not widget:
+                    continue
+                self.view.widgets[name] = widget
 
-		self.view.fields = fields
+        self.view.fields = fields
 
-		self.view.setSvg( os.path.join( directory, 'restaurant.svg' ) )
-		return self.view
+        self.view.setSvg(os.path.join(directory, 'restaurant.svg'))
+        return self.view
 
 
 # vim:noexpandtab:

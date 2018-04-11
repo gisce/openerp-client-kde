@@ -28,13 +28,13 @@
 from PyQt4.QtCore import *
 from time import sleep
 
-## @brief The Subscriber class provides a mechanisme for subscribing to server events.
+# @brief The Subscriber class provides a mechanisme for subscribing to server events.
 #
 # In order to use this class effectively you'll need the koo module installed on the server.
 # This module adds a new /subscription service. You can use this class in conjunction with
 # your own server modules which can publish events. By default, the koo module already publishes
 # events on any update/create/delete operation on a model.
-# 
+#
 # If the 'koo' module is not installed the Subscription service won't emit any signals, but won't
 # return any errors either.
 #
@@ -46,35 +46,36 @@ from time import sleep
 # This example will emit a signal (call self.updateRequestsStatus) each time a changed occurs
 # on any record in 'res.request' model.
 
+
 class Subscriber(QThread):
-	## @brief Creates a new Subscriber object from the given session and with 'parent' as QObject parent.
-	def __init__(self, session, parent=None):
-		QThread.__init__(self, parent)
-		self.session = session.copy()
-		self.slot = None
+    # @brief Creates a new Subscriber object from the given session and with 'parent' as QObject parent.
+    def __init__(self, session, parent=None):
+        QThread.__init__(self, parent)
+        self.session = session.copy()
+        self.slot = None
 
-	## @brief Subscribes to the given 'expression' event on the server. And calls 'slot' each
-	# time the given event is published.
-	def subscribe(self, expression, slot = None):
-		self.expression = expression
-		self.slot = slot
-		if self.slot:
-			self.connect( self, SIGNAL('published()'), self.slot )
-		self.start()
+    # @brief Subscribes to the given 'expression' event on the server. And calls 'slot' each
+    # time the given event is published.
+    def subscribe(self, expression, slot=None):
+        self.expression = expression
+        self.slot = slot
+        if self.slot:
+            self.connect(self, SIGNAL('published()'), self.slot)
+        self.start()
 
-	## @brief Unsubscribes from the previously subscribed event.
-	#
-	# If subscribe() wasn't previously called, nothing happens.
-	def unsubscribe(self):
-		if self.slot:
-			self.disconnect( self, SIGNAL('published()'), self.slot )
-		self.terminate()
+    # @brief Unsubscribes from the previously subscribed event.
+    #
+    # If subscribe() wasn't previously called, nothing happens.
+    def unsubscribe(self):
+        if self.slot:
+            self.disconnect(self, SIGNAL('published()'), self.slot)
+        self.terminate()
 
-	def run(self):
-		while True:
-			try:
-				self.result = self.session.call( '/subscription', 'wait', self.expression )
-				self.emit( SIGNAL('published()') )
-			except Exception, err:
-				sleep( 60 )
-
+    def run(self):
+        while True:
+            try:
+                self.result = self.session.call(
+                    '/subscription', 'wait', self.expression)
+                self.emit(SIGNAL('published()'))
+            except Exception, err:
+                sleep(60)

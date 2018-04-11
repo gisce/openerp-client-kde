@@ -39,85 +39,85 @@ from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
 from Koo.Dialogs.SearchDialog import SearchDialog
 
-(ManyToOnePosFieldWidgetUi, ManyToOnePosFieldWidgetBase ) = loadUiType( Common.uiPath('many2one_pos.ui') ) 
+(ManyToOnePosFieldWidgetUi, ManyToOnePosFieldWidgetBase) = loadUiType(
+    Common.uiPath('many2one_pos.ui'))
+
 
 class ManyToOnePosFieldWidget(AbstractFieldWidget, ManyToOnePosFieldWidgetUi):
-	def __init__(self, parent, model, attrs={}):
-		AbstractFieldWidget.__init__(self, parent, model, attrs)
-		ManyToOnePosFieldWidgetUi.__init__(self)
-		self.setupUi(self)
+    def __init__(self, parent, model, attrs={}):
+        AbstractFieldWidget.__init__(self, parent, model, attrs)
+        ManyToOnePosFieldWidgetUi.__init__(self)
+        self.setupUi(self)
 
-		self.setSizePolicy( QSizePolicy.Preferred, QSizePolicy.Preferred )
+        self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 
-		self.connect( self.screen, SIGNAL('currentChanged()'), self.selected )
+        self.connect(self.screen, SIGNAL('currentChanged()'), self.selected)
 
-		self.installPopupMenu( self.screen )
-		self.old = None
-		self.latestMatch = None
-		self.searching = True
+        self.installPopupMenu(self.screen)
+        self.old = None
+        self.latestMatch = None
+        self.searching = True
 
-	def colorWidget(self):
-		view = self.screen.currentView()
-		if view:
-			return view.widget
-		return self.screen
+    def colorWidget(self):
+        view = self.screen.currentView()
+        if view:
+            return view.widget
+        return self.screen
 
-	def initGui(self):
-		group = RecordGroup( self.attrs['relation'] )
-		group.setDomainForEmptyGroup()
+    def initGui(self):
+        group = RecordGroup(self.attrs['relation'])
+        group.setDomainForEmptyGroup()
 
+        self.screen.setRecordGroup(group)
+        self.screen.setEmbedded(True)
+        #self.screen.setViewTypes( ['tree'] )
+        # Set the view first otherwise, default values created by self.screen.new()
+        # would only be set for those values handled by the current view.
+        if 'views' in self.attrs and 'tree' in self.attrs['views']:
+            arch = self.attrs['views']['tree']['arch']
+            fields = self.attrs['views']['tree']['fields']
+            self.screen.addView(arch, fields, display=True)
+        else:
+            self.screen.addViewByType('tree', display=True)
+        treeView = self.screen.currentView().widget
+        treeView.setHeaderHidden(True)
 
-		self.screen.setRecordGroup( group )
-		self.screen.setEmbedded( True )
-		#self.screen.setViewTypes( ['tree'] )
-		# Set the view first otherwise, default values created by self.screen.new()
-		# would only be set for those values handled by the current view.
-		if 'views' in self.attrs and 'tree' in self.attrs['views']:
-			arch = self.attrs['views']['tree']['arch']
-			fields = self.attrs['views']['tree']['fields']
-			self.screen.addView(arch, fields, display=True)
-		else:
-			self.screen.addViewByType('tree', display=True)
-		treeView = self.screen.currentView().widget
-		treeView.setHeaderHidden( True )
+    def selected(self):
+        id = self.screen.currentId()
+        self.record.setValue(self.name, id)
 
-	def selected(self):
-		id = self.screen.currentId()
-		self.record.setValue(self.name, id)
+    def setReadOnly(self, value):
+        AbstractFieldWidget.setReadOnly(self, value)
 
-	def setReadOnly(self, value):
-		AbstractFieldWidget.setReadOnly(self, value)
+    def clear(self):
+        self.screen.setCurrentRecord(None)
+        # self.screen.display()
 
-	def clear(self):
-		self.screen.setCurrentRecord( None )
-		#self.screen.display()
+    def showValue(self):
+        group = self.screen.group
+        group.setContext(self.record.fieldContext(self.name))
+        domain = self.record.domain(self.name)
+        if group.domain() != domain:
+            group.setDomain(self.record.domain(self.name))
 
-	def showValue(self):
-		group = self.screen.group 
-		group.setContext( self.record.fieldContext( self.name ) )
-		domain = self.record.domain( self.name )
-		if group.domain() != domain:
-			group.setDomain( self.record.domain( self.name ) )
+        id = self.record.value(self.name)
+        if id:
+            record = group.modelById(id)
+        else:
+            record = None
+        self.screen.setCurrentRecord(record)
+        self.screen.display()
+        # Resize all columns to contents
+        treeView = self.screen.currentView().widget
+        for column in xrange(0, treeView.model().columnCount()):
+            treeView.resizeColumnToContents(column)
 
-		id = self.record.value(self.name)
-		if id:
-			record = group.modelById( id )
-		else:
-			record = None
-		self.screen.setCurrentRecord( record )
-		self.screen.display()
-		# Resize all columns to contents
-		treeView = self.screen.currentView().widget
-		for column in xrange(0, treeView.model().columnCount()):
-			treeView.resizeColumnToContents( column )
+    # We do not store anything here as elements are added and removed in the
+    # Screen (self.screen). The only thing we need to take care of (as noted
+    # above) is to ensure that the model and field are marked as modified.
+    def storeValue(self):
+        pass
 
-	# We do not store anything here as elements are added and removed in the
-	# Screen (self.screen). The only thing we need to take care of (as noted 
-	# above) is to ensure that the model and field are marked as modified.
-	def storeValue(self):
-		pass
-
-	def saveState(self):
-		self.screen.storeViewSettings()
-		return AbstractFieldWidget.saveState(self)
-
+    def saveState(self):
+        self.screen.storeViewSettings()
+        return AbstractFieldWidget.saveState(self)

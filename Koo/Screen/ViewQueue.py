@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-## @brief This class encapsulates the view types and ids handling for Screen.
+# @brief This class encapsulates the view types and ids handling for Screen.
 #
 # Model view definitions have an unintuitive way of handling which views should
 # be shown. There are two ways of specifying it: view types and ids. The problem
@@ -41,96 +41,97 @@
 # if queue.isType():
 # 	useViewAsAType( queue.next() )
 
+
 class ViewQueue:
-	def __init__(self):
-		self._mixed = []
-		
-	## @brief Initializes the queue with types and ids view definitions
-	def setup(self, types, ids):
-		if types == None:
-			types = ['form', 'tree']
-		if ids == None:
-			ids = []
-		# Merge lists
-		self._views = []
-		self._mixed = []
-		for x in range(max(len(types),len(ids))):
-			if x < len(ids) and ids[x]:
-				self._views.append( ids[x] )
-			elif x < len(types):
-				self._views.append( types[x] )
+    def __init__(self):
+        self._mixed = []
 
-			if x < len(ids):
-				id = ids[x]
-			else:
-				id = False
-			if x < len(types):
-				type = types[x]
-			else:
-				type = False
-			self._mixed.append( (id, type) )
+    # @brief Initializes the queue with types and ids view definitions
+    def setup(self, types, ids):
+        if types == None:
+            types = ['form', 'tree']
+        if ids == None:
+            ids = []
+        # Merge lists
+        self._views = []
+        self._mixed = []
+        for x in range(max(len(types), len(ids))):
+            if x < len(ids) and ids[x]:
+                self._views.append(ids[x])
+            elif x < len(types):
+                self._views.append(types[x])
 
-	## @brief Initializes the queue with a given list of view types.
-	# If types is None then the list is initialized to the default ['form', 'tree']
-	def setViewTypes(self, types):
-		if types == None:
-			self._views = ['form', 'tree']
-		else:
-			self._views = types
-		self._mixed = [ (False, x) for x in self._views ]
+            if x < len(ids):
+                id = ids[x]
+            else:
+                id = False
+            if x < len(types):
+                type = types[x]
+            else:
+                type = False
+            self._mixed.append((id, type))
 
-	## @brief Initializes the queue with a given list of view ids.
-	def setViewIds(self, ids):
-		self._views = ids
-		self._mixed = [ (x, False) for x in self._views ]
+    # @brief Initializes the queue with a given list of view types.
+    # If types is None then the list is initialized to the default ['form', 'tree']
+    def setViewTypes(self, types):
+        if types == None:
+            self._views = ['form', 'tree']
+        else:
+            self._views = types
+        self._mixed = [(False, x) for x in self._views]
 
-	## @brief Returns True if the next element is a view type.
-	def isType(self):
-		v = self._views[0]
-		if isinstance(v,int):
-			return False
-		else:
-			return True
+    # @brief Initializes the queue with a given list of view ids.
+    def setViewIds(self, ids):
+        self._views = ids
+        self._mixed = [(x, False) for x in self._views]
 
-	## @brief Returns True if the next element is a view id.
-	def isId(self):
-		return not self.isType()
+    # @brief Returns True if the next element is a view type.
+    def isType(self):
+        v = self._views[0]
+        if isinstance(v, int):
+            return False
+        else:
+            return True
 
-	## @brief Returns True if the queue is empty.
-	def isEmpty(self):
-		return len(self._views) == 0
+    # @brief Returns True if the next element is a view id.
+    def isId(self):
+        return not self.isType()
 
-	## @brief Returns the next element of the queue.
-	# 
-	# If the queue is already empty, it will rise an exception.
-	def next(self):
-		self._views.pop(0)
-		return self._mixed.pop(0)
+    # @brief Returns True if the queue is empty.
+    def isEmpty(self):
+        return len(self._views) == 0
 
-	def viewFromType(self, type):
-		for view in self._mixed:
-			if view[1] == type:
-				return view
-		return None, None
+    # @brief Returns the next element of the queue.
+    #
+    # If the queue is already empty, it will rise an exception.
+    def next(self):
+        self._views.pop(0)
+        return self._mixed.pop(0)
 
-	def indexFromType(self, type):
-		index = 0
-		for view in self._mixed:
-			if view[1] == type:
-				return index
-			index += 1
-		return -1
+    def viewFromType(self, type):
+        for view in self._mixed:
+            if view[1] == type:
+                return view
+        return None, None
 
-	def typeFromIndex(self, index):
-		return self._mixed[ index ][1]
+    def indexFromType(self, type):
+        index = 0
+        for view in self._mixed:
+            if view[1] == type:
+                return index
+            index += 1
+        return -1
 
-	def count(self):
-		return len(self._mixed)
+    def typeFromIndex(self, index):
+        return self._mixed[index][1]
 
-	def addViewType(self, type):
-		self._mixed.append( (False, type) )
+    def count(self):
+        return len(self._mixed)
 
-	def typeExists(self, type):
-		return self.indexFromType( type ) != -1
+    def addViewType(self, type):
+        self._mixed.append((False, type))
+
+    def typeExists(self, type):
+        return self.indexFromType(type) != -1
 
 # vim:noexpandtab:

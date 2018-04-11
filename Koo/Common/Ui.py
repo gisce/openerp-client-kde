@@ -29,23 +29,25 @@
 import os
 
 try:
-	from PyQt4 import uic
-	isUicAvailable = True
+    from PyQt4 import uic
+    isUicAvailable = True
 except:
-	isUicAvailabe = False
+    isUicAvailabe = False
 
-def uiToModule( filePath):
-	return os.path.split( filePath[:-3] )[-1]
+
+def uiToModule(filePath):
+    return os.path.split(filePath[:-3])[-1]
+
 
 if isUicAvailable:
-	def loadUiType( fileName  ):
-		return uic.loadUiType( fileName  )
+    def loadUiType(fileName):
+        return uic.loadUiType(fileName)
 else:
-	def loadUiType( fileName ):
-		module = uiToModule( fileName )
-		module = __import__( 'ui.%s' % module, globals(), locals(), [module] )
-		uiClasses = [x for x in dir(module) if x.startswith('Ui_')]
-		ui = eval( 'module.%s' % uiClasses[0] )
-		return (ui, None)
+    def loadUiType(fileName):
+        module = uiToModule(fileName)
+        module = __import__('ui.%s' % module, globals(), locals(), [module])
+        uiClasses = [x for x in dir(module) if x.startswith('Ui_')]
+        ui = eval('module.%s' % uiClasses[0])
+        return (ui, None)
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:

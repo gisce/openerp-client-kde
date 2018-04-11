@@ -32,10 +32,11 @@
 # Added so py2exe properly packs xml.etree.ElementTree
 from xml.etree.ElementTree import parse, SubElement
 
-import sys, os
+import sys
+import os
 
 if os.name == 'nt':
-	sys.path.append('.')
+    sys.path.append('.')
 
 from distutils.sysconfig import get_python_lib
 terp_path = "/".join([get_python_lib(), 'Koo'])
@@ -47,7 +48,7 @@ from Koo.Common import Localization
 
 # Note that we need translations in order to parse command line arguments
 # because we might have to print information to the user. However, koo's
-# language configuration is stored in the .rc file users might provide in 
+# language configuration is stored in the .rc file users might provide in
 # the command line.
 #
 # To solve this problem we load translations twice: one before command line
@@ -66,7 +67,7 @@ arguments = CommandLine.parseArguments(sys.argv)
 Localization.initializeTranslations(Settings.value('client.language'))
 
 
-imports={}
+imports = {}
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -79,45 +80,43 @@ Notifier.warningHandler = Common.warning
 Notifier.concurrencyErrorHandler = Common.concurrencyError
 
 
-
-
-### Main application loop
+# Main application loop
 if Common.isKdeAvailable:
-	from PyKDE4.kdecore import ki18n, KAboutData, KCmdLineArgs
-	from PyKDE4.kdeui import KApplication
+    from PyKDE4.kdecore import ki18n, KAboutData, KCmdLineArgs
+    from PyKDE4.kdeui import KApplication
 
-	appName     = "Koo"
-	catalog     = ""
-	programName = ki18n ("Koo")
-	version     = "1.0"
-	description = ki18n ("KDE OpenObject Client")
-	license     = KAboutData.License_GPL
-	copyright   = ki18n ("(c) 2009 Albert Cervera i Areny")
-	text        = ki18n ("none")
-	homePage    = "www.nan-tic.com"
-	bugEmail    = "albert@nan-tic.com"
-	 
-	aboutData   = KAboutData (appName, catalog, programName, version, description,
-				license, copyright, text, homePage, bugEmail)
+    appName = "Koo"
+    catalog = ""
+    programName = ki18n("Koo")
+    version = "1.0"
+    description = ki18n("KDE OpenObject Client")
+    license = KAboutData.License_GPL
+    copyright = ki18n("(c) 2009 Albert Cervera i Areny")
+    text = ki18n("none")
+    homePage = "www.nan-tic.com"
+    bugEmail = "albert@nan-tic.com"
 
-	KCmdLineArgs.init (arguments, aboutData)
-	 
-	app = KApplication ()
+    aboutData = KAboutData(appName, catalog, programName, version, description,
+                           license, copyright, text, homePage, bugEmail)
+
+    KCmdLineArgs.init(arguments, aboutData)
+
+    app = KApplication()
 else:
-	app = QApplication( arguments )
+    app = QApplication(arguments)
 
-app.setApplicationName( 'Koo POS' )
-app.setOrganizationDomain( 'www.NaN-tic.com' )
-app.setOrganizationName( 'NaN' )
+app.setApplicationName('Koo POS')
+app.setOrganizationDomain('www.NaN-tic.com')
+app.setOrganizationName('NaN')
 
 try:
-	f = open( Settings.value('koo.stylesheet'), 'r' )
-	try:
-		app.setStyleSheet( f.read() )
-	finally:
-		f.close()
+    f = open(Settings.value('koo.stylesheet'), 'r')
+    try:
+        app.setStyleSheet(f.read())
+    finally:
+        f.close()
 except:
-	pass
+    pass
 
 Localization.initializeQtTranslations(Settings.value('client.language'))
 
@@ -130,86 +129,90 @@ mainWindow = QMainWindow(None, Qt.CustomizeWindowHint)
 
 if Settings.value('koo.show_pos_toolbar'):
 
-	toolBar = QToolBar(mainWindow)
+    toolBar = QToolBar(mainWindow)
 
-	if Settings.value('koo.show_pos_button_new', True):
+    if Settings.value('koo.show_pos_button_new', True):
 
-		def executeNew():
-			mainWindow.centralWidget().new()
+        def executeNew():
+            mainWindow.centralWidget().new()
 
-		actionNew = QAction( mainWindow )
-		actionNew.setIcon( QIcon( ':/images/new.png' ) )
-		QObject.connect(actionNew, SIGNAL('triggered()'), executeNew)
-		toolBar.addAction( actionNew )
+        actionNew = QAction(mainWindow)
+        actionNew.setIcon(QIcon(':/images/new.png'))
+        QObject.connect(actionNew, SIGNAL('triggered()'), executeNew)
+        toolBar.addAction(actionNew)
 
-	if Settings.value('koo.show_pos_button_switch_view', True):
+    if Settings.value('koo.show_pos_button_switch_view', True):
 
-		def executeSwitchView():
-			mainWindow.centralWidget().switchView()
+        def executeSwitchView():
+            mainWindow.centralWidget().switchView()
 
-		actionSwitchView = QAction( mainWindow )
-		actionSwitchView.setIcon( QIcon( ':/images/switch_view.png' ) )
-		QObject.connect(actionSwitchView, SIGNAL('triggered()'), executeSwitchView)
-		toolBar.addAction( actionSwitchView )
+        actionSwitchView = QAction(mainWindow)
+        actionSwitchView.setIcon(QIcon(':/images/switch_view.png'))
+        QObject.connect(actionSwitchView, SIGNAL(
+            'triggered()'), executeSwitchView)
+        toolBar.addAction(actionSwitchView)
 
-	mainWindow.addToolBar( Qt.LeftToolBarArea, toolBar )
+    mainWindow.addToolBar(Qt.LeftToolBarArea, toolBar)
 
 from Koo.Common import Api
 
+
 class KooApi(Api.KooApi):
-	def execute(self, actionId, data={}, type=None, context={}):
-		Koo.Actions.execute( actionId, data, type, context )
+    def execute(self, actionId, data={}, type=None, context={}):
+        Koo.Actions.execute(actionId, data, type, context)
 
-	def executeReport(self, name, data={}, context={}):
-		return Koo.Actions.executeReport( name, data, context )
+    def executeReport(self, name, data={}, context={}):
+        return Koo.Actions.executeReport(name, data, context)
 
-	def executeAction(self, action, data={}, context={}):
-		Koo.Actions.executeAction( action, data, context )
-		
-	def executeKeyword(self, keyword, data={}, context={}):
-		return Koo.Actions.executeKeyword( keyword, data, context )
+    def executeAction(self, action, data={}, context={}):
+        Koo.Actions.executeAction(action, data, context)
 
-	def createWindow(self, view_ids, model, res_id=False, domain=None, 
-			view_type='form', window=None, context=None, mode=None, name=False, autoReload=False, 
-			target='current'):
-		WindowService.createWindow( view_ids, model, res_id, domain, 
-			view_type, window, context, mode, name, autoReload, target )
+    def executeKeyword(self, keyword, data={}, context={}):
+        return Koo.Actions.executeKeyword(keyword, data, context)
 
-	def windowCreated(self, window, target):
-		mainWindow.setCentralWidget( window )
-		window.setParent( mainWindow )
-		window.show()
+    def createWindow(self, view_ids, model, res_id=False, domain=None,
+                     view_type='form', window=None, context=None, mode=None, name=False, autoReload=False,
+                     target='current'):
+        WindowService.createWindow(view_ids, model, res_id, domain,
+                                   view_type, window, context, mode, name, autoReload, target)
+
+    def windowCreated(self, window, target):
+        mainWindow.setCentralWidget(window)
+        window.setParent(mainWindow)
+        window.show()
+
 
 Api.instance = KooApi()
 
 mainWindow.showFullScreen()
 
 if Settings.value('koo.pos_mode'):
-        import Koo.Pos
-	app.installEventFilter( Koo.Pos.PosEventFilter(mainWindow) )
+    import Koo.Pos
+    app.installEventFilter(Koo.Pos.PosEventFilter(mainWindow))
 
 if Settings.value('koo.enter_as_tab'):
-	from Koo.Common import EnterEventFilter
-	app.installEventFilter( EnterEventFilter.EnterEventFilter(mainWindow) )
+    from Koo.Common import EnterEventFilter
+    app.installEventFilter(EnterEventFilter.EnterEventFilter(mainWindow))
 
 from Koo.Common import ArrowsEventFilter
-app.installEventFilter( ArrowsEventFilter.ArrowsEventFilter(mainWindow) )
+app.installEventFilter(ArrowsEventFilter.ArrowsEventFilter(mainWindow))
 
 from Koo.Common import WhatsThisEventFilter
-app.installEventFilter( WhatsThisEventFilter.WhatsThisEventFilter(mainWindow) )
+app.installEventFilter(WhatsThisEventFilter.WhatsThisEventFilter(mainWindow))
 
 # Load default wizard
-if not Settings.value( 'login.url'):
-	sys.exit( "Error: No connection parameters given." )
-if not Settings.value( 'login.db'):
-	sys.exit( "Error: No database given." )
+if not Settings.value('login.url'):
+    sys.exit("Error: No connection parameters given.")
+if not Settings.value('login.db'):
+    sys.exit("Error: No database given.")
 
-Rpc.session.login( Settings.value('login.url'), Settings.value('login.db') )
+Rpc.session.login(Settings.value('login.url'), Settings.value('login.db'))
 
 if not Rpc.session.logged():
-	sys.exit( "Error: Invalid credentials." )
+    sys.exit("Error: Invalid credentials.")
 
-id = Rpc.session.execute('/object', 'execute', 'res.users', 'read', [Rpc.session.uid], ['action_id','name'], Rpc.session.context)
+id = Rpc.session.execute('/object', 'execute', 'res.users', 'read',
+                         [Rpc.session.uid], ['action_id', 'name'], Rpc.session.context)
 
 # Store the menuId so we ensure we don't open the menu twice when
 # calling openHomeTab()
@@ -218,4 +221,3 @@ menuId = id[0]['action_id'][0]
 Api.instance.execute(menuId)
 
 app.exec_()
-

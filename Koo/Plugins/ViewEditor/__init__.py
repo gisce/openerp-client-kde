@@ -30,9 +30,13 @@ from Koo.Common import Common
 from Koo.Plugins import Plugins
 from Koo import Rpc
 
-## @brief Opens a new window with all views for the current model so the user can modify them.
-def editView(model, id, ids, context):
-	domain = [('model','=',model)]
-	Api.instance.createWindow( None, 'ir.ui.view', mode='tree,form', domain=domain, context=context )
+# @brief Opens a new window with all views for the current model so the user can modify them.
 
-Plugins.register( 'ViewEditor', '.*', _('Edit View'), editView )
+
+def editView(model, id, ids, context):
+    domain = [('model', '=', model)]
+    Api.instance.createWindow(
+        None, 'ir.ui.view', mode='tree,form', domain=domain, context=context)
+
+
+Plugins.register('ViewEditor', '.*', _('Edit View'), editView)

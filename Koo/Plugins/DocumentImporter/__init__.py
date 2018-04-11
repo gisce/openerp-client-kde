@@ -35,47 +35,49 @@ from Koo.Common.Ui import *
 from Koo.Plugins import Plugins
 from Koo.Common import Calendar
 
+
 def scan(model, id, ids, context):
-	Directories = 1
-	Files = 0
-	Cancel = 2
-	dialog = QMessageBox()
-	dialog.setWindowTitle( _('Import Documents') )
-	dialog.setText( _('How do you want to import documents?') )
-	dialog.addButton( _('Select Files'), 3 )
-	dialog.addButton( _('Selected Directory'), 2 )
-	dialog.addButton( _('Cancel Import'), 1 )
-	result = dialog.exec_()
-	if result == Cancel:
-		return
+    Directories = 1
+    Files = 0
+    Cancel = 2
+    dialog = QMessageBox()
+    dialog.setWindowTitle(_('Import Documents'))
+    dialog.setText(_('How do you want to import documents?'))
+    dialog.addButton(_('Select Files'), 3)
+    dialog.addButton(_('Selected Directory'), 2)
+    dialog.addButton(_('Cancel Import'), 1)
+    result = dialog.exec_()
+    if result == Cancel:
+        return
 
-	if result == Directories:
-		directory = unicode( QFileDialog.getExistingDirectory() )
-		if not directory:
-			return
-		fileNames = QDir( directory ).entryList()
-		fileNames = [os.path.join( directory, unicode(x) ) for x in fileNames]
-	else:
-		fileNames = QFileDialog.getOpenFileNames()
-		fileNames = [unicode(x) for x in fileNames]
-			
-			
-	for fileName in fileNames:
-		try:
-			# As fileName may not be a file, simply try the next file.
-			f = open(fileName, 'rb')
-		except:
-			continue
-		try:
-			data = base64.encodestring( f.read() )
-		except:
-			continue
-		finally:
-			f.close()
-		id = Rpc.session.execute('/object', 'execute', 'nan.document', 'create', {
-			'name': Calendar.dateTimeToText( QDateTime.currentDateTime() ),
-			'datas': data,
-			'filename': os.path.basename(fileName),
-		}, context )
+    if result == Directories:
+        directory = unicode(QFileDialog.getExistingDirectory())
+        if not directory:
+            return
+        fileNames = QDir(directory).entryList()
+        fileNames = [os.path.join(directory, unicode(x)) for x in fileNames]
+    else:
+        fileNames = QFileDialog.getOpenFileNames()
+        fileNames = [unicode(x) for x in fileNames]
 
-Plugins.register( 'document-importer', 'nan.document', _('Import Documents'), scan )
+    for fileName in fileNames:
+        try:
+            # As fileName may not be a file, simply try the next file.
+            f = open(fileName, 'rb')
+        except:
+            continue
+        try:
+            data = base64.encodestring(f.read())
+        except:
+            continue
+        finally:
+            f.close()
+        id = Rpc.session.execute('/object', 'execute', 'nan.document', 'create', {
+            'name': Calendar.dateTimeToText(QDateTime.currentDateTime()),
+            'datas': data,
+            'filename': os.path.basename(fileName),
+        }, context)
+
+
+Plugins.register('document-importer', 'nan.document',
+                 _('Import Documents'), scan)

@@ -33,129 +33,135 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 try:
-	from PyQt4.phonon import *
-	phononAvailable = True
+    from PyQt4.phonon import *
+    phononAvailable = True
 except:
-	phononAvailable = False
-	pass
+    phononAvailable = False
+    pass
 
 
-(VideoFieldWidgetUi, VideoFieldWidgetBase) = loadUiType( Common.uiPath('video.ui') ) 
+(VideoFieldWidgetUi, VideoFieldWidgetBase) = loadUiType(Common.uiPath('video.ui'))
+
 
 class VideoFieldWidget(AbstractFieldWidget, VideoFieldWidgetUi):
-	def __init__(self, parent, view, attrs={}):
-		AbstractFieldWidget.__init__(self, parent, view, attrs)
-		VideoFieldWidgetUi.__init__(self)
-		self.setupUi(self)
-		
-		if phononAvailable:
-			self.layout().removeWidget( self.uiVideo )
-			self.uiVideo.setParent( None )
-			self.uiVideo = Phonon.VideoPlayer( Phonon.VideoCategory, self )
-			self.uiVideo.setSizePolicy( QSizePolicy.Preferred, QSizePolicy.Expanding )
-			self.uiVideo.show()
-			self.layout().addWidget( self.uiVideo )
-			self.uiSlider = Phonon.SeekSlider( self )
-			self.layout().addWidget( self.uiSlider )
+    def __init__(self, parent, view, attrs={}):
+        AbstractFieldWidget.__init__(self, parent, view, attrs)
+        VideoFieldWidgetUi.__init__(self)
+        self.setupUi(self)
 
-		self.installPopupMenu( self.uiVideo )
+        if phononAvailable:
+            self.layout().removeWidget(self.uiVideo)
+            self.uiVideo.setParent(None)
+            self.uiVideo = Phonon.VideoPlayer(Phonon.VideoCategory, self)
+            self.uiVideo.setSizePolicy(
+                QSizePolicy.Preferred, QSizePolicy.Expanding)
+            self.uiVideo.show()
+            self.layout().addWidget(self.uiVideo)
+            self.uiSlider = Phonon.SeekSlider(self)
+            self.layout().addWidget(self.uiSlider)
 
-		self.connect( self.pushPlay, SIGNAL('clicked()'), self.play )
-		self.connect( self.pushPause, SIGNAL('clicked()'), self.pause )
-		self.connect( self.pushStop, SIGNAL('clicked()'), self.stop )
-		self.connect( self.pushLoad, SIGNAL('clicked()'), self.loadVideo )
-		self.connect( self.pushSave, SIGNAL('clicked()'), self.save )
-		self.connect( self.pushRemove, SIGNAL('clicked()'), self.remove )
+        self.installPopupMenu(self.uiVideo)
 
-	def loadVideo(self):
-		try:
-			filename = QFileDialog.getOpenFileName(self, _('Select the file to attach'))
-			if filename.isNull():
-				return
-			if self.isBinary():
-				filename = unicode(filename)
-				value = file(filename).read()
-				self.record.setValue( self.name, value )
-			else:
-				self.record.setValue( self.name, unicode(filename) )
-		except:
-			QMessageBox.information(self, _('Error'), _('Error reading the file'))
+        self.connect(self.pushPlay, SIGNAL('clicked()'), self.play)
+        self.connect(self.pushPause, SIGNAL('clicked()'), self.pause)
+        self.connect(self.pushStop, SIGNAL('clicked()'), self.stop)
+        self.connect(self.pushLoad, SIGNAL('clicked()'), self.loadVideo)
+        self.connect(self.pushSave, SIGNAL('clicked()'), self.save)
+        self.connect(self.pushRemove, SIGNAL('clicked()'), self.remove)
 
-	def save(self):
-		filename = QFileDialog.getSaveFileName( self, _('Save as...') )
-		try:
-			if filename:
-				fp = file(filename,'wb+')
-				fp.write( self.record.value(self.name) )
-				fp.close()
-		except:
-			QMessageBox.information(self, _('Error'), _('Error writing the file!'))
-		Semantic.addInformationToFile( filename, self.record.group.resource, self.record.id, self.name )
+    def loadVideo(self):
+        try:
+            filename = QFileDialog.getOpenFileName(
+                self, _('Select the file to attach'))
+            if filename.isNull():
+                return
+            if self.isBinary():
+                filename = unicode(filename)
+                value = file(filename).read()
+                self.record.setValue(self.name, value)
+            else:
+                self.record.setValue(self.name, unicode(filename))
+        except:
+            QMessageBox.information(
+                self, _('Error'), _('Error reading the file'))
 
-	def remove(self):
-		self.clear()
-		self.record.setValue( self.name, False )
-		self.modified()
+    def save(self):
+        filename = QFileDialog.getSaveFileName(self, _('Save as...'))
+        try:
+            if filename:
+                fp = file(filename, 'wb+')
+                fp.write(self.record.value(self.name))
+                fp.close()
+        except:
+            QMessageBox.information(
+                self, _('Error'), _('Error writing the file!'))
+        Semantic.addInformationToFile(
+            filename, self.record.group.resource, self.record.id, self.name)
 
-	def play(self):
-		if self.uiVideo.isPaused():
-			self.uiVideo.play()
-			return
+    def remove(self):
+        self.clear()
+        self.record.setValue(self.name, False)
+        self.modified()
 
-		self.stop()
-		value = self.record.value( self.name )
-		if not value:
-			return
-		if self.isBinary():
-			media = Phonon.MediaSource( QBuffer( QByteArray( value ) ) )
-		else:
-			media = Phonon.MediaSource( value )
+    def play(self):
+        if self.uiVideo.isPaused():
+            self.uiVideo.play()
+            return
 
-		self.uiVideo.play( media )
-		self.uiVideo.show()
-		self.uiSlider.setMediaObject( self.uiVideo.mediaObject() )
-		self.uiSlider.show()
+        self.stop()
+        value = self.record.value(self.name)
+        if not value:
+            return
+        if self.isBinary():
+            media = Phonon.MediaSource(QBuffer(QByteArray(value)))
+        else:
+            media = Phonon.MediaSource(value)
 
-	def pause(self):
-		self.uiVideo.pause()
+        self.uiVideo.play(media)
+        self.uiVideo.show()
+        self.uiSlider.setMediaObject(self.uiVideo.mediaObject())
+        self.uiSlider.show()
 
-	def stop(self):
-		self.uiVideo.stop()
-		self.uiVideo.hide()
-		self.uiSlider.hide()
+    def pause(self):
+        self.uiVideo.pause()
 
-	def storeValue(self):
-		pass
+    def stop(self):
+        self.uiVideo.stop()
+        self.uiVideo.hide()
+        self.uiSlider.hide()
 
-	def clear(self):
-		self.stop()
-		self.updateButtons()
-	
-	def showValue(self):
-		self.stop()
-		self.updateButtons()
+    def storeValue(self):
+        pass
 
-	def setReadOnly(self, value):
-		AbstractFieldWidget.setReadOnly(self, value)
-		self.pushLoad.setEnabled( not value )
+    def clear(self):
+        self.stop()
+        self.updateButtons()
 
-	def isBinary(self):
-		if self.attrs['type'] == 'binary':
-			return True
-		else:
-			return False
-			
-	def updateButtons(self):
-		if not self.isReadOnly() and self.record and self.record.value(self.name):
-			canPlay = True
-		else:
-			canPlay = False
-		self.pushPlay.setEnabled( canPlay )
-		self.pushStop.setEnabled( canPlay )
-		self.pushPause.setEnabled( canPlay )
-		self.pushSave.setEnabled( canPlay )
-		self.pushRemove.setEnabled( canPlay )
-		if self.isReadOnly():
-			self.pushLoad.setEnabled( False )
-		else:
-			self.pushLoad.setEnabled( True )
+    def showValue(self):
+        self.stop()
+        self.updateButtons()
+
+    def setReadOnly(self, value):
+        AbstractFieldWidget.setReadOnly(self, value)
+        self.pushLoad.setEnabled(not value)
+
+    def isBinary(self):
+        if self.attrs['type'] == 'binary':
+            return True
+        else:
+            return False
+
+    def updateButtons(self):
+        if not self.isReadOnly() and self.record and self.record.value(self.name):
+            canPlay = True
+        else:
+            canPlay = False
+        self.pushPlay.setEnabled(canPlay)
+        self.pushStop.setEnabled(canPlay)
+        self.pushPause.setEnabled(canPlay)
+        self.pushSave.setEnabled(canPlay)
+        self.pushRemove.setEnabled(canPlay)
+        if self.isReadOnly():
+            self.pushLoad.setEnabled(False)
+        else:
+            self.pushLoad.setEnabled(True)

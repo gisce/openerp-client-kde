@@ -25,193 +25,229 @@
 #
 ##############################################################################
 
-## In this module you can find various functions that help calendar 
-# widgets (date, time & datetime) in View.Form, View.Tree and 
-# Search modules. Probably others will use them in the future. These 
-# functions provide very simple ways of parsing user input, and here we define 
-# the standard output format too. Also from and to Storage functions are 
-# provided that ensure date and time are formated the way the storage system 
+# In this module you can find various functions that help calendar
+# widgets (date, time & datetime) in View.Form, View.Tree and
+# Search modules. Probably others will use them in the future. These
+# functions provide very simple ways of parsing user input, and here we define
+# the standard output format too. Also from and to Storage functions are
+# provided that ensure date and time are formated the way the storage system
 # expects.
 #
 # Also a calendar popup is provided for use in widgets.
 #
 from PyQt4.QtCore import *
-from PyQt4.QtGui import * 
+from PyQt4.QtGui import *
 from Ui import *
 import math
 import locale
 import Common
 import re
 
-## @brief Converts a QDate object into a Python string
-def dateToText( date ):
-	return str( date.toString( 'dd/MM/yyyy' ) )
+# @brief Converts a QDate object into a Python string
 
-## @brief Converts a QTime object into a Python string
-def timeToText( time ):
-	return str( time.toString( 'hh:mm:ss' ) )
 
-## @brief Converts a QDateTime object into a Python string
-def dateTimeToText( dateTime ):
-	return str( dateTime.toString( 'dd/MM/yyyy hh:mm:ss' ) )
+def dateToText(date):
+    return str(date.toString('dd/MM/yyyy'))
 
-## @brief Converts a float (type floatTime) into a Python string
-def floatTimeToText( value ):
-	# Ensure the value is a float. This way we also accept strings here.
-	value = float( value )
-	t = '%02d:%02d' % (math.floor(abs(value)),round(abs(value)%1+0.01,2) * 60)
-	if value<0:
-		t = '-'+t
-	return t
+# @brief Converts a QTime object into a Python string
 
-## @brief Converts a QDate object into a Python string ready to be sent to the 
+
+def timeToText(time):
+    return str(time.toString('hh:mm:ss'))
+
+# @brief Converts a QDateTime object into a Python string
+
+
+def dateTimeToText(dateTime):
+    return str(dateTime.toString('dd/MM/yyyy hh:mm:ss'))
+
+# @brief Converts a float (type floatTime) into a Python string
+
+
+def floatTimeToText(value):
+    # Ensure the value is a float. This way we also accept strings here.
+    value = float(value)
+    t = '%02d:%02d' % (math.floor(abs(value)),
+                       round(abs(value) % 1 + 0.01, 2) * 60)
+    if value < 0:
+        t = '-' + t
+    return t
+
+# @brief Converts a QDate object into a Python string ready to be sent to the
 # server.
-def dateToStorage( date ):
-	if date.isValid():
-		return str( date.toString( 'yyyy-MM-dd' ) )
-	else:
-		return False
 
-## @brief Converts a QTime object into a Python string ready to be sent to the 
+
+def dateToStorage(date):
+    if date.isValid():
+        return str(date.toString('yyyy-MM-dd'))
+    else:
+        return False
+
+# @brief Converts a QTime object into a Python string ready to be sent to the
 # server.
-def timeToStorage( time ):
-	if time.isValid():
-		return str( time.toString( 'hh:mm:ss' ) )
-	else:
-		return False
-	
-## @brief Converts a QDateTime object into a Python string ready to be sent to 
+
+
+def timeToStorage(time):
+    if time.isValid():
+        return str(time.toString('hh:mm:ss'))
+    else:
+        return False
+
+# @brief Converts a QDateTime object into a Python string ready to be sent to
 # the server.
-def dateTimeToStorage( dateTime ):
-	if dateTime.isValid():
-		return str( dateTime.toString( 'yyyy-MM-dd hh:mm:ss' ) )
-	else:
-		return False
-
-## @brief Converts a Python string or QString into a QDate object
-def textToDate( text ):
-	text = unicode( text ).strip()
-	if text == '=':
-		return QDate.currentDate()
-
-	inputFormats = [ 
-		'dd/MM/yyyy', 'dd-MM-yyyy', ('dd-MM-yy', 'century'), ('dd/MM/yy', 'century'), 
-		('dd-M-yy', 'century'), ('d-M-yy', 'add'), ('d-MM-yy','century'), 'dd.MM.yyyy', 
-		('dd.MM.yy','century'), 'ddMMyyyy', ('ddMMyy','century'), ('dd/MM', 'year'), 
-		('dd.MM', 'year'), ('ddMM', 'year'), ('dd', 'month')
-	]
-	for x in inputFormats:
-		if isinstance(x, tuple):
-			format = x[0]
-			complete = x[1]
-		else:
-			format = x
-			complete = None
-
-		date = QDate.fromString( text, format )
-		if date.isValid():
-			if complete == 'century':
-				date.setDate( date.year() + 100, date.month(), date.day() )
-			if complete == 'year':
-				date.setDate( QDate.currentDate().year(), date.month(), date.day() )
-			elif complete == 'month':
-				date.setDate( QDate.currentDate().year(), QDate.currentDate().month(), date.day() )
-			break
-	return date
-
-## @brief Converts a Python string or QString into a QTime object
-def textToTime( text ):
-	text = unicode( text ).strip()
-	if text == '=':
-		return QTime.currentTime()
-
-	inputFormats = ['h:m:s', 'h:m', 'hh:mm:ss', 'h.m.s', 'h.m', 'h']
-	for x in inputFormats:
-		time = QTime.fromString( text, x )
-		if time.isValid():
-			break
-
-	if not time.isValid():
-		if len(text) == 4:
-			# Try to convert '1234' to '12:34'
-			time = QTime.fromString( '%s:%s' % ( text[0:2], text[2:4] ), 'h:m' )
-		elif len(text) == 6:
-			# Try to convert '123456' to '12:34:56'
-			time = QTime.fromString( '%s:%s:%s' % ( text[0:2], text[2:4], text[4:6] ), 'h:m:s' )
-	return time
-
-## @brief Converts a Python string or QString into a QDateTime object
-def textToDateTime( text ):
-	text = unicode( text ).strip()
-	if text == '=':
-		return QDateTime.currentDateTime()
-
-	inputFormats = ['dd/MM/yyyy h:m:s', "dd/MM/yyyy", "dd-MM-yyyy", 'dd-MM-yy', 'dd/MM/yy', 'dd-M-yy', 'd-M-yy', 'd-MM-yy', 'ddMMyyyy', 'ddMMyy' ]
-	for x in inputFormats:
-		datetime = QDateTime.fromString( text, x )
-		if datetime.isValid():
-			break
-	return datetime
-
-def internalTextToFloatTime( text ):
-	try:
-		text = text.replace('.',':')
-		if text and ':' in text:
-			return round(int(text.split(':')[0]) + int(text.split(':')[1]) / 60.0,2)
-		else:
-			return locale.atof(text)
-	except:
-		return 0.0
-
-## @brief Converts a Python string into a float (floatTime) 
-def textToFloatTime( text ):
-	text = unicode( text ).strip()
-	time = 0.0
-	last_operation = None
-	texts = re.split('(\+|-+)', text)
-	for text in texts:
-		if text in ('+','-'):
-			last_operation = text
-			continue
-		value = internalTextToFloatTime( text )
-		if last_operation == '+':
-			time += value
-		elif last_operation == '-':
-			time -= value
-		else:
-			time = value
-	return time
-
-## @brief Converts a Python string comming from the server into a QDate object
-def storageToDate( text ):
-	if text:
-		date = QDate.fromString( text, 'yyyy-MM-dd' )
-		if date.isValid():
-			return date
-		# Sometimes we want datetime fields to be shown in pure date widgets
-		return QDateTime.fromString( text, 'yyyy-MM-dd hh:mm:ss' ).date()
-	else:
-		return QDate()
-
-## @brief Converts a Python string comming from the server into a QTime object
-def storageToTime( text ):
-	if text:
-		return QTime.fromString( text, 'h:m:s' )
-	else:
-		return QTime()
-
-## @brief Converts a Python string comming from the server into a QDateTime object
-def storageToDateTime( text ):
-	if text:
-		return QDateTime.fromString( text, 'yyyy-MM-dd h:m:s' )
-	else:
-		return QDateTime
 
 
-(PopupCalendarUi, PopupCalendarBase) = loadUiType( Common.uiPath('datetime.ui') )
+def dateTimeToStorage(dateTime):
+    if dateTime.isValid():
+        return str(dateTime.toString('yyyy-MM-dd hh:mm:ss'))
+    else:
+        return False
 
-## @brief The PopupCalendarWidget class provides a simple way to show a calendar 
-# where the user can pick up a date. 
+# @brief Converts a Python string or QString into a QDate object
+
+
+def textToDate(text):
+    text = unicode(text).strip()
+    if text == '=':
+        return QDate.currentDate()
+
+    inputFormats = [
+        'dd/MM/yyyy', 'dd-MM-yyyy', ('dd-MM-yy',
+                                     'century'), ('dd/MM/yy', 'century'),
+        ('dd-M-yy', 'century'), ('d-M-yy',
+                                 'add'), ('d-MM-yy', 'century'), 'dd.MM.yyyy',
+        ('dd.MM.yy', 'century'), 'ddMMyyyy', ('ddMMyy', 'century'), ('dd/MM', 'year'),
+        ('dd.MM', 'year'), ('ddMM', 'year'), ('dd', 'month')
+    ]
+    for x in inputFormats:
+        if isinstance(x, tuple):
+            format = x[0]
+            complete = x[1]
+        else:
+            format = x
+            complete = None
+
+        date = QDate.fromString(text, format)
+        if date.isValid():
+            if complete == 'century':
+                date.setDate(date.year() + 100, date.month(), date.day())
+            if complete == 'year':
+                date.setDate(QDate.currentDate().year(),
+                             date.month(), date.day())
+            elif complete == 'month':
+                date.setDate(QDate.currentDate().year(),
+                             QDate.currentDate().month(), date.day())
+            break
+    return date
+
+# @brief Converts a Python string or QString into a QTime object
+
+
+def textToTime(text):
+    text = unicode(text).strip()
+    if text == '=':
+        return QTime.currentTime()
+
+    inputFormats = ['h:m:s', 'h:m', 'hh:mm:ss', 'h.m.s', 'h.m', 'h']
+    for x in inputFormats:
+        time = QTime.fromString(text, x)
+        if time.isValid():
+            break
+
+    if not time.isValid():
+        if len(text) == 4:
+            # Try to convert '1234' to '12:34'
+            time = QTime.fromString('%s:%s' % (text[0:2], text[2:4]), 'h:m')
+        elif len(text) == 6:
+            # Try to convert '123456' to '12:34:56'
+            time = QTime.fromString('%s:%s:%s' % (
+                text[0:2], text[2:4], text[4:6]), 'h:m:s')
+    return time
+
+# @brief Converts a Python string or QString into a QDateTime object
+
+
+def textToDateTime(text):
+    text = unicode(text).strip()
+    if text == '=':
+        return QDateTime.currentDateTime()
+
+    inputFormats = ['dd/MM/yyyy h:m:s', "dd/MM/yyyy", "dd-MM-yyyy", 'dd-MM-yy',
+                    'dd/MM/yy', 'dd-M-yy', 'd-M-yy', 'd-MM-yy', 'ddMMyyyy', 'ddMMyy']
+    for x in inputFormats:
+        datetime = QDateTime.fromString(text, x)
+        if datetime.isValid():
+            break
+    return datetime
+
+
+def internalTextToFloatTime(text):
+    try:
+        text = text.replace('.', ':')
+        if text and ':' in text:
+            return round(int(text.split(':')[0]) + int(text.split(':')[1]) / 60.0, 2)
+        else:
+            return locale.atof(text)
+    except:
+        return 0.0
+
+# @brief Converts a Python string into a float (floatTime)
+
+
+def textToFloatTime(text):
+    text = unicode(text).strip()
+    time = 0.0
+    last_operation = None
+    texts = re.split('(\+|-+)', text)
+    for text in texts:
+        if text in ('+', '-'):
+            last_operation = text
+            continue
+        value = internalTextToFloatTime(text)
+        if last_operation == '+':
+            time += value
+        elif last_operation == '-':
+            time -= value
+        else:
+            time = value
+    return time
+
+# @brief Converts a Python string comming from the server into a QDate object
+
+
+def storageToDate(text):
+    if text:
+        date = QDate.fromString(text, 'yyyy-MM-dd')
+        if date.isValid():
+            return date
+        # Sometimes we want datetime fields to be shown in pure date widgets
+        return QDateTime.fromString(text, 'yyyy-MM-dd hh:mm:ss').date()
+    else:
+        return QDate()
+
+# @brief Converts a Python string comming from the server into a QTime object
+
+
+def storageToTime(text):
+    if text:
+        return QTime.fromString(text, 'h:m:s')
+    else:
+        return QTime()
+
+# @brief Converts a Python string comming from the server into a QDateTime object
+
+
+def storageToDateTime(text):
+    if text:
+        return QDateTime.fromString(text, 'yyyy-MM-dd h:m:s')
+    else:
+        return QDateTime
+
+
+(PopupCalendarUi, PopupCalendarBase) = loadUiType(Common.uiPath('datetime.ui'))
+
+# @brief The PopupCalendarWidget class provides a simple way to show a calendar
+# where the user can pick up a date.
 #
 # You simply need to call PopupCalendarWidget(widget) where widget
 # should be a QLineEdit or similar. The Popup will fill in the date itself.
@@ -223,60 +259,65 @@ def storageToDateTime( text ):
 #
 # Of course, PopupCalendarWidget uses the other ToTime and ToText helper functions.
 #
+
+
 class PopupCalendarWidget(QWidget, PopupCalendarUi):
-	## @brief Constructs a PopupCalendarWidget. 
-	# If showTime is True, the user will be able to select the time too.
-	def __init__(self, parent, showTime = False):
-		QWidget.__init__(self, parent)
-		PopupCalendarUi.__init__(self)
-		self.setupUi( self )
+    # @brief Constructs a PopupCalendarWidget.
+    # If showTime is True, the user will be able to select the time too.
+    def __init__(self, parent, showTime=False):
+        QWidget.__init__(self, parent)
+        PopupCalendarUi.__init__(self)
+        self.setupUi(self)
 
-		self.showTime = showTime
-		if self.showTime:
-			self.uiTime.setText( textToDateTime( unicode(parent.text()) ).time().toString() )
-			self.connect( self.uiTime, SIGNAL('returnPressed()'), self.storeOnParent )
-		else:
-			self.uiTime.hide()
-			self.labelTime.hide()
+        self.showTime = showTime
+        if self.showTime:
+            self.uiTime.setText(textToDateTime(
+                unicode(parent.text())).time().toString())
+            self.connect(self.uiTime, SIGNAL(
+                'returnPressed()'), self.storeOnParent)
+        else:
+            self.uiTime.hide()
+            self.labelTime.hide()
 
-		self.setWindowFlags( Qt.Popup )
-		self.setWindowModality( Qt.ApplicationModal )
-		pos = parent.parent().mapToGlobal( parent.pos() )
-		self.move( pos.x(), pos.y() + parent.height() )
+        self.setWindowFlags(Qt.Popup)
+        self.setWindowModality(Qt.ApplicationModal)
+        pos = parent.parent().mapToGlobal(parent.pos())
+        self.move(pos.x(), pos.y() + parent.height())
 
-		# Check if the widget falls out of the available screen space
-		newX = self.x()
-		newY = self.y()
-		if self.frameGeometry().right() > QApplication.desktop().availableGeometry().right():
-			newX = QApplication.desktop().availableGeometry().right() - self.width()
-		if self.frameGeometry().bottom() > QApplication.desktop().availableGeometry().bottom():
-			newY = QApplication.desktop().availableGeometry().bottom() - self.height()
-		self.move( newX, newY )
+        # Check if the widget falls out of the available screen space
+        newX = self.x()
+        newY = self.y()
+        if self.frameGeometry().right() > QApplication.desktop().availableGeometry().right():
+            newX = QApplication.desktop().availableGeometry().right() - self.width()
+        if self.frameGeometry().bottom() > QApplication.desktop().availableGeometry().bottom():
+            newY = QApplication.desktop().availableGeometry().bottom() - self.height()
+        self.move(newX, newY)
 
-		self.connect( self.uiCalendar, SIGNAL('activated(QDate)'), self.storeOnParent )
-		if self.showTime:
-			self.uiCalendar.setSelectedDate( textToDateTime( parent.text() ).date() )
-		else:
-			self.uiCalendar.setSelectedDate( textToDate( parent.text() ) )
-		self.uiCalendar.setFirstDayOfWeek( Qt.Monday )
-		self.show()
-		if self.showTime:
-			self.uiTime.setFocus()
-		else:
-			self.uiCalendar.setFocus()
+        self.connect(self.uiCalendar, SIGNAL(
+            'activated(QDate)'), self.storeOnParent)
+        if self.showTime:
+            self.uiCalendar.setSelectedDate(
+                textToDateTime(parent.text()).date())
+        else:
+            self.uiCalendar.setSelectedDate(textToDate(parent.text()))
+        self.uiCalendar.setFirstDayOfWeek(Qt.Monday)
+        self.show()
+        if self.showTime:
+            self.uiTime.setFocus()
+        else:
+            self.uiCalendar.setFocus()
 
-	## @brief Stores the currently selected date (or date and time) in the parent widget
-	# and closes the popup. It also emits a 'selected()' signal.
-	def storeOnParent(self):
-		date = self.uiCalendar.selectedDate()
-		text = dateToText( date )
-		if self.showTime: 
-			time = textToTime( self.uiTime.text() )
-			if time.isValid():
-				text = text + ' ' + timeToText(time)
-			else:
-				text = text + ' ' + '00:00:00'
-		self.parent().setText( text )
-		self.emit(SIGNAL('selected()'))
-		self.close()
-
+    # @brief Stores the currently selected date (or date and time) in the parent widget
+    # and closes the popup. It also emits a 'selected()' signal.
+    def storeOnParent(self):
+        date = self.uiCalendar.selectedDate()
+        text = dateToText(date)
+        if self.showTime:
+            time = textToTime(self.uiTime.text())
+            if time.isValid():
+                text = text + ' ' + timeToText(time)
+            else:
+                text = text + ' ' + '00:00:00'
+        self.parent().setText(text)
+        self.emit(SIGNAL('selected()'))
+        self.close()

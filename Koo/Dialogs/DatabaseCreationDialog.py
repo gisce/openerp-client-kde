@@ -34,182 +34,200 @@ from Koo.Common.Settings import *
 from Koo import Rpc
 import re
 
-(CreationOkDialogUi, CreationOkDialogBase) = loadUiType( Common.uiPath('dbcreateok.ui') )
+(CreationOkDialogUi, CreationOkDialogBase) = loadUiType(
+    Common.uiPath('dbcreateok.ui'))
 
-class CreationOkDialog( QDialog, CreationOkDialogUi ):
-	def __init__(self, passwordList, parent=None ):
-		QDialog.__init__(self, parent)
-		CreationOkDialogUi.__init__(self)
-		self.setupUi( self )
 
-		self.connect( self.pushConnect, SIGNAL('clicked()'), self.connectNow )
-		self.connect( self.pushLater, SIGNAL('clicked()'), self.connectLater )
+class CreationOkDialog(QDialog, CreationOkDialogUi):
+    def __init__(self, passwordList, parent=None):
+        QDialog.__init__(self, parent)
+        CreationOkDialogUi.__init__(self)
+        self.setupUi(self)
 
-		self.textEdit.setPlainText( _('The following users have been installed on your database:\n\n'+ passwordList + '\n\n'+_('You can now connect to the database as an administrator.') ) )
-		self.show()
+        self.connect(self.pushConnect, SIGNAL('clicked()'), self.connectNow)
+        self.connect(self.pushLater, SIGNAL('clicked()'), self.connectLater)
 
-	def connectLater(self):
-		self.reject()
+        self.textEdit.setPlainText(_('The following users have been installed on your database:\n\n' +
+                                     passwordList + '\n\n' + _('You can now connect to the database as an administrator.')))
+        self.show()
 
-	def connectNow(self):
-		self.accept()
+    def connectLater(self):
+        self.reject()
 
-(ProgressBarUi, ProgressBarBase) = loadUiType( Common.uiPath('progress.ui') )
+    def connectNow(self):
+        self.accept()
 
-class ProgressBar( QDialog, ProgressBarUi ):
-	def __init__(self, parent=None ):
-		QDialog.__init__(self, parent )
-		ProgressBarUi.__init__(self)
-		self.setupUi( self )
 
-		self.setModal( True )
-		self.timer = QTimer( self )
-		self.connect(self.timer,SIGNAL("timeout()"),self.timeout)
-		self.url = ""
-		self.databaseName = ""
-		self.demoData = ""
-		self.language = ""
-		self.password = ""
-		self.adminPassword = ""
-		self.progressBar.setMinimum( 0 )
-		self.progressBar.setMaximum( 0 )
-		self.show()
+(ProgressBarUi, ProgressBarBase) = loadUiType(Common.uiPath('progress.ui'))
 
-	def start(self):
-		try:
-			self.id = Rpc.database.execute(self.url, 'create', self.password, self.databaseName, self.demoData, self.language, self.adminPassword)
-			self.timer.start( 1000 )
-		except Exception, e:
-			if e.code == 'AccessDenied':
-				QMessageBox.warning(self,_("Error during database creation"),_('Bad database administrator password !'))
-			else:
-				QMessageBox.warning(self,_('Error during database creation'),_("Could not create database."))
 
-	def timeout(self):
-		try:
-			progress,users = Rpc.database.call(self.url, 'get_progress', self.password, self.id)
-		except:
-			self.timer.stop()
-			QMessageBox.warning(self,_("Error during database creation !"),_("The server crashed during installation.\nWe suggest you to drop this database."))
-			self.reject()
-			return
+class ProgressBar(QDialog, ProgressBarUi):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        ProgressBarUi.__init__(self)
+        self.setupUi(self)
 
-		
-		# While progress will be 0.0 we'll keep the moving (undefined) progress bar.
-		# once it's different we allow it to progress normally. This is done because
-		# currently no intermediate values exist.
-		if progress > 0.0:
-			self.progressBar.setMaximum( 100 )
-			
-		if 0.0 < progress < 1.0:
-			self.progressBar.setValue(progress * 100)
-		elif progress == 1.0:
-			self.progressBar.setMaximum( 100 )
-			self.progressBar.setValue(100)
-			self.timer.stop()
-			pwdlst = '\n'.join(['    - %s: %s / %s' % (x['name'],x['login'],x['password']) for x in users])
-			dialog = CreationOkDialog( pwdlst, self )
-			r = dialog.exec_()
-			# Propagate the result of the dialog. If the user wants to connect return
-			# Accepted, otherwise return Rejected
-			self.done( r )
+        self.setModal(True)
+        self.timer = QTimer(self)
+        self.connect(self.timer, SIGNAL("timeout()"), self.timeout)
+        self.url = ""
+        self.databaseName = ""
+        self.demoData = ""
+        self.language = ""
+        self.password = ""
+        self.adminPassword = ""
+        self.progressBar.setMinimum(0)
+        self.progressBar.setMaximum(0)
+        self.show()
 
-(DatabaseCreationDialogUi, DatabaseCreationDialogBase) = loadUiType( Common.uiPath('create_database.ui') )
+    def start(self):
+        try:
+            self.id = Rpc.database.execute(
+                self.url, 'create', self.password, self.databaseName, self.demoData, self.language, self.adminPassword)
+            self.timer.start(1000)
+        except Exception, e:
+            if e.code == 'AccessDenied':
+                QMessageBox.warning(self, _("Error during database creation"), _(
+                    'Bad database administrator password !'))
+            else:
+                QMessageBox.warning(self, _('Error during database creation'), _(
+                    "Could not create database."))
 
-## @brief The DatabaseCreationDialog class shows a dialog to create a new database 
+    def timeout(self):
+        try:
+            progress, users = Rpc.database.call(
+                self.url, 'get_progress', self.password, self.id)
+        except:
+            self.timer.stop()
+            QMessageBox.warning(self, _("Error during database creation !"), _(
+                "The server crashed during installation.\nWe suggest you to drop this database."))
+            self.reject()
+            return
+
+        # While progress will be 0.0 we'll keep the moving (undefined) progress bar.
+        # once it's different we allow it to progress normally. This is done because
+        # currently no intermediate values exist.
+        if progress > 0.0:
+            self.progressBar.setMaximum(100)
+
+        if 0.0 < progress < 1.0:
+            self.progressBar.setValue(progress * 100)
+        elif progress == 1.0:
+            self.progressBar.setMaximum(100)
+            self.progressBar.setValue(100)
+            self.timer.stop()
+            pwdlst = '\n'.join(
+                ['    - %s: %s / %s' % (x['name'], x['login'], x['password']) for x in users])
+            dialog = CreationOkDialog(pwdlst, self)
+            r = dialog.exec_()
+            # Propagate the result of the dialog. If the user wants to connect return
+            # Accepted, otherwise return Rejected
+            self.done(r)
+
+
+(DatabaseCreationDialogUi, DatabaseCreationDialogBase) = loadUiType(
+    Common.uiPath('create_database.ui'))
+
+# @brief The DatabaseCreationDialog class shows a dialog to create a new database
 # in the OpenERP server.
-class DatabaseCreationDialog( QDialog, DatabaseCreationDialogUi ):
-	def __init__(self, parent=None ):
-		QDialog.__init__(self, parent)
-		DatabaseCreationDialogUi.__init__(self)
-		self.setupUi( self )
 
-		self.connect(self.pushCancel,SIGNAL("clicked()"),self.cancelled )
-		self.connect(self.pushAccept,SIGNAL("clicked()"),self.accepted )
-		self.connect(self.pushChange,SIGNAL("clicked()"),self.changeServer )
 
-		url = QUrl( Settings.value('login.url' ) )
-		url.setUserName( '' )
-		self.uiServer.setText( url.toString() )
-		self.refreshLangList( unicode(url.toString()) ) 
-	
-	def refreshLangList(self, url):
-		self.uiLanguage.clear()
-		try:
-			lang_list = Rpc.database.call(url, 'list_lang')
-		except:
-			self.setDialogEnabled( False )
-			return
-		
-		# Add all available languages to the combo and put koo's
-		# language as default
-		appLanguage = Settings.value('client.language')
-		currentLanguage = False
-		lang_list.append( ('en_US','English') )
-		for key,val in lang_list:
-			if appLanguage and key.startswith( appLanguage ):
-				currentLanguage = val
-			self.uiLanguage.addItem( val, QVariant( key ) )
-		if currentLanguage:
-			self.uiLanguage.setCurrentIndex( self.uiLanguage.findText( currentLanguage ) )
-		else:
-			self.uiLanguage.setCurrentIndex( self.uiLanguage.count() - 1 )
-		self.setDialogEnabled( True )
+class DatabaseCreationDialog(QDialog, DatabaseCreationDialogUi):
+    def __init__(self, parent=None):
+        QDialog.__init__(self, parent)
+        DatabaseCreationDialogUi.__init__(self)
+        self.setupUi(self)
 
-	def setDialogEnabled(self, value):
-		if not value:
-			self.uiMessage.show()
-		else:
-			self.uiMessage.hide()
-		self.uiPassword.setEnabled( value )
-		self.uiDatabase.setEnabled( value )
-		self.uiDemoData.setEnabled( value )
-		self.uiLanguage.setEnabled( value )
-		self.pushAccept.setEnabled( value )
-		self.uiAdminPassword.setEnabled( value )
-		self.uiRepeatedAdminPassword.setEnabled( value )
+        self.connect(self.pushCancel, SIGNAL("clicked()"), self.cancelled)
+        self.connect(self.pushAccept, SIGNAL("clicked()"), self.accepted)
+        self.connect(self.pushChange, SIGNAL("clicked()"), self.changeServer)
 
-	def cancelled(self):
-		self.close()
-	
-	def accepted(self):
-		databaseName = unicode( self.uiDatabase.text() )
-		if ((not databaseName) or (not re.match('^[a-zA-Z][a-zA-Z0-9_]+$', databaseName))):
-			QMessageBox.warning( self, _('Bad database name !'), _('The database name must contain only normal characters or "_".\nYou must avoid all accents, space or special characters.') )
-			return
-		if self.uiAdminPassword.text() != self.uiRepeatedAdminPassword.text():
-                        QMessageBox.warning( self, _('Wrong password'), _('Administrator passwords differ.') )
-                        return
-		demoData = self.uiDemoData.isChecked()
+        url = QUrl(Settings.value('login.url'))
+        url.setUserName('')
+        self.uiServer.setText(url.toString())
+        self.refreshLangList(unicode(url.toString()))
 
-		langreal = unicode( self.uiLanguage.itemData( self.uiLanguage.currentIndex() ).toString() )
-		password = unicode( self.uiPassword.text() )
-		url = unicode( self.uiServer.text() )
-		adminPassword = unicode( self.uiAdminPassword.text() )
+    def refreshLangList(self, url):
+        self.uiLanguage.clear()
+        try:
+            lang_list = Rpc.database.call(url, 'list_lang')
+        except:
+            self.setDialogEnabled(False)
+            return
 
-		progress = ProgressBar( self )
-		progress.url = url
-		progress.databaseName = databaseName
-		progress.demoData = demoData
-		progress.language = langreal 
-		progress.password = password
-		progress.adminPassword = adminPassword
-		progress.start()
-		r = progress.exec_()
+        # Add all available languages to the combo and put koo's
+        # language as default
+        appLanguage = Settings.value('client.language')
+        currentLanguage = False
+        lang_list.append(('en_US', 'English'))
+        for key, val in lang_list:
+            if appLanguage and key.startswith(appLanguage):
+                currentLanguage = val
+            self.uiLanguage.addItem(val, QVariant(key))
+        if currentLanguage:
+            self.uiLanguage.setCurrentIndex(
+                self.uiLanguage.findText(currentLanguage))
+        else:
+            self.uiLanguage.setCurrentIndex(self.uiLanguage.count() - 1)
+        self.setDialogEnabled(True)
 
-		if r == QDialog.Accepted:
-			m = QUrl( url )
-			m.setUserName( 'admin' )
-			m.setPassword( adminPassword or 'admin' )
-			self.url = unicode( m.toString() )
-			self.databaseName = databaseName
-		self.done( r )
+    def setDialogEnabled(self, value):
+        if not value:
+            self.uiMessage.show()
+        else:
+            self.uiMessage.hide()
+        self.uiPassword.setEnabled(value)
+        self.uiDatabase.setEnabled(value)
+        self.uiDemoData.setEnabled(value)
+        self.uiLanguage.setEnabled(value)
+        self.pushAccept.setEnabled(value)
+        self.uiAdminPassword.setEnabled(value)
+        self.uiRepeatedAdminPassword.setEnabled(value)
 
-	def changeServer(self):
-		dialog = ServerConfigurationDialog.ServerConfigurationDialog( self )
-		dialog.setUrl( Settings.value( 'login.url' ) )
-		ret = dialog.exec_()
-		if ret == QDialog.Accepted:
-			url = dialog.url
-			self.uiServer.setText( url )
-			self.refreshLangList(url)
+    def cancelled(self):
+        self.close()
+
+    def accepted(self):
+        databaseName = unicode(self.uiDatabase.text())
+        if ((not databaseName) or (not re.match('^[a-zA-Z][a-zA-Z0-9_]+$', databaseName))):
+            QMessageBox.warning(self, _('Bad database name !'), _(
+                'The database name must contain only normal characters or "_".\nYou must avoid all accents, space or special characters.'))
+            return
+        if self.uiAdminPassword.text() != self.uiRepeatedAdminPassword.text():
+            QMessageBox.warning(self, _('Wrong password'), _(
+                'Administrator passwords differ.'))
+            return
+        demoData = self.uiDemoData.isChecked()
+
+        langreal = unicode(self.uiLanguage.itemData(
+            self.uiLanguage.currentIndex()).toString())
+        password = unicode(self.uiPassword.text())
+        url = unicode(self.uiServer.text())
+        adminPassword = unicode(self.uiAdminPassword.text())
+
+        progress = ProgressBar(self)
+        progress.url = url
+        progress.databaseName = databaseName
+        progress.demoData = demoData
+        progress.language = langreal
+        progress.password = password
+        progress.adminPassword = adminPassword
+        progress.start()
+        r = progress.exec_()
+
+        if r == QDialog.Accepted:
+            m = QUrl(url)
+            m.setUserName('admin')
+            m.setPassword(adminPassword or 'admin')
+            self.url = unicode(m.toString())
+            self.databaseName = databaseName
+        self.done(r)
+
+    def changeServer(self):
+        dialog = ServerConfigurationDialog.ServerConfigurationDialog(self)
+        dialog.setUrl(Settings.value('login.url'))
+        ret = dialog.exec_()
+        if ret == QDialog.Accepted:
+            url = dialog.url
+            self.uiServer.setText(url)
+            self.refreshLangList(url)

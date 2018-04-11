@@ -34,51 +34,51 @@ from Koo.Fields.AbstractFieldDelegate import *
 
 
 class ProgressBarFieldWidget(AbstractFieldWidget):
-	def __init__(self, parent, view, attrs={}):
-		AbstractFieldWidget.__init__(self, parent, view, attrs)
+    def __init__(self, parent, view, attrs={}):
+        AbstractFieldWidget.__init__(self, parent, view, attrs)
 
-		self.uiBar = QProgressBar( self )
-		self.uiBar.setMinimum( 0 )
-		self.uiBar.setMaximum( 100 )
-		layout = QHBoxLayout( self )
-		layout.setContentsMargins( 0, 0, 0, 0 )
-		layout.addWidget( self.uiBar )
+        self.uiBar = QProgressBar(self)
+        self.uiBar.setMinimum(0)
+        self.uiBar.setMaximum(100)
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.uiBar)
 
-		self.installPopupMenu( self.uiBar )
+        self.installPopupMenu(self.uiBar)
 
-	def clear(self):
-		self.uiBar.reset()
+    def clear(self):
+        self.uiBar.reset()
 
-	def showValue(self):
-		value = self.record.value(self.name)
-		if not value:
-			self.clear()
-		value = max( min( value, 100 ), 0 )
-		self.uiBar.setValue( value )
+    def showValue(self):
+        value = self.record.value(self.name)
+        if not value:
+            self.clear()
+        value = max(min(value, 100), 0)
+        self.uiBar.setValue(value)
 
-class ProgressBarFieldDelegate( AbstractFieldDelegate ):
 
-	def createEditor(self, parent, option, index):
-		return None
+class ProgressBarFieldDelegate(AbstractFieldDelegate):
 
-	def paint(self, painter, option, index):
-		# Paint background
-		itemOption = QStyleOptionViewItemV4(option)
-		# Last parameter (None) shouldn't be necessary but we put it to workaround a bug in
-		# KStyle which expects always four parameters, wheareas QStyle makes it optional.
-		QApplication.style().drawControl(QStyle.CE_ItemViewItem, itemOption, painter, None)
+    def createEditor(self, parent, option, index):
+        return None
 
-		# Paint ProgressBar
-		opts = QStyleOptionProgressBarV2()
-		opts.rect = option.rect
-		opts.minimum = 1
-		opts.maximum = 100
-		opts.textVisible = True
-		percent, ok = index.data(Qt.DisplayRole).toDouble()
-		percent = max( min( percent, 100 ), 0 )
-		opts.progress = percent
-		opts.text = QString( '%d%%' % percent )
-		# Last parameter (None) shouldn't be necessary but we put it to workaround a bug in
-		# KStyle which expects always four parameters, wheareas QStyle makes it optional.
-		QApplication.style().drawControl(QStyle.CE_ProgressBar, opts, painter, None)
+    def paint(self, painter, option, index):
+        # Paint background
+        itemOption = QStyleOptionViewItemV4(option)
+        # Last parameter (None) shouldn't be necessary but we put it to workaround a bug in
+        # KStyle which expects always four parameters, wheareas QStyle makes it optional.
+        QApplication.style().drawControl(QStyle.CE_ItemViewItem, itemOption, painter, None)
 
+        # Paint ProgressBar
+        opts = QStyleOptionProgressBarV2()
+        opts.rect = option.rect
+        opts.minimum = 1
+        opts.maximum = 100
+        opts.textVisible = True
+        percent, ok = index.data(Qt.DisplayRole).toDouble()
+        percent = max(min(percent, 100), 0)
+        opts.progress = percent
+        opts.text = QString('%d%%' % percent)
+        # Last parameter (None) shouldn't be necessary but we put it to workaround a bug in
+        # KStyle which expects always four parameters, wheareas QStyle makes it optional.
+        QApplication.style().drawControl(QStyle.CE_ProgressBar, opts, painter, None)

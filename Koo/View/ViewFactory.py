@@ -35,52 +35,52 @@ from DummyView import *
 # for available views and calls the parser of the appropiate one.
 #
 # Each directory could handle more than one view types.
-# Standard types are 'form', 'tree', 'calendar' and 'graph'. 
+# Standard types are 'form', 'tree', 'calendar' and 'graph'.
+
 
 class ViewFactory:
-	views = {}
+    views = {}
 
-	@staticmethod
-	def viewAction(name, parent):
-		ViewFactory.scan()
-		if not name in ViewFactory.views:
-			return None
-		action = QAction( parent )
-		view = ViewFactory.views[name]
-		action.setObjectName( name )
-		action.setText( view['label'] )
-		action.setIcon( QIcon( view['icon'] ) )
-		action.setCheckable( True )
-		return action
+    @staticmethod
+    def viewAction(name, parent):
+        ViewFactory.scan()
+        if not name in ViewFactory.views:
+            return None
+        action = QAction(parent)
+        view = ViewFactory.views[name]
+        action.setObjectName(name)
+        action.setText(view['label'])
+        action.setIcon(QIcon(view['icon']))
+        action.setCheckable(True)
+        return action
 
-	@staticmethod
-	def scan():
-		# Scan only once
-		if ViewFactory.views:
-			return
-		# Search for all available views
-		Plugins.scan( 'Koo.View', os.path.abspath(os.path.dirname(__file__)) )
+    @staticmethod
+    def scan():
+        # Scan only once
+        if ViewFactory.views:
+            return
+        # Search for all available views
+        Plugins.scan('Koo.View', os.path.abspath(os.path.dirname(__file__)))
 
-	@staticmethod
-	def create(viewId, parent, model, root_node, fields):
-		ViewFactory.scan()
-		# Search for the view and parse the XML 
-		widget = None
-		for node in root_node.childNodes:
-			if not node.nodeType == node.ELEMENT_NODE:
-				continue
-			if node.localName in ViewFactory.views:
-				parser = ViewFactory.views[ node.localName ]['parser']()
-				return parser.create(viewId, parent, model, node, fields)
-		dummy = DummyView()
-		dummy.setViewType( node.localName )
-		return dummy
+    @staticmethod
+    def create(viewId, parent, model, root_node, fields):
+        ViewFactory.scan()
+        # Search for the view and parse the XML
+        widget = None
+        for node in root_node.childNodes:
+            if not node.nodeType == node.ELEMENT_NODE:
+                continue
+            if node.localName in ViewFactory.views:
+                parser = ViewFactory.views[node.localName]['parser']()
+                return parser.create(viewId, parent, model, node, fields)
+        dummy = DummyView()
+        dummy.setViewType(node.localName)
+        return dummy
 
-	@staticmethod
-	def register(parser, viewName, label, icon):
-		ViewFactory.views[viewName] = {
-			'parser': parser,
-			'label': label,
-			'icon': icon
-		}
-
+    @staticmethod
+    def register(parser, viewName, label, icon):
+        ViewFactory.views[viewName] = {
+            'parser': parser,
+            'label': label,
+            'icon': icon
+        }

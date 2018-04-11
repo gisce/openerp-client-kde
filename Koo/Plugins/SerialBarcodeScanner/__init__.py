@@ -28,6 +28,5 @@
 from SerialBarcodeScanner import *
 
 if isSerialAvailable:
-	scanner = SerialBarcodeScanner()
-	scanner.start()
-
+    scanner = SerialBarcodeScanner()
+    scanner.start()
