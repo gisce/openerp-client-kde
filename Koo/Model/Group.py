@@ -72,7 +72,8 @@ class RecordGroup(QObject):
     recordsRemoved = pyqtSignal(int, int)
     recordChanged = pyqtSignal('PyQt_PyObject')
     modified = pyqtSignal()
-    sorting = pyqtSignal()
+    # @xtorello toreview signal int type
+    sorting = pyqtSignal(int)
 
     SortVisibleItems = 1
     SortAllItems = 2
