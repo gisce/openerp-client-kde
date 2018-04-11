@@ -106,7 +106,7 @@ class KooModel(QAbstractItemModel):
         if self.group:
         	self.group.recordsInserted[int, int].disconnect(self.recordsInserted)
             # @xtorello toreview
-        	self.group.recordChanged['PyQt_PyObject'].disconnect(self.recordChanged)
+        	self.group.recordChangedSignal['PyQt_PyObject'].disconnect(self.recordChanged)
         	# self.group.recordChanged['QObject'].disconnect(self.recordChanged)
         	self.group.recordsRemoved[int, int].disconnect(self.recordsRemoved)
 
@@ -114,7 +114,7 @@ class KooModel(QAbstractItemModel):
         if self.group:
         	self.group.recordsInserted[int, int].connect(self.recordsInserted)
             # @xtorello toreview
-        	self.group.recordChanged['PyQt_PyObject'].connect(self.recordChanged)
+        	self.group.recordChangedSignal['PyQt_PyObject'].connect(self.recordChanged)
         	# self.group.recordChanged[QObject].connect(self.recordChanged)
         	self.group.recordsRemoved[int, int].connect(self.recordsRemoved)
 

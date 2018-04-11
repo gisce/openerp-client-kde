@@ -70,7 +70,8 @@ except NameError:
 class RecordGroup(QObject):
     recordsInserted = pyqtSignal(int, int)
     recordsRemoved = pyqtSignal(int, int)
-    recordChanged = pyqtSignal('PyQt_PyObject')
+    recordChangedSignal = pyqtSignal('PyQt_PyObject')
+    # recordChanged = pyqtSignal(QObject)
     modified = pyqtSignal()
     # @xtorello toreview signal int type
     sorting = pyqtSignal(int)
@@ -110,6 +111,8 @@ class RecordGroup(QObject):
         self.loadFieldObjects(list(self.fields.keys()))
 
         self.records = []
+
+        self.recordChangedSignal.connect(self.recordChanged)
 
         self.enableSignals()
 
