@@ -107,7 +107,7 @@ if isHelpWidgetAvailable:
 
         def openLink(self, url):
             Api.instance.createWebWindow(
-                unicode(url.toString()), _('Documentation'))
+                str(url.toString()), _('Documentation'))
             self.hide()
 
         def updateText(self):

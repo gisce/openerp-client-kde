@@ -28,7 +28,7 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
-from AbstractView import *
+from .AbstractView import *
 
 
 class DummyView(AbstractView):

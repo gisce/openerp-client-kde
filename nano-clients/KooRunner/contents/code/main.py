@@ -73,7 +73,7 @@ class KooRunner(Runner):
         if not Rpc.session.logged():
             return
 
-        text = unicode(context.query())
+        text = str(context.query())
 
         if self.prefix:
             if not text.startswith(self.prefix):
@@ -101,7 +101,7 @@ class KooRunner(Runner):
         # Use environment variable to pass the URL so that user password is not
         # visible when listing running processes.
         env['KOO_URL'] = self.url
-        data = unicode(match.data().toString()).split(':')
+        data = str(match.data().toString()).split(':')
         command = ['sh', '/usr/bin/koo', '--database', self.database,
                    '--open-model', data[0], '--open-id', data[1]]
         process = subprocess.Popen(command, env=env)
@@ -120,7 +120,7 @@ class KooRunner(Runner):
 
         Localization.initializeTranslations(self.language)
         if not Rpc.session.login(self.url, self.database):
-            print '### KooRunner: Could not log in.'
+            print('### KooRunner: Could not log in.')
 
     def teardown(self):
         pass

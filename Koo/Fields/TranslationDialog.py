@@ -126,7 +126,7 @@ class TranslationDialog(QDialog, TranslationDialogUi):
 
     def slotAccept(self):
         self.uiScreen.currentView().store()
-        for lang, oldValue in self.values.iteritems():
+        for lang, oldValue in self.values.items():
             newValue = self.uiScreen.currentRecord().value(lang)
             # Don't update on the server the current text. This would cause information
             # on the server to be updated after the form has been read causing possible

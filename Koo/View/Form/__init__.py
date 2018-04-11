@@ -25,8 +25,8 @@
 #
 ##############################################################################
 
-from FormView import *
-from Parser import *
+from .FormView import *
+from .Parser import *
 from Koo.View.ViewFactory import *
 
 ViewFactory.register(FormParser, 'form', _('Form View'), ':/images/form.png')

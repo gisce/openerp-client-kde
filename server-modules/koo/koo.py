@@ -27,7 +27,7 @@
 
 from osv import osv, fields
 from osv import orm
-import SimpleXMLRPCServer
+import xmlrpc.server
 import re
 from service import security
 import netsvc
@@ -170,8 +170,8 @@ class koo_services(netsvc_service):
 		return res
 
 koo_services()
-paths = list(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler.rpc_paths) + ['/xmlrpc/koo' ]
-SimpleXMLRPCServer.SimpleXMLRPCRequestHandler.rpc_paths = tuple(paths)
+paths = list(xmlrpc.server.SimpleXMLRPCRequestHandler.rpc_paths) + ['/xmlrpc/koo' ]
+xmlrpc.server.SimpleXMLRPCRequestHandler.rpc_paths = tuple(paths)
 
 class nan_koo_release(osv.osv):
 	_name = 'nan.koo.release'
@@ -367,7 +367,7 @@ def new_fields_get(self, cr, user, fields=None, context=None, read_access=True):
 	res = old_fields_get(self, cr, user, fields, context, read_access)
 	# Return wether the field is stored in the database or not,
 	# so the client can decide if it can be sorted.
-	for f in res.keys():
+	for f in list(res.keys()):
 		if not f in self._columns:
 			continue
 		if hasattr(self._columns[f], 'store'):
@@ -408,8 +408,8 @@ def new_fields_view_get(self, cr, user, view_id=None, view_type='form', context=
 			[(self._name, False)], False, context)
 		resrelate = ir_values_obj.get(cr, user, 'action', 'client_action_relate', 
 			[(self._name, False)], False, context)
-		resprint = map(clean, resprint)
-		resaction = map(clean, resaction)
+		resprint = list(map(clean, resprint))
+		resaction = list(map(clean, resaction))
 		# Standard fields_view_get function returns only those actions with multi==False.
 		#resaction = filter(lambda x: not x.get('multi', False), resaction)
 		#resprint = filter(lambda x: not x.get('multi', False), resprint)

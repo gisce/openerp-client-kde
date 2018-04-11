@@ -65,7 +65,7 @@ class PluggableFields:
                     elif w['type'] == 'delegate':
                         moduleDelegates[w['name']] = w['class']
                     else:
-                        print "Invalid type: %s" % w['type']
+                        print("Invalid type: %s" % w['type'])
                 PluggableFields.widgets.update(moduleWidgets)
                 PluggableFields.delegates.update(moduleDelegates)
                 for w in moduleDicts:

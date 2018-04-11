@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-import Paths
+from . import Paths
 import os
 
 # @brief Initializes gettext translation system.
@@ -41,7 +41,7 @@ def initializeTranslations(language=None):
     except:
         # If locale is not supported just continue
         # with default language
-        print "Warning: Unsupported locale."
+        print("Warning: Unsupported locale.")
 
     if not language:
         language, encoding = locale.getdefaultlocale()
@@ -68,7 +68,7 @@ def initializeTranslations(language=None):
         directory = Paths.searchFile(os.path.join('share', 'locale'))
         lang = gettext.translation(name, directory, fallback=True)
 
-    lang.install(unicode=1)
+    lang.install()
 
 # @brief Initializes Qt translation system.
 

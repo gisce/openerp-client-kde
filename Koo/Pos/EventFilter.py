@@ -17,8 +17,8 @@
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 from PyQt4.QtCore import *
-from KeyboardWidget import *
-from KeypadWidget import *
+from .KeyboardWidget import *
+from .KeypadWidget import *
 
 # @brief The PosEventFilter class provides an eventFilter that shows a Keyboard for touchscreen
 # environemnts when a QLineEdit or QTextEdit gets the focus (is clicked by the user).

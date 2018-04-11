@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from Calendar import *
+from .Calendar import *
 from Koo.Fields.FieldWidgetFactory import *
 from Koo.Fields.FieldDelegateFactory import *
 

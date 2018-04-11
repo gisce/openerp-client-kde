@@ -75,12 +75,12 @@ class BinaryFieldWidget(AbstractFieldWidget, BinaryFieldWidgetUi):
         self.setupUi(self)
 
         self.filters = attrs.get('filters', '*')
-        if isinstance(self.filters, basestring):
+        if isinstance(self.filters, str):
             self.filters = self.filters.split(',')
         self.filters = _('Files (%s)') % ' '.join(self.filters)
 
         self.fileNameField = attrs.get('filename')
-        self.baseDirectory = unicode(QDir.homePath())
+        self.baseDirectory = str(QDir.homePath())
 
         self.connect(self.pushRemove, SIGNAL('clicked()'), self.remove)
 
@@ -139,12 +139,12 @@ class BinaryFieldWidget(AbstractFieldWidget, BinaryFieldWidgetUi):
             event.accept()
             return True
         if event.mimeData().hasText():
-            path = unicode(event.mimeData().text()).replace('file://', '')
+            path = str(event.mimeData().text()).replace('file://', '')
             self.setBinaryFile(path)
         else:
             urls = event.mimeData().urls()
             if len(urls) > 0:
-                path = unicode(urls[0].toString()).replace('file://', '')
+                path = str(urls[0].toString()).replace('file://', '')
                 self.setBinaryFile(path)
         return True
 
@@ -231,16 +231,16 @@ class BinaryFieldWidget(AbstractFieldWidget, BinaryFieldWidgetUi):
             self, _('Select the file to attach'), self.baseDirectory, self.filters)
         if filename.isNull():
             return
-        filename = unicode(filename)
+        filename = str(filename)
         self.baseDirectory = os.path.dirname(filename)
         self.setBinaryFile(filename)
 
     def setBinaryFile(self, filename):
         try:
             value = file(filename, 'rb').read()
-        except Exception, e:
+        except Exception as e:
             QMessageBox.information(self, _('Error'), _(
-                'Error reading the file:\n%s') % unicode(e.args))
+                'Error reading the file:\n%s') % str(e.args))
             return
 
         self.record.setValue(self.name, value)
@@ -263,21 +263,21 @@ class BinaryFieldWidget(AbstractFieldWidget, BinaryFieldWidgetUi):
         return self.name
 
     def save(self):
-        directory = '%s/%s' % (self.baseDirectory, unicode(self.fileName()))
+        directory = '%s/%s' % (self.baseDirectory, str(self.fileName()))
         filename = QFileDialog.getSaveFileName(
             self, _('Save as...'), directory, self.filters)
         if filename.isNull():
             return
-        filename = unicode(filename)
+        filename = str(filename)
         self.baseDirectory = os.path.dirname(filename)
 
         try:
             fp = file(filename, 'wb+')
             fp.write(self.record.value(self.name))
             fp.close()
-        except Exception, e:
+        except Exception as e:
             QMessageBox.information(self, _('Error'), _(
-                'Error writing the file:\n%s') % unicode(e.args))
+                'Error writing the file:\n%s') % str(e.args))
             return
         Semantic.addInformationToFile(
             filename, self.record.group.resource, self.record.id, self.name)
@@ -325,4 +325,4 @@ class BinaryFieldWidget(AbstractFieldWidget, BinaryFieldWidgetUi):
     def restoreState(self, value):
         if not value:
             return
-        self.baseDirectory = unicode(str(value), 'utf-8')
+        self.baseDirectory = str(str(value), 'utf-8')

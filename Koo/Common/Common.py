@@ -29,19 +29,19 @@
 
 import gettext
 
-import Api
-from Settings import *
+from Koo.Common import Api
+from Koo.Common.Settings import *
 from Koo import Rpc
 
 import os
 import sys
-import Debug
+from Koo.Common import Debug
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from Ui import *
+from Koo.Common.Ui import *
 
-from Paths import *
+from Koo.Common.Paths import *
 
 try:
     if Settings.value('kde.enabled'):
@@ -62,7 +62,7 @@ serverMajorVersion = None
 
 
 # Load Resource
-import common_rc
+from Koo.Common import common_rc
 # When using loadUiType(), the generated (and executed) code will try to import
 # common_rc and it will crash if we don't ensure it's available in PYTHONPATH
 # so by no we have to add Koo/Common to sys.path
@@ -123,7 +123,7 @@ class SelectionDialog(QDialog, SelectionDialogUi):
 
         if title:
             self.uiTitle.setText(title)
-        for x in values.keys():
+        for x in list(values.keys()):
             item = QListWidgetItem()
             item.setText(x)
             item.value = values[x]
@@ -133,7 +133,7 @@ class SelectionDialog(QDialog, SelectionDialogUi):
     def selected(self):
         self.result = ""
         item = self.uiList.currentItem()
-        self.result = (unicode(item.text()), item.value)
+        self.result = (str(item.text()), item.value)
         self.accept()
 
 # @brief Shows the SelectionDialog
@@ -149,7 +149,7 @@ def selection(title, values, alwaysask=False):
     if len(values) == 0:
         return None
     elif len(values) == 1 and (not alwaysask):
-        key = values.keys()[0]
+        key = list(values.keys())[0]
         return (key, values[key])
     s = SelectionDialog(title, values)
     if s.exec_() == QDialog.Accepted:
@@ -191,7 +191,7 @@ def concurrencyError(model, id, context):
     if result == 0:
         return True
     if result == 1:
-        Api.instance.createWindow(False, model, id, context=context)
+        Api_instance.createWindow(False, model, id, context=context)
 
     return False
 
@@ -243,7 +243,7 @@ class ErrorDialog(QDialog, ErrorDialogUi):
         body += 'User ID: %s\n' % Rpc.session.uid
         body += 'URL: %s\n\n' % Rpc.session.url
         body += 'Backtrace:\n\n'
-        body += unicode(self.uiDetails.toPlainText()
+        body += str(self.uiDetails.toPlainText()
                         ).encode('ascii', 'replace')
         try:
             sendEMail(Settings.value('koo.smtp_backtraces_to'), subject, body)
@@ -260,7 +260,7 @@ class ErrorDialog(QDialog, ErrorDialogUi):
 # @brief Shows the ErrorDialog. Function used by the notifier in the Koo application.
 def error(title, message, details=''):
     QApplication.setOverrideCursor(Qt.ArrowCursor)
-    dialog = ErrorDialog(unicode(title), unicode(message), unicode(details))
+    dialog = ErrorDialog(str(title), str(message), str(details))
     dialog.exec_()
     QApplication.restoreOverrideCursor()
 
@@ -400,7 +400,7 @@ def normalizeLabel(text):
 # it's a bit complicated to properly evaluate it. At first only "1" and "0" were
 # used, for example.
 def stringToBool(text):
-    if isinstance(text, str) or isinstance(text, unicode):
+    if isinstance(text, str) or isinstance(text, str):
         text = text.strip()
         if text.lower() == 'true' or text == '1':
             return True
@@ -415,7 +415,7 @@ def stringToBool(text):
 
 def simplifyHtml(html):
     if isinstance(html, QString):
-        html = unicode(html)
+        html = str(html)
     if '<p' in html:
         index = html.find('<p')
         html = html[index:]

@@ -86,7 +86,7 @@ class ButtonFieldWidget(AbstractFieldWidget):
                         Api.instance.executeAction(r, {'ids': [id]})
                         if result['type'] == 'ir.actions.act_window':
                             QApplication.restoreOverrideCursor()
-            except Rpc.RpcException, e:
+            except Rpc.RpcException as e:
                 pass
             QApplication.restoreOverrideCursor()
         elif type == 'object':
@@ -96,7 +96,7 @@ class ButtonFieldWidget(AbstractFieldWidget):
             try:
                 result = Rpc.session.execute(
                     '/object', 'execute', screen.name, self.name, [id], self.record.context())
-            except Rpc.RpcException, e:
+            except Rpc.RpcException as e:
                 QApplication.restoreOverrideCursor()
                 return
             QApplication.restoreOverrideCursor()
@@ -119,7 +119,7 @@ class ButtonFieldWidget(AbstractFieldWidget):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
             screen.reload()
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             pass
         QApplication.restoreOverrideCursor()
 
@@ -134,7 +134,7 @@ class ButtonFieldWidget(AbstractFieldWidget):
             sys.exit(0)
         if self.attrs.get('special', '') == 'cancel':
             screen.close()
-            if 'name' in self.attrs.keys():
+            if 'name' in list(self.attrs.keys()):
                 result = Rpc.session.execute(
                     '/object', 'execute', screen.name,
                     self.attrs['name'], [], self.record.context()
@@ -201,7 +201,7 @@ class ButtonFieldDelegate(AbstractFieldDelegate):
         view.store()
         if self.attributes.get('special', '') == 'cancel':
             screen.close()
-            if 'name' in self.attributes.keys():
+            if 'name' in list(self.attributes.keys()):
                 result = Rpc.session.execute(
                     '/object', 'execute', screen.name,
                     self.attributes['name'], [], record.context()
@@ -255,7 +255,7 @@ class ButtonFieldDelegate(AbstractFieldDelegate):
                         Api.instance.executeAction(r, {'ids': [id]})
                         if result['type'] == 'ir.actions.act_window':
                             QApplication.restoreOverrideCursor()
-            except Rpc.RpcException, e:
+            except Rpc.RpcException as e:
                 pass
             QApplication.restoreOverrideCursor()
         elif type == 'object':
@@ -265,7 +265,7 @@ class ButtonFieldDelegate(AbstractFieldDelegate):
             try:
                 result = Rpc.session.execute(
                     '/object', 'execute', screen.name, self.name, [id], record.context())
-            except Rpc.RpcException, e:
+            except Rpc.RpcException as e:
                 QApplication.restoreOverrideCursor()
                 return
             QApplication.restoreOverrideCursor()
@@ -288,6 +288,6 @@ class ButtonFieldDelegate(AbstractFieldDelegate):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
             screen.reload()
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             pass
         QApplication.restoreOverrideCursor()

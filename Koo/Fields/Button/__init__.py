@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from ButtonFieldWidget import *
+from .ButtonFieldWidget import *
 from Koo.Fields.FieldWidgetFactory import *
 from Koo.Fields.FieldDelegateFactory import *
 

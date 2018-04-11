@@ -26,6 +26,6 @@
 #
 ##############################################################################
 
-import analyze_documents_queue
-import process_documents_queue
-import execute_documents_queue
+from . import analyze_documents_queue
+from . import process_documents_queue
+from . import execute_documents_queue

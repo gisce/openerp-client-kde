@@ -113,7 +113,7 @@ class JasperReport:
 				newPath.append( x.split('-')[-1] )
 			path = '/'.join( newPath )
 			if path in fields:
-				print "WARNING: path '%s' already exists in report. This is not supported by the module. Offending fields: %s, %s" % (path, fields[path]['name'], name)
+				print("WARNING: path '%s' already exists in report. This is not supported by the module. Offending fields: %s, %s" % (path, fields[path]['name'], name))
 			fields[ path ] = {
 				'name': name,
 				'type': type,
@@ -141,7 +141,7 @@ class JasperReport:
 		
 		# Relations
 		relationTags = doc.xpath( '/jr:jasperReport/jr:property[@name="OPENERP_RELATIONS"]', namespaces=nss )
-		if relationTags and 'value' in relationTags[0].keys():
+		if relationTags and 'value' in list(relationTags[0].keys()):
 			relation = relationTags[0].get('value').strip()
 			if relation.startswith('['):
 				self._relations = safe_eval( relationTags[0].get('value'), {} )
@@ -153,17 +153,17 @@ class JasperReport:
 
 		# Repeat field
 		copiesFieldTags = doc.xpath( '/jr:jasperReport/jr:property[@name="OPENERP_COPIES_FIELD"]', namespaces=nss )
-		if copiesFieldTags and 'value' in copiesFieldTags[0].keys():
+		if copiesFieldTags and 'value' in list(copiesFieldTags[0].keys()):
 			self._copiesField = self._pathPrefix + copiesFieldTags[0].get('value')
 
 		# Repeat
 		copiesTags = doc.xpath( '/jr:jasperReport/jr:property[@name="OPENERP_COPIES"]', namespaces=nss )
-		if copiesTags and 'value' in copiesTags[0].keys():
+		if copiesTags and 'value' in list(copiesTags[0].keys()):
 			self._copies = int(copiesTags[0].get('value'))
 
 		self._isHeader = False
 		headerTags = doc.xpath( '/jr:jasperReport/jr:property[@name="OPENERP_HEADER"]', namespaces=nss )
-		if headerTags and 'value' in headerTags[0].keys():
+		if headerTags and 'value' in list(headerTags[0].keys()):
 			self._isHeader = True
 
 		fieldTags = doc.xpath( '/jr:jasperReport/jr:field', namespaces=nss )
@@ -197,7 +197,7 @@ class JasperReport:
 			try:
 				subreportExpression = safe_eval( subreportExpression, {} )
 			except:
-				print "COULD NOT EVALUATE EXPRESSION: '%s'" % subreportExpression
+				print("COULD NOT EVALUATE EXPRESSION: '%s'" % subreportExpression)
 				# If we're not able to evaluate the expression go to next subreport
 				continue
 			if subreportExpression.endswith('.jasper'):
@@ -206,17 +206,17 @@ class JasperReport:
 			# Model
 			model = ''
 			modelTags = tag.xpath( '//jr:reportElement/jr:property[@name="OPENERP_MODEL"]', namespaces=nss )
-			if modelTags and 'value' in modelTags[0].keys():
+			if modelTags and 'value' in list(modelTags[0].keys()):
 				model = modelTags[0].get('value')
 			
 			pathPrefix = ''
 			pathPrefixTags = tag.xpath( '//jr:reportElement/jr:property[@name="OPENERP_PATH_PREFIX"]', namespaces=nss )
-			if pathPrefixTags and 'value' in pathPrefixTags[0].keys():
+			if pathPrefixTags and 'value' in list(pathPrefixTags[0].keys()):
 				pathPrefix = pathPrefixTags[0].get('value')
 
 			isHeader = False
 			headerTags = tag.xpath( '//jr:reportElement/jr:property[@name="OPENERP_HEADER"]', namespaces=nss )
-			if headerTags and 'value' in headerTags[0].keys():
+			if headerTags and 'value' in list(headerTags[0].keys()):
 				isHeader = True
 
 			# Add our own pathPrefix to subreport's pathPrefix
@@ -266,7 +266,7 @@ class JasperReport:
 			# Relations
 			relations = []
 			relationTags = tag.xpath( '../../jr:reportElement/jr:property[@name="OPENERP_RELATIONS"]', namespaces=nss )
-			if relationTags and 'value' in relationTags[0].keys():
+			if relationTags and 'value' in list(relationTags[0].keys()):
 				relation = relationTags[0].get('value').strip()
 				if relation.startswith('['):
 					relations = safe_eval( relationTags[0].get('value'), {} )
@@ -279,24 +279,24 @@ class JasperReport:
 			# Repeat field
 			copiesField = None
 			copiesFieldTags = tag.xpath( '../../jr:reportElement/jr:property[@name="OPENERP_COPIES_FIELD"]', namespaces=nss )
-			if copiesFieldTags and 'value' in copiesFieldTags[0].keys():
+			if copiesFieldTags and 'value' in list(copiesFieldTags[0].keys()):
 				copiesField = self._pathPrefix + copiesFieldTags[0].get('value')
 
 			# Repeat
 			copies = None
 			copiesTags = tag.xpath( '../../jr:reportElement/jr:property[@name="OPENERP_COPIES"]', namespaces=nss )
-			if copiesTags and 'value' in copiesTags[0].keys():
+			if copiesTags and 'value' in list(copiesTags[0].keys()):
 				copies = int(copiesTags[0].get('value'))
 
 			# Model
 			model = ''
 			modelTags = tag.xpath( '../../jr:reportElement/jr:property[@name="OPENERP_MODEL"]', namespaces=nss )
-			if modelTags and 'value' in modelTags[0].keys():
+			if modelTags and 'value' in list(modelTags[0].keys()):
 				model = modelTags[0].get('value')
 			
 			pathPrefix = ''
 			pathPrefixTags = tag.xpath( '../../jr:reportElement/jr:property[@name="OPENERP_PATH_PREFIX"]', namespaces=nss )
-			if pathPrefixTags and 'value' in pathPrefixTags[0].keys():
+			if pathPrefixTags and 'value' in list(pathPrefixTags[0].keys()):
 				pathPrefix = pathPrefixTags[0].get('value')
 
 			# We need to find the appropriate subDataset definition for this dataset run.

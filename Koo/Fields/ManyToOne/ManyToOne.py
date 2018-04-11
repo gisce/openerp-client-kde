@@ -158,8 +158,8 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
 
     def completerActivated(self, index):
         id = self.completerList[index.row()][0]
-        assert isinstance(id, (int, long)), id
-        text = unicode(index.data().toString())
+        assert isinstance(id, int), id
+        text = str(index.data().toString())
         self.record.setValue(self.name, (id, text))
 
     def match(self):
@@ -167,7 +167,7 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
             return
         if not self.record:
             return
-        name = unicode(self.uiText.text())
+        name = str(self.uiText.text())
         if name.strip() == '':
             self.record.setValue(self.name, False)
             self.showValue()
@@ -220,7 +220,7 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
                         self.record.setValue(self.name, dialog.record)
                         self.display()
         else:
-            text = unicode(self.uiText.text())
+            text = str(self.uiText.text())
             if text.strip() == '':
                 self.search('')
 
@@ -469,16 +469,16 @@ class ManyToOneFieldDelegate(AbstractFieldDelegate):
         # We expect a KooModel here
         model = kooModel.recordFromIndex(index)
 
-        if not unicode(editor.text()):
+        if not str(editor.text()):
             model.setValue(self.name, False)
             return
 
-        if unicode(kooModel.data(index, Qt.DisplayRole).toString()) == unicode(editor.text()):
+        if str(kooModel.data(index, Qt.DisplayRole).toString()) == str(editor.text()):
             return
 
         domain = model.domain(self.name)
         context = model.context()
-        ids = Rpc.session.execute('/object', 'execute', self.attributes['relation'], 'name_search', unicode(
+        ids = Rpc.session.execute('/object', 'execute', self.attributes['relation'], 'name_search', str(
             editor.text()), domain, 'ilike', context, False)
         if ids and len(ids) == 1:
             model.setValue(self.name, ids[0])

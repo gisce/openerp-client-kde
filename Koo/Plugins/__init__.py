@@ -51,7 +51,7 @@ class Plugins:
                 'Koo.Plugins', os.path.abspath(os.path.dirname(__file__)))
 
         plugins = {}
-        for name, plugin in Plugins.plugins.items():
+        for name, plugin in list(Plugins.plugins.items()):
             if model:
                 if plugin['model_regexp'].search(model):
                     plugins[name] = plugin

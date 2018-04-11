@@ -54,12 +54,12 @@ class IntegerFieldWidget(AbstractFieldWidget):
         self.installPopupMenu(self.widget)
 
     def calculate(self):
-        val = textToInteger(unicode(self.widget.text()))
+        val = textToInteger(str(self.widget.text()))
         self.setText(integerToText(val))
         self.modified()
 
     def value(self):
-        return textToInteger(unicode(self.widget.text()))
+        return textToInteger(str(self.widget.text()))
 
     def storeValue(self):
         self.record.setValue(self.name, self.value())
@@ -86,5 +86,5 @@ class IntegerFieldWidget(AbstractFieldWidget):
 
 class IntegerFieldDelegate(AbstractFieldDelegate):
     def setModelData(self, editor, model, index):
-        value = textToInteger(unicode(editor.text()))
+        value = textToInteger(str(editor.text()))
         model.setData(index, QVariant(value), Qt.EditRole)

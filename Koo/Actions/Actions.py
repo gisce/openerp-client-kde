@@ -35,7 +35,7 @@ import copy
 
 from Koo import Rpc
 
-import Wizard
+from . import Wizard
 from Koo.Printer import *
 
 from Koo.Common import Api
@@ -62,9 +62,9 @@ class ExecuteReportThread(QThread):
             try:
                 ids = self.session.call(
                     '/object', 'execute', self.datas['model'], 'search', [])
-            except Rpc.RpcException, e:
+            except Rpc.RpcException as e:
                 self.emit(SIGNAL('error'), (_('Error: %s') %
-                                            unicode(e.type), e.message, e.data))
+                                            str(e.type), e.message, e.data))
                 return
 
             if ids == []:
@@ -89,9 +89,9 @@ class ExecuteReportThread(QThread):
                         'Printing aborted. Delay too long.'))
                     return False
             Printer.printData(val)
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             self.emit(SIGNAL('error'), (_('Error: %s') %
-                                        unicode(e.type), e.message, e.data))
+                                        str(e.type), e.message, e.data))
 
 # @brief Executes the given report.
 
@@ -131,7 +131,7 @@ def executeReport(name, data, context=None):
                     'Printing aborted, too long delay !'))
                 return False
         Printer.printData(val, datas['model'], ids)
-    except Rpc.RpcException, e:
+    except Rpc.RpcException as e:
         QApplication.restoreOverrideCursor()
         return False
     QApplication.restoreOverrideCursor()
@@ -149,7 +149,7 @@ def execute(act_id, datas, type=None, context=None):
         res = Rpc.session.execute(
             '/object', 'execute', 'ir.actions.actions', 'read', [act_id], ['type'], ctx)
         if not len(res):
-            raise Exception, 'ActionNotFound'
+            raise Exception('ActionNotFound')
         type = res[0]['type']
     res = Rpc.session.execute('/object', 'execute',
                               type, 'read', [act_id], False, ctx)[0]
@@ -254,8 +254,8 @@ def executeKeyword(keyword, data=None, context=None):
             actions = Rpc.session.execute('/object', 'execute',
                                           'ir.values', 'get', 'action', keyword,
                                           [(data['model'], id)], False, Rpc.session.context)
-            actions = map(lambda x: x[2], actions)
-        except Rpc.RpcException, e:
+            actions = [x[2] for x in actions]
+        except Rpc.RpcException as e:
             return None
 
     if not actions:

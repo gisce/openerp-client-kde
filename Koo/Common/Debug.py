@@ -39,28 +39,28 @@ def printReferrers(obj):
 
 
 def printList(l):
-    print '\n'.join([str(x) for x in l])
+    print('\n'.join([str(x) for x in l]))
 
 
 def info(text):
     try:
-        print str(text)
+        print(str(text))
     except:
-        print "Error trying to print info message."
+        print("Error trying to print info message.")
 
 
 def warning(text):
     try:
-        print str(text)
+        print(str(text))
     except:
-        print "Error trying to print warning message."
+        print("Error trying to print warning message.")
 
 
 def error(text):
     try:
-        print str(text)
+        print(str(text))
     except:
-        print "Error trying to print error message."
+        print("Error trying to print error message.")
 
 # The DebugEventFilter class has been used to find a problem with an invisible
 # widget that was created, not inserted in any layout and that didn't allow to
@@ -73,7 +73,7 @@ class DebugEventFilter(QObject):
         QObject.__init__(self, parent)
 
     def eventFilter(self, obj, event):
-        print "EVENT %d THROWN ON OBJECT '%s' OF TYPE '%s'" % (event.type(), unicode(obj.objectName()), unicode(obj.staticMetaObject.className()))
+        print("EVENT %d THROWN ON OBJECT '%s' OF TYPE '%s'" % (event.type(), str(obj.objectName()), str(obj.staticMetaObject.className())))
         return QObject.eventFilter(self, obj, event)
 
 #app.installEventFilter( DebugEventFilter(win) )
@@ -111,7 +111,7 @@ def exceptionHook(type, value, backtrace):
     cursor = QApplication.overrideCursor()
     if cursor:
         QApplication.restoreOverrideCursor()
-    from Settings import Settings
+    from .Settings import Settings
     import traceback
     backtrace = ''.join(traceback.format_tb(backtrace))
     if Settings.value('client.debug'):

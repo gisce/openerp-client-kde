@@ -249,7 +249,7 @@ class FloatTimeFieldWidget(AbstractFieldWidget):
 
     def storeValue(self):
         self.record.setValue(self.name, textToFloatTime(
-            unicode(self.uiTime.text())))
+            str(self.uiTime.text())))
 
     def clear(self):
         self.setText('00:00')
@@ -291,5 +291,5 @@ class DateTimeFieldDelegate(AbstractFieldDelegate):
 
 class FloatTimeFieldDelegate(AbstractFieldDelegate):
     def setModelData(self, editor, model, index):
-        value = textToFloatTime(unicode(editor.text()))
+        value = textToFloatTime(str(editor.text()))
         model.setData(index, QVariant(value), Qt.EditRole)

@@ -31,8 +31,8 @@ from xml.parsers import expat
 import sys
 import gettext
 
-from SearchWidgetFactory import *
-from AbstractSearchWidget import *
+from .SearchWidgetFactory import *
+from .AbstractSearchWidget import *
 from Koo.Common import Common
 from Koo.Common import Shortcuts
 from Koo.Common import Calendar
@@ -206,7 +206,7 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
             self.setAndSelected()
 
     def updateRelatedAndOperators(self, index=None):
-        fieldName = unicode(self.uiField.itemData(
+        fieldName = str(self.uiField.itemData(
             self.uiField.currentIndex()).toString())
         if not fieldName:
             return
@@ -239,9 +239,9 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
 
     def updateOperators(self, index=None):
         self.uiOperator.clear()
-        fieldName = unicode(self.uiField.itemData(
+        fieldName = str(self.uiField.itemData(
             self.uiField.currentIndex()).toString())
-        relatedFieldName = unicode(self.uiRelatedField.itemData(
+        relatedFieldName = str(self.uiRelatedField.itemData(
             self.uiRelatedField.currentIndex()).toString())
         if not fieldName:
             return
@@ -257,7 +257,7 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
                 self.uiOperator.addItem(operator[1], QVariant(operator[0]))
 
     def updateValue(self, index):
-        operator = unicode(self.uiOperator.itemData(
+        operator = str(self.uiOperator.itemData(
             self.uiOperator.currentIndex()).toString())
         for op in self.operators:
             if operator == op[0]:
@@ -345,13 +345,13 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
             self.setValid(False)
             return []
         self.setValid(True)
-        fieldName = unicode(self.uiField.itemData(
+        fieldName = str(self.uiField.itemData(
             self.uiField.currentIndex()).toString())
-        relatedFieldName = unicode(self.uiRelatedField.itemData(
+        relatedFieldName = str(self.uiRelatedField.itemData(
             self.uiRelatedField.currentIndex()).toString())
-        operator = unicode(self.uiOperator.itemData(
+        operator = str(self.uiOperator.itemData(
             self.uiOperator.currentIndex()).toString())
-        value = unicode(self.uiValue.text())
+        value = str(self.uiValue.text())
         fieldType = self.fields[fieldName].get('type')
 
         if operator in ('in', 'not in'):
@@ -443,7 +443,7 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
                 self.uiOperator.setCurrentIndex(index)
                 break
             i += 1
-        self.uiValue.setText(unicode(value))
+        self.uiValue.setText(str(value))
 
 
 class CustomSearchFormWidget(AbstractSearchWidget):
@@ -480,7 +480,7 @@ class CustomSearchFormWidget(AbstractSearchWidget):
         self.widgets[number].setValid(valid)
 
     def setAllItemsValid(self, valid):
-        for number in xrange(self.itemCount()):
+        for number in range(self.itemCount()):
             self.setItemValid(number, valid)
 
     def insertItem(self, previousItem=None):

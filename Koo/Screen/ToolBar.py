@@ -67,7 +67,7 @@ class ToolBar(QToolBar):
             button.setDefaultAction(action)
             button.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
             button.setAutoRaise(True)
-            button.setText(self.wordWrap(unicode(button.text()), 25))
+            button.setText(self.wordWrap(str(button.text()), 25))
 
             self.addWidget(button)
 

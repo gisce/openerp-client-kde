@@ -25,8 +25,8 @@
 #
 ##############################################################################
 
-from Parser import *
-from TreeView import *
+from .Parser import *
+from .TreeView import *
 from Koo.View.ViewFactory import *
 
 ViewFactory.register(TreeParser, 'tree', _('List View'), ':/images/list.png')

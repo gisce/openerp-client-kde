@@ -34,7 +34,7 @@ def flatten(x):
     result = []
     for el in x:
         # if isinstance(el, (list, tuple)):
-        if hasattr(el, "__iter__") and not isinstance(el, basestring):
+        if hasattr(el, "__iter__") and not isinstance(el, str):
             result.extend(flatten(el))
         else:
             result.append(el)
@@ -89,7 +89,8 @@ class ColorManager:
     @staticmethod
     def pickColors(n):
         if n:
-            return ColorManager.colorList[0:-1:len(ColorManager.colorList) / (n + 1)]
+            color_pos = int(len(ColorManager.colorList) / (n + 1))
+            return ColorManager.colorList[0:-1:color_pos]
         else:
             return []
 

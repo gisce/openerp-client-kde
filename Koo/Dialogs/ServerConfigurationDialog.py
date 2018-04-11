@@ -88,21 +88,21 @@ class ServerConfigurationDialog(QDialog, ServerConfigurationDialogUi):
             self.uiConnection.setCurrentIndex(
                 self.uiConnection.findData(QVariant(url.scheme())))
             self.uiServer.setText(url.host())
-            self.uiPort.setText(unicode(url.port()))
+            self.uiPort.setText(str(url.port()))
 
     def slotAccept(self):
         url = QUrl(self.url)
-        protocol = unicode(self.uiConnection.itemData(
+        protocol = str(self.uiConnection.itemData(
             self.uiConnection.currentIndex()).toString())
         url.setScheme(protocol)
         url.setHost(self.uiServer.text())
         url.setPort(int(self.uiPort.text().toInt()[0]))
         if url.isValid():
             # Store default settings
-            Settings.setValue('login.url', unicode(url.toString()))
+            Settings.setValue('login.url', str(url.toString()))
             Settings.saveToFile()
         url.setUserName('')
-        self.url = unicode(url.toString())
+        self.url = str(url.toString())
         self.accept()
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:

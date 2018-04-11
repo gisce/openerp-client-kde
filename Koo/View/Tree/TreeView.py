@@ -63,7 +63,7 @@ class KooTreeView(QTreeView):
                 index = model.indexFromRecord(record)
                 index = model.index(index.row(), column, index.parent())
                 hint = max(hint, delegate.sizeHint(viewOptions, index).width())
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             hint = 100
         QApplication.restoreOverrideCursor()
         return hint
@@ -266,7 +266,7 @@ class TreeView(AbstractView):
         try:
             self.treeModel.group.ensureAllLoaded()
             self.updateAggregates()
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             pass
         QApplication.restoreOverrideCursor()
 

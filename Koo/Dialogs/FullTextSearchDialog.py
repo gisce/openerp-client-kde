@@ -89,7 +89,7 @@ if isWebKitAvailable:
             self.connect(self.pushClose, SIGNAL("clicked()"), self.accept)
             self.connect(self.pushFind, SIGNAL("clicked()"), self.find)
             self.connect(self.pushPrevious, SIGNAL("clicked()"), self.previous)
-            self.connect(self.pushNext, SIGNAL("clicked()"), self.next)
+            self.connect(self.pushNext, SIGNAL("clicked()"), self.__next__)
             self.connect(self, SIGNAL('accept()'), self.accepted)
             if Settings.value('koo.fts_instant', True):
                 self.connect(self.uiText, SIGNAL(
@@ -146,7 +146,7 @@ if isWebKitAvailable:
                 "<span style='font-size: large'>%s</span>" % text)
 
         def textToQuery(self):
-            q = unicode(self.uiText.text()).strip()
+            q = str(self.uiText.text()).strip()
             return re.sub(' +', '|', q)
 
         def query(self):
@@ -154,7 +154,7 @@ if isWebKitAvailable:
             if self.uiModel.currentIndex() == 0:
                 model = False
             else:
-                model = unicode(self.uiModel.itemData(
+                model = str(self.uiModel.itemData(
                     self.uiModel.currentIndex()).toString())
 
             # We always query for limit+1 items so we can know if there will be more records in the next page
@@ -180,7 +180,7 @@ if isWebKitAvailable:
             self.resultsToHtml(answer)
 
         def resultsToHtml(self, answer):
-            for shortcut in self.shortcuts.keys():
+            for shortcut in list(self.shortcuts.keys()):
                 shortcut.setParent(None)
             self.shortcuts = {}
             number = 1
@@ -251,7 +251,7 @@ if isWebKitAvailable:
             self.offset = max(0, self.offset - self.limit)
             self.query()
 
-        def next(self):
+        def __next__(self):
             self.offset = self.offset + self.limit
             self.query()
 
@@ -265,7 +265,7 @@ if isWebKitAvailable:
         def open(self, url):
             QApplication.setOverrideCursor(Qt.WaitCursor)
             if isinstance(url, QUrl):
-                url = unicode(url.toString())
+                url = str(url.toString())
             url = url.split('/')
             if url[0] == 'open':
                 model = url[1]

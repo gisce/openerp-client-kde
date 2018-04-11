@@ -31,7 +31,7 @@ from Koo.Common import Icons
 from Koo.Common.Settings import *
 from Koo import Rpc
 
-from FormView import FormView, FormContainer, FormTabWidget
+from .FormView import FormView, FormContainer, FormTabWidget
 from Koo.View.AbstractParser import *
 from Koo.Fields.FieldWidgetFactory import *
 from Koo.Fields.AbstractFieldWidget import *

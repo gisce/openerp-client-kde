@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from ButtonSearchWidget import *
+from .ButtonSearchWidget import *
 from Koo.Search.SearchWidgetFactory import *
 
 SearchWidgetFactory.register('button', ButtonSearchWidget)

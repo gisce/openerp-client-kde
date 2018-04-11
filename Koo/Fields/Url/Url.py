@@ -60,7 +60,7 @@ class UrlFieldWidget(AbstractFieldWidget, UrlFieldWidgetUi):
         self.installPopupMenu(self.uiUrl)
 
     def storeValue(self):
-        return self.record.setValue(self.name, unicode(self.uiUrl.text()) or False)
+        return self.record.setValue(self.name, str(self.uiUrl.text()) or False)
 
     def clear(self):
         self.uiUrl.clear()
@@ -76,28 +76,28 @@ class UrlFieldWidget(AbstractFieldWidget, UrlFieldWidgetUi):
         self.uiUrl.setReadOnly(value)
 
     def openUrl(self):
-        value = unicode(self.uiUrl.text()).strip()
+        value = str(self.uiUrl.text()).strip()
         if value != '':
             Api.instance.createWebWindow(value, value)
 
 
 class EMailFieldWidget(UrlFieldWidget):
     def openUrl(self):
-        value = unicode(self.uiUrl.text()).strip()
+        value = str(self.uiUrl.text()).strip()
         if value != '':
             QDesktopServices.openUrl(QUrl('mailto:' + value))
 
 
 class CallToFieldWidget(UrlFieldWidget):
     def openUrl(self):
-        value = unicode(self.uiUrl.text()).strip()
+        value = str(self.uiUrl.text()).strip()
         if value != '':
             QDesktopServices.openUrl(QUrl('callto:%s' + value))
 
 
 class SipFieldWidget(UrlFieldWidget):
     def openUrl(self):
-        value = unicode(self.uiUrl.text()).strip()
+        value = str(self.uiUrl.text()).strip()
         if value != '':
             QDesktopServices.openUrl(QUrl('sip:%s' + value))
 

@@ -28,11 +28,11 @@
 
 import re
 import time
-import exceptions
+#import exceptions
 from Koo import Rpc
 from Koo.Common import Notifier
 from Koo.Rpc import RpcProxy
-from Field import ToManyField
+from .Field import ToManyField
 import gettext
 from Koo.Common import Debug
 
@@ -82,8 +82,8 @@ class Record(QObject):
         self.modified_fields = None
         self.parent = None
         self.setParent(None)
-        for key, value in self.values.iteritems():
-            from Group import RecordGroup
+        for key, value in self.values.items():
+            from .Group import RecordGroup
             if isinstance(value, RecordGroup):
                 #value.parent.fieldObjects[key].disconnect( SIGNAL('modified'), value )
                 value.__del__()
@@ -146,7 +146,7 @@ class Record(QObject):
         return self.group.fieldObjects
 
     def modifiedFields(self):
-        return self.modified_fields.keys()
+        return list(self.modified_fields.keys())
 
     def stateAttributes(self, fieldName):
         if fieldName not in self._stateAttributes:
@@ -182,12 +182,12 @@ class Record(QObject):
             except:
                 attributeChanges = eval(attributes, self.value(fieldName))
 
-            for attribute, condition in attributeChanges.items():
+            for attribute, condition in list(attributeChanges.items()):
                 for i in range(0, len(condition)):
                     if len(condition[i]) >= 3 and condition[i][2] and isinstance(condition[i][2], list):
                         attributeChanges[attribute][i] = (
                             condition[i][0], condition[i][1], condition[i][2][0])
-            for attribute, condition in attributeChanges.iteritems():
+            for attribute, condition in attributeChanges.items():
                 value = self.evaluateCondition(condition)
                 if value:
                     self.stateAttributes(fieldName)[attribute] = value
@@ -196,7 +196,7 @@ class Record(QObject):
         readOnly = self.stateAttributes(fieldName).get('readonly', False)
         if isinstance(readOnly, bool):
             return readOnly
-        if isinstance(readOnly, str) or isinstance(readOnly, unicode):
+        if isinstance(readOnly, str) or isinstance(readOnly, str):
             readOnly = readOnly.strip()
             if readOnly.lower() == 'true' or readOnly == '1':
                 return True
@@ -208,7 +208,7 @@ class Record(QObject):
         required = self.stateAttributes(fieldName).get('required', False)
         if isinstance(required, bool):
             return required
-        if isinstance(required, str) or isinstance(required, unicode):
+        if isinstance(required, str) or isinstance(required, str):
             required = required.strip()
             if required.lower() == 'true' or required == '1':
                 return True
@@ -286,7 +286,7 @@ class Record(QObject):
         if context is None:
             context = {}
         if len(self.group.fields):
-            val = self.rpc.default_get(self.group.fields.keys(), context)
+            val = self.rpc.default_get(list(self.group.fields.keys()), context)
             for d in domain:
                 if d[0] in self.group.fields:
                     if d[1] == '=':
@@ -352,14 +352,14 @@ class Record(QObject):
     def defaults(self):
         self.ensureIsLoaded()
         value = dict([(name, field.default(self))
-                      for name, field in self.group.fieldObjects.items()])
+                      for name, field in list(self.group.fieldObjects.items())])
         return value
 
     # @brief Sets the default values for each field from a dict
     # { 'field': defaultValue }
     def setDefaults(self, val):
         self.createMissingFields()
-        for fieldname, value in val.items():
+        for fieldname, value in list(val.items()):
             if fieldname not in self.group.fieldObjects:
                 continue
             self.group.fieldObjects[fieldname].setDefault(self, value)
@@ -381,7 +381,7 @@ class Record(QObject):
         self.createMissingFields()
 
         later = {}
-        for fieldname, value in val.items():
+        for fieldname, value in list(val.items()):
             if fieldname not in self.group.fieldObjects:
                 continue
             if isinstance(self.group.fieldObjects[fieldname], ToManyField):
@@ -389,7 +389,7 @@ class Record(QObject):
                 continue
             self.group.fieldObjects[fieldname].set(
                 self, value, modified=modified)
-        for fieldname, value in later.items():
+        for fieldname, value in list(later.items()):
             self.group.fieldObjects[fieldname].set(
                 self, value, modified=modified)
 
@@ -424,7 +424,7 @@ class Record(QObject):
     # a context with 'current_date', 'time', 'context', 'active_id' and
     # 'parent' (if applies) is prepared.
     def evaluateExpression(self, dom, checkLoad=True, firstTry=True):
-        if not isinstance(dom, basestring):
+        if not isinstance(dom, str):
             return dom
         if checkLoad:
             self.ensureIsLoaded()
@@ -447,7 +447,7 @@ class Record(QObject):
             d['parent'] = EvalEnvironment(self.parent)
         try:
             val = Rpc.session.evaluateExpression(dom, d)
-        except NameError, exception:
+        except NameError as exception:
             # If evaluateExpression raises a NameError exception like this one:
             # NameError: name 'unit_amount' is not defined
             # It may be because not all fields are loaded yet, so we'll ensure
@@ -477,7 +477,7 @@ class Record(QObject):
         if not self.fieldExists(condition[0]):
             return False
         value = self.value(condition[0])
-        from Group import RecordGroup
+        from .Group import RecordGroup
         if isinstance(value, RecordGroup):
             value = value.ids()
         if condition[1] in ('=', '=='):
@@ -517,7 +517,7 @@ class Record(QObject):
     def callOnChange(self, callback):
         match = re.match('^(.*?)\((.*)\)$', callback)
         if not match:
-            raise Exception, 'ERROR: Wrong on_change trigger: %s' % callback
+            raise Exception('ERROR: Wrong on_change trigger: %s' % callback)
         func_name = match.group(1)
         arg_names = [n.strip() for n in match.group(2).split(',')]
         args = [self.evaluateExpression(arg) for arg in arg_names]
@@ -526,7 +526,7 @@ class Record(QObject):
         if response:
             self.set(response.get('value', {}), modified=True)
             if 'domain' in response:
-                for fieldname, value in response['domain'].items():
+                for fieldname, value in list(response['domain'].items()):
                     if fieldname not in self.group.fieldObjects:
                         continue
                     self.group.fieldObjects[fieldname].attrs['domain'] = value

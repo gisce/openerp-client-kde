@@ -16,7 +16,7 @@
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 from PyQt4.QtGui import *
-from AbstractGraphicsChartItem import *
+from .AbstractGraphicsChartItem import *
 
 
 class PieChartSector(QGraphicsEllipseItem):

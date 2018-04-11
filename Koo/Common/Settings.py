@@ -27,11 +27,11 @@
 #
 ##############################################################################
 
-import ConfigParser
+import configparser
 import os
 import sys
 from Koo import Rpc
-import Debug
+from . import Debug
 from PyQt4.QtCore import QDir, QUrl
 
 # @brief The ConfigurationManager class handles Koo settings information.
@@ -85,11 +85,11 @@ class Settings(object):
             # If no file was specified we try to read it from environment
             # variable o standard path
             Settings.rcFile = os.environ.get('TERPRC') or os.path.join(
-                unicode(QDir.toNativeSeparators(QDir.homePath())), '.koorc')
+                str(QDir.toNativeSeparators(QDir.homePath())), '.koorc')
         try:
-            parser = ConfigParser.ConfigParser()
+            parser = configparser.ConfigParser()
             sections = {}
-            for option in Settings.options.keys():
+            for option in list(Settings.options.keys()):
                 if not len(option.split('.')) == 2:
                     continue
 
@@ -129,13 +129,13 @@ class Settings(object):
             # If no file was specified we try to read it from environment
             # variable o standard path
             Settings.rcFile = os.environ.get('TERPRC') or os.path.join(
-                unicode(QDir.toNativeSeparators(QDir.homePath())), '.koorc')
+                str(QDir.toNativeSeparators(QDir.homePath())), '.koorc')
         try:
             if not os.path.isfile(Settings.rcFile):
                 Settings.save()
                 return False
 
-            p = ConfigParser.ConfigParser()
+            p = configparser.ConfigParser()
             p.read([Settings.rcFile])
             for section in p.sections():
                 for (name, value) in p.items(section):
@@ -146,7 +146,7 @@ class Settings(object):
                     if value == 'None' or value == 'none':
                         value = None
                     Settings.options[section + '.' + name] = value
-        except Exception, e:
+        except Exception as e:
             Debug.warning('Unable to read config file %s !' % Settings.rcFile)
         return True
 
@@ -164,9 +164,9 @@ class Settings(object):
             '1040': 'it',
         }
 
-        import _winreg
-        key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r"Software\Koo")
-        value, value_type = _winreg.QueryValueEx(key, "Language")
+        import winreg
+        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Koo")
+        value, value_type = winreg.QueryValueEx(key, "Language")
         Settings.options['client.language'] = languages.get(value, False)
 
     # @brief Sets the value for the given key.
@@ -201,7 +201,7 @@ class Settings(object):
         except:
             settings = {}
         new_settings = {}
-        for key, value in settings.iteritems():
+        for key, value in settings.items():
             if key == 'stylesheet':
                 new_settings['koo.stylesheet_code'] = value
                 continue

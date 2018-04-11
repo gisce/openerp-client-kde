@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from ReferenceSearchWidget import *
+from .ReferenceSearchWidget import *
 from Koo.Search.SearchWidgetFactory import *
 
 SearchWidgetFactory.register('reference', ReferenceSearchWidget)

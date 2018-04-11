@@ -30,13 +30,13 @@ import types
 import gettext
 
 from Koo import Rpc
-from SearchDialog import *
-from ExportDialog import *
-from ImportDialog import *
-from AttachmentDialog import *
-from GoToIdDialog import *
-from BatchUpdateDialog import *
-from BatchInsertDialog import *
+from .SearchDialog import *
+from .ExportDialog import *
+from .ImportDialog import *
+from .AttachmentDialog import *
+from .GoToIdDialog import *
+from .BatchUpdateDialog import *
+from .BatchInsertDialog import *
 
 from Koo.Common import Api
 from Koo.Common import Common
@@ -86,7 +86,7 @@ class FormWidget(QWidget, FormWidgetUi):
         if view_type:
             new_view_ids = []
             new_view_type = []
-            for i in xrange(len(view_type)):
+            for i in range(len(view_type)):
                 if not view_type[i] in new_view_type:
                     if i < len(view_ids):
                         new_view_ids.append(view_ids[i])
@@ -155,7 +155,7 @@ class FormWidget(QWidget, FormWidgetUi):
             'Delete': self.remove,
             'Find': self.search,
             'Previous': self.previous,
-            'Next':  self.next,
+            'Next':  self.__next__,
             'GoToResourceId':  self.goto,
             'AccessLog':  self.showLogs,
             'Reload': self.reload,
@@ -241,7 +241,7 @@ class FormWidget(QWidget, FormWidgetUi):
                     window = AttachmentDialog(self.model, id, self)
                     self.connect(window, SIGNAL('destroyed()'),
                                  self.attachmentsClosed)
-                except Rpc.RpcException, e:
+                except Rpc.RpcException as e:
                     QApplication.restoreOverrideCursor()
                     return
                 QApplication.restoreOverrideCursor()
@@ -284,7 +284,7 @@ class FormWidget(QWidget, FormWidgetUi):
                                               view_type='form', mode='form,tree', target=target)
             else:
                 sender = self.sender()
-                name = unicode(sender.objectName())
+                name = str(sender.objectName())
                 if isinstance(sender, QAction) and name != 'actionSwitch':
                     self.sender().setChecked(True)
                     self.screen.switchView(name)
@@ -293,7 +293,7 @@ class FormWidget(QWidget, FormWidgetUi):
             if self.pendingReload:
                 self.reload()
             self.updateSwitchView()
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             pass
         QApplication.restoreOverrideCursor()
 
@@ -316,7 +316,7 @@ class FormWidget(QWidget, FormWidgetUi):
             for (key, val) in todo:
                 if line[key] and key in ('create_uid', 'write_uid') and isinstance(line[key], tuple):
                     line[key] = line[key][1]
-                message += val + ': ' + unicode(line[key] or '-') + '\n'
+                message += val + ': ' + str(line[key] or '-') + '\n'
         QMessageBox.information(self, _('Record log'), message)
 
     def remove(self):
@@ -329,7 +329,7 @@ class FormWidget(QWidget, FormWidgetUi):
                     self.updateStatus(_('Resource not removed !'))
                 else:
                     self.updateStatus(_('Resource removed.'))
-            except Rpc.RpcException, e:
+            except Rpc.RpcException as e:
                 pass
             QApplication.restoreOverrideCursor()
 
@@ -416,7 +416,7 @@ class FormWidget(QWidget, FormWidgetUi):
                 value = QMessageBox.question(self, _('Error'),
                                              _('<p>The following fields have an invalid value and have been highlighted in red:</p>%s<p>Please fix them before saving.</p>') % fields,
                                              _('Ok'))
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             QApplication.restoreOverrideCursor()
             id = False
         return bool(id)
@@ -428,18 +428,18 @@ class FormWidget(QWidget, FormWidgetUi):
         try:
             self.screen.displayPrevious()
             self.updateStatus()
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             pass
         QApplication.restoreOverrideCursor()
 
-    def next(self):
+    def __next__(self):
         if not self.modifiedSave():
             return
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
             self.screen.displayNext()
             self.updateStatus()
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             pass
         QApplication.restoreOverrideCursor()
 
@@ -474,7 +474,7 @@ class FormWidget(QWidget, FormWidgetUi):
             self.screen.reload()
             self.updateStatus()
             self.pendingReload = False
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             pass
         QApplication.restoreOverrideCursor()
 
@@ -483,7 +483,7 @@ class FormWidget(QWidget, FormWidgetUi):
         try:
             self.screen.cancel()
             self.updateStatus()
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             pass
         QApplication.restoreOverrideCursor()
 
@@ -666,8 +666,11 @@ class FormWidget(QWidget, FormWidgetUi):
         QApplication.restoreOverrideCursor()
 
     def __del__(self):
+        pass
+        """ to review @xtorello
         self.group.__del__()
         del self.group
+        """
 
     def batchButton(self):
         viewTypes = self.viewTypes
@@ -685,7 +688,7 @@ class FormWidget(QWidget, FormWidgetUi):
             queue.setup(viewTypes, viewIds)
             type = ''
             while type != 'form':
-                id, type = queue.next()
+                id, type = next(queue)
             screen.setupViews(['form'], [id])
         else:
             screen.setupViews(['form'], [False])
@@ -694,9 +697,9 @@ class FormWidget(QWidget, FormWidgetUi):
         from Koo.Common import Common
 
         buttons = {}
-        for key, widget in screen.currentView().widgets.iteritems():
+        for key, widget in screen.currentView().widgets.items():
             if isinstance(widget, ButtonFieldWidget):
-                buttons[unicode(widget.button.text())] = widget.name
+                buttons[str(widget.button.text())] = widget.name
 
         selectionDialog = Common.SelectionDialog(
             _('Choose action to apply to selected records'), buttons, self)

@@ -29,7 +29,7 @@ import base64
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from Koo.Common.Ui import *
-import ServerConfigurationDialog
+from . import ServerConfigurationDialog
 from Koo.Common import Common
 from Koo.Common.Settings import *
 
@@ -125,7 +125,7 @@ def restoreDatabase(parent):
         f.close()
         Rpc.database.call(dialog.url, 'restore',
                           dialog.password, dialog.databaseName, data)
-    except Exception, e:
+    except Exception as e:
         parent.unsetCursor()
         if e.message == 'AccessDenied:None':
             QMessageBox.warning(parent, _('Could not restore database'), _(
@@ -156,7 +156,7 @@ def backupDatabase(parent):
         f = file(fileName, 'wb')
         f.write(dump)
         f.close()
-    except Exception, e:
+    except Exception as e:
         parent.unsetCursor()
         QMessageBox.warning(parent, _('Error'), _(
             'Could not backup database.\n%s') % (str(e)))
@@ -177,7 +177,7 @@ def dropDatabase(parent):
     try:
         Rpc.database.call(dialog.url, 'drop',
                           dialog.password, dialog.databaseName)
-    except Exception, e:
+    except Exception as e:
         parent.unsetCursor()
         if e.message == 'AccessDenied:None':
             QMessageBox.warning(parent, _("Could not drop database."), _(

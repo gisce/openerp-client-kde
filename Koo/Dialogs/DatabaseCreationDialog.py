@@ -28,7 +28,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from Koo.Common.Ui import *
-import ServerConfigurationDialog
+from . import ServerConfigurationDialog
 from Koo.Common import Common
 from Koo.Common.Settings import *
 from Koo import Rpc
@@ -85,7 +85,7 @@ class ProgressBar(QDialog, ProgressBarUi):
             self.id = Rpc.database.execute(
                 self.url, 'create', self.password, self.databaseName, self.demoData, self.language, self.adminPassword)
             self.timer.start(1000)
-        except Exception, e:
+        except Exception as e:
             if e.code == 'AccessDenied':
                 QMessageBox.warning(self, _("Error during database creation"), _(
                     'Bad database administrator password !'))
@@ -145,7 +145,7 @@ class DatabaseCreationDialog(QDialog, DatabaseCreationDialogUi):
         url = QUrl(Settings.value('login.url'))
         url.setUserName('')
         self.uiServer.setText(url.toString())
-        self.refreshLangList(unicode(url.toString()))
+        self.refreshLangList(str(url.toString()))
 
     def refreshLangList(self, url):
         self.uiLanguage.clear()
@@ -188,7 +188,7 @@ class DatabaseCreationDialog(QDialog, DatabaseCreationDialogUi):
         self.close()
 
     def accepted(self):
-        databaseName = unicode(self.uiDatabase.text())
+        databaseName = str(self.uiDatabase.text())
         if ((not databaseName) or (not re.match('^[a-zA-Z][a-zA-Z0-9_]+$', databaseName))):
             QMessageBox.warning(self, _('Bad database name !'), _(
                 'The database name must contain only normal characters or "_".\nYou must avoid all accents, space or special characters.'))
@@ -199,11 +199,11 @@ class DatabaseCreationDialog(QDialog, DatabaseCreationDialogUi):
             return
         demoData = self.uiDemoData.isChecked()
 
-        langreal = unicode(self.uiLanguage.itemData(
+        langreal = str(self.uiLanguage.itemData(
             self.uiLanguage.currentIndex()).toString())
-        password = unicode(self.uiPassword.text())
-        url = unicode(self.uiServer.text())
-        adminPassword = unicode(self.uiAdminPassword.text())
+        password = str(self.uiPassword.text())
+        url = str(self.uiServer.text())
+        adminPassword = str(self.uiAdminPassword.text())
 
         progress = ProgressBar(self)
         progress.url = url
@@ -219,7 +219,7 @@ class DatabaseCreationDialog(QDialog, DatabaseCreationDialogUi):
             m = QUrl(url)
             m.setUserName('admin')
             m.setPassword(adminPassword or 'admin')
-            self.url = unicode(m.toString())
+            self.url = str(m.toString())
             self.databaseName = databaseName
         self.done(r)
 

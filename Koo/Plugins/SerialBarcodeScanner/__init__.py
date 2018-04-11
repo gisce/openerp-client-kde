@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from SerialBarcodeScanner import *
+from .SerialBarcodeScanner import *
 
 if isSerialAvailable:
     scanner = SerialBarcodeScanner()

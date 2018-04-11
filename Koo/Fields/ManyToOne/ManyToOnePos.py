@@ -109,7 +109,7 @@ class ManyToOnePosFieldWidget(AbstractFieldWidget, ManyToOnePosFieldWidgetUi):
         self.screen.display()
         # Resize all columns to contents
         treeView = self.screen.currentView().widget
-        for column in xrange(0, treeView.model().columnCount()):
+        for column in range(0, treeView.model().columnCount()):
             treeView.resizeColumnToContents(column)
 
     # We do not store anything here as elements are added and removed in the

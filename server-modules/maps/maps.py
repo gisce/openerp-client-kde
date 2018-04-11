@@ -32,10 +32,10 @@ class res_partner_address(osv.osv):
 	_inherit = 'res.partner.address'
 
 	def toUnicode(self, value):
-		if isinstance(value, unicode):
+		if isinstance(value, str):
 			return value
 		else:
-			return unicode( value, 'utf-8' )
+			return str( value, 'utf-8' )
 
 	def url(self, street, zip, city, country):
 		street = self.toUnicode(street)

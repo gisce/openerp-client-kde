@@ -39,19 +39,19 @@ import subprocess
 
 from Koo import Rpc
 
-import WindowService
-from PreferencesDialog import *
-from FullTextSearchDialog import *
-from DatabaseCreationDialog import DatabaseCreationDialog
-from DatabaseDialog import *
-from TipOfTheDayDialog import *
+from . import WindowService
+from .PreferencesDialog import *
+from .FullTextSearchDialog import *
+from .DatabaseCreationDialog import DatabaseCreationDialog
+from .DatabaseDialog import *
+from .TipOfTheDayDialog import *
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from Koo.Common.Ui import *
 
-from LoginDialog import *
-from AdministratorPasswordDialog import *
+from .LoginDialog import *
+from .AdministratorPasswordDialog import *
 
 from Koo.Common.Settings import Settings
 from Koo.Common import Common
@@ -474,7 +474,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
         try:
             ids, ids2 = Rpc.session.call(
                 '/object', 'execute', 'res.request', 'request_get')
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             return ([], [])
 
         if len(ids):
@@ -594,7 +594,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
                 QMessageBox.warning(self, _('Connection error !'), _(
                     'Bad username or password !'))
 
-        except Rpc.RpcException, e:
+        except Rpc.RpcException as e:
             if len(e.args) == 2:
                 (e1, e2) = e.args
                 Common.error(_('Connection Error !'), e.args[0], e.args[1])
@@ -661,7 +661,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
         loadUi(Common.uiPath('about.ui'), dialog)
         from Koo.Common import Version
         dialog.uiOpenErp.setHtml(
-            unicode(dialog.uiOpenErp.toHtml()) % Version.Version)
+            str(dialog.uiOpenErp.toHtml()) % Version.Version)
         dialog.exec_()
 
     def showShortcuts(self):

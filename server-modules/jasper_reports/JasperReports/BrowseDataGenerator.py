@@ -35,8 +35,8 @@ from osv import orm, osv, fields
 import tempfile 
 import codecs
 
-from JasperReport import *
-from AbstractDataGenerator import *
+from .JasperReport import *
+from .AbstractDataGenerator import *
 
 class BrowseDataGenerator(AbstractDataGenerator):
 	def __init__(self, report, model, pool, cr, uid, ids, context):
@@ -63,7 +63,7 @@ class BrowseDataGenerator(AbstractDataGenerator):
 		if self.logger:
 			self.logger.notifyChannel("jasper_reports", self.WARNING, message )
 		else:
-			print 'JasperReports: %s' % message
+			print('JasperReports: %s' % message)
 
 	def languages(self):
 		if self._languages:
@@ -85,7 +85,7 @@ class BrowseDataGenerator(AbstractDataGenerator):
 			values[ language ] = value[0][field] or ''
 
 		result = []
-		for key, value in values.iteritems():
+		for key, value in values.items():
 			result.append( '%s~%s' % (key, value) )
 		return '|'.join( result )
 
@@ -154,7 +154,7 @@ class XmlBrowseDataGenerator(BrowseDataGenerator):
 			if self.report.copiesField() and record.__hasattr__(self.report.copiesField()):
 				copies = int( record.__getattr__(self.report.copiesField()) )
 			for new in newRecords:
-				for x in xrange(copies):
+				for x in range(copies):
 					self.allRecords.append( new )
 
 		# Once all records have been calculated, create the XML structure itself
@@ -243,11 +243,11 @@ class XmlBrowseDataGenerator(BrowseDataGenerator):
 					self.imageFiles[ imageId ] = fileName
 				value = fileName
 			elif isinstance(value, str):
-				value = unicode(value, 'utf-8')
+				value = str(value, 'utf-8')
 			elif isinstance(value, float):
 				value = '%.10f' % value
-			elif not isinstance(value, unicode):
-				value = unicode(value)
+			elif not isinstance(value, str):
+				value = str(value)
 
 			valueNode = self.document.createTextNode( value )
 			fieldNode.appendChild( valueNode )
@@ -277,7 +277,7 @@ class CsvBrowseDataGenerator(BrowseDataGenerator):
 				new['sequence'] = sequence
 				new['subsequence'] = subsequence
 				subsequence += 1
-				for x in xrange(copies):
+				for x in range(copies):
 					new['copy'] = x
 					self.allRecords.append( new.copy() )
 
@@ -288,7 +288,7 @@ class CsvBrowseDataGenerator(BrowseDataGenerator):
 			writer = csv.DictWriter( f, self.report.fieldNames() + [''], delimiter=",", quotechar='"' )
 			header = {}
 			for field in self.report.fieldNames() + ['']:
-				if isinstance(field, unicode):
+				if isinstance(field, str):
 					name = field.encode('utf-8')
 				else:
 					name = field
@@ -397,7 +397,7 @@ class CsvBrowseDataGenerator(BrowseDataGenerator):
 					self.temporaryFiles.append( fileName )
 					self.imageFiles[ imageId ] = fileName
 				value = fileName
-			elif isinstance(value, unicode):
+			elif isinstance(value, str):
 				value = value.encode('utf-8')
 			elif isinstance(value, float):
 				value = '%.10f' % value

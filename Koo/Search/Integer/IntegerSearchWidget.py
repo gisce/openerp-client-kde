@@ -79,8 +79,8 @@ class IntegerSearchWidget(AbstractSearchWidget):
 
     def setValue(self, value):
         if value:
-            self.uiStart.setText(unicode(value))
-            self.uiEnd.setText(unicode(value))
+            self.uiStart.setText(str(value))
+            self.uiEnd.setText(str(value))
         else:
             self.uiStart.clear()
             self.uiEnd.clear()

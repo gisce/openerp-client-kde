@@ -25,6 +25,6 @@
 #
 ##############################################################################
 
-import full_text_index
-import fulltextsearch
-import fts_wizard
+from . import full_text_index
+from . import fulltextsearch
+from . import fts_wizard

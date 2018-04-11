@@ -1,1 +1,1 @@
-import create_data_template
+from . import create_data_template

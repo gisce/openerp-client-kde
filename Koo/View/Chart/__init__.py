@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from Parser import *
+from .Parser import *
 from Koo.View.ViewFactory import *
 
 ViewFactory.register(ChartParser, 'graph', _(

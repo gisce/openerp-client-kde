@@ -25,6 +25,6 @@
 #
 ##############################################################################
 
-import filters
-import koo
-import subscription
+from . import filters
+from . import koo
+from . import subscription

@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from Float import *
+from .Float import *
 from Koo.Fields.FieldWidgetFactory import *
 from Koo.Fields.FieldDelegateFactory import *
 

@@ -36,11 +36,11 @@ from string import *
 # not available
 modules = {}
 try:
-	from pyaspell import *
+	from .pyaspell import *
 	modules['pyaspell'] = True
 except:
 	modules['pyaspell'] = False
-	print "Module 'pyaspell' is not available. Consider installing it if you want to use tesseract2 for text recognition in images."
+	print("Module 'pyaspell' is not available. Consider installing it if you want to use tesseract2 for text recognition in images.")
 
 class Classifier:
 	def ocr(self):

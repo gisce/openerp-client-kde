@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from SelectionSearchWidget import *
+from .SelectionSearchWidget import *
 from Koo.Search.SearchWidgetFactory import *
 
 SearchWidgetFactory.register('selection', SelectionSearchWidget)

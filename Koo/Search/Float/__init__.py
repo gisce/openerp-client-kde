@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from FloatSearchWidget import *
+from .FloatSearchWidget import *
 from Koo.Search.SearchWidgetFactory import *
 
 SearchWidgetFactory.register('float', FloatSearchWidget)

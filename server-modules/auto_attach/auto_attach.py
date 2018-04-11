@@ -84,7 +84,7 @@ class nan_template(osv.osv):
 			box.filter = y['filter']
 			# Important step: ensure box.text is unicode!
 			if isinstance( box.text, str ):
-				box.text = unicode( box.text, 'latin-1' )
+				box.text = str( box.text, 'latin-1' )
 			template.addBox( box )
 		return template
 
@@ -340,9 +340,9 @@ class nan_document(osv.osv):
 				doc = result['document']
 
 			if not template:
-				print "No template found for document %s." % document.name
+				print("No template found for document %s." % document.name)
 			else:
-				print "The best template found for document %s is %s." % (document.name, template.name)
+				print("The best template found for document %s is %s." % (document.name, template.name))
 
 			if template:
 				template_id = template.id
@@ -440,7 +440,7 @@ class nan_document(osv.osv):
 		name = expression.group(1)
 		parameters = expression.group(2)
 		if name not in dir(self):
-			print "Function '%s' not found" % (name)
+			print("Function '%s' not found" % (name))
 			return False
 
 		parameters = parameters.split(',')
@@ -449,13 +449,13 @@ class nan_document(osv.osv):
 			value = p.strip()
 			if value.startswith( '#' ):
 				if value[1:] not in properties:
-					print "Property '%s' not found" % value
+					print("Property '%s' not found" % value)
 					newParameters.append( "''" )
 					continue
 				value = properties[ value[1:] ]
 			value = "'" + value.replace("'","\\'") + "'"
-			if type(value) != unicode:
-				value = unicode( value, errors='ignore' )
+			if type(value) != str:
+				value = str( value, errors='ignore' )
 			newParameters.append( value )
 		return (name, newParameters)
 
@@ -469,7 +469,7 @@ class nan_document(osv.osv):
 			}
 
 		for document in self.browse( cr, uid, ids, context ):
-			print "Executing action on document with state ", document.state, explain
+			print("Executing action on document with state ", document.state, explain)
 			if not explain and document.state not in ('verified','processing'):
 				continue
 
@@ -511,7 +511,7 @@ class nan_document(osv.osv):
 			if document.template_id:
 				function = document.template_id.action_function
 				if function:
-					properties = dict( [(x.name, unicode(x.value)) for x in document.property_ids] )
+					properties = dict( [(x.name, str(x.value)) for x in document.property_ids] )
 					(name, parameters) = self._parseFunction(function, properties)
 
 					obj = self.pool.get('nan.document')
@@ -537,7 +537,7 @@ class nan_document(osv.osv):
 
 					(name, parameters) = self._parseFunction(function, properties)
 					obj = self.pool.get('nan.document')
-					reference = eval('obj.%s(cr, uid, document.id, %s, context)' % ( name, u','.join( parameters ) ) )
+					reference = eval('obj.%s(cr, uid, document.id, %s, context)' % ( name, ','.join( parameters ) ) )
 
 			if reference:
 				self.write( cr, uid, [document.id], {

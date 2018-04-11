@@ -29,7 +29,7 @@
 import os
 from PyQt4.QtGui import *
 from Koo.Common import Plugins
-from DummyView import *
+from .DummyView import *
 
 # The 'ViewFactory' class specializes in creating the appropiate views. Searches
 # for available views and calls the parser of the appropiate one.

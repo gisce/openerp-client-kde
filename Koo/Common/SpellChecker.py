@@ -29,7 +29,7 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
-import Debug
+from . import Debug
 
 try:
     from enchant.checker import SpellChecker
@@ -65,7 +65,7 @@ class SpellCheckHighlighter(QSyntaxHighlighter):
         if not enchantAvailable or not self._checker:
             return
 
-        text = unicode(text)
+        text = str(text)
         self._checker.set_text(text)
         for error in self._checker:
             self.setFormat(error.wordpos, len(error.word), self._format)

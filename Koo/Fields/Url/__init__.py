@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from Url import *
+from .Url import *
 from Koo.Fields.FieldWidgetFactory import *
 
 FieldWidgetFactory.register( 'url', UrlFieldWidget )

@@ -1,6 +1,6 @@
 from service.http_server import reg_http_service, HttpDaemon
 from service.websrv_lib import HTTPDir
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import netsvc
 import tools
 
@@ -31,7 +31,7 @@ class JasperHandler(netsvc.OpenERPDispatcher, BaseHTTPRequestHandler):
         path = self.raw_requestline.replace('GET','').strip().split(' ')[0]
         try:
             result = self.execute(path)
-        except Exception, e:
+        except Exception as e:
             result = '<error><exception>%s</exception></error>' % (e.args, )
         self.wfile.write( result )
         return True

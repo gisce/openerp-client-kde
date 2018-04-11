@@ -27,7 +27,7 @@
 
 from Common import Debug
 
-from WebFieldWidget import *
+from .WebFieldWidget import *
 from Koo.Fields.FieldWidgetFactory import *
 
 try:

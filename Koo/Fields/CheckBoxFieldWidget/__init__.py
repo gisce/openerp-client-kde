@@ -25,4 +25,4 @@
 #
 ##############################################################################
 
-from CheckBoxFieldWidget import *
+from .CheckBoxFieldWidget import *

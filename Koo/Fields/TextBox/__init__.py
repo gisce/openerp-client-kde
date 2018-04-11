@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from TextBoxFieldWidget import *
+from .TextBoxFieldWidget import *
 from Koo.Fields.FieldWidgetFactory import *
 
 FieldWidgetFactory.register( 'text', TextBoxFieldWidget )

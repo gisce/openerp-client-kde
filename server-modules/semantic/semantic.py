@@ -47,7 +47,7 @@ class nan_semantic_services(netsvc.Service):
 
 	def rating(self, db, uid, passwd, model, ids, field, context={}):
 		res = self.value(db, uid, passwd, model, ids, field, 'rating', context)
-		for key in res.keys():
+		for key in list(res.keys()):
 			res[str(key)] = int(res[key])
 		return res
 
@@ -106,7 +106,7 @@ class nan_semantic_services(netsvc.Service):
 		addressField = None
 		partnerField = None
 		columns = pool.get( model )._columns
-		for key, value in columns.iteritems():
+		for key, value in columns.items():
 			if value._type == 'many2one':
 				if value._obj == 'res.partner.address':
 					addressField = key
@@ -168,7 +168,7 @@ class nan_semantic_services(netsvc.Service):
 		modelId = pool.get('ir.model').search(cr, uid, [('model','=',model)])[0]
 		query = [('subject_model','=',modelId),('subject_id','in',ids),('predicate','=',predicate)]
 		if field:
-			print "FIELD: ", field
+			print("FIELD: ", field)
 			fieldId = pool.get('ir.model.fields').search(cr, uid, [('model','=',modelId),('name','=',field)])[0]
 			query.append( ('subject_field','=',fieldId) )
 		tripleIds = pool.get('nan.semantic.triple').search(cr, uid, query)
@@ -192,7 +192,7 @@ class nan_semantic_triple(osv.osv):
 		return [(x['model'], x['name']) for x in data]
 	
 	def _reference(self, cr, uid, ids, field_name, arg, context={}):
-		print "IDS: ", ids
+		print("IDS: ", ids)
 		res = {}
 		for record in self.browse(cr, uid, ids):
 			res[ record.id ] = '%s,%d' % (record.subject_model.model, record.subject_id)
@@ -201,7 +201,7 @@ class nan_semantic_triple(osv.osv):
 	def create(self, cr, uid, vals, context=None):
 		if not context:
 			context = {}
-		print "CONTEXT: ", context
+		print("CONTEXT: ", context)
 		if 'subject_model' in context:
 			ids = self.pool.get('ir.model').search(cr, uid, [('model','=',context['subject_model'])])
 			if ids:

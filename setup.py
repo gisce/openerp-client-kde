@@ -17,7 +17,7 @@ from distutils.file_util import copy_file
 from distutils.sysconfig import get_python_lib
 
 if len(sys.argv) < 2:
-    print "Syntax: setup.py command [options]"
+    print("Syntax: setup.py command [options]")
     sys.exit(2)
 
 command = sys.argv[1]
@@ -78,7 +78,7 @@ def check_modules():
             exec('import %s' % modname)
         except ImportError:
             ok = False
-            print 'Error: python module %s (%s) is required' % (modname, desc)
+            print('Error: python module %s (%s) is required' % (modname, desc))
 
     if not ok:
         sys.exit(1)
@@ -222,7 +222,7 @@ setup(
     url='http://www.NaN-tic.com/koo-platform',
     author='NaN',
     author_email='info@nan-tic.com',
-    classifiers=filter(None, classifiers.splitlines()),
+    classifiers=[_f for _f in classifiers.splitlines() if _f],
     license='GPL',
     data_files=data_files(),
     scripts=script_files,

@@ -70,7 +70,7 @@ class ManyToManyFieldWidget(AbstractFieldWidget, ManyToManyFieldWidgetUi):
         self.connect(self.screen, SIGNAL('activated()'), self.open)
 
         self.connect(self.pushBack, SIGNAL("clicked()"), self.previous)
-        self.connect(self.pushForward, SIGNAL("clicked()"), self.next)
+        self.connect(self.pushForward, SIGNAL("clicked()"), self.__next__)
         self.connect(self.screen, SIGNAL(
             'recordMessage(int,int,int)'), self.setLabel)
 
@@ -91,7 +91,7 @@ class ManyToManyFieldWidget(AbstractFieldWidget, ManyToManyFieldWidgetUi):
         self.screen.setViewTypes(['tree'])
         self.screen.setEmbedded(True)
 
-    def next(self):
+    def __next__(self):
         self.screen.displayNext()
 
     def previous(self):
@@ -126,7 +126,7 @@ class ManyToManyFieldWidget(AbstractFieldWidget, ManyToManyFieldWidgetUi):
             return
         if not self.record:
             return
-        text = unicode(self.uiText.text()).strip()
+        text = str(self.uiText.text()).strip()
         if text == '':
             self.uiText.clear()
             return
@@ -137,7 +137,7 @@ class ManyToManyFieldWidget(AbstractFieldWidget, ManyToManyFieldWidgetUi):
         self.searching = False
 
     def slotAdd(self):
-        text = unicode(self.uiText.text()).strip()
+        text = str(self.uiText.text()).strip()
         # As opening the search dialog will emit the editingFinished signal,
         # we need to know we're searching by setting self.searching = True
         self.searching = True
@@ -153,10 +153,10 @@ class ManyToManyFieldWidget(AbstractFieldWidget, ManyToManyFieldWidgetUi):
         domain = self.record.domain(self.name)
         context = self.record.fieldContext(self.name)
 
-        ids = Rpc.session.execute('/object', 'execute', self.attrs['relation'], 'name_search', unicode(
+        ids = Rpc.session.execute('/object', 'execute', self.attrs['relation'], 'name_search', str(
             self.uiText.text()), domain, 'ilike', context, False)
         ids = [x[0] for x in ids]
-        if unicode(self.uiText.text()) == '' or len(ids) != 1:
+        if str(self.uiText.text()) == '' or len(ids) != 1:
             dialog = SearchDialog(
                 self.attrs['relation'], sel_multi=True, ids=ids, domain=domain, context=context)
             if dialog.exec_() == QDialog.Rejected:
@@ -210,7 +210,7 @@ class ManyToManyFieldWidget(AbstractFieldWidget, ManyToManyFieldWidgetUi):
 
 class ManyToManyFieldDelegate(AbstractFieldDelegate):
     def setModelData(self, editor, kooModel, index):
-        if unicode(editor.text()) == unicode(index.data(Qt.DisplayRole).toString()):
+        if str(editor.text()) == str(index.data(Qt.DisplayRole).toString()):
             return
         # We expecte a KooModel here
         model = kooModel.recordFromIndex(index)
@@ -219,7 +219,7 @@ class ManyToManyFieldDelegate(AbstractFieldDelegate):
         domain = model.domain(self.name)
         context = model.fieldContext(self.name)
 
-        ids = Rpc.session.execute('/object', 'execute', self.attributes['relation'], 'name_search', unicode(
+        ids = Rpc.session.execute('/object', 'execute', self.attributes['relation'], 'name_search', str(
             editor.text()), domain, 'ilike', context, False)
         ids = [x[0] for x in ids]
         if len(ids) != 1:

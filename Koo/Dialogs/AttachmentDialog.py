@@ -26,7 +26,7 @@
 ##############################################################################
 
 from Koo.Common import Common
-import FormWidget
+from . import FormWidget
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *

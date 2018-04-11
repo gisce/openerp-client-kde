@@ -26,10 +26,10 @@
 ##############################################################################
 
 #from translation import *
-from jasper_report import *
-from report_xml import *
-import wizard
+from .jasper_report import *
+from .report_xml import *
+from . import wizard
 
 import release
 if release.major_version != '5.0':
-    from http_server import *
+    from .http_server import *

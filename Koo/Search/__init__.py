@@ -26,4 +26,4 @@
 #
 ##############################################################################
 
-from SearchFormWidget import *
+from .SearchFormWidget import *

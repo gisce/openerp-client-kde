@@ -38,14 +38,14 @@ from Koo.Common import Url
 from Koo.Common import Api
 from Koo.Common import Debug
 
-from Cache import *
+from .Cache import *
 try:
-    import tiny_socket
+    from . import tiny_socket
     isNetRpcAvailable = True
 except:
     isNetRpcAvailable = False
 
-import xmlrpclib
+import xmlrpc.client
 import base64
 import socket
 
@@ -69,7 +69,7 @@ class RpcProtocolException(RpcException):
     def __init__(self, backtrace):
         self.code = None
         self.args = (backtrace,)
-        self.info = unicode(str(backtrace), 'utf-8')
+        self.info = str(str(backtrace), 'utf-8')
         self.backtrace = backtrace
 
 
@@ -105,21 +105,21 @@ class Connection:
 
     def stringToUnicode(self, result):
         if isinstance(result, str):
-            return unicode(result, 'utf-8')
+            return str(result, 'utf-8')
         elif isinstance(result, list):
             return [self.stringToUnicode(x) for x in result]
         elif isinstance(result, tuple):
             return tuple([self.stringToUnicode(x) for x in result])
         elif isinstance(result, dict):
             newres = {}
-            for i in result.keys():
+            for i in list(result.keys()):
                 newres[i] = self.stringToUnicode(result[i])
             return newres
         else:
             return result
 
     def unicodeToString(self, result):
-        if isinstance(result, unicode):
+        if isinstance(result, str):
             return result.encode('utf-8')
         elif isinstance(result, list):
             return [self.unicodeToString(x) for x in result]
@@ -127,7 +127,7 @@ class Connection:
             return tuple([self.unicodeToString(x) for x in result])
         elif isinstance(result, dict):
             newres = {}
-            for i in result.keys():
+            for i in list(result.keys()):
                 newres[i] = self.unicodeToString(result[i])
             return newres
         else:
@@ -195,7 +195,7 @@ class PyroConnection(Connection):
 
         try:
             self.proxy = Pyro.core.getProxyForURI(self.url)
-        except SSLError, e:
+        except SSLError as e:
             title = _('SSL Error')
             if e.message == 'No such file or directory':
                 msg = _('Please check your SSL certificate: ')
@@ -207,7 +207,7 @@ class PyroConnection(Connection):
             else:
                 raise
 
-        except Exception, e:
+        except Exception as e:
             raise
 
     def singleCall(self, obj, method, *args):
@@ -226,7 +226,7 @@ class PyroConnection(Connection):
                 # traceback.print_stack()
                 #print >> sys.stderr, "CALLING: ", obj, method, args
                 result = self.singleCall(obj, method, *args)
-            except (Pyro.errors.ConnectionClosedError, Pyro.errors.ProtocolError), x:
+            except (Pyro.errors.ConnectionClosedError, Pyro.errors.ProtocolError) as x:
                 # As Pyro is a statefull protocol, network errors
                 # or server reestarts will cause errors even if the server
                 # is running and available again. So if remote call failed
@@ -234,23 +234,23 @@ class PyroConnection(Connection):
                 # and make the call again.
                 self.proxy = Pyro.core.getProxyForURI(self.url)
                 result = self.singleCall(obj, method, *args)
-        except (Pyro.errors.ConnectionClosedError, Pyro.errors.ProtocolError), err:
-            raise RpcProtocolException(unicode(err))
-        except Pyro.core.PyroError, err:
+        except (Pyro.errors.ConnectionClosedError, Pyro.errors.ProtocolError) as err:
+            raise RpcProtocolException(str(err))
+        except Pyro.core.PyroError as err:
             faultCode = err.args and err.args[0] or ''
             faultString = '\n'.join(err.remote_stacktrace)
             raise RpcServerException(faultCode, faultString)
-        except WrongHost, err:
+        except WrongHost as err:
             faultCode = err.args and err.args[0] or ''
             faultString = 'The hostname of the server and the SSL certificate do not match.\n  The hostname is %s and the SSL certifcate says %s\n Set postconncheck to 0 in koorc to override this check.' % (
                 err.expectedHost, err.actualHost)
             raise RpcServerException(faultCode, faultString)
-        except Exception, err:
+        except Exception as err:
             faultCode = err.message
             if Pyro.util.getPyroTraceback(err):
-                faultString = u''
+                faultString = ''
                 for x in Pyro.util.getPyroTraceback(err):
-                    faultString += unicode(x, 'utf-8', errors='ignore')
+                    faultString += str(x, 'utf-8', errors='ignore')
 
             else:
                 faultString = err.message
@@ -267,8 +267,8 @@ class SocketConnection(Connection):
         try:
             s = tiny_socket.mysocket()
             s.connect(self.url)
-        except socket.error, err:
-            raise RpcProtocolException(unicode(err))
+        except socket.error as err:
+            raise RpcProtocolException(str(err))
         try:
             # Remove leading slash (ie. '/object' -> 'object')
             obj = obj[1:]
@@ -279,9 +279,9 @@ class SocketConnection(Connection):
             else:
                 s.mysend((obj, method) + encodedArgs)
             result = s.myreceive()
-        except socket.error, err:
-            raise RpcProtocolException(unicode(err))
-        except tiny_socket.Myexception, err:
+        except socket.error as err:
+            raise RpcProtocolException(str(err))
+        except tiny_socket.Myexception as err:
             faultCode = err.faultCode
             faultString = err.faultString
             raise RpcServerException(faultCode, faultString)
@@ -300,7 +300,7 @@ class XmlRpcConnection(Connection):
         self.url += '/xmlrpc'
 
     def call(self, obj, method, *args):
-        remote = xmlrpclib.ServerProxy(self.url + obj)
+        remote = xmlrpc.client.ServerProxy(self.url + obj)
         function = getattr(remote, method)
         try:
             if self.authorized:
@@ -308,9 +308,9 @@ class XmlRpcConnection(Connection):
                                   self.password, *args)
             else:
                 result = function(*args)
-        except socket.error, err:
+        except socket.error as err:
             raise RpcProtocolException(err)
-        except xmlrpclib.Fault, err:
+        except xmlrpc.client.Fault as err:
             raise RpcServerException(err.faultCode, err.faultString)
         return result
 
@@ -397,16 +397,16 @@ class AsynchronousSessionCall(QThread):
             try:
                 self.result = self.session.call(
                     self.obj, self.method, *self.args)
-            except Exception, err:
+            except Exception as err:
                 self.exception = err
         else:
             try:
                 self.result = self.session.call(
                     self.obj, self.method, *self.args)
-            except RpcProtocolException, err:
+            except RpcProtocolException as err:
                 self.exception = err
                 self.error = (_('Connection Refused'), err.info, err.info)
-            except RpcServerException, err:
+            except RpcServerException as err:
                 self.exception = err
                 if err.type in ('warning', 'UserError'):
                     self.warning = (err.info, err.data)
@@ -524,10 +524,10 @@ class Session:
         while True:
             try:
                 return self.call(obj, method, *args)
-            except RpcProtocolException, err:
+            except RpcProtocolException as err:
                 if not Notifier.notifyLostConnection(count):
                     raise
-            except RpcServerException, err:
+            except RpcServerException as err:
                 if err.type in ('warning', 'UserError'):
                     if err.info in ('ConcurrencyException') and len(args) > 4:
                         if Notifier.notifyConcurrencyError(args[0], args[2] and args[2][0], args[4]):
@@ -552,11 +552,11 @@ class Session:
         _url = str(url.scheme()) + '://' + \
             str(url.host()) + ':' + str(url.port())
         self.connection = createConnection(_url)
-        user = Url.decodeFromUrl(unicode(url.userName()))
-        password = Url.decodeFromUrl(unicode(url.password()))
+        user = Url.decodeFromUrl(str(url.userName()))
+        password = Url.decodeFromUrl(str(url.password()))
         try:
             res = self.connection.call('/common', 'login', db, user, password)
-        except socket.error, e:
+        except socket.error as e:
             return Session.Exception
         if not res:
             self.open = False
@@ -608,7 +608,7 @@ class Session:
         if context is None:
             context = {}
         context['uid'] = self.uid
-        if isinstance(expression, basestring):
+        if isinstance(expression, str):
             expression = expression.replace("'active_id'", "active_id")
             return eval(expression, context)
         else:
@@ -646,14 +646,14 @@ class Database:
     def list(self, url):
         try:
             call = self.call(url, 'list')
-        except RpcServerException, e:
+        except RpcServerException as e:
             if e.type == 'AccessDenied':
                 # The server has been configured to not return
                 # the list of available databases.
                 call = False
             else:
                 call = -1
-        except Exception, e:
+        except Exception as e:
             call = -1
         finally:
             return call
@@ -671,7 +671,7 @@ class Database:
         res = False
         try:
             res = self.call(url, method, *args)
-        except socket.error, msg:
+        except socket.error as msg:
             Notifier.notifyWarning('', _('Could not contact server!'))
         return res
 
@@ -718,11 +718,11 @@ if isQtNetworkAvailable:
         def __init__(self, parent, url, operation):
             QNetworkReply.__init__(self, parent)
 
-            path = unicode(url.path())
+            path = str(url.path())
             path = path.split('/')
-            if unicode(url.host()) == 'client':
+            if str(url.host()) == 'client':
                 function = path[-1]
-                parameters = [[unicode(x[0]), unicode(x[1])]
+                parameters = [[str(x[0]), str(x[1])]
                               for x in url.queryItems()]
                 parameters = dict(parameters)
                 if 'res_id' in parameters:
@@ -737,7 +737,7 @@ if isQtNetworkAvailable:
 
                 return
             elif len(path) >= 3:
-                model = unicode(url.host())
+                model = str(url.host())
                 function = path[1]
                 parameter = '/%s' % '/'.join(path[2:])
 

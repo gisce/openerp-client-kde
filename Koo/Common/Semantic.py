@@ -64,19 +64,19 @@ def addInformationToFile(fileName, model, ids, field=None):
     # Calculate average rating
     rating = 0
     if ratings:
-        for x in ratings.values():
+        for x in list(ratings.values()):
             rating += x
         rating = rating / len(ratings)
     # Pickup all tags
     tags = []
-    for x in allTags.values():
+    for x in list(allTags.values()):
         tags += x
     tags = list(set(tags))
     # Pickup all descriptions and merge them into one
     description = '\n--\n'.join(set(allDescriptions.values()))
     # Pickup all contacts
     contacts = []
-    for x in allContacts.values():
+    for x in list(allContacts.values()):
         contacts += x
     contacts = list(set(contacts))
 
@@ -110,10 +110,10 @@ def addInformationToFile(fileName, model, ids, field=None):
         contacts = []
         # First store all contacts we want the document to be related to because
         # Soprano doesn't support adding resources while iterating.
-        while iterator.next():
+        while next(iterator):
             x = iterator.binding('contact')
             if x.isResource():
-                contacts.append(unicode(x.uri()))
+                contacts.append(str(x.uri()))
         # Add the relation to the corresponding PIMO of the resource.
         for contact in contacts:
             resource.addIsRelated(Nepomuk.Resource(x.uri()).pimoThing())
