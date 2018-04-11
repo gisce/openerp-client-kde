@@ -805,11 +805,11 @@ class RecordGroup(QObject):
             ids = self.rpc.search(
                 self._domain + self._filter, 0, False, False, self._context)
         else:
-            type = self.fields[field]['type']
-            if type == 'one2many' or type == 'many2many':
+            field_type = self.fields[field]['type']
+            if field_type == 'one2many' or type == 'many2many':
                 # We're not able to sort 2many fields
                 sortingResult = self.SortingNotPossible
-            elif type == 'many2one':
+            elif field_type == 'many2one':
                 # This works only if '#407667' is fixed, but it was fixed in 2010-02-03
                 orderby = '"%s"' % field
                 if order == Qt.AscendingOrder:
@@ -899,8 +899,8 @@ class RecordGroup(QObject):
                 else:
                     return v
 
-            type = self.fields[field]['type']
-            if type == 'one2many' or type == 'many2many':
+            field_type = self.fields[field]['type']
+            if field_type == 'one2many' or field_type == 'many2many':
                 self.records.sort(key=lambda x: len(x.value(field).group))
             else:
                 self.records.sort(key=ignoreCase)
