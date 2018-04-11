@@ -88,7 +88,7 @@ class Screen(QScrollArea):
 
         self.searchForm = SearchFormWidget(self.container)
         # @xtorello toreview
-        # self.searchForm.search.connect(self.search)
+        self.searchForm.performSearch.connect(self.search)
         self.searchForm.keyDownPressed.connect(self.setFocusToView)
         self.searchForm.hide()
         self.containerView = None
