@@ -131,6 +131,10 @@ class Screen(QScrollArea):
         # if none is selected.
         self._firstTimeShown = True
 
+        # @xtorello toreview signal to method integration
+        self.currentChangedSignal.connect(self.currentChanged)
+
+
     def showEvent(self, event):
         if self._firstTimeShown:
             self._firstTimeShown = False
@@ -310,10 +314,10 @@ class Screen(QScrollArea):
         # form it produces an ugly flickering.
         self.loadSearchForm()
         self.containerView.show()
-        # @xtorello toreview
-        ## widget.activated.connect(self.activate)
-        ## widget.currentChanged['PyQt_PyObject'].connect(self.currentChanged)
-        ## widget.statusMessage['QString'].connect(self.statusMessage['QString'])
+        # @xtorello toreview zzz
+        widget.activated.connect(self.activate)
+        widget.currentChanged['PyQt_PyObject'].connect(self.currentChanged)
+        widget.statusMessage['QString'].connect(self.statusMessage['QString'])
 
         # Set focus proxy so other widgets can try to setFocus to us
         # and the focus is set to the expected widget.
