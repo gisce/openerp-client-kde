@@ -101,7 +101,8 @@ class KooModel(QAbstractItemModel):
     # call
     def setRecordGroup(self, group):
         self.modelAboutToBeReset.emit()
-        from pudb.remote import set_trace; set_trace(term_size=(300, 40), host='0.0.0.0', port=6900)
+        # @xtorello toreview debug
+        # from pudb.remote import set_trace; set_trace(term_size=(200, 40), host='0.0.0.0', port=6900)
 
         if self.group:
         	self.group.recordsInserted[int, int].disconnect(self.recordsInserted)
