@@ -1,6 +1,10 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QHBoxLayout
 #from PyQt5.QtCore import SIGNAL
 
+import sys
+sys.path.insert(0, '..')
+sys.path.insert(0, '.')
+
 from Koo.Rpc import Rpc
 from Koo.Common import Api
 from Koo.Common import Localization
