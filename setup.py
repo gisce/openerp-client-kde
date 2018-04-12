@@ -240,7 +240,7 @@ setup(
             'includes': [
                 'sip',
                 'PyQt5.QtNetwork',
-                'PyQt5.QtWebKit',
+                # 'PyQt5.QtWebKit',
             ] + packages +
             # Required by enchant
             [
