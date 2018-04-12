@@ -295,7 +295,6 @@ class ToManyField(QObject, StringField):
 
         #@xtorello toreview
         # QObject.__init__(self)
-        print(attrs)
         super().__init__(attrs)
         #self.parent = parent
         self.attrs = attrs
