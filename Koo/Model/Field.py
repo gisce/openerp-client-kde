@@ -290,12 +290,14 @@ class ManyToOneField(StringField):
 
 
 class ToManyField(QObject, StringField):
-    def __init__(self, attrs):
-        pass
+    def __init__(self, parent, attrs):
 
-        #@xtorello toreview
+
+        QObject.__init__(parent)
+        StringField.__init__(self,parent,attrs)
+
         # QObject.__init__(self)
-        super().__init__(attrs)
+        #super().__init__(parent,attrs)
         #self.parent = parent
         self.attrs = attrs
         self.name = attrs['name']
@@ -329,7 +331,7 @@ class ToManyField(QObject, StringField):
     def set(self, record, value, test_state=False, modified=False):
         pass
         # @xtorello toreview
-        """
+
 
         from Koo.Model.Group import RecordGroup
         # We can't add the context here as it might cause an infinite loop in some cases where
@@ -345,7 +347,7 @@ class ToManyField(QObject, StringField):
         record.values[self.name] = group
         if modified:
             self.changed(record)
-        """
+
 
     def set_client(self, record, value, test_state=False):
         self.set(record, value, test_state=test_state)
@@ -367,9 +369,9 @@ class OneToManyField(ToManyField):
     pass
 
 
-    def __init__(self, attrs):
+    def __init__(self, parent, attrs):
         # QObject.__init__(self)
-        super().__init__(attrs)
+        super().__init__(parent,attrs)
 
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         if not record.values[self.name]:
@@ -501,7 +503,7 @@ class FieldFactory:
             fieldType = 'many2one'
 
         if fieldType == "one2many" or fieldType == "many2many":
-            return FieldFactory.types[fieldType](attributes)
+            return FieldFactory.types[fieldType](parent,attributes)
 
         if fieldType in FieldFactory.types:
             return FieldFactory.types[fieldType](parent, attributes)
