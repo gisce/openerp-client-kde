@@ -190,6 +190,7 @@ class TreeView(AbstractView):
         self._readOnly = True
 
         self.activated.connect(self.perform_activated)
+        self.currentChanged.connect(self.perform_currentChanged)
 
     def sizeHint(self):
         return QSize(10, 10)
@@ -211,7 +212,7 @@ class TreeView(AbstractView):
         self.currentRecord = None
         self.treeModel = model
         self.widget.setModel(self.treeModel)
-        self.widget.selectionModel().currentChanged[QModelIndex, QModelIndex].connect(self.currentChanged)
+        self.widget.selectionModel().currentChanged[QModelIndex, QModelIndex].connect(self.perform_currentChanged)
         self.treeModel.rowsInserted[QModelIndex, int, int].connect(self.updateAggregates)
         self.treeModel.rowsRemoved[QModelIndex, int, int].connect(self.updateAggregates)
         self.treeModel.modelReset.connect(self.updateAggregates)
@@ -280,7 +281,10 @@ class TreeView(AbstractView):
         if self._readOnly:
             self.activated.emit()
 
-    def currentChanged(self, current, previous):
+    # @xtorello toreview
+    # @pyqtSlot('PyQt_PyObject')
+    # @pyqtSlot('PyQt_PyObject', 'PyQt_PyObject')
+    def perform_currentChanged(self, current, previous):
         if self.selecting:
             return
         self.currentRecord = self.treeModel.recordFromIndex(current)
