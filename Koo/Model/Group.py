@@ -113,7 +113,7 @@ class RecordGroup(QObject):
         self.records = []
 
         # @xtorello toreview signal to method integration
-        self.recordChangedSignal.connect(self.recordChanged)
+        # self.recordChangedSignal.connect(self.recordChanged)
 
         self.enableSignals()
 
@@ -406,7 +406,7 @@ class RecordGroup(QObject):
     def recordChanged(self, record):
         # @xtorello toreview or True
         if self._signalsEnabled:
-            self.recordChanged.emit(record)
+            self.recordChangedSignal.emit(record)
 
     def recordModified(self, record):
         if self._signalsEnabled:
