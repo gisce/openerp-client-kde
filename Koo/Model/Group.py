@@ -189,8 +189,8 @@ class RecordGroup(QObject):
         for f in self.fieldObjects:
             self.fieldObjects[f].parent = None
             # @xtorello toreview
-            ## self.fieldObjects[f].setParent(None)
-            # self.fieldObjects[f].__del__()
+            #self.fieldObjects[f].setParent(None)
+            #self.fieldObjects[f].__del__()
             #self.disconnect( self.fieldObjects[f], None, 0, 0 )
             #self.fieldObjects[f] = None
             #del self.fieldObjects[f]

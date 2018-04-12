@@ -500,8 +500,7 @@ class FieldFactory:
         if fieldType == 'selection' and 'relation' in attributes:
             fieldType = 'many2one'
 
-        if fieldType == "one2many" or fieldType == "many2many":# or fieldType == "many2one":
-            print (fieldType, "MANY")
+        if fieldType == "one2many" or fieldType == "many2many":
             return FieldFactory.types[fieldType](attributes)
 
         if fieldType in FieldFactory.types:
