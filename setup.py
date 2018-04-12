@@ -64,10 +64,7 @@ version = Version.Version
 py_short_version = '%s.%s' % sys.version_info[:2]
 
 required_modules = [
-    ('PyQt5.QtCore', 'Qt5 Core python bindings'),
-    ('PyQt5.QtGui', 'Qt5 Gui python bindings'),
-    ('PyQt5.uic', 'Qt5 uic python bindings'),
-    ('PyQt5.QtWebKit', 'Qt5 WebKit python bindings')
+    ('PyQt5', 'Qt5 python bindings'),
 ]
 
 
