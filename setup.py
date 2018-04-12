@@ -64,10 +64,10 @@ version = Version.Version
 py_short_version = '%s.%s' % sys.version_info[:2]
 
 required_modules = [
-    ('PyQt4.QtCore', 'Qt4 Core python bindings'),
-    ('PyQt4.QtGui', 'Qt4 Gui python bindings'),
-    ('PyQt4.uic', 'Qt4 uic python bindings'),
-    ('PyQt4.QtWebKit', 'Qt4 WebKit python bindings')
+    ('PyQt5.QtCore', 'Qt5 Core python bindings'),
+    ('PyQt5.QtGui', 'Qt5 Gui python bindings'),
+    ('PyQt5.uic', 'Qt5 uic python bindings'),
+    ('PyQt5.QtWebKit', 'Qt5 WebKit python bindings')
 ]
 
 
@@ -100,9 +100,9 @@ def data_files():
     if using_py2exe:
         # Add NanScan files
         files.append((opj('share', 'NanScan'), [
-                     'c:\\python26\\lib\\site-packages\\NanScan\\ScanDialog.ui']))
+                     'c:\\python36\\lib\\site-packages\\NanScan\\ScanDialog.ui']))
         files.append((opj('share', 'NanScan'), [
-                     'c:\\python26\\lib\\site-packages\\NanScan\\Common.rcc']))
+                     'c:\\python36\\lib\\site-packages\\NanScan\\Common.rcc']))
 
         dest = opj('share', 'locale', '%s', 'LC_MESSAGES')
         for src in glob.glob(opj('Koo', 'l10n', '*', 'LC_MESSAGES', 'koo.mo')):
@@ -242,8 +242,8 @@ setup(
         'py2exe': {
             'includes': [
                 'sip',
-                'PyQt4.QtNetwork',
-                'PyQt4.QtWebKit',
+                'PyQt5.QtNetwork',
+                'PyQt5.QtWebKit',
             ] + packages +
             # Required by enchant
             [
