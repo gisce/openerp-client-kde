@@ -1,9 +1,5 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QHBoxLayout
-#from PyQt5.QtCore import SIGNAL
-
-import sys
-sys.path.insert(0, '..')
-sys.path.insert(0, '.')
+from PyQt4.QtGui import QApplication, QMainWindow, QDialog, QHBoxLayout
+from PyQt4.QtCore import SIGNAL
 
 from Koo.Rpc import Rpc
 from Koo.Common import Api
@@ -11,7 +7,7 @@ from Koo.Common import Localization
 Localization.initializeTranslations()
 from Koo.Dialogs import WindowService
 
-x = Rpc.session.login('http://admin:admin@localhost:8069', 'test_1519123854')
+x = Rpc.session.login('http://admin:admin@localhost:8069', 'test_1522167327')
 
 app = QApplication([])
 
@@ -27,8 +23,7 @@ class TestWindow(QMainWindow):
         layout.setContentsMargins( 0, 0, 0, 0 )
         layout.addWidget(window)
         window.setParent( dialog )
-        #self.connect( window, SIGNAL('closed()'), dialog.accept )
-        # self.connect( window, oialog.accept )
+        self.connect( window, SIGNAL('closed()'), dialog.accept )
         window.show()
         dialog.exec_()
 
@@ -43,14 +38,14 @@ class KooApi(Api.KooApi):
 
 	def executeAction(self, action, data={}, context={}):
 		Koo.Actions.executeAction( action, data, context )
-
+		
 	def executeKeyword(self, keyword, data={}, context={}):
 		return Koo.Actions.executeKeyword( keyword, data, context )
 
-	def createWindow(self, view_ids, model, res_id=False, domain=None,
-			view_type='form', window=None, context=None, mode=None, name=False, autoReload=False,
+	def createWindow(self, view_ids, model, res_id=False, domain=None, 
+			view_type='form', window=None, context=None, mode=None, name=False, autoReload=False, 
 			target='current'):
-		WindowService.createWindow( view_ids, model, res_id, domain,
+		WindowService.createWindow( view_ids, model, res_id, domain, 
 			view_type, window, context, mode, name, autoReload, target )
 
 	def createWebWindow(self, url, title):
@@ -63,5 +58,7 @@ Api.instance = KooApi()
 
 Api.instance.createWindow([], 'res.partner', 1, target='current')
 win.show()
+
+
 
 Rpc.session.logout()
