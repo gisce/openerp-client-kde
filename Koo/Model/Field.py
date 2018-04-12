@@ -292,19 +292,20 @@ class ManyToOneField(StringField):
 class ToManyField(QObject, StringField):
     def __init__(self, attrs):
         pass
-        """
+
         #@xtorello toreview
         # QObject.__init__(self)
+        print(attrs)
         super().__init__(attrs)
-        self.parent = parent
+        #self.parent = parent
         self.attrs = attrs
         self.name = attrs['name']
-        """
+
 
     def create(self, record):
         pass
         # @xtorello toreview
-        """
+
         from Koo.Model.Group import RecordGroup
         group = RecordGroup(
             resource=self.attrs['relation'], fields={}, parent=record,
@@ -314,7 +315,7 @@ class ToManyField(QObject, StringField):
         group.tomanyfield = self
         group.modified.connect(self.groupModified)
         return group
-        """
+
 
     def groupModified(self):
         p = self.sender().parent
@@ -365,7 +366,7 @@ class ToManyField(QObject, StringField):
 class OneToManyField(ToManyField):
     # @xtorello toreview
     pass
-    """
+
 
     def __init__(self, attrs):
         # QObject.__init__(self)
@@ -412,13 +413,10 @@ class OneToManyField(ToManyField):
 
     def default(self, record):
         return [x.defaults() for x in record.values[self.name]]
-    """
 
 
 class ManyToManyField(ToManyField):
     # @xtorello toreview
-    pass
-    """
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         if not record.values[self.name]:
             return []
@@ -428,7 +426,6 @@ class ManyToManyField(ToManyField):
         if not record.values[self.name]:
             return []
         return record.values[self.name].ids()
-    """
 
 
 class ReferenceField(StringField):
@@ -487,10 +484,8 @@ class FieldFactory:
         'integer': IntegerField,
         'float': FloatField,
         'many2one': ManyToOneField,
-        # 'many2many': ManyToManyField,
-        # 'one2many': OneToManyField,
-        'many2many': ManyToOneField,
-        'one2many': ManyToOneField,
+        'many2many': ManyToManyField,
+        'one2many': OneToManyField,
         'reference': ReferenceField,
         'selection': SelectionField,
         'boolean': IntegerField,
