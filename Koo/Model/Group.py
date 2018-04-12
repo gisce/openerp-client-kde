@@ -207,9 +207,6 @@ class RecordGroup(QObject):
         for fname in fkeys:
             fvalue = self.fields[fname]
             fvalue['name'] = fname
-            # @xtorello toreview
-            if fvalue['type'] in ["one2many", "many2many"]:
-                continue
             self.fieldObjects[fname] = Field.FieldFactory.create(
                 fvalue['type'], self, fvalue)
             if fvalue['type'] in ('binary', 'image'):
