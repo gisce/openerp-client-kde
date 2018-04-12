@@ -35,7 +35,6 @@ from Koo.Common import Numeric
 
 class StringField:
     def __init__(self, parent, attrs):
-        print ("PETO")
         self.parent = parent
         self.attrs = attrs
         self.name = attrs['name']
