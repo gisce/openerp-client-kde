@@ -189,6 +189,8 @@ class TreeView(AbstractView):
         self.setLayout(layout)
         self._readOnly = True
 
+        self.activated.connect(self.perform_activated)
+
     def sizeHint(self):
         return QSize(10, 10)
 
@@ -271,7 +273,10 @@ class TreeView(AbstractView):
     # or activated, only when it's read-only.
     # Used by the search dialog to "accept" the choice or by
     # Screen to switch view
-    def activated(self, index):
+    # @xtorello toreview
+    #def activated(self, index):
+    @pyqtSlot()
+    def perform_activated(self, index):
         if self._readOnly:
             self.activated.emit()
 
