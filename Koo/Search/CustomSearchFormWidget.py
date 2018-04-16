@@ -202,8 +202,9 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
             self.setAndSelected()
 
     def updateRelatedAndOperators(self, index=None):
-        fieldName = str(self.uiField.itemData(self.uiField.currentIndex()))
-        if not fieldName:
+        itemData = self.uiField.itemData(self.uiField.currentIndex())
+        fieldName = str(itemData)
+        if not itemData:
             return
 
         fieldType = self.fields[fieldName].get('type')
