@@ -276,7 +276,7 @@ class TreeView(AbstractView):
     # Screen to switch view
     # @xtorello toreview
     #def activated(self, index):
-    def perform_activated(self, index):
+    def perform_activated(self, index=None):
         if self._readOnly:
             self.activated.emit()
 
