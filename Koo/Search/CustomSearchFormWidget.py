@@ -263,8 +263,12 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
                 self.uiOperator.addItem(operator[1], QVariant(operator[0]))
 
     def updateValue(self, index):
-        operator = str(self.uiOperator.itemData(
-            self.uiOperator.currentIndex()).toString())
+        operatorData = self.uiField.itemData(self.uiOperator.currentIndex())
+        operator = str(operatorData)
+
+        if not operator:
+            return
+
         for op in self.operators:
             if operator == op[0]:
                 self.uiValue.setVisible(op[3])
