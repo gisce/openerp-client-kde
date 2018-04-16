@@ -136,6 +136,10 @@ class KooModel(QAbstractItemModel):
     def isReadOnly(self):
     	return self._readOnly
 
+    def reset(self):
+        pass
+        # @xtorello toreview todo https://stackoverflow.com/questions/14756645/how-to-reset-model-in-qt
+
     def recordsInserted(self, start, end):
     	if self._updatesEnabled:
     		self.reset()
