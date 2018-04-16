@@ -174,13 +174,14 @@ class Record(QObject):
     def setStateAttributes(self, fieldName, state='draft'):
         # @xtorello toreview
         field = self.group.fieldObjects[fieldName]
-        stateChanges = dict(field.attrs.get('states', {}).get(state, []))
+        stateChanges = dict(field.attrs.get('states', {}).get(state[0], []))
         for key in ('readonly', 'required'):
             if key in stateChanges:
                 self.stateAttributes(fieldName)[key] = stateChanges[key]
             else:
-                self.stateAttributes(fieldName)[
-                    key] = field.attrs.get(key, False)
+                self.stateAttributes(fieldName)[key] = field.attrs.get(
+                    key, False
+                )
 
     def updateStateAttributes(self):
         state = self.values.get('state', 'draft')
