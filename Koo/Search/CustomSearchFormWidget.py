@@ -235,6 +235,16 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
 
     def updateOperators(self, index=None):
         self.uiOperator.clear()
+
+        fieldData= self.uiField.itemData(self.uiField.currentIndex())
+        fieldName = str(fieldData)
+
+        relatedFielData = self.uiField.itemData(self.uiRelatedField.currentIndex())
+        relatedFieldName = str(relatedFielData)
+
+        if not fieldData  or not relatedFielData:
+            return
+
         fieldName = str(self.uiField.itemData(
             self.uiField.currentIndex()).toString())
         relatedFieldName = str(self.uiRelatedField.itemData(
