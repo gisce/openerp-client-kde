@@ -278,7 +278,9 @@ class TreeView(AbstractView):
     #def activated(self, index):
     def perform_activated(self, index=None):
         if self._readOnly:
-            self.activated.emit()
+            # @xtorello toreview if needed
+            pass
+            # self.activated.emit()
 
     # @xtorello toreview
     # @pyqtSlot('PyQt_PyObject')
