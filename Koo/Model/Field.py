@@ -490,8 +490,8 @@ class FieldFactory:
         'many2one': ManyToOneField,
         # 'many2many': ManyToManyField,
         # 'one2many': OneToManyField,
-        'many2many': ManyToOneField,
-        'one2many': ManyToOneField,
+        'many2many': None,
+        'one2many': None,
         'reference': ReferenceField,
         'selection': SelectionField,
         'boolean': IntegerField,
@@ -509,6 +509,7 @@ class FieldFactory:
 
         if fieldType == "one2many" or fieldType == "many2many":# or fieldType == "many2one":
             print (fieldType, "MANY")
+            return False
             return FieldFactory.types[fieldType](attributes)
 
         if fieldType in FieldFactory.types:
