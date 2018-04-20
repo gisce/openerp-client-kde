@@ -291,21 +291,19 @@ class ManyToOneField(StringField):
 
 
 class ToManyField(QObject, StringField):
-    def __init__(self, attrs):
-        pass
-        """
-        #@xtorello toreview
+    def __init__(self, parent, attrs):
+        StringField.__init__(self,parent,attrs)
         # QObject.__init__(self)
-        super().__init__(attrs)
-        self.parent = parent
+        #super().__init__(parent,attrs)
+        #self.parent = parent
         self.attrs = attrs
         self.name = attrs['name']
-        """
+
 
     def create(self, record):
         pass
         # @xtorello toreview
-        """
+
         from Koo.Model.Group import RecordGroup
         group = RecordGroup(
             resource=self.attrs['relation'], fields={}, parent=record,
@@ -315,7 +313,7 @@ class ToManyField(QObject, StringField):
         group.tomanyfield = self
         group.modified.connect(self.groupModified)
         return group
-        """
+
 
     def groupModified(self):
         p = self.sender().parent
@@ -330,7 +328,7 @@ class ToManyField(QObject, StringField):
     def set(self, record, value, test_state=False, modified=False):
         pass
         # @xtorello toreview
-        """
+
 
         from Koo.Model.Group import RecordGroup
         # We can't add the context here as it might cause an infinite loop in some cases where
@@ -346,7 +344,7 @@ class ToManyField(QObject, StringField):
         record.values[self.name] = group
         if modified:
             self.changed(record)
-        """
+
 
     def set_client(self, record, value, test_state=False):
         self.set(record, value, test_state=test_state)
@@ -368,9 +366,10 @@ class OneToManyField(ToManyField):
     pass
     """
 
-    def __init__(self, attrs):
+
+    def __init__(self, parent, attrs):
         # QObject.__init__(self)
-        super().__init__(attrs)
+        super().__init__(parent,attrs)
 
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         if not record.values[self.name]:
@@ -488,10 +487,8 @@ class FieldFactory:
         'integer': IntegerField,
         'float': FloatField,
         'many2one': ManyToOneField,
-        # 'many2many': ManyToManyField,
-        # 'one2many': OneToManyField,
-        'many2many': None,
-        'one2many': None,
+        'many2many': ManyToManyField,
+        'one2many': OneToManyField,
         'reference': ReferenceField,
         'selection': SelectionField,
         'boolean': IntegerField,
@@ -507,10 +504,8 @@ class FieldFactory:
         if fieldType == 'selection' and 'relation' in attributes:
             fieldType = 'many2one'
 
-        if fieldType == "one2many" or fieldType == "many2many":# or fieldType == "many2one":
-            print (fieldType, "MANY")
-            return False
-            return FieldFactory.types[fieldType](attributes)
+        if fieldType == "one2many" or fieldType == "many2many":
+            return FieldFactory.types[fieldType](parent,attributes)
 
         if fieldType in FieldFactory.types:
             return FieldFactory.types[fieldType](parent, attributes)

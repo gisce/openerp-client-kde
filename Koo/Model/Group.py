@@ -189,8 +189,8 @@ class RecordGroup(QObject):
         for f in self.fieldObjects:
             self.fieldObjects[f].parent = None
             # @xtorello toreview
-            ## self.fieldObjects[f].setParent(None)
-            # self.fieldObjects[f].__del__()
+            #self.fieldObjects[f].setParent(None)
+            #self.fieldObjects[f].__del__()
             #self.disconnect( self.fieldObjects[f], None, 0, 0 )
             #self.fieldObjects[f] = None
             #del self.fieldObjects[f]
@@ -207,9 +207,6 @@ class RecordGroup(QObject):
         for fname in fkeys:
             fvalue = self.fields[fname]
             fvalue['name'] = fname
-            # @xtorello toreview
-            if fvalue['type'] in ["one2many", "many2many"]:
-                continue
             self.fieldObjects[fname] = Field.FieldFactory.create(
                 fvalue['type'], self, fvalue)
             if fvalue['type'] in ('binary', 'image'):
