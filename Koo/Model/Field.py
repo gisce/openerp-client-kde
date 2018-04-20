@@ -182,7 +182,7 @@ class BinaryField(StringField):
             c.update(record.context())
             value = record.rpc.read([record.id], [self.name], c)[0][self.name]
             if value:
-                record.values[self.name] = base64.decodestring(value)
+                record.values[self.name] = base64.b64decode(value)
             else:
                 record.values[self.name] = ''
         return record.values[self.name]
