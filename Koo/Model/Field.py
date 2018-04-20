@@ -293,7 +293,6 @@ class ToManyField(QObject, StringField):
     def __init__(self, parent, attrs):
 
 
-        QObject.__init__(parent)
         StringField.__init__(self,parent,attrs)
 
         # QObject.__init__(self)
