@@ -276,21 +276,22 @@ class TreeView(AbstractView):
     # Screen to switch view
     # @xtorello toreview
     #def activated(self, index):
-    @pyqtSlot()
-    def perform_activated(self, index):
+    def perform_activated(self, index=None):
         if self._readOnly:
-            self.activated.emit()
+            # @xtorello toreview if needed
+            pass
+            # self.activated.emit()
 
     # @xtorello toreview
     # @pyqtSlot('PyQt_PyObject')
     # @pyqtSlot('PyQt_PyObject', 'PyQt_PyObject')
-    def perform_currentChanged(self, current, previous):
+    def perform_currentChanged(self, current, previous=None):
         if self.selecting:
             return
         self.currentRecord = self.treeModel.recordFromIndex(current)
         # We send the current record. Previously we sent only the id of the model, but
         # new models have id=None
-        self.currentChanged.emit(self.currentRecord)
+        # self.currentChanged.emit(self.currentRecord)
         self.updateAggregates()
 
     def store(self):

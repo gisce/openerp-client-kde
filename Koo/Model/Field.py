@@ -35,6 +35,7 @@ from Koo.Common import Numeric
 
 class StringField:
     def __init__(self, parent, attrs):
+        print ("PETO")
         self.parent = parent
         self.attrs = attrs
         self.name = attrs['name']
@@ -291,10 +292,7 @@ class ManyToOneField(StringField):
 
 class ToManyField(QObject, StringField):
     def __init__(self, parent, attrs):
-
-
         StringField.__init__(self,parent,attrs)
-
         # QObject.__init__(self)
         #super().__init__(parent,attrs)
         #self.parent = parent
@@ -366,6 +364,7 @@ class ToManyField(QObject, StringField):
 class OneToManyField(ToManyField):
     # @xtorello toreview
     pass
+    """
 
 
     def __init__(self, parent, attrs):
@@ -413,10 +412,13 @@ class OneToManyField(ToManyField):
 
     def default(self, record):
         return [x.defaults() for x in record.values[self.name]]
+    """
 
 
 class ManyToManyField(ToManyField):
     # @xtorello toreview
+    pass
+    """
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         if not record.values[self.name]:
             return []
@@ -426,6 +428,7 @@ class ManyToManyField(ToManyField):
         if not record.values[self.name]:
             return []
         return record.values[self.name].ids()
+    """
 
 
 class ReferenceField(StringField):

@@ -174,13 +174,14 @@ class Record(QObject):
     def setStateAttributes(self, fieldName, state='draft'):
         # @xtorello toreview
         field = self.group.fieldObjects[fieldName]
-        stateChanges = dict(field.attrs.get('states', {}).get(state, []))
+        stateChanges = dict(field.attrs.get('states', {}).get(state[0], []))
         for key in ('readonly', 'required'):
             if key in stateChanges:
                 self.stateAttributes(fieldName)[key] = stateChanges[key]
             else:
-                self.stateAttributes(fieldName)[
-                    key] = field.attrs.get(key, False)
+                self.stateAttributes(fieldName)[key] = field.attrs.get(
+                    key, False
+                )
 
     def updateStateAttributes(self):
         state = self.values.get('state', 'draft')
@@ -256,14 +257,14 @@ class Record(QObject):
         # Iterate over self.group.fields to avoid objects of type BinarySizeField
         # which shouldn't be treated as a normal field.
         for name in self.group.fields:
+            if not name in self.values:
+                continue
+
             field = self.group.fieldObjects[name]
             # The record may not have all the fields the group has.
             # This is because there may have been a switch view to a form
             # but not for this record.
-            if not name in self.values:
-                continue
-            if not name in self.values:
-                continue
+
             if (get_readonly or not self.isFieldReadOnly(name)) \
                     and (not get_modifiedonly or field.name in self.modified_fields):
                 value[name] = field.get(
