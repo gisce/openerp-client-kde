@@ -192,8 +192,6 @@ class Record(QObject):
         self.updateStateAttributes()
         for fieldName in self.group.fieldObjects:
             # @xtorello toreview
-            pass
-            """
             attributes = self.group.fieldObjects[fieldName].attrs.get(
                 'attrs', '{}'
             )
@@ -212,7 +210,7 @@ class Record(QObject):
                 value = self.evaluateCondition(condition)
                 if value:
                     self.stateAttributes(fieldName)[attribute] = value
-            """
+
 
     def isFieldReadOnly(self, fieldName):
         readOnly = self.stateAttributes(fieldName).get('readonly', False)
