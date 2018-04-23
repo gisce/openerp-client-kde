@@ -85,19 +85,16 @@ class SelectionFieldWidget(AbstractFieldWidget):
                 self.widget.currentText(),
                 Qt.MatchExactly | Qt.MatchCaseSensitive,
             ),
-            0
         )
 
         if not value:
             value = self.widget.itemData(
                 self.widget.findText(self.widget.currentText(), Qt.MatchExactly),
-                0
             )
 
         if not value:
             value = self.widget.itemData(
                 self.widget.findText(self.widget.currentText(), Qt.MatchContains),
-                0
             )
 
         if value:
