@@ -133,6 +133,7 @@ class ActionFactory:
             # If definition is not set we initialize it appropiately
             # to be able to add the 'Print Screen' action.
             definition = {
+                'save': [],
                 'print': [],
                 'action': [],
                 'relate': []
@@ -146,8 +147,16 @@ class ActionFactory:
             'type': 'ir.actions.report.xml'
         })
 
+        # We always add the 'Print Screen' action.
+        definition['save'] = [{
+            'name': 'Save changes',
+            'string': _('Save'),
+            'report_name': 'printscreen.list',
+            'type': 'ir.actions.report.xml'
+        }]
+
         actions = []
-        for icontype in ('print', 'action', 'relate'):
+        for icontype in ('print', 'action', 'relate', 'save'):
             for tool in definition[icontype]:
                 action = Action(parent)
                 action.setIcon(QIcon(":/images/%s.png" % icontype))
@@ -167,6 +176,7 @@ class ActionFactory:
                     action.setToolTip(action.text() + ' (%s)' % shortcut)
 
                 actions.append(action)
+
 
         plugs = Plugins.list(model)
         for p in sorted(list(plugs.keys()), key=lambda x: plugs[x].get('string', '')):
