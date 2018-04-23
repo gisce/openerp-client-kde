@@ -147,13 +147,21 @@ class ActionFactory:
             'type': 'ir.actions.report.xml'
         })
 
-        # We always add the 'Print Screen' action.
+        # Save as new definition
         definition['save'] = [{
             'name': 'Save changes',
             'string': _('Save'),
             'report_name': 'printscreen.list',
             'type': 'ir.actions.report.xml'
         }]
+
+        # Save as action
+        definition['action'].append({
+            'name': 'save',
+            'string': _('Save as action'),
+            'report_name': 'printscreen.list',
+            'type': 'ir.actions.report.xml'
+        })
 
         actions = []
         for icontype in ('print', 'action', 'relate', 'save'):
