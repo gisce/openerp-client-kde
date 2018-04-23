@@ -151,7 +151,7 @@ class ActionFactory:
             'name': 'save',
             'string': _('Save'),
             'shortcut': 'S',
-            'action': parent.save,
+            'action': parent.parentWidget().save,
         })
 
         # Cancel action
