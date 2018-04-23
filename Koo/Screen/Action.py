@@ -184,6 +184,15 @@ class ActionFactory:
                     action.setToolTip(action.text() + ' (%s)' % shortcut)
                     action.setIcon(QIcon(":/images/save.png"))
 
+                else:
+                    if number > 9:
+                        shortcut += 'Shift+'
+                        number -= 10
+                    if number < 10:
+                        shortcut += str(number)
+                        action.setShortcut(QKeySequence(shortcut))
+                        action.setToolTip(action.text() + ' (%s)' % shortcut)
+
 
                 actions.append(action)
 
