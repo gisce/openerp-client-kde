@@ -98,10 +98,7 @@ class SelectionFieldWidget(AbstractFieldWidget):
             )
 
         if value:
-            if type(value) == str:
-                return value
-            else:
-                return value
+            return value
         else:
             return False
 
