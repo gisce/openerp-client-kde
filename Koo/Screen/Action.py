@@ -159,7 +159,7 @@ class ActionFactory:
             'name': 'cancel',
             'string': _('Cancel'),
             'shortcut': 'C',
-            'action': parent.cancel,
+            'action': parent.parentWidget().cancel,
         })
 
         actions = []
