@@ -173,6 +173,8 @@ class ActionFactory:
                     action.setToolTip(action.text() + ' (%s)' % shortcut)
                     action.setIcon(QIcon(":/images/save.png"))
 
+                    action.triggered.connect(parent.save)
+
                 else:
                     if number > 9:
                         shortcut += 'Shift+'
