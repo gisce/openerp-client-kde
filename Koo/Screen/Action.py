@@ -133,7 +133,6 @@ class ActionFactory:
             # If definition is not set we initialize it appropiately
             # to be able to add the 'Print Screen' action.
             definition = {
-                'save': [],
                 'print': [],
                 'action': [],
                 'relate': []
@@ -147,24 +146,16 @@ class ActionFactory:
             'type': 'ir.actions.report.xml'
         })
 
-        # Save as new definition
-        definition['save'] = [{
-            'name': 'Save changes',
-            'string': _('Save'),
-            'report_name': 'printscreen.list',
-            'type': 'ir.actions.report.xml'
-        }]
-
         # Save as action
         definition['action'].append({
             'name': 'save',
-            'string': _('Save as action'),
+            'string': _('Save'),
             'report_name': 'printscreen.list',
             'type': 'ir.actions.report.xml'
         })
 
         actions = []
-        for icontype in ('print', 'action', 'relate', 'save'):
+        for icontype in ('print', 'action', 'relate'):
             for tool in definition[icontype]:
                 action = Action(parent)
                 action.setIcon(QIcon(":/images/%s.png" % icontype))
