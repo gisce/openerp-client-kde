@@ -174,12 +174,12 @@ class ActionFactory:
                 action.setModel(model)
 
                 number = len(actions)
+
                 shortcut = 'Ctrl+'
-                if number > 9:
-                    shortcut += 'Shift+'
-                    number -= 10
-                if number < 10:
-                    shortcut += str(number)
+
+                # Add save shortcut with Ctrl + S
+                if tool['name'] == "save":
+                    shortcut += "S"
                     action.setShortcut(QKeySequence(shortcut))
                     action.setToolTip(action.text() + ' (%s)' % shortcut)
 
