@@ -146,10 +146,16 @@ class ActionFactory:
             'type': 'ir.actions.report.xml'
         })
 
-        # Save as action
+        # Save action
         definition['action'].append({
             'name': 'save',
             'string': _('Save'),
+        })
+
+        # Save action
+        definition['action'].append({
+            'name': 'cancel',
+            'string': _('Cancel'),
         })
 
         actions = []
@@ -167,12 +173,11 @@ class ActionFactory:
                 shortcut = 'Ctrl+'
 
                 # Add save shortcut with Ctrl + S
-                if tool['name'] == "save":
+                if tool['name'] in ["save", "cancel"]:
                     shortcut += "S"
                     action.setShortcut(QKeySequence(shortcut))
                     action.setToolTip(action.text() + ' (%s)' % shortcut)
                     action.setIcon(QIcon(":/images/save.png"))
-
                     action.triggered.connect(parent.save)
 
                 else:
