@@ -151,13 +151,15 @@ class ActionFactory:
             'name': 'save',
             'string': _('Save'),
             'shortcut': 'S',
+            'action': parent.save,
         })
 
-        # Save action
+        # Cancel action
         definition['action'].append({
             'name': 'cancel',
             'string': _('Cancel'),
             'shortcut': 'C',
+            'action': parent.cancel,
         })
 
         actions = []
@@ -180,7 +182,7 @@ class ActionFactory:
                     action.setShortcut(QKeySequence(shortcut))
                     action.setToolTip(action.text() + ' (%s)' % shortcut)
                     action.setIcon(QIcon(":/images/{}.png".format(tool['name'])))
-                    action.triggered.connect(parent.save)
+                    action.triggered.connect(tool['action'])
 
                 else:
                     if number > 9:
