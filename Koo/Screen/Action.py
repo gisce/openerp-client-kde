@@ -182,6 +182,8 @@ class ActionFactory:
                     shortcut += "S"
                     action.setShortcut(QKeySequence(shortcut))
                     action.setToolTip(action.text() + ' (%s)' % shortcut)
+                    action.setIcon(QIcon(":/images/save.png"))
+
 
                 actions.append(action)
 
