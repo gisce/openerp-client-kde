@@ -150,8 +150,6 @@ class ActionFactory:
         definition['action'].append({
             'name': 'save',
             'string': _('Save'),
-            'report_name': 'printscreen.list',
-            'type': 'ir.actions.report.xml'
         })
 
         actions = []
