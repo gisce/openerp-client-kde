@@ -101,7 +101,7 @@ class SelectionFieldWidget(AbstractFieldWidget):
             if type(value) == str:
                 return value
             else:
-                return value.toLongLong()[0]
+                return value
         else:
             return False
 
