@@ -150,12 +150,14 @@ class ActionFactory:
         definition['action'].append({
             'name': 'save',
             'string': _('Save'),
+            'shortcut': 'S',
         })
 
         # Save action
         definition['action'].append({
             'name': 'cancel',
             'string': _('Cancel'),
+            'shortcut': 'C',
         })
 
         actions = []
@@ -174,7 +176,7 @@ class ActionFactory:
 
                 # Add save shortcut with Ctrl + S
                 if tool['name'] in ["save", "cancel"]:
-                    shortcut += "S"
+                    shortcut += tool['shortcut']
                     action.setShortcut(QKeySequence(shortcut))
                     action.setToolTip(action.text() + ' (%s)' % shortcut)
                     action.setIcon(QIcon(":/images/save.png"))
