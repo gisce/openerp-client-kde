@@ -179,7 +179,7 @@ class ActionFactory:
                     shortcut += tool['shortcut']
                     action.setShortcut(QKeySequence(shortcut))
                     action.setToolTip(action.text() + ' (%s)' % shortcut)
-                    action.setIcon(QIcon(":/images/save.png"))
+                    action.setIcon(QIcon(":/images/{}.png".format(tool['name'])))
                     action.triggered.connect(parent.save)
 
                 else:
