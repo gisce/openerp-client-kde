@@ -147,11 +147,6 @@ class KooModel(QAbstractItemModel):
     		# self.emit( SIGNAL('rowsInserted(QModelIndex,int,int)'), QModelIndex(), start, end )
 
     def recordChanged(self, record):
-        print ("XXXXXXXXXXXXXX", type(record))
-        print ("XXXXXXXXXXXXXX", type(record))
-        print ("XXXXXXXXXXXXXX", type(record))
-        print ("XXXXXXXXXXXXXX", type(record))
-        print ("XXXXXXXXXXXXXX", type(record))
         if not record:
         	return
         leftIndex = self.indexFromId(record.id)

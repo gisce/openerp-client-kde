@@ -67,7 +67,6 @@ class Record(QObject):
     setFocus = pyqtSignal('QString')
 
     def __init__(self, id, group, parent=None, new=False):
-        print ("xxx record",type(self))
         QObject.__init__(self, group)
         self.rpc = group.rpc
         self.id = id
@@ -84,7 +83,6 @@ class Record(QObject):
 
     def __del__(self):
         # @xtorello toreview
-        """
         self.rpc = None
         self.modified_fields = None
         self.parent = None
@@ -92,16 +90,19 @@ class Record(QObject):
         for key, value in self.values.items():
             from .Group import RecordGroup
             if isinstance(value, RecordGroup):
-                #value.parent.fieldObjects[key].disconnect( SIGNAL('modified'), value )
-                value.__del__()
+                try:
+                    # value.parent.fieldObjects[key].disconnect( SIGNAL('modified'), value )
+                    value.parent.fields()[key].disconnect()
+                    value.__del__()
+                except Exception as e:
+                    # print (e)
+                    pass
 
         self.values = {}
         self.invalidFields = []
         if self.id == 2:
             Debug.printReferrers(self)
         self.group = None
-        """
-        pass
 
     def _getModified(self):
         return self._modified

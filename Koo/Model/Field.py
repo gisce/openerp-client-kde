@@ -35,7 +35,6 @@ from Koo.Common import Numeric
 
 class StringField:
     def __init__(self, parent, attrs):
-        print ("PETO")
         self.parent = parent
         self.attrs = attrs
         self.name = attrs['name']
@@ -499,8 +498,6 @@ class FieldFactory:
     @staticmethod
     def create(fieldType, parent, attributes):
         # We do not support relational fields treated as selection ones
-        print (fieldType)
-
         if fieldType == 'selection' and 'relation' in attributes:
             fieldType = 'many2one'
 
