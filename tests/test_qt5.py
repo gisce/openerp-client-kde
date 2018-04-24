@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QHBoxLayout
 #from PyQt5.QtCore import SIGNAL
 
@@ -10,8 +11,10 @@ from Koo.Common import Api
 from Koo.Common import Localization
 Localization.initializeTranslations()
 from Koo.Dialogs import WindowService
+from Koo.Actions import Actions
+import Koo
 
-x = Rpc.session.login('http://admin:admin@localhost:8069', 'test_1522167327')
+x = Rpc.session.login('http://admin:admin@localhost:8069', 'koo')
 
 app = QApplication([])
 
@@ -42,27 +45,27 @@ class KooApi(Api.KooApi):
     	return Koo.Actions.executeReport( name, data, context )
 
     def executeAction(self, action, data={}, context={}):
-        pass
-    	# Koo.Actions.executeAction( action, data, context )
+    	return Koo.Actions.executeAction( action, data, context )
 
-	def executeKeyword(self, keyword, data={}, context={}):
-		return Koo.Actions.executeKeyword( keyword, data, context )
+    def executeKeyword(self, keyword, data={}, context={}):
+    	return Koo.Actions.executeKeyword( keyword, data, context )
 
-	def createWindow(self, view_ids, model, res_id=False, domain=None,
-			view_type='form', window=None, context=None, mode=None, name=False, autoReload=False,
-			target='current'):
-		WindowService.createWindow( view_ids, model, res_id, domain,
-			view_type, window, context, mode, name, autoReload, target )
+    def createWindow(self, view_ids, model, res_id=False, domain=None,
+    		view_type='form', window=None, context=None, mode=None, name=False, autoReload=False,
+    		target='current'):
+    	WindowService.createWindow( view_ids, model, res_id, domain,
+    		view_type, window, context, mode, name, autoReload, target )
 
-	def createWebWindow(self, url, title):
-		WindowService.createWebWindow(url, title)
+    def createWebWindow(self, url, title):
+    	WindowService.createWebWindow(url, title)
 
-	def windowCreated(self, window, target):
-		win.addWindow( window, target )
+    def windowCreated(self, window, target):
+    	win.addWindow( window, target )
 
 Api.instance = KooApi()
 
-Api.instance.createWindow([], 'res.partner', 1, target='current')
+# Api.instance.createWindow([], 'res.partner', 2, target='current')
+Api.instance.createWindow([], 'giscedata.at.tram', 1, target='current')
 win.show()
 
 Rpc.session.logout()
