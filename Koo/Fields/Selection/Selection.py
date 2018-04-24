@@ -62,8 +62,8 @@ class SelectionFieldWidget(AbstractFieldWidget):
         self.fill(attrs.get('selection') or [])
 
     def fill(self, selection):
-        for (id, name) in selection:
-            self.widget.addItem(name, None)
+        for (identifier, name) in selection:
+            self.widget.addItem(name, identifier)
 
     def setReadOnly(self, value):
         AbstractFieldWidget.setReadOnly(self, value)
@@ -78,19 +78,27 @@ class SelectionFieldWidget(AbstractFieldWidget):
 
         # If we checked with MatchContains directly, we might find incorrect values when
         # the user clicked the item instead of writting it.
-        value = self.widget.itemData(self.widget.findText(
-            self.widget.currentText(), Qt.MatchExactly | Qt.MatchCaseSensitive))
-        if not value.isValid():
-            value = self.widget.itemData(self.widget.findText(
-                self.widget.currentText(), Qt.MatchExactly))
-        if not value.isValid():
-            value = self.widget.itemData(self.widget.findText(
-                self.widget.currentText(), Qt.MatchContains))
-        if value.isValid():
-            if value.typeName() == 'QString':
-                return str(value.toString())
-            else:
-                return value.toLongLong()[0]
+
+        # @xtorello toreview
+        value = self.widget.itemData(
+            self.widget.findText(
+                self.widget.currentText(),
+                Qt.MatchExactly | Qt.MatchCaseSensitive,
+            ),
+        )
+
+        if not value:
+            value = self.widget.itemData(
+                self.widget.findText(self.widget.currentText(), Qt.MatchExactly),
+            )
+
+        if not value:
+            value = self.widget.itemData(
+                self.widget.findText(self.widget.currentText(), Qt.MatchContains),
+            )
+
+        if value:
+            return value
         else:
             return False
 

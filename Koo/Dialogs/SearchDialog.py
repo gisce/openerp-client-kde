@@ -106,7 +106,7 @@ class SearchDialog(QDialog, SearchDialogUi):
         self.pushAccept.clicked.connect(self.accepted)
         self.pushCancel.clicked.connect(self.reject)
         self.pushFind.clicked.connect(self.find)
-        self.form.search.connect(self.find)
+        self.form.performSearch.connect(self.find)
 
         # Selects all items
         self.select()

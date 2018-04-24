@@ -132,8 +132,8 @@ class FormWidget(QWidget, FormWidgetUi):
         self.screen.setRecordGroup(self.group)
         self.screen.setEmbedded(False)
         self.screen.activated.connect(self.switchToForm)
-        # @xtorello toreview
-        # self.screen.currentChanged.connect(self.updateStatus)
+        # @xtorello toreview not-clear signal<->slot
+        self.screen.currentChangedSignal.connect(self.updateStatus)
         self.screen.closed.connect(self.closeWidget)
         self.screen.recordMessage[int, int, int].connect(self.updateRecordStatus)
         self.screen.statusMessage['QString'].connect(self.updateStatus)

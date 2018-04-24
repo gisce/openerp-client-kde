@@ -400,8 +400,8 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
     def showValue(self):
         group = self.record.value(self.name)
         # Update context
-        # @xtorello toreview
-        if type(group) != str:
+        # @xtorello toreview added group
+        if type(group) != str and group:
             group.setContext(self.record.fieldContext(self.name))
         if self.screen.group != group:
             self.screen.setRecordGroup(group)

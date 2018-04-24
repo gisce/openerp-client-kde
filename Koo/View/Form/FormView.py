@@ -174,6 +174,11 @@ class FormContainer(QWidget):
 
 
 class FormView(AbstractView):
+    # @xtorello toreview
+    activated = pyqtSignal()
+    currentChanged = pyqtSignal('PyQt_PyObject')
+    statusMessage = pyqtSignal('QString')
+
     def __init__(self, parent=None):
         AbstractView.__init__(self, parent)
         # We still depend on the parent being a screen because of ButtonFieldWidget

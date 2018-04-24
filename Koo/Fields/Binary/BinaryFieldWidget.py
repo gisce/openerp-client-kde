@@ -42,7 +42,7 @@ from Koo.Common import Numeric
 try:
     from NanScan.ScanDialog import ScanDialog, AbstractImageSaverFactory, AbstractImageSaver
     isNanScanAvailable = True
-except:
+except Exception:
     isNanScanAvailable = False
 
 if isNanScanAvailable:
