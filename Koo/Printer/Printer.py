@@ -80,9 +80,9 @@ class Printer(object):
 
         if data.get('code', 'normal') == 'zlib':
             import zlib
-            content = zlib.decompress(base64.decodestring(data['result']))
+            content = zlib.decompress(base64.b64decode(data['result']))
         else:
-            content = base64.decodestring(data['result'])
+            content = base64.b64decode(data['result'])
 
         # We'll always try to open the file and won't limit ourselves to
         # doc, html and pdf. For example, one might get odt, ods, etc. Before
