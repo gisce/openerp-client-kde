@@ -62,8 +62,8 @@ class SelectionFieldWidget(AbstractFieldWidget):
         self.fill(attrs.get('selection') or [])
 
     def fill(self, selection):
-        for (id, name) in selection:
-            self.widget.addItem(name, id)
+        for (identifier, name) in selection:
+            self.widget.addItem(name, identifier)
 
     def setReadOnly(self, value):
         AbstractFieldWidget.setReadOnly(self, value)
