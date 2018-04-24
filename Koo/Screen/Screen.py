@@ -330,6 +330,9 @@ class Screen(QScrollArea):
         self.activated.emit()
 
     def close(self):
+        # @xtorello @xbarnada TODO revisar si hi ha canvis pendents d'aplicar abans de tancar
+        ## veure FormWidget.canClose / modifiedSave
+        print ("tancant")
         self.closed.emit()
 
     # @brief Searches with the current parameters of the search form and loads the

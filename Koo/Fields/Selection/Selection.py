@@ -63,7 +63,7 @@ class SelectionFieldWidget(AbstractFieldWidget):
 
     def fill(self, selection):
         for (identifier, name) in selection:
-            self.widget.addItem(name, None)
+            self.widget.addItem(name, identifier)
 
     def setReadOnly(self, value):
         AbstractFieldWidget.setReadOnly(self, value)
@@ -85,26 +85,20 @@ class SelectionFieldWidget(AbstractFieldWidget):
                 self.widget.currentText(),
                 Qt.MatchExactly | Qt.MatchCaseSensitive,
             ),
-            0
         )
 
         if not value:
             value = self.widget.itemData(
                 self.widget.findText(self.widget.currentText(), Qt.MatchExactly),
-                0
             )
 
         if not value:
             value = self.widget.itemData(
                 self.widget.findText(self.widget.currentText(), Qt.MatchContains),
-                0
             )
 
         if value:
-            if type(value) == str:
-                return value
-            else:
-                return value.toLongLong()[0]
+            return value
         else:
             return False
 
