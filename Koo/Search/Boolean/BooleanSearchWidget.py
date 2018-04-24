@@ -51,8 +51,8 @@ class BooleanSearchWidget(AbstractSearchWidget):
 
     def value(self):
         value = self.uiCombo.itemData(self.uiCombo.currentIndex())
-        if value.type() == QVariant.Bool:
-            return [(self.name, '=', int(value.toBool()))]
+        if type(value) == bool:
+            return [(self.name, '=', int(value))]
         return []
 
     def clear(self):

@@ -70,9 +70,11 @@ except NameError:
 class RecordGroup(QObject):
     recordsInserted = pyqtSignal(int, int)
     recordsRemoved = pyqtSignal(int, int)
-    recordChanged = pyqtSignal('PyQt_PyObject')
+    recordChangedSignal = pyqtSignal('PyQt_PyObject')
+    # recordChanged = pyqtSignal(QObject)
     modified = pyqtSignal()
-    sorting = pyqtSignal()
+    # @xtorello toreview signal int type
+    sorting = pyqtSignal(int)
 
     SortVisibleItems = 1
     SortAllItems = 2
@@ -109,6 +111,9 @@ class RecordGroup(QObject):
         self.loadFieldObjects(list(self.fields.keys()))
 
         self.records = []
+
+        # @xtorello toreview signal to method integration
+        # self.recordChangedSignal.connect(self.recordChanged)
 
         self.enableSignals()
 
@@ -166,8 +171,6 @@ class RecordGroup(QObject):
 
     def __del__(self):
         # @xtorello toreview
-        pass
-        """
         if self.parent:
             self.modified.disconnect(self.tomanyfield.groupModified)
             self.tomanyfield = None
@@ -185,13 +188,13 @@ class RecordGroup(QObject):
         self.records = []
         for f in self.fieldObjects:
             self.fieldObjects[f].parent = None
-            self.fieldObjects[f].setParent(None)
-            # self.fieldObjects[f].__del__()
+            # @xtorello toreview
+            #self.fieldObjects[f].setParent(None)
+            #self.fieldObjects[f].__del__()
             #self.disconnect( self.fieldObjects[f], None, 0, 0 )
             #self.fieldObjects[f] = None
             #del self.fieldObjects[f]
         self.fieldObjects = {}
-        """
 
     # @brief Returns a string with the name of the type of a given field. Such as 'char'.
     def fieldType(self, fieldName):
@@ -204,9 +207,6 @@ class RecordGroup(QObject):
         for fname in fkeys:
             fvalue = self.fields[fname]
             fvalue['name'] = fname
-            # @xtorello toreview
-            if fvalue['type'] in ["one2many", "many2many"]:
-                continue
             self.fieldObjects[fname] = Field.FieldFactory.create(
                 fvalue['type'], self, fvalue)
             if fvalue['type'] in ('binary', 'image'):
@@ -398,9 +398,12 @@ class RecordGroup(QObject):
     def enableSignals(self):
         self._signalsEnabled = True
 
+    # @xtorello toreview or True
+    @pyqtSlot('PyQt_PyObject')
     def recordChanged(self, record):
+        # @xtorello toreview or True
         if self._signalsEnabled:
-            self.recordChanged.emit(record)
+            self.recordChangedSignal.emit(record)
 
     def recordModified(self, record):
         if self._signalsEnabled:
@@ -805,11 +808,11 @@ class RecordGroup(QObject):
             ids = self.rpc.search(
                 self._domain + self._filter, 0, False, False, self._context)
         else:
-            type = self.fields[field]['type']
-            if type == 'one2many' or type == 'many2many':
+            field_type = self.fields[field]['type']
+            if field_type == 'one2many' or type == 'many2many':
                 # We're not able to sort 2many fields
                 sortingResult = self.SortingNotPossible
-            elif type == 'many2one':
+            elif field_type == 'many2one':
                 # This works only if '#407667' is fixed, but it was fixed in 2010-02-03
                 orderby = '"%s"' % field
                 if order == Qt.AscendingOrder:
@@ -870,7 +873,7 @@ class RecordGroup(QObject):
             self.load(ids)
 
         # @xtorello toreview
-        ## self.sorting.emit(sortingResult)
+        self.sorting.emit(sortingResult)
 
     # Sorts the records of the group taking into account only loaded fields.
     def sortVisible(self, field, order):
@@ -899,8 +902,8 @@ class RecordGroup(QObject):
                 else:
                     return v
 
-            type = self.fields[field]['type']
-            if type == 'one2many' or type == 'many2many':
+            field_type = self.fields[field]['type']
+            if field_type == 'one2many' or field_type == 'many2many':
                 self.records.sort(key=lambda x: len(x.value(field).group))
             else:
                 self.records.sort(key=ignoreCase)

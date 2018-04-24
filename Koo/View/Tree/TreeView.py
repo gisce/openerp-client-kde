@@ -189,6 +189,9 @@ class TreeView(AbstractView):
         self.setLayout(layout)
         self._readOnly = True
 
+        self.activated.connect(self.perform_activated)
+        self.currentChanged.connect(self.perform_currentChanged)
+
     def sizeHint(self):
         return QSize(10, 10)
 
@@ -209,7 +212,7 @@ class TreeView(AbstractView):
         self.currentRecord = None
         self.treeModel = model
         self.widget.setModel(self.treeModel)
-        self.widget.selectionModel().currentChanged[QModelIndex, QModelIndex].connect(self.currentChanged)
+        self.widget.selectionModel().currentChanged[QModelIndex, QModelIndex].connect(self.perform_currentChanged)
         self.treeModel.rowsInserted[QModelIndex, int, int].connect(self.updateAggregates)
         self.treeModel.rowsRemoved[QModelIndex, int, int].connect(self.updateAggregates)
         self.treeModel.modelReset.connect(self.updateAggregates)
@@ -271,17 +274,24 @@ class TreeView(AbstractView):
     # or activated, only when it's read-only.
     # Used by the search dialog to "accept" the choice or by
     # Screen to switch view
-    def activated(self, index):
+    # @xtorello toreview
+    #def activated(self, index):
+    def perform_activated(self, index=None):
         if self._readOnly:
-            self.activated.emit()
+            # @xtorello toreview if needed
+            pass
+            # self.activated.emit()
 
-    def currentChanged(self, current, previous):
+    # @xtorello toreview
+    # @pyqtSlot('PyQt_PyObject')
+    # @pyqtSlot('PyQt_PyObject', 'PyQt_PyObject')
+    def perform_currentChanged(self, current, previous=None):
         if self.selecting:
             return
         self.currentRecord = self.treeModel.recordFromIndex(current)
         # We send the current record. Previously we sent only the id of the model, but
         # new models have id=None
-        self.currentChanged.emit(self.currentRecord)
+        # self.currentChanged.emit(self.currentRecord)
         self.updateAggregates()
 
     def store(self):

@@ -70,7 +70,7 @@ from .ViewQueue import *
 class Screen(QScrollArea):
     activated = pyqtSignal()
     closed = pyqtSignal()
-    currentChanged = pyqtSignal()
+    currentChangedSignal = pyqtSignal()
     recordMessage = pyqtSignal(int, int, int)
     statusMessage = pyqtSignal('QString')
 
@@ -88,7 +88,7 @@ class Screen(QScrollArea):
 
         self.searchForm = SearchFormWidget(self.container)
         # @xtorello toreview
-        # self.searchForm.search.connect(self.search)
+        self.searchForm.performSearch.connect(self.search)
         self.searchForm.keyDownPressed.connect(self.setFocusToView)
         self.searchForm.hide()
         self.containerView = None
@@ -130,6 +130,10 @@ class Screen(QScrollArea):
         # The first time Screen is shown it will try to setCurrentRecord
         # if none is selected.
         self._firstTimeShown = True
+
+        # @xtorello toreview signal to method integration
+        self.currentChangedSignal.connect(self.currentChanged)
+
 
     def showEvent(self, event):
         if self._firstTimeShown:
@@ -310,10 +314,10 @@ class Screen(QScrollArea):
         # form it produces an ugly flickering.
         self.loadSearchForm()
         self.containerView.show()
-        # @xtorello toreview
-        ## widget.activated.connect(self.activate)
-        ## widget.currentChanged['PyQt_PyObject'].connect(self.currentChanged)
-        ## widget.statusMessage['QString'].connect(self.statusMessage['QString'])
+        # @xtorello toreview zzz
+        widget.activated.connect(self.activate)
+        widget.currentChanged['PyQt_PyObject'].connect(self.currentChanged)
+        widget.statusMessage['QString'].connect(self.statusMessage['QString'])
 
         # Set focus proxy so other widgets can try to setFocus to us
         # and the focus is set to the expected widget.
@@ -326,6 +330,9 @@ class Screen(QScrollArea):
         self.activated.emit()
 
     def close(self):
+        # @xtorello @xbarnada TODO revisar si hi ha canvis pendents d'aplicar abans de tancar
+        ## veure FormWidget.canClose / modifiedSave
+        print ("tancant")
         self.closed.emit()
 
     # @brief Searches with the current parameters of the search form and loads the
@@ -358,6 +365,7 @@ class Screen(QScrollArea):
             self.searchForm.setEnabled(True)
 
     # Slot to recieve the signal from a view when the current item changes
+    @pyqtSlot()
     def currentChanged(self, model):
         self.setCurrentRecord(model)
         self.currentChanged.emit()

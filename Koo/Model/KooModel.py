@@ -100,24 +100,29 @@ class KooModel(QAbstractItemModel):
     # Fields should already be set and can't be added after this
     # call
     def setRecordGroup(self, group):
-    	self.modelAboutToBeReset.emit()
-    	if self.group:
-    		self.group.recordsInserted[int, int].disconnect(self.recordsInserted)
-            # @xtorello toreview
-    		# self.group.recordChanged['PyQt_PyObject'].disconnect(self.recordChanged)
-    		self.group.recordsRemoved[int, int].disconnect(self.recordsRemoved)
+        self.modelAboutToBeReset.emit()
+        # @xtorello toreview debug
+        # from pudb.remote import set_trace; set_trace(term_size=(200, 40), host='0.0.0.0', port=6900)
 
-    	self.group = group
-    	if self.group:
-    		self.group.recordsInserted[int, int].connect(self.recordsInserted)
+        if self.group:
+        	self.group.recordsInserted[int, int].disconnect(self.recordsInserted)
             # @xtorello toreview
-    		# self.group.recordChanged['PyQt_PyObject'].connect(self.recordChanged)
-    		self.group.recordsRemoved[int, int].connect(self.recordsRemoved)
+        	self.group.recordChangedSignal['PyQt_PyObject'].disconnect(self.recordChanged)
+        	# self.group.recordChanged['QObject'].disconnect(self.recordChanged)
+        	self.group.recordsRemoved[int, int].disconnect(self.recordsRemoved)
 
-    	# We emit modelReset() so widgets will be notified that
-    	# they need to be updated
-    	self.modelReset.emit()
-    	self.updateVisibleFields()
+        self.group = group
+        if self.group:
+        	self.group.recordsInserted[int, int].connect(self.recordsInserted)
+            # @xtorello toreview
+        	self.group.recordChangedSignal['PyQt_PyObject'].connect(self.recordChanged)
+        	# self.group.recordChanged[QObject].connect(self.recordChanged)
+        	self.group.recordsRemoved[int, int].connect(self.recordsRemoved)
+
+        # We emit modelReset() so widgets will be notified that
+        # they need to be updated
+        self.modelReset.emit()
+        self.updateVisibleFields()
 
     # @brief Returns the current RecordGroup associated with this Qt Model
     def recordGroup(self):
@@ -131,6 +136,10 @@ class KooModel(QAbstractItemModel):
     def isReadOnly(self):
     	return self._readOnly
 
+    def reset(self):
+        pass
+        # @xtorello toreview todo https://stackoverflow.com/questions/14756645/how-to-reset-model-in-qt
+
     def recordsInserted(self, start, end):
     	if self._updatesEnabled:
     		self.reset()
@@ -138,20 +147,25 @@ class KooModel(QAbstractItemModel):
     		# self.emit( SIGNAL('rowsInserted(QModelIndex,int,int)'), QModelIndex(), start, end )
 
     def recordChanged(self, record):
-    	if not record:
-    		return
-    	leftIndex = self.indexFromId(record.id)
-    	if not leftIndex.isValid():
-    		self.reset()
-    		return
-    	rightIndex = self.index(leftIndex.row(), self.columnCount() - 1)
-    	self.dataChanged.emit(leftIndex, rightIndex)
+        print ("XXXXXXXXXXXXXX", type(record))
+        print ("XXXXXXXXXXXXXX", type(record))
+        print ("XXXXXXXXXXXXXX", type(record))
+        print ("XXXXXXXXXXXXXX", type(record))
+        print ("XXXXXXXXXXXXXX", type(record))
+        if not record:
+        	return
+        leftIndex = self.indexFromId(record.id)
+        if not leftIndex.isValid():
+        	self.reset()
+        	return
+        rightIndex = self.index(leftIndex.row(), self.columnCount() - 1)
+        self.dataChanged.emit(leftIndex, rightIndex)
 
     def recordsRemoved(self, start, end):
         return None
         # @xtorello toreview
-    	## if self._updatesEnabled:
-            ## self.reset()
+    	# if self._updatesEnabled:
+            # self.reset()
             # self.emit( SIGNAL('rowsAboutToBeRemoved(QModelIndex,int,int)'), QModelIndex(), start, end )
             # self.emit( SIGNAL('rowsRemoved(QModelIndex,int,int)'), QModelIndex(), start, end )
 

@@ -127,17 +127,18 @@ class ImageFieldWidget(AbstractFieldWidget, ImageFieldWidgetUi):
 
     def saveImage(self):
         name = QFileDialog.getSaveFileName(self, _('Save image as...'))[0]
-        if name.isNull():
+        if name:
+            try:
+                with open(name, "wb") as fp:
+                    fp.write(self.getImage())
+            except:
+                QMessageBox.warning(self, _('Error saving file'), _(
+                    'Could not save the image with the given file name. Please check that you have permissions.'))
+            Semantic.addInformationToFile(
+                name, self.record.group.resource, self.record.id, self.name)
+        else:
             return
-        try:
-            fp = file(str(name), 'wb')
-            fp.write(self.getImage())
-            fp.close()
-        except:
-            QMessageBox.warning(self, _('Error saving file'), _(
-                'Could not save the image with the given file name. Please check that you have permissions.'))
-        Semantic.addInformationToFile(
-            name, self.record.group.resource, self.record.id, self.name)
+
 
     def loadImage(self):
         fileTypes = "*.png *.jpg *.jpeg *.gif *.tif *.xpm *.bmp"
