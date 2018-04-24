@@ -67,7 +67,6 @@ class Record(QObject):
     setFocus = pyqtSignal('QString')
 
     def __init__(self, id, group, parent=None, new=False):
-        print ("xxx record",type(self))
         QObject.__init__(self, group)
         self.rpc = group.rpc
         self.id = id
