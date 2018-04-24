@@ -253,7 +253,8 @@ class TreeWidget(QWidget, TreeWidgetUi):
         item = self.uiList.currentIndex()
         if not item.isValid():
             return
-        id = item.data(Qt.UserRole).toInt()[0]
+        value = item.data(Qt.UserRole)
+        id = value if isinstance(value, int) else item.data(Qt.UserRole).toInt()[0]
         if not id:
             return
         m = self.group[id]
