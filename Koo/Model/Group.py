@@ -172,8 +172,13 @@ class RecordGroup(QObject):
     def __del__(self):
         # @xtorello toreview
         if self.parent:
-            self.modified.disconnect(self.tomanyfield.groupModified)
-            self.tomanyfield = None
+            # @xtorello TODO toreview
+            try:
+                self.modified.disconnect()
+                self.tomanyfield = None
+            except:
+                pass
+
         self.rpc = None
         self.parent = None
         self.resource = None
@@ -182,12 +187,23 @@ class RecordGroup(QObject):
         for r in self.records:
             if not isinstance(r, Record):
                 continue
-            r.recordChanged['PyQt_PyObject'].disconnect(self.recordChanged)
-            r.recordModified['PyQt_PyObject'].disconnect(self.recordModified)
+
+            # @xtorello TODO toreview
+            try:
+                r.recordChanged.disconnect()
+            except:
+                pass
+
             r.__del__()
         self.records = []
         for f in self.fieldObjects:
-            self.fieldObjects[f].parent = None
+            # @xtorello TODO toreview
+            try:
+                self.fieldObjects[f].parent = None
+                self.disconnect()
+            except:
+                pass
+
             # @xtorello toreview
             #self.fieldObjects[f].setParent(None)
             #self.fieldObjects[f].__del__()
