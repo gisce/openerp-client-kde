@@ -265,15 +265,14 @@ class BinaryFieldWidget(AbstractFieldWidget, BinaryFieldWidgetUi):
         directory = '%s/%s' % (self.baseDirectory, str(self.fileName()))
         filename = QFileDialog.getSaveFileName(
             self, _('Save as...'), directory, self.filters)[0]
-        if filename.isNull():
+        if not filename:
             return
         filename = str(filename)
         self.baseDirectory = os.path.dirname(filename)
 
         try:
-            fp = file(filename, 'wb+')
-            fp.write(self.record.value(self.name))
-            fp.close()
+            with open(filename, 'wb+') as fp:
+                fp.write(self.record.value(self.name))
         except Exception as e:
             QMessageBox.information(self, _('Error'), _(
                 'Error writing the file:\n%s') % str(e.args))
