@@ -199,6 +199,28 @@ class BinaryField(StringField):
         if self.attrs.get('on_change', False):
             record.callOnChange(self.attrs['on_change'])
 
+    def validate(self, record):
+        """
+        Validates the binary field,it checks the field value or the field.size
+
+        :param record: Record to validate
+        :return: True if is valid
+        :rtype: bool
+        """
+        ok = True
+
+        # We ensure that the field is read-write. In some cases there might be
+        # forms in which a readonly field is marked as required. For example,
+        # banks some fields inside partner change readonlyness depending on the
+        # value of a selection field.
+
+        if not record.isFieldReadOnly(self.name):
+            if record.isFieldRequired(self.name):
+                if not record.values.get(self.name, record.values.get(self.sizeName)):
+                    ok = False
+        record.setFieldValid(self.name, ok)
+        return ok
+
 
 class BinarySizeField(StringField):
     def __init__(self, parent, attrs):
