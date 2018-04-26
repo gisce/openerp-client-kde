@@ -170,15 +170,13 @@ class RecordGroup(QObject):
         return self._onWriteFunction
 
     def __del__(self):
-        # @xtorello toreview
-        if self.parent:
-            # @xtorello TODO toreview
-            try:
-                self.modified.disconnect()
-                self.tomanyfield = None
-            except:
-                pass
+        """
+        Class destructor
+        :return: None
+        """
 
+        if self.parent:
+            self.tomanyfield = None
         self.rpc = None
         self.parent = None
         self.resource = None
