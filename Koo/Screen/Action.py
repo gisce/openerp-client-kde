@@ -32,6 +32,7 @@ from Koo.Common import Api
 from Koo.Common import Common
 from Koo.Plugins import *
 from Koo import Rpc
+from Koo.Dialogs import FormWidget
 
 # @brief The Action class is a QAction that can execute a model action. Such
 # as relate, print or wizard (on the server) and plugins (on the client).
@@ -146,10 +147,8 @@ class ActionFactory:
             'type': 'ir.actions.report.xml'
         })
 
-        # Save action
-
-        from Koo.Dialogs.FormWidget import FormWidget, SearchDialog
-        if not isinstance(parent.parentWidget(), (FormWidget, SearchDialog)):
+        if isinstance(parent.parentWidget(), FormWidget.FormWidget):
+            # Save action
             definition['action'].append({
                 'name': 'save',
                 'string': _('Save'),
