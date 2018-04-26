@@ -147,20 +147,23 @@ class ActionFactory:
         })
 
         # Save action
-        definition['action'].append({
-            'name': 'save',
-            'string': _('Save'),
-            'shortcut': 'S',
-            'action': parent.parentWidget().save,
-        })
 
-        # Cancel action
-        definition['action'].append({
-            'name': 'cancel',
-            'string': _('Cancel'),
-            'shortcut': 'C',
-            'action': parent.parentWidget().cancel,
-        })
+        from Koo.Dialogs.FormWidget import FormWidget, SearchDialog
+        if not isinstance(parent.parentWidget(), (FormWidget, SearchDialog)):
+            definition['action'].append({
+                'name': 'save',
+                'string': _('Save'),
+                'shortcut': 'S',
+                'action': parent.parentWidget().save,
+            })
+
+            # Cancel action
+            definition['action'].append({
+                'name': 'cancel',
+                'string': _('Cancel'),
+                'shortcut': 'C',
+                'action': parent.parentWidget().cancel,
+            })
 
         actions = []
         for icontype in ('print', 'action', 'relate'):
