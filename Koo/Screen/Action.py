@@ -146,6 +146,8 @@ class ActionFactory:
             'type': 'ir.actions.report.xml'
         })
 
+        parent_widget = parent.parentWidget()
+
         # Save action
         definition['action'].append({
             'name': 'save',
