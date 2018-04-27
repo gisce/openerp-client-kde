@@ -154,6 +154,12 @@ class ActionFactory:
         except:
             save_method = None
 
+        # Handle cancel method
+        try:
+            cancel_method = parent_widget.save
+        except:
+            cancel_method = None
+
         # Save action
         definition['action'].append({
             'name': 'save',
@@ -167,7 +173,7 @@ class ActionFactory:
             'name': 'cancel',
             'string': _('Cancel'),
             'shortcut': 'C',
-            'action': parent.parentWidget().cancel,
+            'action': cancel_method,
         })
 
         actions = []
