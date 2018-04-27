@@ -156,7 +156,7 @@ class ActionFactory:
 
         # Handle cancel method
         try:
-            cancel_method = parent_widget.save
+            cancel_method = parent_widget.cancel
         except:
             cancel_method = None
 
