@@ -117,11 +117,12 @@ class Action(QAction):
         Plugins.execute(self._data, self._model,
                         currentId, selectedIds, context)
 
+def dummy_method(self):
+    pass
+
 # @brief The ActionFactory class is a factory that creates Action objects to execute
 # actions on the server. Typically those shown in the toolbar and menus for an specific
 # model
-
-
 class ActionFactory:
     # @brief Creates a list of Action objects given a parent, model and definition.
     #
@@ -129,6 +130,7 @@ class ActionFactory:
     # fields_view_get.
     @staticmethod
     def create(parent, definition, model):
+
         if not definition:
             # If definition is not set we initialize it appropiately
             # to be able to add the 'Print Screen' action.
@@ -147,18 +149,19 @@ class ActionFactory:
         })
 
         parent_widget = parent.parentWidget()
+        print (model, parent, parent.parentWidget())
 
         # Handle cancel method
         try:
             save_method = parent_widget.save
         except:
-            save_method = None
+            save_method = dummy_method
 
         # Handle cancel method
         try:
             cancel_method = parent_widget.cancel
         except:
-            cancel_method = None
+            cancel_method = dummy_method
 
         # Save action
         definition['action'].append({
@@ -198,6 +201,7 @@ class ActionFactory:
                     action.setIcon(QIcon(":/images/{}.png".format(tool['name'])))
                     if tool['action'] is not None:
                         action.triggered.connect(tool['action'])
+
 
                 else:
                     if number > 9:
