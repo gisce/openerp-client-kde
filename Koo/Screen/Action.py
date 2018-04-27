@@ -196,7 +196,8 @@ class ActionFactory:
                     action.setShortcut(QKeySequence(shortcut))
                     action.setToolTip(action.text() + ' (%s)' % shortcut)
                     action.setIcon(QIcon(":/images/{}.png".format(tool['name'])))
-                    action.triggered.connect(tool['action'])
+                    if tool['action'] is not None:
+                        action.triggered.connect(tool['action'])
 
                 else:
                     if number > 9:
