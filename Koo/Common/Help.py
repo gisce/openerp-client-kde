@@ -31,8 +31,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
 try:
-    from PyQt5.QtWebKit import *
-
+    from PyQt5.QtWebKitWidgets import QWebPage, QWebView
     isHelpWidgetAvailable = True
 except:
     isHelpWidgetAvailable = False
