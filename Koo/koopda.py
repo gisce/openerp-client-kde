@@ -177,8 +177,8 @@ Notifier.concurrencyErrorHandler = handleConcurrency
 
 # Main application loop
 if Common.isKdeAvailable:
-    from PyKDE4.kdecore import ki18n, KAboutData, KCmdLineArgs
-    from PyKDE4.kdeui import KApplication
+    from PyKDE5.kdecore import ki18n, KAboutData, KCmdLineArgs
+    from PyKDE5.kdeui import KApplication
 
     appName = "Koo"
     catalog = ""

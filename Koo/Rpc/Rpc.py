@@ -69,7 +69,7 @@ class RpcProtocolException(RpcException):
     def __init__(self, backtrace):
         self.code = None
         self.args = (backtrace,)
-        self.info = str(str(backtrace), 'utf-8')
+        self.info = backtrace
         self.backtrace = backtrace
 
 
