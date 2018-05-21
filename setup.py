@@ -41,5 +41,6 @@ setup(
     description='Koo Client',
     LONG_DESCription=LONG_DESC,
     CLASSIFIERS=[_f for _f in CLASSIFIERS.splitlines() if _f],
+    include_package_data=True,
 )
 
