@@ -1,1 +1,2 @@
 include Koo/ui/*
+include Koo/l10n/*
