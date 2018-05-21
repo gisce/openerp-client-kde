@@ -1,5 +1,8 @@
 from setuptools import setup, find_packages
 
+with open('requirements.txt') as fp:
+    INSTALL_REQUIRES = fp.read()
+
 LONG_DESC = '''\
 =====================================
 Koo Client and Development Platform
@@ -34,6 +37,7 @@ setup(
     author_email='info@nan-tic.com',
     mantainer='GISCE-TI, S.L.',
     mantainer_email='devel@gisce.net',
+    install_requires=INSTALL_REQUIRES,
     description='Koo Client',
     LONG_DESCription=LONG_DESC,
     CLASSIFIERS=[_f for _f in CLASSIFIERS.splitlines() if _f],
