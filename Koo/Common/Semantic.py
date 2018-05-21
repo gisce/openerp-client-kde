@@ -80,8 +80,8 @@ def addInformationToFile(fileName, model, ids, field=None):
         contacts += x
     contacts = list(set(contacts))
 
-    from PyKDE4.nepomuk import Nepomuk
-    from PyKDE4.soprano import Soprano
+    from PyKDE5.nepomuk import Nepomuk
+    from PyKDE5.soprano import Soprano
 
     resource = Nepomuk.Resource('file://%s' %
                                 fileName, Soprano.Vocabulary.Xesam.File())

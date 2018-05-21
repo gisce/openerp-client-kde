@@ -27,10 +27,10 @@
 ##############################################################################
 
 from PyQt5.QtCore import *
-from PyKDE4.kdecore import *
-from PyKDE4.kdeui import *
-from PyKDE4.plasma import *
-from PyKDE4.plasmascript import Runner
+from PyKDE5.kdecore import *
+from PyKDE5.kdeui import *
+from PyKDE5.plasma import *
+from PyKDE5.plasmascript import Runner
 
 from Koo import Rpc
 from Koo.Common.Settings import Settings

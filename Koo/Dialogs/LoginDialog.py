@@ -131,7 +131,7 @@ class LoginDialog(QDialog, LoginDialogUi):
 
     def checkWallet(self):
         if Common.isKdeAvailable:
-            from PyKDE4.kdeui import KWallet
+            from PyKDE5.kdeui import KWallet
             KWallet.Wallet.NetworkWallet()
             wallet = KWallet.Wallet.openWallet(
                 KWallet.Wallet.NetworkWallet(), self.winId())
@@ -195,7 +195,7 @@ class LoginDialog(QDialog, LoginDialogUi):
                         storeWallet = False
 
                 if storeWallet:
-                    from PyKDE4.kdeui import KWallet
+                    from PyKDE5.kdeui import KWallet
                     KWallet.Wallet.NetworkWallet()
                     wallet = KWallet.Wallet.openWallet(
                         KWallet.Wallet.NetworkWallet(), self.winId())

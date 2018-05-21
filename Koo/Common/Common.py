@@ -52,7 +52,7 @@ except NameError:
 
 try:
     if Settings.value('kde.enabled'):
-        from PyKDE4.kdecore import ki18n
+        from PyKDE5.kdecore import ki18n
         isKdeAvailable = True
     else:
         isKdeAvailable = False

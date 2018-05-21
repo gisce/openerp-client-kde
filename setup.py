@@ -144,7 +144,7 @@ Koo Client and Development Platform
 
 Koo is a Qt/KDE based client for Open ERP, a complete ERP and CRM. Koo
 aims for great flexibility allowing easy creation of plugins and views, high
-integration with KDE4 under Unix, Windows and Mac, as well as providing
+integration with KDE5 under Unix, Windows and Mac, as well as providing
 a development platform for new applications using the Open ERP server.
 
 A set of server side modules is also provided among the Koo distribution
