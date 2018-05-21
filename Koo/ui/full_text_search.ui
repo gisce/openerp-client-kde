@@ -173,7 +173,7 @@ p, li { white-space: pre-wrap; }
   <customwidget>
    <class>QWebView</class>
    <extends>QWidget</extends>
-   <header>PyQt4.QtWebKit</header>
+   <header>PyQt5.QtWebKitWidgets</header>
   </customwidget>
  </customwidgets>
  <resources>
