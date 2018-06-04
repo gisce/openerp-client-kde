@@ -71,13 +71,13 @@ class ProgressBarFieldDelegate(AbstractFieldDelegate):
 
     def paint(self, painter, option, index):
         # Paint background
-        itemOption = QStyleOptionViewItemV4(option)
+        itemOption = QStyleOptionViewItem(option)
         # Last parameter (None) shouldn't be necessary but we put it to workaround a bug in
         # KStyle which expects always four parameters, wheareas QStyle makes it optional.
         QApplication.style().drawControl(QStyle.CE_ItemViewItem, itemOption, painter, None)
 
         # Paint ProgressBar
-        opts = QStyleOptionProgressBarV2()
+        opts = QStyleOptionProgressBar()
         opts.rect = option.rect
         opts.minimum = 1
         opts.maximum = 100

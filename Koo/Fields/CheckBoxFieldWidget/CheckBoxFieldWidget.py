@@ -81,7 +81,7 @@ class BooleanFieldDelegate(AbstractFieldDelegate):
 
     def paint(self, painter, option, index):
         # Paint background
-        itemOption = QStyleOptionViewItemV4(option)
+        itemOption = QStyleOptionViewItem(option)
         QApplication.style().drawControl(QStyle.CE_ItemViewItem, itemOption, painter)
 
         # Paint CheckBox
