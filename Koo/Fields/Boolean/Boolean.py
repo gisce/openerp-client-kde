@@ -87,7 +87,7 @@ class BooleanFieldDelegate(AbstractFieldDelegate):
         # Paint CheckBox
         op = QStyleOptionButton()
         op.rect = option.rect
-        value = index.data(Qt.DisplayRole).toBool()
+        value = index.data(Qt.DisplayRole)
         if value:
             op.state = QStyle.State_On
         else:
