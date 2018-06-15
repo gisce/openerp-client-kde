@@ -53,6 +53,7 @@ import sys
 import os
 
 import traceback
+from gettext import gettext as _
 
 ConcurrencyCheckField = '__last_update'
 
