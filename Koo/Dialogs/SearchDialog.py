@@ -143,4 +143,10 @@ class SearchDialog(QDialog, SearchDialogUi):
         else:
             self.reject()
 
-# vim:noexpandtab:
+    def save(self):
+        print("SearchDialog.save")
+        pass
+
+    def cancel(self):
+        print("SearchDialog.cancel")
+        pass

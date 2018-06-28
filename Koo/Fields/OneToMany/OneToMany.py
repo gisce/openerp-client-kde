@@ -116,9 +116,24 @@ class OneToManyDialog(QDialog, OneToManyDialogUi):
         # trigger a updateDisplay in this screen object.
         self.screen.setCurrentRecord(None)
 
+    def save(self):
+        print("OneToMany.save")
+        self.done(1)
+        pass
+
+    def cancel(self):
+        print("OneToManyDia.cancel")
+        pass
+
     def rejected(self):
         self.cleanup()
         self.reject()
+
+    def reject(self):
+        print("reject")
+        #self.cleanup()
+        self.close()
+        self.done(0)
 
     def accepted(self):
         if self._recordAdded:
@@ -417,6 +432,14 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
     def saveState(self):
         self.screen.storeViewSettings()
         return AbstractFieldWidget.saveState(self)
+
+    def save(self):
+        print("OneToMany.save")
+        pass
+
+    def cancel(self):
+        print("OneToManyDia.cancel")
+        pass
 
 # We don't allow modifying OneToMany fields but we allow creating the editor
 # because otherwise the view is no longer in edit mode and moving from one field
