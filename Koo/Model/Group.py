@@ -770,8 +770,13 @@ class RecordGroup(QObject):
     def isDomainForEmptyGroup(self):
         return self.domain() == [('id', 'in', [])]
 
-    # @brief Reload the record group with current selected sort field, order, domain and filter
     def update(self):
+        """
+        Reload the record group with current selected sort field, order,
+        domain and filter
+        :return:
+        """
+
         # Update context from Rpc.session.context as language
         # (or other settings) might have changed.
         self._context.update(Rpc.session.context)
