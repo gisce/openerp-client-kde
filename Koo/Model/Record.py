@@ -277,8 +277,17 @@ class Record(QObject):
         self._modified = False
         self._loaded = False
 
-    # @brief Save the record to the database. It doesn't matter if the record is new or already exists.
+    #
     def save(self, reload=True):
+        """
+        Save the record to the database. It doesn't matter if the record is
+        new or already exists.
+
+        :param reload:
+        :return:
+        """
+        print("Record.save")
+
         self.ensureIsLoaded()
         if not self.id:
             value = self.get(get_readonly=False)
@@ -388,11 +397,16 @@ class Record(QObject):
         self.recordChanged.emit(self)
         self.recordModified.emit(self)
 
-    # This functions simply emits a signal indicating that
-    # the model has changed. This is mainly used by fields
-    # so they don't have to emit the signal, but relay in
-    # model emiting it itself.
     def changed(self):
+        """
+        This functions simply emits a signal indicating that
+        the model has changed. This is mainly used by fields
+        so they don't have to emit the signal, but relay in
+        model emiting it itself.
+
+        :return:
+        """
+
         self.updateAttributes()
         self.recordChanged.emit(self)
         self.recordModified.emit(self)
@@ -440,11 +454,20 @@ class Record(QObject):
             # modified (as it's not, it's just reloaded).
             self.set(value, signal=False)
 
-    # @brief Evaluates the string expression given by dom.
-    # Before passing the dom expression to Rpc.session.evaluateExpression
-    # a context with 'current_date', 'time', 'context', 'active_id' and
-    # 'parent' (if applies) is prepared.
+
     def evaluateExpression(self, dom, checkLoad=True, firstTry=True):
+        """
+        Evaluates the string expression given by dom. Before passing the dom
+        expression to Rpc.session.evaluateExpression a context with
+        'current_date', 'time', 'context', 'active_id' and 'parent'
+        (if applies) is prepared.
+
+        :param dom:
+        :param checkLoad:
+        :param firstTry:
+        :return:
+        """
+
         if not isinstance(dom, str):
             return dom
         if checkLoad:
@@ -530,12 +553,17 @@ class Record(QObject):
             return True
         return False
 
-    # This function is called by the field when it's changed
-    # and has a 'on_change' attribute. The 'callback' parameter
-    # is the function that has to be executed on the server.
-    # So the function specified is called on the server whenever
-    # the field changes.
     def callOnChange(self, callback):
+        """
+        This function is called by the field when it's changed and has a
+        'on_change' attribute. The 'callback' parameter is the function that
+        has to be executed on the server. So the function specified is called
+        on the server whenever the field changes.
+
+        :param callback:
+        :return:
+        """
+
         match = re.match('^(.*?)\((.*)\)$', callback)
         if not match:
             raise Exception('ERROR: Wrong on_change trigger: %s' % callback)
