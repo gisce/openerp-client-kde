@@ -86,7 +86,6 @@ class OneToManyDialog(QDialog, OneToManyDialogUi):
 
         self.pushOk.clicked.connect(self.accepted)
         self.pushCancel.clicked.connect(self.rejected)
-        self.reject.connect(self.cleanup)
         self.pushPrevious.clicked.connect(self.previous)
         self.pushNext.clicked.connect(self.__next__)
 
