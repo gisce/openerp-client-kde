@@ -673,9 +673,16 @@ class RecordGroup(QObject):
     def isWizard(self):
         return self.resource.startswith('wizard.')
 
-    # @brief Checks whether the specified record is fully loaded and loads
-    # it if necessary.
     def ensureRecordLoaded(self, record):
+        """
+        Checks whether the specified record is fully loaded and loads
+        it if necessary.
+
+        :param record:
+        :return: None
+        :rtype: None
+        """
+
         self.ensureUpdated()
         # Do not try to load if record is new.
         if not record.id:
@@ -773,8 +780,13 @@ class RecordGroup(QObject):
         self.updated = False
         self.sort(self.toBeSortedField, self.toBeSortedOrder)
 
-    # @brief Ensures the group is updated.
     def ensureUpdated(self):
+        """
+        Ensures the group is updated.
+        :return: None
+        :rtype: None
+        """
+        
         if self.updated:
             return
         self.update()

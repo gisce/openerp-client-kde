@@ -81,9 +81,15 @@ class ReferenceFieldWidget(AbstractFieldWidget, ReferenceFieldWidgetUi):
         self.updateStates()
 
     def clear(self):
-        # As the 'clear' button might modify the model we need to be sure all other fields/widgets
-        # have been stored in the model. Otherwise the recordChanged() triggered by modifying
-        # the parent model could make us lose changes.
+        """
+        As the 'clear' button might modify the model we need to be sure all
+        other fields/widgets have been stored in the model. Otherwise the
+        recordChanged() triggered by modifying the parent model could make us
+        lose changes.
+
+        :return:
+        """
+
         self.view.store()
 
         # This automatically refreshes the widget and thus clears

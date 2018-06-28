@@ -620,9 +620,15 @@ class Record(QObject):
     def missingFields(self):
         return list(set(self.group.fieldObjects.keys()) - set(self.values.keys()))
 
-    # @brief Creates entries in the values dictionary for fields
-    # returned by missingFields()
+
     def createMissingFields(self):
+        """
+        Creates entries in the values dictionary for fields
+        returned by missingFields()
+
+        :return:
+        """
+
         # Try to avoid some CPU cycles because this function is called in value()
         # function which will be called lots of times.
         if len(self.group.fieldObjects) == len(self.values):
