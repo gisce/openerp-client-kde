@@ -33,7 +33,7 @@ import base64
 from Koo.Common import Numeric
 
 
-class StringField:
+class StringField(object):
     def __init__(self, parent, attrs):
         self.parent = parent
         self.attrs = attrs
