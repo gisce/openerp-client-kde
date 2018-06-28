@@ -368,10 +368,6 @@ class ToManyField(QObject, StringField):
         pass
 
     def set(self, record, value, test_state=False, modified=False):
-        pass
-        # @xtorello toreview
-
-
         from Koo.Model.Group import RecordGroup
         # We can't add the context here as it might cause an infinite loop in some cases where
         # a field of the parent appears in the context, and the parent is just being loaded.
@@ -405,9 +401,6 @@ class ToManyField(QObject, StringField):
 
 class OneToManyField(ToManyField):
     # @xtorello toreview
-    pass
-    """
-
 
     def __init__(self, parent, attrs):
         # QObject.__init__(self)
@@ -454,13 +447,11 @@ class OneToManyField(ToManyField):
 
     def default(self, record):
         return [x.defaults() for x in record.values[self.name]]
-    """
 
 
 class ManyToManyField(ToManyField):
     # @xtorello toreview
-    pass
-    """
+
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         if not record.values[self.name]:
             return []
@@ -470,7 +461,7 @@ class ManyToManyField(ToManyField):
         if not record.values[self.name]:
             return []
         return record.values[self.name].ids()
-    """
+
 
 
 class ReferenceField(StringField):

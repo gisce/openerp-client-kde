@@ -229,11 +229,17 @@ class RecordGroup(QObject):
                 self.fieldObjects['%s.size' % fname] = Field.FieldFactory.create(
                     'binary-size', self, fvalue)
 
-    # @brief Saves all the records.
-    #
-    # Note that there will be one request to the server per modified or
-    # created record.
     def save(self):
+        """
+        Saves all the records.
+
+        Note that there will be one request to the server per modified or
+        created record.
+
+        :return:
+        """
+
+        print("RecordGroup.save")
         for record in self.records:
             if isinstance(record, Record):
                 saved = record.save()
@@ -798,7 +804,7 @@ class RecordGroup(QObject):
         :return: None
         :rtype: None
         """
-        
+
         if self.updated:
             return
         self.update()
