@@ -627,9 +627,16 @@ class RecordGroup(QObject):
     def fieldExists(self, fieldName):
         return fieldName in self.fieldObjects
 
-    # @brief Returns the record with id 'id'. You can use [] instead.
-    # Note that it will return the record but won't try to load it.
     def recordById(self, id):
+        """
+        Returns the record with id 'id'. You can use [] instead. Note that it
+        will return the record but won't try to load it.
+
+        :param id: Record id
+        :type id: int
+        :return: record
+        :rtype: Record
+        """
         for record in self.records:
             if isinstance(record, Record):
                 if record.id == id:

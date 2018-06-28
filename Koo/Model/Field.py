@@ -108,8 +108,12 @@ class StringField(object):
         if (internal or False) != (record.values.get(self.name, False) or False):
             self.changed(record)
 
-    # Returns the value for the client widget
     def get_client(self, record):
+        """
+        Returns the value for the client widget
+        :param record:
+        :return:
+        """
         return record.values.get(self.name, False)
 
     def setDefault(self, record, value):
@@ -285,6 +289,14 @@ class ManyToOneField(StringField):
         return False
 
     def get_client(self, record):
+        """
+        Returns the value of the record
+
+        :param record:
+        :type record: Record
+        :return:
+        """
+
         if record.values[self.name]:
             return record.values[self.name][1]
         return False

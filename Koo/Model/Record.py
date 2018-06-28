@@ -124,17 +124,34 @@ class Record(QObject):
             self.group.ensureRecordLoaded(self)
         self.group.fieldObjects[fieldName].set_client(self, value)
 
-    # @brief Obtains the value of a given field
     def value(self, fieldName):
+        """
+        Obtains the value of a given field
+
+        :param fieldName: Name of the field
+        :type fieldName: str
+        :return: Value of the field
+        :rtype: int, list, tuple
+        """
+        record = self
+        field = self.group.fieldObjects[fieldName]
         if not fieldName in self.values:
             self.group.ensureRecordLoaded(self)
-        # @xtorello toreview
-        if fieldName in self.group.fieldObjects:
-            return self.group.fieldObjects[fieldName].get_client(self)
-        return None
+            x = 0
+            while self.group.records[x].id != self.id:
+                x += 1
+            record = self.group.records[x]
+        return field.get_client(record)
 
-    # @brief Establishes the default value for a given field
     def setDefault(self, fieldName, value):
+        """
+        Establishes the default value for a given field
+
+        :param fieldName:
+        :param value:
+        :return: None
+        """
+
         self.group.fieldObjects[fieldName].set_client(self, value)
 
     # @brief Obtains the default value of a given field
