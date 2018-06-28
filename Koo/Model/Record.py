@@ -118,11 +118,23 @@ class Record(QObject):
         # return '<Record %s@%s>' % (self.id, self.group.resource)
         return '<Record %s>' % self.id
 
-    # @brief Establishes the value for a given field
     def setValue(self, fieldName, value):
+        """
+        Establishes the value for a given field
+
+        :param fieldName:
+        :param value:
+        :return: None
+        """
+
+        record = self
         if not fieldName in self.values:
             self.group.ensureRecordLoaded(self)
-        self.group.fieldObjects[fieldName].set_client(self, value)
+            x = 0
+            while self.group.records[x].id != self.id:
+                x += 1
+            record = self.group.records[x]
+        self.group.fieldObjects[fieldName].set_client(record, value)
 
     def value(self, fieldName):
         """
