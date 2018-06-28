@@ -39,10 +39,14 @@ class StringField:
         self.attrs = attrs
         self.name = attrs['name']
 
-    # This function is in charge of executing "on_change" and
-    # "change_defalt" events and setting the appropiate record
-    # as modified.
     def changed(self, record):
+        """
+        This function is in charge of executing "on_change" and "change_defalt"
+        events and setting the appropiate record as modified.
+
+        :param record:
+        :return:
+        """
         record.modified = True
         record.modified_fields.setdefault(self.name)
         record.changed()
@@ -65,10 +69,15 @@ class StringField:
             context.update(fieldContext)
         return context
 
-    # Checks if the current value is valid and sets stateAttributes on the record.
-    #
-    # Here it's checked if the field is required but is empty.
     def validate(self, record):
+        """
+        Checks if the current value is valid and sets stateAttributes on the record.
+
+        Here it's checked if the field is required but is empty.
+        :param record:
+        :return:
+        """
+
         ok = True
         # We ensure that the field is read-write. In some cases there might be
         # forms in which a readonly field is marked as required. For example,
@@ -302,16 +311,18 @@ class ManyToOneField(StringField):
         if internal != record.values[self.name]:
             self.changed(record)
 
-# This is the base class for ManyToManyField and OneToManyField
-# The only difference between these classes is the 'get()' method.
-# In the case of ManyToMany we always return all elements because
-# it only stores the relation between two records which already exist.
-# In the case of OneToMany we only return those objects that have
-# been modified because the pointed object stores the relation to the
-# parent.
-
 
 class ToManyField(QObject, StringField):
+    """
+    This is the base class for ManyToManyField and OneToManyField
+    The only difference between these classes is the 'get()' method.
+    In the case of ManyToMany we always return all elements because
+    it only stores the relation between two records which already exist.
+    In the case of OneToMany we only return those objects that have
+    been modified because the pointed object stores the relation to the
+    parent.
+    """
+
     def __init__(self, parent, attrs):
         StringField.__init__(self,parent,attrs)
         # QObject.__init__(self)
@@ -319,7 +330,6 @@ class ToManyField(QObject, StringField):
         #self.parent = parent
         self.attrs = attrs
         self.name = attrs['name']
-
 
     def create(self, record):
         pass
@@ -334,7 +344,6 @@ class ToManyField(QObject, StringField):
         group.tomanyfield = self
         group.modified.connect(self.groupModified)
         return group
-
 
     def groupModified(self):
         p = self.sender().parent
@@ -487,14 +496,17 @@ class ReferenceField(StringField):
             record.modified_fields.setdefault(self.name)
 
 
-# @brief The FieldFactory class provides a means of creating the appropiate object
-#  to handle a given field type.
-#
-#  By default some classes exist for many file types
-#  but if you create new types or want to replace current implementations you can
-#  do it too.
 # @xtorello xxx
 class FieldFactory:
+    """
+    The FieldFactory class provides a means of creating the appropiate object
+    to handle a given field type.
+
+    By default some classes exist for many file types but if you create new
+    types or want to replace current implementations you can do it too.
+    """
+
+
     # The types property holds the class that will be called whenever a new
     #  object has to be created for a given field type.
     #  By default there's a number of field types but new ones can be easily
