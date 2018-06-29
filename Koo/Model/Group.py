@@ -720,10 +720,10 @@ class RecordGroup(QObject):
         values = self.rpc.read(queryIds, missingFields, c)
         if values:
             for v in values:
-                id = v['id']
+                ident = v['id']
                 if 'id' not in missingFields:
                     del v['id']
-                self.recordById(id).set(v, signal=False)
+                self.recordById(ident).set(v, signal=False)
         self.enableSignals()
         # TODO: Take a look if we need to set default values for new records!
         # Set defaults
