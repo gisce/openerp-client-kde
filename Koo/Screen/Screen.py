@@ -675,8 +675,11 @@ class Screen(QScrollArea):
     def setOnWriteFunction(self, functionName):
         self.group.setOnWriteFunction(functionName)
 
-    # @brief Stores all modified models.
     def save(self):
+        """
+        Stores all modified models.
+        :return:
+        """
         if not self.currentRecord():
             return False
         self.currentView().store()
