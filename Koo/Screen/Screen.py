@@ -371,9 +371,14 @@ class Screen(QScrollArea):
         self.currentChanged.emit()
         self.updateSearchFormStatus()
 
-    # @brief Sets the RecordGroup this Screen should show.
-    # @param group RecordGroup object.
     def setRecordGroup(self, group):
+        """
+        @brief Sets the RecordGroup this Screen should show.
+
+        :param group: group RecordGroup object
+        :return: None
+        :rtype: None
+        """
         if not group:
             self.group = None
             self._currentRecord = None
@@ -408,8 +413,12 @@ class Screen(QScrollArea):
         else:
             self._firstTimeShown = True
 
-    # @brief Returns a reference the current record (Record).
     def currentRecord(self):
+        """
+        Returns a reference the current record (Record).
+        :return:
+        """
+
         # Checking _currentRecordPosition before count() can save a search() call to the server because
         # count() will execute a search() in the server if no items have been loaded yet. What happens is
         # that the first time a screen with a TreeView is shown currentRecord() will be called but there
@@ -430,10 +439,15 @@ class Screen(QScrollArea):
             # fields haven't been created yet??)
             return self._currentRecord
 
-    # @brief Sets the current record.
-    #
-    # Note that value will be a reference to the Record.
     def setCurrentRecord(self, value):
+        """
+        Sets the current record.
+
+        Note that value will be a reference to the Record.
+        :param value:
+        :return:
+        """
+
         if self.group and self.group.recordExists(value):
             pos = self.group.indexOfRecord(value)
         else:
@@ -461,9 +475,14 @@ class Screen(QScrollArea):
             if self.currentView():
                 self.currentView().setSelected(self._currentRecord)
 
-    # @brief Switches the current view to the previous one. If viewType (such as 'calendar')
-    # is given it will switch to that view type.
     def switchView(self, viewType=None):
+        """
+        Switches the current view to the previous one. If viewType (such as 'calendar')
+        is given it will switch to that view type.
+        :param viewType:
+        :return:
+        """
+
         if self.currentView():
             self.currentView().store()
 
@@ -842,6 +861,14 @@ class Screen(QScrollArea):
     # @brief Displays the record with id 'id' or refreshes the current record if
     # no id is given.
     def display(self, id=None):
+        """
+        Displays the record with id 'id' or refreshes the current record if
+        no id is given.
+
+        :param id:
+        :return:
+        """
+
         if id:
             self.setCurrentRecord(self.group[id])
         if self.views:
