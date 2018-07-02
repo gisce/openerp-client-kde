@@ -711,9 +711,9 @@ class Screen(QScrollArea):
             return False
         self.currentView().store()
 
-        id = False
+        ident = False
         if self.currentRecord().validate():
-            id = self.currentRecord().save(reload=True)
+            ident = self.currentRecord().save(reload=True)
         else:
             self.currentView().display(self.currentRecord(), self.group)
             return False
@@ -721,7 +721,7 @@ class Screen(QScrollArea):
         if self.currentView().showsMultipleRecords():
             for record in self.group.modifiedRecords():
                 if record.validate():
-                    id = record.save(reload=True)
+                    ident = record.save(reload=True)
                 else:
                     self.setCurrentRecord(record)
                     self.display()
@@ -729,7 +729,7 @@ class Screen(QScrollArea):
             self.display()
 
         self.display()
-        return id
+        return ident
 
     # @brief Reload current model and refreshes the view.
     #
