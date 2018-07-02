@@ -306,7 +306,6 @@ class Record(QObject):
         self._modified = False
         self._loaded = False
 
-    #
     def save(self, reload=True):
         """
         Save the record to the database. It doesn't matter if the record is
