@@ -117,18 +117,26 @@ class Action(QAction):
         Plugins.execute(self._data, self._model,
                         currentId, selectedIds, context)
 
-# @brief The ActionFactory class is a factory that creates Action objects to execute
-# actions on the server. Typically those shown in the toolbar and menus for an specific
-# model
-
 
 class ActionFactory:
-    # @brief Creates a list of Action objects given a parent, model and definition.
-    #
-    # The 'definition' parameter is the 'toolbar' parameter returned by server function
-    # fields_view_get.
+    """
+    The ActionFactory class is a factory that creates Action objects
+    to execute actions on the server. Typically those shown in the toolbar and
+    menus for an specific model
+    """
+
     @staticmethod
     def create(parent, definition, model):
+        """
+        Creates a list of Action objects given a parent, model and definition.
+
+        The 'definition' parameter is the 'toolbar' parameter returned by
+        server function fields_view_get.
+        :param parent:
+        :param definition:
+        :param model:
+        :return:
+        """
         if not definition:
             # If definition is not set we initialize it appropiately
             # to be able to add the 'Print Screen' action.
