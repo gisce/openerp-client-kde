@@ -90,8 +90,17 @@ class StringField(object):
         record.setFieldValid(self.name, ok)
         return ok
 
-    # Stores the value from the server
     def set(self, record, value, test_state=True, modified=False):
+        """
+        Stores the value from the server
+
+        :param record:
+        :param value:
+        :param test_state:
+        :param modified:
+        :return: None
+        :rtype: None
+        """
         record.values[self.name] = value
         if modified:
             record.modified = True

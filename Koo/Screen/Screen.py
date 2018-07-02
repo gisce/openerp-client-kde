@@ -786,8 +786,13 @@ class Screen(QScrollArea):
                 self.setCurrentRecord(None)
             self.display()
 
-    # @brief Returns a reference to the current view.
     def currentView(self):
+        """
+        Returns a reference to the current view.
+
+        :return:
+        """
+
         if self._currentView < 0:
             return None
         type = self._viewQueue.typeFromIndex(self._currentView)
