@@ -181,8 +181,12 @@ class Record(QObject):
         # loaded too, causing performance issues.
         return self.group.fieldObjects[fieldName].context(self, checkLoad=False)
 
-    # @brief Returns whether the record has been modified or not
     def isModified(self):
+        """
+        Returns whether the record has been modified or not
+        :return: True if  the record been modified
+        :rtype: bool
+        """
         return self.modified
 
     def fields(self):
