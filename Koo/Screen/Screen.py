@@ -50,24 +50,32 @@ from .Action import *
 from .ViewQueue import *
 
 
-# @brief The Screen class is a widget that provides an easy way of handling multiple views.
-#
-# This class is capable of managing various views of the same model and provides
-# functions for moving to the next and previous record.
-#
-# If neither setViewTypes() nor setViewIds() are called, form and tree views (in this order)
-# will be used. If you use only a single 'id' and say it's a 'tree', one you try to switchView
-# the default 'form' view will be shown. If you only want to show the 'tree' view, use
-# setViewTypes( [] ) or setViewTypes( ['tree'] )
-# When you add a new view by it's ID the type of the given view is removed from the list of
-# view types. (See: addViewById() )
-#
-# A Screen can emit four different signals:
-#   activated() -> Emited each time a record is activated (such as a double click on a list).
-#   closed() -> Emited when a view asks for the screen to be closed (such as a 'close' button on a form).
-#   currentChanged() -> Emited when the current record has been modified.
-#   recordMessage(int,int,int) -> Emited each time the current record changes (such as moving to previous or next).
 class Screen(QScrollArea):
+    """
+    The Screen class is a widget that provides an easy way of handling
+    multiple views.
+
+    This class is capable of managing various views of the same model and
+    provides functions for moving to the next and previous record.
+
+    If neither setViewTypes() nor setViewIds() are called, form and tree views
+    (in this order) will be used. If you use only a single 'id' and say it's a
+    'tree', one you try to switchView the default 'form' view will be shown. If
+    you only want to show the 'tree' view, use setViewTypes( [] ) or
+    setViewTypes( ['tree'] )
+
+    When you add a new view by it's ID the type of the given view is removed
+    from the list of view types. (See: addViewById() )
+
+    A Screen can emit four different signals:
+        activated() -> Emited each time a record is activated (such as a
+        double click on a list).
+        closed() -> Emited when a view asks for the screen to be closed (such
+        as a 'close' button on a form).
+        currentChanged() -> Emited when the current record has been modified.
+        recordMessage(int,int,int) -> Emited each time the current record
+        changes (such as moving to previous or next).
+    """
     activated = pyqtSignal()
     closed = pyqtSignal()
     currentChangedSignal = pyqtSignal()
