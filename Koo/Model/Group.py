@@ -340,17 +340,17 @@ class RecordGroup(QObject):
             # Note we don't use sets to discard ids, because we want to keep the order
             # their order and because it can cause infinite recursion.
             currentIds = self.ids()
-            for id in ids:
-                if id not in currentIds:
-                    self.records.insert(0, id)
+            for ident in ids:
+                if ident not in currentIds:
+                    self.records.insert(0, ident)
             end = len(ids) - 1
         else:
             start = len(self.records)
             # Discard from 'ids' those that are already loaded. Same as above.
             currentIds = self.ids()
-            for id in ids:
-                if id not in currentIds:
-                    self.records.append(id)
+            for ident in ids:
+                if ident not in currentIds:
+                    self.records.append(ident)
             end = len(self.records) - 1
         # We consider the group is updated because otherwise calling count() would
         # force an update() which would cause one2many relations to load elements
