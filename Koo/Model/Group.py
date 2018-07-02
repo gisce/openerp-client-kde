@@ -313,11 +313,20 @@ class RecordGroup(QObject):
         end = len(self.records) - 1
         self.recordsInserted.emit(start, end)
 
-    # @brief Creates as many records as len(ids) with the ids[x] as id.
-    #
-    # 'ids' needs to be a list of identifiers. The addFields() function
-    # can be used later to load the necessary fields for each record.
     def load(self, ids, addOnTop=False):
+        """
+        Creates as many records as len(ids) with the ids[x] as id.
+
+        'ids' needs to be a list of identifiers. The addFields() function
+        can be used later to load the necessary fields for each record.
+
+        :param ids:
+        :type ids: list(int)
+        :param addOnTop:
+        :return: None
+        :rtype: None
+        """
+
         if not ids:
             return
         if addOnTop:
