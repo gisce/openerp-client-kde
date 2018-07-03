@@ -66,10 +66,10 @@ class Record(QObject):
     recordModified = pyqtSignal('PyQt_PyObject')
     setFocus = pyqtSignal('QString')
 
-    def __init__(self, id, group, parent=None, new=False):
+    def __init__(self, ident, group, parent=None, new=False):
         QObject.__init__(self, group)
         self.rpc = group.rpc
-        self.id = id
+        self.id = ident
         self._loaded = False
         self.parent = parent
         self.group = group
