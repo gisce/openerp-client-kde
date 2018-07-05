@@ -456,10 +456,16 @@ class RecordGroup(QObject):
         if self.parent:
             self.parent.recordModified.emit(self.parent)
 
-    # @brief Removes a record from the record group but not from the server.
-    #
-    # If the record doesn't exist it will ignore it silently.
     def removeRecord(self, record):
+        """
+        Removes a record from the record group but not from the server.
+
+        If the record doesn't exist it will ignore it silently.
+        :param record:
+        :return: None
+        :rtype: None
+        """
+
         idx = self.records.index(record)
         if isinstance(record, Record):
             id = record.id
