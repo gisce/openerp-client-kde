@@ -123,7 +123,8 @@ class StringField(object):
         :rtype: None
         """
         internal = record.values.get(self.name, False)
-        self.set(record, value, test_state)
+        modified = (internal or False) != value
+        self.set(record, value, test_state, modified)
         if (internal or False) != (record.values.get(self.name, False) or False):
             self.changed(record)
 

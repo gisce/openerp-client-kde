@@ -187,7 +187,13 @@ class Record(QObject):
         :return: True if  the record been modified
         :rtype: bool
         """
-        return self.modified
+        mod = self.modified
+        for key_name, value in self.values.items():
+            from .Group import RecordGroup
+            if isinstance(value, RecordGroup):
+                if value.isModified():
+                    mod = True
+        return mod
 
     def fields(self):
         return self.group.fieldObjects
@@ -296,9 +302,11 @@ class Record(QObject):
             # The record may not have all the fields the group has.
             # This is because there may have been a switch view to a form
             # but not for this record.
-
-            if (get_readonly or not self.isFieldReadOnly(name)) \
-                    and (not get_modifiedonly or field.name in self.modified_fields):
+            from .Group import RecordGroup
+            if isinstance(self.values[name], RecordGroup) and self.values[name].isModified():
+                value[name] = field.get(self, readonly=get_readonly, modified=get_modifiedonly)
+            elif (get_readonly or not self.isFieldReadOnly(name)) \
+                    and (not get_modifiedonly or field.name in self.modified_fields) :
                 value[name] = field.get(
                     self, readonly=get_readonly, modified=get_modifiedonly)
         if includeid:

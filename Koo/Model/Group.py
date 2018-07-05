@@ -109,6 +109,7 @@ class RecordGroup(QObject):
         self.limit = Settings.value('koo.limit', 80, int)
         self.maximumLimit = self.limit
         self.rpc = RpcProxy(resource)
+
         if fields == None:
             self.fields = {}
         else:
@@ -446,10 +447,14 @@ class RecordGroup(QObject):
         # @xtorello toreview or True
         if self._signalsEnabled:
             self.recordChangedSignal.emit(record)
+        if self.parent:
+            self.recordChangedSignal.emit(self.parent)
 
     def recordModified(self, record):
         if self._signalsEnabled:
             self.modified.emit()
+        if self.parent:
+            self.parent.recordModified.emit(self.parent)
 
     # @brief Removes a record from the record group but not from the server.
     #
