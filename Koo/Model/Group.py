@@ -84,13 +84,19 @@ class RecordGroup(QObject):
     SortingOnlyGroups = 2
     SortingNotPossibleModified = 3
 
-    # @brief Creates a new RecordGroup object.
-    # @param resource Name of the model to load. Such as 'res.partner'.
-    # @param fields Dictionary with the fields to load. This value typically comes from the server.
-    # @param ids Record identifiers to load in the group.
-    # @param parent Only used if this RecordGroup serves as a relation to another model. Otherwise it's None.
-    # @param context Context for RPC calls.
     def __init__(self, resource, fields=None, ids=None, parent=None, context=None):
+        """
+        Creates a new RecordGroup object.
+
+        :param resource: Name of the model to load. Such as 'res.partner'.
+        :param fields: Dictionary with the fields to load. This value typically
+        comes from the server.
+        :param ids: Record identifiers to load in the group.
+        :param parent: Only used if this RecordGroup serves as a relation to
+        another model. Otherwise it's None.
+        :param context: context Context for RPC calls.
+        """
+
         QObject.__init__(self)
         if ids is None:
             ids = []
