@@ -1017,6 +1017,11 @@ class RecordGroup(QObject):
 
     # @brief Returns True if any of the records in the group has been modified.
     def isModified(self):
+        """
+        Returns True if any of the records in the group has been modified.
+        :return: True if any of the records in the group has been modified.
+        :rtype: bool
+        """
         for record in self.records:
             if isinstance(record, Record):
                 if record.isModified():
