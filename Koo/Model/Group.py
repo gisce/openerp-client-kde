@@ -499,14 +499,14 @@ class RecordGroup(QObject):
             if lastIdx < 0 or idx > lastIdx:
                 lastIdx = idx
             if isinstance(record, Record):
-                id = record.id
+                ident = record.id
             else:
-                id = record
-            if id:
+                ident = record
+            if ident:
                 # Only store removedRecords if they have a valid Id.
                 # Otherwise we don't need them because they don't have
                 # to be removed in the server.
-                self.removedRecords.append(id)
+                self.removedRecords.append(ident)
             if isinstance(record, Record):
                 if record.parent:
                     record.parent.modified = True
