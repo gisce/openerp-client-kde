@@ -28,4 +28,4 @@
 from .Rpc import *
 from .Cache import *
 from .Subscriber import *
-
+from .Client import Client
