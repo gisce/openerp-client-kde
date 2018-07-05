@@ -250,8 +250,13 @@ class RecordGroup(QObject):
             if isinstance(record, Record):
                 saved = record.save()
 
-    # @brief Returns a list with all modified records
     def modifiedRecords(self):
+        """
+        Returns a list with all modified records
+
+        :return: None
+        :rtype: None
+        """
         modified = []
         for record in self.records:
             if isinstance(record, Record) and record.isModified():
