@@ -43,39 +43,39 @@ import sys
 from PyQt5.QtGui import *
 
 class RequestsDialog(QDialog):
-	def __init__(self,parent=None):
-		QDialog.__init__(self,parent)
-		layout = QVBoxLayout(self)
-		tree = QTreeView(self)
-		tree.setRootIsDecorated( False )
-		layout.addWidget(tree)
-		layout.setContentsMargins(0, 0, 0, 0)
-		self.resize(600, 300)
+    def __init__(self,parent=None):
+        QDialog.__init__(self,parent)
+        layout = QVBoxLayout(self)
+        tree = QTreeView(self)
+        tree.setRootIsDecorated( False )
+        layout.addWidget(tree)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.resize(600, 300)
 
-		Rpc.session.login( 'http://admin:admin@127.0.0.1:8069', 'semantic' )
-		
-		# Example of asynchronous call:
-		# The function 'called()' will be called twice in this example,
-		# one for the signal and another one for the callback. Of course,
-		# only one method is needed.
-		self.thread = Rpc.session.executeAsync( self.called, '/object', 'execute', 'res.partner', 'search', [] )
+        Rpc.session.login( 'http://admin:admin@127.0.0.1:8069', 'semantic' )
 
-		visible = ['create_date', 'name', 'act_from', 'act_to', 'body' ]
-		self.fields = Rpc.session.execute('/object', 'execute', 'res.request', 'fields_get', visible)
-		ids = Rpc.session.execute('/object', 'execute', 'res.request', 'search', [])
-		self.group = RecordGroup( 'res.request', self.fields, ids )
-		treeModel = KooModel( self )
-		treeModel.setRecordGroup( self.group )
-		treeModel.setFields( self.fields )
-		treeModel.setShowBackgroundColor( False )
+        # Example of asynchronous call:
+        # The function 'called()' will be called twice in this example,
+        # one for the signal and another one for the callback. Of course,
+        # only one method is needed.
+        self.thread = Rpc.session.executeAsync( self.called, '/object', 'execute', 'res.partner', 'search', [] )
 
-		tree.setModel( treeModel )
+        visible = ['create_date', 'name', 'act_from', 'act_to', 'body' ]
+        self.fields = Rpc.session.execute('/object', 'execute', 'res.request', 'fields_get', visible)
+        ids = Rpc.session.execute('/object', 'execute', 'res.request', 'search', [])
+        self.group = RecordGroup( 'res.request', self.fields, ids )
+        treeModel = KooModel( self )
+        treeModel.setRecordGroup( self.group )
+        treeModel.setFields( self.fields )
+        treeModel.setShowBackgroundColor( False )
 
-	def called(self, result, exception):
-		if exception:
-			QMessageBox.information(self, 'Error', 'There was an error executing the background request.' )
-			return
-		QMessageBox.information(self, 'Background request', 'Result was: %s' % result )
+        tree.setModel( treeModel )
+
+    def called(self, result, exception):
+        if exception:
+            QMessageBox.information(self, 'Error', 'There was an error executing the background request.' )
+            return
+        QMessageBox.information(self, 'Background request', 'Result was: %s' % result )
 
 
 app = QApplication(sys.argv)
