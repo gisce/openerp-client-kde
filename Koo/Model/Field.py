@@ -95,6 +95,7 @@ class StringField(object):
         Stores the value from the server
 
         :param record:
+        :type record: Record
         :param value:
         :param test_state:
         :param modified:
