@@ -445,6 +445,16 @@ class Record(QObject):
         self.recordModified.emit(self)
 
     def set(self, val, modified=False, signal=True):
+        """
+        Sets the value on the record
+
+        :param val: Value to set on the Record
+        :param modified: True if it's modified from the last value
+        :param signal: Enables signal propagation
+        :return: None
+        :rtype: None
+        """
+
         # Ensure there are values for all fields in the group
         self.createMissingFields()
 
