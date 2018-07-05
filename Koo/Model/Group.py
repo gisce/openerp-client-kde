@@ -468,14 +468,14 @@ class RecordGroup(QObject):
 
         idx = self.records.index(record)
         if isinstance(record, Record):
-            id = record.id
+            ident = record.id
         else:
-            id = record
+            ident = record
         if id:
             # Only store removedRecords if they have a valid Id.
             # Otherwise we don't need them because they don't have
             # to be removed in the server.
-            self.removedRecords.append(id)
+            self.removedRecords.append(ident)
         if isinstance(record, Record):
             if record.parent:
                 record.parent.modified = True
