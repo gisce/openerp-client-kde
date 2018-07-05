@@ -436,7 +436,8 @@ class Record(QObject):
         so they don't have to emit the signal, but relay in
         model emiting it itself.
 
-        :return:
+        :return: None
+        :rtype: None
         """
 
         self.updateAttributes()

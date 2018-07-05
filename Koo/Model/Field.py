@@ -110,8 +110,17 @@ class StringField(object):
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         return record.values.get(self.name, False)
 
-    # Stores the value for the client widget
     def set_client(self, record, value, test_state=True):
+        """
+        Stores the value for the client widget
+
+        :param record:
+        :type record: Record
+        :param value:
+        :param test_state:
+        :return: None
+        :rtype: None
+        """
         internal = record.values.get(self.name, False)
         self.set(record, value, test_state)
         if (internal or False) != (record.values.get(self.name, False) or False):
