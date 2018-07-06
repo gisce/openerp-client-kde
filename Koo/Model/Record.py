@@ -326,6 +326,8 @@ class Record(QObject):
         :param reload:
         :return:
         """
+
+        from .Group import RecordGroup
         print("Record.save")
 
         self.ensureIsLoaded()
@@ -342,6 +344,14 @@ class Record(QObject):
             if not self.rpc.write([self.id], value, context):
                 return False
         self._loaded = False
+
+        # Delete elements
+        for key_name, value in self.values.items():
+            if isinstance(value, RecordGroup):
+                if value.removedRecords:
+                    model = value.resource
+                    ids = value.removedRecords
+                    Rpc.RpcProxy(model).unlink(ids)
         if reload:
             self.reload()
         if self.group:
