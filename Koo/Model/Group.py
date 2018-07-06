@@ -521,10 +521,14 @@ class RecordGroup(QObject):
         self.modified.emit()
         self.recordsRemoved.emit(firstIdx, lastIdx)
 
-    # @brief Removes a record from the record group but not from the server.
-    #
-    # If the record doesn't exist it will ignore it silently.
     def remove(self, record):
+        """
+        Removes a record from the record group but not from the server.
+
+        If the record doesn't exist it will ignore it silently.
+        :param record:
+        :return:
+        """
         if isinstance(record, list):
             self.removeRecords(record)
         else:

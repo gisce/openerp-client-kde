@@ -396,8 +396,11 @@ class Record(QObject):
             self.recordChanged.emit(self)
         return change
 
-    # @brief Returns True if all fields are valid. Otherwise it returns False.
     def validate(self):
+        """
+        Returns True if all fields are valid. Otherwise it returns False.
+        :return:
+        """
         self.ensureIsLoaded()
         ok = True
         for name in self.group.fieldObjects:
