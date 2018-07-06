@@ -819,11 +819,17 @@ class Screen(QScrollArea):
         else:
             return self.currentRecord().isModified()
 
-    # @brief Removes all selected ids.
-    #
-    # If unlink is False (the default) records are only removed from the list. If
-    # unlink is True records will be removed from the server too.
     def remove(self, unlink=False):
+        """
+        Removes all selected ids.
+
+
+        :param unlink: If unlink is False (the default) records are only removed
+        from the list.
+        :type unlink: bool
+        :return:If unlink is True records will be removed from the server too.
+        :rtype: bool
+        """
         records = self.selectedRecords()
         if unlink and records:
             # Remove records with id None as they would cause an exception
