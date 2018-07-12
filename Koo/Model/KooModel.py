@@ -702,7 +702,6 @@ class KooModel(QAbstractItemModel):
         else:
             return group.modelByIndex( row )
 
-
     def value(self, row, column, group):
         """
         Returns the value from the model from the given row, column and group
