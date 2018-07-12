@@ -686,8 +686,17 @@ class KooModel(QAbstractItemModel):
         else:
             return None
 
-    # @brief Returns a Record refered by row and group parameters
+    # @brief
     def record(self, row, group):
+        """
+        Returns a Record refered by row and group parameters
+
+        :param row:
+        :type row: int
+        :param group:
+        :type group: int
+        :return:
+        """
         if not group:
             return None
         # We ensure the group has been loaded by checking if there
