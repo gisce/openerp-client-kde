@@ -372,15 +372,15 @@ class KooModel(QAbstractItemModel):
         if not self.group:
             return QVariant()
         if role in (Qt.DisplayRole, Qt.EditRole) or (self._showToolTips and role == Qt.ToolTipRole):
-            value = self.value( index.row(), index.column(), index.internalPointer() )
-            fieldType = self.fieldType( index.column(), index.internalPointer() )
+            value = self.value(index.row(), index.column(), index.internalPointer())
+            fieldType = self.fieldType(index.column(), index.internalPointer())
             if fieldType in ['one2many', 'many2many']:
-                return QVariant( '(%d)' % value.count() )
+                return QVariant('(%d)' % value.count())
             elif fieldType == 'selection':
-                field = self.fields[self.field( index.column() )]
+                field = self.fields[self.field(index.column())]
                 for x in field['selection']:
                     if x[0] == value:
-                        return QVariant( str(x[1]) )
+                        return QVariant(str(x[1]))
                 return QVariant()
             elif fieldType == 'date' and value:
                 return QVariant( Calendar.dateToText( Calendar.storageToDate( value ) ) )
