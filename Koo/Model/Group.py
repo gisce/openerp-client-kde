@@ -84,13 +84,19 @@ class RecordGroup(QObject):
     SortingOnlyGroups = 2
     SortingNotPossibleModified = 3
 
-    # @brief Creates a new RecordGroup object.
-    # @param resource Name of the model to load. Such as 'res.partner'.
-    # @param fields Dictionary with the fields to load. This value typically comes from the server.
-    # @param ids Record identifiers to load in the group.
-    # @param parent Only used if this RecordGroup serves as a relation to another model. Otherwise it's None.
-    # @param context Context for RPC calls.
     def __init__(self, resource, fields=None, ids=None, parent=None, context=None):
+        """
+        Creates a new RecordGroup object.
+
+        :param resource: Name of the model to load. Such as 'res.partner'.
+        :param fields: Dictionary with the fields to load. This value typically
+        comes from the server.
+        :param ids: Record identifiers to load in the group.
+        :param parent: Only used if this RecordGroup serves as a relation to
+        another model. Otherwise it's None.
+        :param context: context Context for RPC calls.
+        """
+
         QObject.__init__(self)
         if ids is None:
             ids = []
@@ -103,6 +109,7 @@ class RecordGroup(QObject):
         self.limit = Settings.value('koo.limit', 80, int)
         self.maximumLimit = self.limit
         self.rpc = RpcProxy(resource)
+
         if fields == None:
             self.fields = {}
         else:
@@ -229,17 +236,28 @@ class RecordGroup(QObject):
                 self.fieldObjects['%s.size' % fname] = Field.FieldFactory.create(
                     'binary-size', self, fvalue)
 
-    # @brief Saves all the records.
-    #
-    # Note that there will be one request to the server per modified or
-    # created record.
     def save(self):
+        """
+        Saves all the records.
+
+        Note that there will be one request to the server per modified or
+        created record.
+
+        :return:
+        """
+
+        print("RecordGroup.save")
         for record in self.records:
             if isinstance(record, Record):
                 saved = record.save()
 
-    # @brief Returns a list with all modified records
     def modifiedRecords(self):
+        """
+        Returns a list with all modified records
+
+        :return: None
+        :rtype: None
+        """
         modified = []
         for record in self.records:
             if isinstance(record, Record) and record.isModified():
@@ -307,11 +325,20 @@ class RecordGroup(QObject):
         end = len(self.records) - 1
         self.recordsInserted.emit(start, end)
 
-    # @brief Creates as many records as len(ids) with the ids[x] as id.
-    #
-    # 'ids' needs to be a list of identifiers. The addFields() function
-    # can be used later to load the necessary fields for each record.
     def load(self, ids, addOnTop=False):
+        """
+        Creates as many records as len(ids) with the ids[x] as id.
+
+        'ids' needs to be a list of identifiers. The addFields() function
+        can be used later to load the necessary fields for each record.
+
+        :param ids:
+        :type ids: list(int)
+        :param addOnTop:
+        :return: None
+        :rtype: None
+        """
+
         if not ids:
             return
         if addOnTop:
@@ -325,17 +352,17 @@ class RecordGroup(QObject):
             # Note we don't use sets to discard ids, because we want to keep the order
             # their order and because it can cause infinite recursion.
             currentIds = self.ids()
-            for id in ids:
-                if id not in currentIds:
-                    self.records.insert(0, id)
+            for ident in ids:
+                if ident not in currentIds:
+                    self.records.insert(0, ident)
             end = len(ids) - 1
         else:
             start = len(self.records)
             # Discard from 'ids' those that are already loaded. Same as above.
             currentIds = self.ids()
-            for id in ids:
-                if id not in currentIds:
-                    self.records.append(id)
+            for ident in ids:
+                if ident not in currentIds:
+                    self.records.append(ident)
             end = len(self.records) - 1
         # We consider the group is updated because otherwise calling count() would
         # force an update() which would cause one2many relations to load elements
@@ -420,25 +447,35 @@ class RecordGroup(QObject):
         # @xtorello toreview or True
         if self._signalsEnabled:
             self.recordChangedSignal.emit(record)
+        if self.parent:
+            self.recordChangedSignal.emit(self.parent)
 
     def recordModified(self, record):
         if self._signalsEnabled:
             self.modified.emit()
+        if self.parent:
+            self.parent.recordModified.emit(self.parent)
 
-    # @brief Removes a record from the record group but not from the server.
-    #
-    # If the record doesn't exist it will ignore it silently.
     def removeRecord(self, record):
+        """
+        Removes a record from the record group but not from the server.
+
+        If the record doesn't exist it will ignore it silently.
+        :param record:
+        :return: None
+        :rtype: None
+        """
+
         idx = self.records.index(record)
         if isinstance(record, Record):
-            id = record.id
+            ident = record.id
         else:
-            id = record
+            ident = record
         if id:
             # Only store removedRecords if they have a valid Id.
             # Otherwise we don't need them because they don't have
             # to be removed in the server.
-            self.removedRecords.append(id)
+            self.removedRecords.append(ident)
         if isinstance(record, Record):
             if record.parent:
                 record.parent.modified = True
@@ -446,10 +483,17 @@ class RecordGroup(QObject):
         self.modified.emit()
         self.recordsRemoved.emit(idx, idx)
 
-    # @brief Remove a list of records from the record group but not from the server.
-    #
-    # If a record doesn't exist it will ignore it silently.
     def removeRecords(self, records):
+        """
+        Remove a list of records from the record group but not from the server.
+
+        If a record doesn't exist it will ignore it silently.
+        :param records:
+        :type records: list(Record)
+        :return: None
+        :rtype: None
+        """
+
         firstIdx = -1
         lastIdx = -1
         toRemove = []
@@ -462,14 +506,14 @@ class RecordGroup(QObject):
             if lastIdx < 0 or idx > lastIdx:
                 lastIdx = idx
             if isinstance(record, Record):
-                id = record.id
+                ident = record.id
             else:
-                id = record
-            if id:
+                ident = record
+            if ident:
                 # Only store removedRecords if they have a valid Id.
                 # Otherwise we don't need them because they don't have
                 # to be removed in the server.
-                self.removedRecords.append(id)
+                self.removedRecords.append(ident)
             if isinstance(record, Record):
                 if record.parent:
                     record.parent.modified = True
@@ -477,10 +521,14 @@ class RecordGroup(QObject):
         self.modified.emit()
         self.recordsRemoved.emit(firstIdx, lastIdx)
 
-    # @brief Removes a record from the record group but not from the server.
-    #
-    # If the record doesn't exist it will ignore it silently.
     def remove(self, record):
+        """
+        Removes a record from the record group but not from the server.
+
+        If the record doesn't exist it will ignore it silently.
+        :param record:
+        :return:
+        """
         if isinstance(record, list):
             self.removeRecords(record)
         else:
@@ -627,9 +675,16 @@ class RecordGroup(QObject):
     def fieldExists(self, fieldName):
         return fieldName in self.fieldObjects
 
-    # @brief Returns the record with id 'id'. You can use [] instead.
-    # Note that it will return the record but won't try to load it.
     def recordById(self, id):
+        """
+        Returns the record with id 'id'. You can use [] instead. Note that it
+        will return the record but won't try to load it.
+
+        :param id: Record id
+        :type id: int
+        :return: record
+        :rtype: Record
+        """
         for record in self.records:
             if isinstance(record, Record):
                 if record.id == id:
@@ -673,9 +728,16 @@ class RecordGroup(QObject):
     def isWizard(self):
         return self.resource.startswith('wizard.')
 
-    # @brief Checks whether the specified record is fully loaded and loads
-    # it if necessary.
     def ensureRecordLoaded(self, record):
+        """
+        Checks whether the specified record is fully loaded and loads
+        it if necessary.
+
+        :param record:
+        :return: None
+        :rtype: None
+        """
+
         self.ensureUpdated()
         # Do not try to load if record is new.
         if not record.id:
@@ -700,10 +762,10 @@ class RecordGroup(QObject):
         values = self.rpc.read(queryIds, missingFields, c)
         if values:
             for v in values:
-                id = v['id']
+                ident = v['id']
                 if 'id' not in missingFields:
                     del v['id']
-                self.recordById(id).set(v, signal=False)
+                self.recordById(ident).set(v, signal=False)
         self.enableSignals()
         # TODO: Take a look if we need to set default values for new records!
         # Set defaults
@@ -763,8 +825,13 @@ class RecordGroup(QObject):
     def isDomainForEmptyGroup(self):
         return self.domain() == [('id', 'in', [])]
 
-    # @brief Reload the record group with current selected sort field, order, domain and filter
     def update(self):
+        """
+        Reload the record group with current selected sort field, order,
+        domain and filter
+        :return:
+        """
+
         # Update context from Rpc.session.context as language
         # (or other settings) might have changed.
         self._context.update(Rpc.session.context)
@@ -773,8 +840,13 @@ class RecordGroup(QObject):
         self.updated = False
         self.sort(self.toBeSortedField, self.toBeSortedOrder)
 
-    # @brief Ensures the group is updated.
     def ensureUpdated(self):
+        """
+        Ensures the group is updated.
+        :return: None
+        :rtype: None
+        """
+
         if self.updated:
             return
         self.update()
@@ -962,6 +1034,11 @@ class RecordGroup(QObject):
 
     # @brief Returns True if any of the records in the group has been modified.
     def isModified(self):
+        """
+        Returns True if any of the records in the group has been modified.
+        :return: True if any of the records in the group has been modified.
+        :rtype: bool
+        """
         for record in self.records:
             if isinstance(record, Record):
                 if record.isModified():

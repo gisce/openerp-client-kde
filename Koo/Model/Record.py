@@ -66,10 +66,10 @@ class Record(QObject):
     recordModified = pyqtSignal('PyQt_PyObject')
     setFocus = pyqtSignal('QString')
 
-    def __init__(self, id, group, parent=None, new=False):
+    def __init__(self, ident, group, parent=None, new=False):
         QObject.__init__(self, group)
         self.rpc = group.rpc
-        self.id = id
+        self.id = ident
         self._loaded = False
         self.parent = parent
         self.group = group
@@ -118,23 +118,52 @@ class Record(QObject):
         # return '<Record %s@%s>' % (self.id, self.group.resource)
         return '<Record %s>' % self.id
 
-    # @brief Establishes the value for a given field
     def setValue(self, fieldName, value):
+        """
+        Establishes the value for a given field
+
+        :param fieldName:
+        :param value:
+        :return: None
+        """
+
+        record = self
         if not fieldName in self.values:
             self.group.ensureRecordLoaded(self)
-        self.group.fieldObjects[fieldName].set_client(self, value)
+            x = 0
+            while self.group.records[x].id != self.id:
+                x += 1
+            record = self.group.records[x]
+        self.group.fieldObjects[fieldName].set_client(record, value)
 
-    # @brief Obtains the value of a given field
     def value(self, fieldName):
+        """
+        Obtains the value of a given field
+
+        :param fieldName: Name of the field
+        :type fieldName: str
+        :return: Value of the field
+        :rtype: int, list, tuple
+        """
+        record = self
+        field = self.group.fieldObjects[fieldName]
         if not fieldName in self.values:
             self.group.ensureRecordLoaded(self)
-        # @xtorello toreview
-        if fieldName in self.group.fieldObjects:
-            return self.group.fieldObjects[fieldName].get_client(self)
-        return None
+            x = 0
+            while self.group.records[x].id != self.id:
+                x += 1
+            record = self.group.records[x]
+        return field.get_client(record)
 
-    # @brief Establishes the default value for a given field
     def setDefault(self, fieldName, value):
+        """
+        Establishes the default value for a given field
+
+        :param fieldName:
+        :param value:
+        :return: None
+        """
+
         self.group.fieldObjects[fieldName].set_client(self, value)
 
     # @brief Obtains the default value of a given field
@@ -152,9 +181,19 @@ class Record(QObject):
         # loaded too, causing performance issues.
         return self.group.fieldObjects[fieldName].context(self, checkLoad=False)
 
-    # @brief Returns whether the record has been modified or not
     def isModified(self):
-        return self.modified
+        """
+        Returns whether the record has been modified or not
+        :return: True if  the record been modified
+        :rtype: bool
+        """
+        mod = self.modified
+        for key_name, value in self.values.items():
+            from .Group import RecordGroup
+            if isinstance(value, RecordGroup):
+                if value.isModified():
+                    mod = True
+        return mod
 
     def fields(self):
         return self.group.fieldObjects
@@ -263,9 +302,11 @@ class Record(QObject):
             # The record may not have all the fields the group has.
             # This is because there may have been a switch view to a form
             # but not for this record.
-
-            if (get_readonly or not self.isFieldReadOnly(name)) \
-                    and (not get_modifiedonly or field.name in self.modified_fields):
+            from .Group import RecordGroup
+            if isinstance(self.values[name], RecordGroup) and self.values[name].isModified():
+                value[name] = field.get(self, readonly=get_readonly, modified=get_modifiedonly)
+            elif (get_readonly or not self.isFieldReadOnly(name)) \
+                    and (not get_modifiedonly or field.name in self.modified_fields) :
                 value[name] = field.get(
                     self, readonly=get_readonly, modified=get_modifiedonly)
         if includeid:
@@ -277,8 +318,18 @@ class Record(QObject):
         self._modified = False
         self._loaded = False
 
-    # @brief Save the record to the database. It doesn't matter if the record is new or already exists.
     def save(self, reload=True):
+        """
+        Save the record to the database. It doesn't matter if the record is
+        new or already exists.
+
+        :param reload:
+        :return:
+        """
+
+        from .Group import RecordGroup
+        print("Record.save")
+
         self.ensureIsLoaded()
         if not self.id:
             value = self.get(get_readonly=False)
@@ -293,6 +344,14 @@ class Record(QObject):
             if not self.rpc.write([self.id], value, context):
                 return False
         self._loaded = False
+
+        # Delete elements
+        for key_name, value in self.values.items():
+            if isinstance(value, RecordGroup):
+                if value.removedRecords:
+                    model = value.resource
+                    ids = value.removedRecords
+                    Rpc.RpcProxy(model).unlink(ids)
         if reload:
             self.reload()
         if self.group:
@@ -347,8 +406,11 @@ class Record(QObject):
             self.recordChanged.emit(self)
         return change
 
-    # @brief Returns True if all fields are valid. Otherwise it returns False.
     def validate(self):
+        """
+        Returns True if all fields are valid. Otherwise it returns False.
+        :return:
+        """
         self.ensureIsLoaded()
         ok = True
         for name in self.group.fieldObjects:
@@ -388,16 +450,32 @@ class Record(QObject):
         self.recordChanged.emit(self)
         self.recordModified.emit(self)
 
-    # This functions simply emits a signal indicating that
-    # the model has changed. This is mainly used by fields
-    # so they don't have to emit the signal, but relay in
-    # model emiting it itself.
     def changed(self):
+        """
+        This functions simply emits a signal indicating that
+        the model has changed. This is mainly used by fields
+        so they don't have to emit the signal, but relay in
+        model emiting it itself.
+
+        :return: None
+        :rtype: None
+        """
+
         self.updateAttributes()
         self.recordChanged.emit(self)
         self.recordModified.emit(self)
 
     def set(self, val, modified=False, signal=True):
+        """
+        Sets the value on the record
+
+        :param val: Value to set on the Record
+        :param modified: True if it's modified from the last value
+        :param signal: Enables signal propagation
+        :return: None
+        :rtype: None
+        """
+
         # Ensure there are values for all fields in the group
         self.createMissingFields()
 
@@ -440,11 +518,20 @@ class Record(QObject):
             # modified (as it's not, it's just reloaded).
             self.set(value, signal=False)
 
-    # @brief Evaluates the string expression given by dom.
-    # Before passing the dom expression to Rpc.session.evaluateExpression
-    # a context with 'current_date', 'time', 'context', 'active_id' and
-    # 'parent' (if applies) is prepared.
+
     def evaluateExpression(self, dom, checkLoad=True, firstTry=True):
+        """
+        Evaluates the string expression given by dom. Before passing the dom
+        expression to Rpc.session.evaluateExpression a context with
+        'current_date', 'time', 'context', 'active_id' and 'parent'
+        (if applies) is prepared.
+
+        :param dom:
+        :param checkLoad:
+        :param firstTry:
+        :return:
+        """
+
         if not isinstance(dom, str):
             return dom
         if checkLoad:
@@ -530,12 +617,17 @@ class Record(QObject):
             return True
         return False
 
-    # This function is called by the field when it's changed
-    # and has a 'on_change' attribute. The 'callback' parameter
-    # is the function that has to be executed on the server.
-    # So the function specified is called on the server whenever
-    # the field changes.
     def callOnChange(self, callback):
+        """
+        This function is called by the field when it's changed and has a
+        'on_change' attribute. The 'callback' parameter is the function that
+        has to be executed on the server. So the function specified is called
+        on the server whenever the field changes.
+
+        :param callback:
+        :return:
+        """
+
         match = re.match('^(.*?)\((.*)\)$', callback)
         if not match:
             raise Exception('ERROR: Wrong on_change trigger: %s' % callback)
@@ -592,9 +684,15 @@ class Record(QObject):
     def missingFields(self):
         return list(set(self.group.fieldObjects.keys()) - set(self.values.keys()))
 
-    # @brief Creates entries in the values dictionary for fields
-    # returned by missingFields()
+
     def createMissingFields(self):
+        """
+        Creates entries in the values dictionary for fields
+        returned by missingFields()
+
+        :return:
+        """
+
         # Try to avoid some CPU cycles because this function is called in value()
         # function which will be called lots of times.
         if len(self.group.fieldObjects) == len(self.values):

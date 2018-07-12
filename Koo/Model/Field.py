@@ -33,16 +33,20 @@ import base64
 from Koo.Common import Numeric
 
 
-class StringField:
+class StringField(object):
     def __init__(self, parent, attrs):
         self.parent = parent
         self.attrs = attrs
         self.name = attrs['name']
 
-    # This function is in charge of executing "on_change" and
-    # "change_defalt" events and setting the appropiate record
-    # as modified.
     def changed(self, record):
+        """
+        This function is in charge of executing "on_change" and "change_defalt"
+        events and setting the appropiate record as modified.
+
+        :param record:
+        :return:
+        """
         record.modified = True
         record.modified_fields.setdefault(self.name)
         record.changed()
@@ -65,10 +69,15 @@ class StringField:
             context.update(fieldContext)
         return context
 
-    # Checks if the current value is valid and sets stateAttributes on the record.
-    #
-    # Here it's checked if the field is required but is empty.
     def validate(self, record):
+        """
+        Checks if the current value is valid and sets stateAttributes on the record.
+
+        Here it's checked if the field is required but is empty.
+        :param record:
+        :return:
+        """
+
         ok = True
         # We ensure that the field is read-write. In some cases there might be
         # forms in which a readonly field is marked as required. For example,
@@ -81,8 +90,18 @@ class StringField:
         record.setFieldValid(self.name, ok)
         return ok
 
-    # Stores the value from the server
     def set(self, record, value, test_state=True, modified=False):
+        """
+        Stores the value from the server
+
+        :param record:
+        :type record: Record
+        :param value:
+        :param test_state:
+        :param modified:
+        :return: None
+        :rtype: None
+        """
         record.values[self.name] = value
         if modified:
             record.modified = True
@@ -92,15 +111,29 @@ class StringField:
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         return record.values.get(self.name, False)
 
-    # Stores the value for the client widget
     def set_client(self, record, value, test_state=True):
+        """
+        Stores the value for the client widget
+
+        :param record:
+        :type record: Record
+        :param value:
+        :param test_state:
+        :return: None
+        :rtype: None
+        """
         internal = record.values.get(self.name, False)
-        self.set(record, value, test_state)
+        modified = (internal or False) != value
+        self.set(record, value, test_state, modified)
         if (internal or False) != (record.values.get(self.name, False) or False):
             self.changed(record)
 
-    # Returns the value for the client widget
     def get_client(self, record):
+        """
+        Returns the value for the client widget
+        :param record:
+        :return:
+        """
         return record.values.get(self.name, False)
 
     def setDefault(self, record, value):
@@ -276,6 +309,14 @@ class ManyToOneField(StringField):
         return False
 
     def get_client(self, record):
+        """
+        Returns the value of the record
+
+        :param record:
+        :type record: Record
+        :return:
+        """
+
         if record.values[self.name]:
             return record.values[self.name][1]
         return False
@@ -302,16 +343,18 @@ class ManyToOneField(StringField):
         if internal != record.values[self.name]:
             self.changed(record)
 
-# This is the base class for ManyToManyField and OneToManyField
-# The only difference between these classes is the 'get()' method.
-# In the case of ManyToMany we always return all elements because
-# it only stores the relation between two records which already exist.
-# In the case of OneToMany we only return those objects that have
-# been modified because the pointed object stores the relation to the
-# parent.
-
 
 class ToManyField(QObject, StringField):
+    """
+    This is the base class for ManyToManyField and OneToManyField
+    The only difference between these classes is the 'get()' method.
+    In the case of ManyToMany we always return all elements because
+    it only stores the relation between two records which already exist.
+    In the case of OneToMany we only return those objects that have
+    been modified because the pointed object stores the relation to the
+    parent.
+    """
+
     def __init__(self, parent, attrs):
         StringField.__init__(self,parent,attrs)
         # QObject.__init__(self)
@@ -319,7 +362,6 @@ class ToManyField(QObject, StringField):
         #self.parent = parent
         self.attrs = attrs
         self.name = attrs['name']
-
 
     def create(self, record):
         pass
@@ -335,7 +377,6 @@ class ToManyField(QObject, StringField):
         group.modified.connect(self.groupModified)
         return group
 
-
     def groupModified(self):
         p = self.sender().parent
         self.changed(self.sender().parent)
@@ -347,10 +388,6 @@ class ToManyField(QObject, StringField):
         pass
 
     def set(self, record, value, test_state=False, modified=False):
-        pass
-        # @xtorello toreview
-
-
         from Koo.Model.Group import RecordGroup
         # We can't add the context here as it might cause an infinite loop in some cases where
         # a field of the parent appears in the context, and the parent is just being loaded.
@@ -384,9 +421,6 @@ class ToManyField(QObject, StringField):
 
 class OneToManyField(ToManyField):
     # @xtorello toreview
-    pass
-    """
-
 
     def __init__(self, parent, attrs):
         # QObject.__init__(self)
@@ -433,13 +467,11 @@ class OneToManyField(ToManyField):
 
     def default(self, record):
         return [x.defaults() for x in record.values[self.name]]
-    """
 
 
 class ManyToManyField(ToManyField):
     # @xtorello toreview
-    pass
-    """
+
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         if not record.values[self.name]:
             return []
@@ -449,7 +481,7 @@ class ManyToManyField(ToManyField):
         if not record.values[self.name]:
             return []
         return record.values[self.name].ids()
-    """
+
 
 
 class ReferenceField(StringField):
@@ -487,14 +519,17 @@ class ReferenceField(StringField):
             record.modified_fields.setdefault(self.name)
 
 
-# @brief The FieldFactory class provides a means of creating the appropiate object
-#  to handle a given field type.
-#
-#  By default some classes exist for many file types
-#  but if you create new types or want to replace current implementations you can
-#  do it too.
 # @xtorello xxx
 class FieldFactory:
+    """
+    The FieldFactory class provides a means of creating the appropiate object
+    to handle a given field type.
+
+    By default some classes exist for many file types but if you create new
+    types or want to replace current implementations you can do it too.
+    """
+
+
     # The types property holds the class that will be called whenever a new
     #  object has to be created for a given field type.
     #  By default there's a number of field types but new ones can be easily

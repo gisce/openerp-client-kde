@@ -683,13 +683,17 @@ class Database:
 
 database = Database()
 
-# @brief The RpcProxy class allows wrapping a server object only by giving it's name.
-#
-# For example:
-# obj = RpcProxy('ir.values')
+
 
 
 class RpcProxy(object):
+    """
+    The RpcProxy class allows wrapping a server object only by giving it's
+    name.
+
+    For example:
+    obj = RpcProxy('ir.values')
+    """
     def __init__(self, resource, useExecute=True):
         self.resource = resource
         self.__attrs = {}
