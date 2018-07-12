@@ -715,13 +715,13 @@ class KooModel(QAbstractItemModel):
         # We ensure the group has been loaded by checking if there
         # are any fields
         if not group.fields:
-            group.addFields(self.fields)
+            group.addFields( self.fields)
         model = self.record(row, group)
         field = self.field(column)
         if not field or not model or not field in self.fields:
             return None
         else:
-            return model.value(fields)
+            return model.value(field)
 
     def setValue(self, value, row, column, group):
         # We ensure the group has been loaded by checking if there
