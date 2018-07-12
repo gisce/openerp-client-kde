@@ -705,11 +705,11 @@ class KooModel(QAbstractItemModel):
         # we only have performance gains they can be removed with
         # the only drawback that the server will be queried twice.
         if not group.fields:
-            group.addFields( self.fields )
+            group.addFields(self.fields)
         if row >= group.count():
             return None
         else:
-            return group.modelByIndex( row )
+            return group.modelByIndex(row)
 
     def value(self, row, column, group):
         """
