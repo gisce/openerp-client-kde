@@ -702,20 +702,26 @@ class KooModel(QAbstractItemModel):
         else:
             return group.modelByIndex( row )
 
-    # @brief Returns the value from the model from the given row, column and group
-    #
-    # 'group' is usually obtained from the internalPointer() of a QModelIndex.
+
     def value(self, row, column, group):
+        """
+        Returns the value from the model from the given row, column and group
+
+        :param row:
+        :param column:
+        :param group: is usually obtained from the internalPointer() of a QModelIndex.
+        :return:
+        """
         # We ensure the group has been loaded by checking if there
         # are any fields
         if not group.fields:
-            group.addFields( self.fields )
+            group.addFields(self.fields)
         model = self.record(row, group)
         field = self.field(column)
         if not field or not model or not field in self.fields:
             return None
         else:
-            return model.value( field )
+            return model.value(fields)
 
     def setValue(self, value, row, column, group):
         # We ensure the group has been loaded by checking if there

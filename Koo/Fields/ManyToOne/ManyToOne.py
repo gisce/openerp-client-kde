@@ -237,8 +237,15 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
             self.record.setValue(self.name, ids[0])
             self.display()
         else:
-            dialog = SearchDialog(self.attrs['relation'], sel_multi=False, ids=[
-                                  x[0] for x in ids], context=context, domain=domain, parent=self)
+            l_ids = [x[0] for x in ids]
+            dialog = SearchDialog(
+                self.attrs['relation'],
+                sel_multi=False,
+                ids=l_ids,
+                context=context,
+                domain=domain,
+                parent=self
+            )
             if dialog.exec_() == QDialog.Accepted and dialog.result:
                 id = dialog.result[0]
                 name = Rpc.session.execute(
