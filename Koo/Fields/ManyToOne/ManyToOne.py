@@ -254,11 +254,14 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
                 parent=self
             )
             if dialog.exec_() == QDialog.Accepted and dialog.result:
-                ident = dialog.result[0]
-                name = Rpc.session.execute(
-                    '/object', 'execute', self.attrs['relation'], 'name_get', [ident], context)[0]
-                self.record.setValue(self.name, name)
-                self.display()
+                if len(dialog.result) == 1:
+                    ident = dialog.result[0]
+                    name = Rpc.session.execute(
+                        '/object', 'execute', self.attrs['relation'], 'name_get', [ident], context)[0]
+                    self.record.setValue(self.name, name)
+                    self.display()
+                else:
+                    self.clear()
             else:
                 self.clear()
 

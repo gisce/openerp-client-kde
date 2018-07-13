@@ -277,8 +277,12 @@ class KooModel(QAbstractItemModel):
             # If we get here it means that we return the _real_ children
             fieldType = self.fieldType( parent.column(), parent.internalPointer() )
             if fieldType in ['one2many', 'many2many']:
-                value = self.value( parent.row(), parent.column(), parent.internalPointer() )
-                return value.count()
+                value = self.value(parent.row(), parent.column(), parent.internalPointer())
+                if value:
+                    return value.count()
+                else:
+                    return 0
+
             else:
                 return 0
         else:
