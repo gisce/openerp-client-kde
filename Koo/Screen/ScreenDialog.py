@@ -57,6 +57,21 @@ class ScreenDialog(QDialog, ScreenDialogUi):
         self._context = {}
         self._domain = []
 
+    def save(self):
+        """
+        Dumy save method
+
+        :return: None
+        """
+        pass
+
+    def cancel(self):
+        """
+        Dumy cancel method
+        :return:
+        """
+        pass
+
     def setup(self, model, id=None):
         if self.group:
             return
