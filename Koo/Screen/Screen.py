@@ -797,8 +797,8 @@ class Screen(QScrollArea):
             return None
         type = self._viewQueue.typeFromIndex(self._currentView)
         if not type in self.views:
-            (id, type) = self._viewQueue.viewFromType(type)
-            self.addViewByIdAndType(id, type)
+            (ident, type) = self._viewQueue.viewFromType(type)
+            self.addViewByIdAndType(ident, type)
         return self.views[type]
 
     # @brief Returns a dictionary with all field values for the current record.
