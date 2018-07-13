@@ -377,6 +377,8 @@ class KooModel(QAbstractItemModel):
             return QVariant()
         if role in (Qt.DisplayRole, Qt.EditRole) or (self._showToolTips and role == Qt.ToolTipRole):
             value = self.value(index.row(), index.column(), index.internalPointer())
+            if value is None:
+                return QVariant()
             fieldType = self.fieldType(index.column(), index.internalPointer())
             if fieldType in ['one2many', 'many2many']:
                 return QVariant('(%d)' % value.count())
