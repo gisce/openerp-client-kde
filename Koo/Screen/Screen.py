@@ -926,13 +926,18 @@ class Screen(QScrollArea):
             self.currentRecord().setValidate()
         self.display()
 
-    # @brief Returns all selected record ids.
-    #
-    # Note that if there are new unsaved records, they might all have
-    # ID=None. You're probably looking for selectedRecords() function.
-    #
-    # @see selectedRecords
+
     def selectedIds(self):
+        """
+        Returns all selected record ids.
+
+        Note that if there are new unsaved records, they might all have
+        ID=None. You're probably looking for selectedRecords() function.
+
+        see selectedRecords
+        :return:
+        """
+
         records = self.currentView().selectedRecords()
         ids = [record.id for record in records]
         return ids
