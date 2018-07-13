@@ -428,8 +428,8 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
 
         index = self.uiStoredFilters.currentIndex()
         if index > 0:
-            id = self.uiStoredFilters.itemData(index).toInt()[0]
-            storedDomain = eval(self._storedFilters[id]['domain'])
+            ident = self.uiStoredFilters.itemData(index).toInt()[0]
+            storedDomain = eval(self._storedFilters[ident]['domain'])
             domain = domain + storedDomain
 
         if self.pushSwitchView.isChecked():
