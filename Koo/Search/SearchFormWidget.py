@@ -415,11 +415,17 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
         for x in list(self.widgets.values()):
             x.clear()
 
-    # @brief Returns a domain-like list for the current search parameters.
-    #
-    # Note you can optionally give a 'domain' parameter which will be added to
-    # the filters the widget will return.
+
     def value(self, domain=[]):
+        """
+        Returns a domain-like list for the current search parameters.
+
+        Note you can optionally give a 'domain' parameter which will be added to
+        the filters the widget will return.
+        :param domain:
+        :return:
+        """
+
         index = self.uiStoredFilters.currentIndex()
         if index > 0:
             id = self.uiStoredFilters.itemData(index).toInt()[0]
