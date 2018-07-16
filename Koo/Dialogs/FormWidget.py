@@ -503,6 +503,13 @@ class FormWidget(QWidget, FormWidgetUi):
         self.screen.load(dialog.result)
 
     def updateStatus(self, message=''):
+        """
+        Updates the status message of the form (bottom right)
+
+        :param message: Message
+        :return: None
+        :rtype: None
+        """
         if self.model and self.screen.currentRecord() and self.screen.currentRecord().id:
             # We don't need to query the server for the number of attachments if current record
             # has not changed since list update.
