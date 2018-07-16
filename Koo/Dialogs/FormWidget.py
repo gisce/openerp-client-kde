@@ -49,7 +49,8 @@ class FormWidget(QWidget, FormWidgetUi):
 
     closed = pyqtSignal()
 
-    def __init__(self, model, res_id=False, domain=None, view_type=None, view_ids=None, context=None, parent=None, name=False):
+    def __init__(self, model, res_id=False, domain=None, view_type=None,
+                 view_ids=None, context=None, parent=None, name=False):
         """
         Class constructor
 
@@ -73,14 +74,16 @@ class FormWidget(QWidget, FormWidgetUi):
         if context is None:
             context = {}
 
-        # This variable holds the id used to update status (and show number of attachments)
-        # If it doesn't change we won't update the number of attachments, avoiding some server
-        # calls.
+        # This variable holds the id used to update status (and show number of
+        # attachments)
+        # If it doesn't change we won't update the number of attachments,
+        # avoiding some server calls.
         self.previousId = False
         self.previousAttachments = False
 
-        # Workaround: In some cases (detected in some CRM actions) view_type and view_ids
-        # may contain duplicate entries. Here we remove duplicates (ensuring lists order is kept).
+        # Workaround: In some cases (detected in some CRM actions) view_type
+        # and view_ids may contain duplicate entries. Here we remove duplicates
+        # (ensuring lists order is kept).
         if view_type:
             new_view_ids = []
             new_view_type = []
@@ -194,15 +197,18 @@ class FormWidget(QWidget, FormWidgetUi):
     # value is != 0 Subscription based reloads are always used if available.
     def setAutoReload(self, value):
         if value:
-            # We use both, timer and subscriber as in some cases information may change
-            # only virtually: Say change the color of a row depending on current time.
-            # If the value is negative we don't start the timer but keep subscription,
-            # so this allows setting -1 in autorefresh when you don't want timed updates
-            # but only when data is changed in the server.
+            # We use both, timer and subscriber as in some cases information
+            # may change only virtually: Say change the color of a row
+            # depending on current time.
+            # If the value is negative we don't start the timer but keep
+            # subscription, so this allows setting -1 in autorefresh when you
+            # don't want timed updates but only when data is changed in the
+            # server.
             if value > 0:
                 self.reloadTimer.start(int(value) * 1000)
             if not Settings.value('koo.auto_reload'):
-                # Do not subscribe again if that was already done in the constructor
+                # Do not subscribe again if that was already done in the
+                # constructor
                 self.subscriber.subscribe(
                     'updated_model:%s' % self.model, self.autoReload)
         else:
@@ -349,7 +355,8 @@ class FormWidget(QWidget, FormWidgetUi):
         self.screen.new()
 
     def duplicate(self):
-        # Store selected ids before executing modifiedSave() because, there, the selection is lost.
+        # Store selected ids before executing modifiedSave() because, there,
+        # the selection is lost.
         selectedIds = self.screen.selectedIds()
 
         if not self.modifiedSave():
@@ -511,7 +518,8 @@ class FormWidget(QWidget, FormWidgetUi):
         :rtype: None
         """
         if self.model and self.screen.currentRecord() and self.screen.currentRecord().id:
-            # We don't need to query the server for the number of attachments if current record
+            # We don't need to query the server for the number of attachments
+            # if current record
             # has not changed since list update.
             id = self.screen.currentRecord().id
             if id != self.previousId:
@@ -579,10 +587,10 @@ class FormWidget(QWidget, FormWidgetUi):
             else:
                 return False
         else:
-            # If a new record was created but not modified, isModified() will return
-            # False but we want to cancel new records anyway.
-            # We call screen.cancel() directly as we don't want to trigger an updateStatus()
-            # which will result in a server request.
+            # If a new record was created but not modified, isModified()
+            # will return False but we want to cancel new records anyway.
+            # We call screen.cancel() directly as we don't want to trigger
+            # an updateStatus() which will result in a server request.
             self.screen.cancel()
         return True
 
