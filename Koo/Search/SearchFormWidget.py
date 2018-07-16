@@ -239,8 +239,6 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
         self.actionManage.triggered.connect(self.manage)
         self.uiStoredFilters.currentIndexChanged[int].connect(self.setStoredFilter)
 
-        # @xtorello toreview
-        self.performSearch.connect(self.search)
 
     def setStoredFilter(self, index):
         if index >= 0:
