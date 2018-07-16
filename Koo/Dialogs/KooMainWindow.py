@@ -735,7 +735,10 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
             Rpc.session.cache.clear()
 
     def closeEvent(self, event):
-        if QMessageBox.question(self, _("Quit"), _("Do you really want to quit ?"), _("Yes"), _("No")) == 1:
+        if QMessageBox.question(
+                self, _("Quit"), _("Do you really want to quit ?"),
+                QMessageBox.Yes|QMessageBox.No
+        ) == 1:
             event.ignore()
             return
         wid = self.tabWidget.currentWidget()
