@@ -521,12 +521,12 @@ class FormWidget(QWidget, FormWidgetUi):
             # We don't need to query the server for the number of attachments
             # if current record
             # has not changed since list update.
-            id = self.screen.currentRecord().id
-            if id != self.previousId:
+            ident = self.screen.currentRecord().id
+            if ident != self.previousId:
                 ids = Rpc.session.execute('/object', 'execute', 'ir.attachment', 'search', [
-                                          ('res_model', '=', self.model), ('res_id', '=', id)])
+                                          ('res_model', '=', self.model), ('res_id', '=', ident)])
                 self.previousAttachments = ids
-                self.previousId = id
+                self.previousId = ident
             else:
                 ids = self.previousAttachments
         else:
