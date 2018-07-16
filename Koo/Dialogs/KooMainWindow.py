@@ -38,28 +38,18 @@ import base64
 import tempfile
 import subprocess
 
-from Koo import Rpc
-
-from . import WindowService
 from .PreferencesDialog import *
 from .FullTextSearchDialog import *
-from .DatabaseCreationDialog import DatabaseCreationDialog
-from .DatabaseDialog import *
 from .TipOfTheDayDialog import *
 
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from Koo.Common.Ui import *
 
 from .LoginDialog import *
 from .AdministratorPasswordDialog import *
 
 from Koo.Common.Settings import Settings
-from Koo.Common import Common
 from Koo.Common import Api
 from Koo.Common import ViewSettings
-from Koo.Common import Debug
-from Koo.Common import Icons
 from Koo.Common import RemoteHelp
 
 from Koo.View.ViewFactory import *
