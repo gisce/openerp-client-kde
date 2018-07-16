@@ -117,17 +117,19 @@ class Settings(object):
             # Set umask='077' to ensure file permissions used are '600'.
             # This way we can store passwords and other information safely.
             oldUmask = os.umask(63)
-            f = open(Settings.rcFile, 'wb')
             try:
-                parser.write(f.encode('utf-8'))
-            except Exception:
+                with open(Settings.rcFile, 'w') as f:
+                    parser.write(f)
+            except Exception as e:
                 Debug.warning('Unable to write config file %s !' %
                               Settings.rcFile)
+
             finally:
                 f.close()
             os.umask(oldUmask)
-        except Exception:
+        except Exception as e:
             Debug.warning('Unable to write config file %s !' % Settings.rcFile)
+
         return True
 
     # @brief Loads settings from the appropiate config file.
