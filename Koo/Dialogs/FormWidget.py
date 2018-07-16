@@ -48,6 +48,7 @@ from gettext import gettext as _
 class FormWidget(QWidget, FormWidgetUi):
 
     closed = pyqtSignal()
+    shortcutsChanged = pyqtSignal()
 
     def __init__(self, model, res_id=False, domain=None, view_type=None,
                  view_ids=None, context=None, parent=None, name=False):
