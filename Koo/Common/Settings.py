@@ -33,13 +33,16 @@ import sys
 from Koo import Rpc
 from . import Debug
 from PyQt5.QtCore import QDir, QUrl
-
-# @brief The ConfigurationManager class handles Koo settings information.
-# Those settings can be specified in the command line, .koorc configuration file
-# or koo server module.
+import traceback
 
 
 class Settings(object):
+    """
+    The ConfigurationManager class handles Koo settings information.
+    Those settings can be specified in the command line, .koorc configuration
+    file or koo server module.
+    """
+
     rcFile = False
     options = {
         'login.db': 'test',
