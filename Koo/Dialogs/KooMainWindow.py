@@ -759,7 +759,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
 
     def addWindow(self, win, target):
         if target in ('current', 'background'):
-            #win.closed.connect(self.closeTabForced)
+            win.closed.connect(self.closeTabForced)
             win.shortcutsChanged.connect(self.shortcutsChanged)
             self.tabWidget.addTab(win, win.name)
             # If shift key is pressed do not show the added tab
