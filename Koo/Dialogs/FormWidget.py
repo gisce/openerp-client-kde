@@ -26,11 +26,6 @@
 #
 ##############################################################################
 
-import types
-from PyQt5.QtWidgets import *
-import gettext
-
-from Koo import Rpc
 from .SearchDialog import *
 from .ExportDialog import *
 from .ImportDialog import *
@@ -39,16 +34,11 @@ from .GoToIdDialog import *
 from .BatchUpdateDialog import *
 from .BatchInsertDialog import *
 
-from Koo.Common import Api
-from Koo.Common import Common
-from Koo.Common.Settings import *
 from Koo.Common import Help
-import copy
 
 from Koo.Screen.Screen import *
 from Koo.Model.Group import RecordGroup
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 (FormWidgetUi, FormWidgetBase) = loadUiType(Common.uiPath('formcontainer.ui'))
