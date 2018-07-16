@@ -40,6 +40,7 @@ from Koo.Screen.Screen import *
 from Koo.Model.Group import RecordGroup
 from PyQt5.QtCore import *
 from Koo.Common.Ui import *
+from gettext import gettext as _
 
 (FormWidgetUi, FormWidgetBase) = loadUiType(Common.uiPath('formcontainer.ui'))
 
