@@ -409,7 +409,7 @@ class FormWidget(QWidget, FormWidgetUi):
                 fields.sort()
                 fields = '<ul>{}</ul>'.format(''.join(fields))
                 mesage = _('<p>The following fields have an invalid value and have been highlighted in red:</p>{}<p>Please fix them before saving.</p>')
-                value = QMessageBox.question(
+                QMessageBox.question(
                     self,
                     _('Error'),
                     mesage.format(fields),
