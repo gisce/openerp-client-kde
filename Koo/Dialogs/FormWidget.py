@@ -535,7 +535,7 @@ class FormWidget(QWidget, FormWidgetUi):
             ids = []
             self.previousId = False
             self.previousAttachments = ids
-        message = (_("(%s attachments) ") % len(ids)) + message
+        message = (_("({} attachments) ").format(len(ids))) + str(message)
         self.uiStatus.setText(message)
 
     def updateSwitchView(self):
