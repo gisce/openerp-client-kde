@@ -280,9 +280,11 @@ class FloatField(StringField):
         internal = record.values[self.name]
         self.set(record, value, test_state)
         digits = self.attrs.get('digits', (14, 2))
-        # Use floatToText as the comparison we inherited from the GTK client failed for us in some cases
-        # were python was considering the difference between 145,13 and 145,12 as 0,009999999 instead of 0,01
-        # Converting to string the numbers with the appropiate number of digits make it much easier.
+        # Use floatToText as the comparison we inherited from the GTK client
+        # failed for us in some cases were python was considering the difference
+        # between 145,13 and 145,12 as 0,009999999 instead of 0,01
+        # Converting to string the numbers with the appropiate number of
+        # digits make it much easier.
         if Numeric.floatToText(internal, digits) != Numeric.floatToText(record.values[self.name], digits):
             if not record.isFieldReadOnly(self.name):
                 self.changed(record)
@@ -389,10 +391,11 @@ class ToManyField(QObject, StringField):
 
     def set(self, record, value, test_state=False, modified=False):
         from Koo.Model.Group import RecordGroup
-        # We can't add the context here as it might cause an infinite loop in some cases where
-        # a field of the parent appears in the context, and the parent is just being loaded.
-        # This has crashed when switching view of the 'account.invoice.line' one2many field
-        # in 'account.invoice' view.
+        # We can't add the context here as it might cause an infinite loop in
+        # some cases where a field of the parent appears in the context,
+        # and the parent is just being loaded.
+        # This has crashed when switching view of the 'account.invoice.line'
+        # one2many field in 'account.invoice' view.
         group = RecordGroup(resource=self.attrs['relation'], fields={
         }, parent=record, context=self.context(record, eval=False))
         group.tomanyfield = self
