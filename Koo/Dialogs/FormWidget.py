@@ -413,9 +413,11 @@ class FormWidget(QWidget, FormWidgetUi):
                     fields.append('<li>%s</li>' % name)
                 fields.sort()
                 fields = '<ul>%s</ul>' % ''.join(fields)
-                value = QMessageBox.question(self, _('Error'),
-                                             _('<p>The following fields have an invalid value and have been highlighted in red:</p>%s<p>Please fix them before saving.</p>') % fields,
-                                             _('Ok'))
+                value = QMessageBox.question(
+                    self,
+                    _('Error'),
+                    _('<p>The following fields have an invalid value and have been highlighted in red:</p>%s<p>Please fix them before saving.</p>') % fields,
+                    QMessageBox.Yes | QMessageBox.No)
         except Rpc.RpcException as e:
             QApplication.restoreOverrideCursor()
             id = False
