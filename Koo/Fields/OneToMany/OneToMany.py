@@ -48,7 +48,18 @@ from Koo.Model.Group import RecordGroup
 
 
 class OneToManyDialog(QDialog, OneToManyDialogUi):
-    def __init__(self, modelGroup, parent, record=None, attrs=None, creationContext=None):
+    def __init__(self, modelGroup, parent, record=None, attrs=None,
+                 creationContext=None):
+        """
+        Class constructor
+
+        :param modelGroup: Group model
+        :type modelGroup: RecordGroup
+        :param parent:
+        :param record:
+        :param attrs:
+        :param creationContext:
+        """
         QDialog.__init__(self, parent)
         OneToManyDialogUi.__init__(self)
         self.setupUi(self)
@@ -66,8 +77,8 @@ class OneToManyDialog(QDialog, OneToManyDialogUi):
 
         self.screen.setRecordGroup(modelGroup)
         self.screen.setEmbedded(True)
-        # Set the view first otherwise, default values created by self.screen.new()
-        # would only be set for those values handled by the current view.
+        # Set the view first otherwise, default values created by self.screen.
+        # new() would only be set for those values handled by the current view.
         if ('views' in attrs) and ('form' in attrs['views']):
             arch = attrs['views']['form']['arch']
             fields = attrs['views']['form']['fields']
@@ -116,12 +127,10 @@ class OneToManyDialog(QDialog, OneToManyDialogUi):
         self.screen.setCurrentRecord(None)
 
     def save(self):
-        print("OneToMany.save")
         self.done(1)
         pass
 
     def cancel(self):
-        print("OneToManyDia.cancel")
         pass
 
     def rejected(self):
@@ -129,7 +138,6 @@ class OneToManyDialog(QDialog, OneToManyDialogUi):
         self.reject()
 
     def reject(self):
-        print("reject")
         #self.cleanup()
         self.close()
         self.done(0)
@@ -204,8 +212,6 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
         if Settings.value('koo.enable_batch_update_field'):
             self.actionsMenu.addAction(self.actionBatchUpdateField)
         self.pushActions.setMenu(self.actionsMenu)
-
-        #self.colors['normal'] = self.palette().color( self.backgroundRole() )
 
         self.pushNew.clicked.connect(self.new)
         self.pushEdit.clicked.connect(self.edit)
@@ -306,7 +312,9 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
         if dialog.exec_() == QDialog.Rejected:
             return
         if len(dialog.newValues) != len(self.screen.selectedRecords()):
-            QMessageBox.warning(self, _('Batch Field Update'), _('The number of selected records (%(records)d) does not match the number of records to be inserted in fields (%(fields)d).') % {
+            QMessageBox.warning(
+                self, _('Batch Field Update'),
+                _('The number of selected records (%(records)d) does not match the number of records to be inserted in fields (%(fields)d).') % {
                 'records': len(dialog.newValues),
                 'fields': len(self.screen.selectedRecords())
             })
@@ -332,8 +340,10 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
                 target = 'current'
 
             for id in self.screen.selectedIds():
-                Api.instance.createWindow(False, self.attrs['relation'], id, [('id', '=', id)], 'form',
-                                          mode='form,tree', target=target)
+                Api.instance.createWindow(
+                    False, self.attrs['relation'], id,
+                    [('id', '=', id)], 'form', mode='form,tree', target=target
+                )
         else:
             self.screen.switchView()
 
@@ -359,9 +369,11 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
         return self.screen
 
     def new(self):
-        # As the 'new' button modifies the model we need to be sure all other fields/widgets
-        # have been stored in the model. Otherwise the recordChanged() triggered by calling new
-        # in the parent model could make us lose changes.
+        # As the 'new' button modifies the model we need to be sure all other
+        # fields/widgets have been stored in the model. Otherwise the
+        # recordChanged() triggered by calling new in the parent model could
+        # make us lose changes.
+
         self.view.store()
 
         ctx = self.record.evaluateExpression(self.attrs.get('default_get', {}))
@@ -372,7 +384,8 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
             self.screen.new(context=ctx)
         else:
             dialog = OneToManyDialog(
-                self.screen.group, parent=self, attrs=self.attrs, creationContext=ctx)
+                self.screen.group, parent=self,
+                attrs=self.attrs, creationContext=ctx)
             dialog.exec_()
             self.screen.display()
 
@@ -381,8 +394,10 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
             QMessageBox.information(
                 self, _('Information'), _('No record selected'))
             return
-        dialog = OneToManyDialog(self.screen.group, parent=self,
-                                 record=self.screen.currentRecord(), attrs=self.attrs)
+        dialog = OneToManyDialog(
+            self.screen.group, parent=self,
+            record=self.screen.currentRecord(), attrs=self.attrs
+        )
         dialog.setReadOnly(self.isReadOnly())
         dialog.exec_()
         self.screen.display()
@@ -443,8 +458,8 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
 
 # We don't allow modifying OneToMany fields but we allow creating the editor
 # because otherwise the view is no longer in edit mode and moving from one field
-# to another, if there's a OneToMany in the middle the user has to press F2 again
-# in the next field.
+# to another, if there's a OneToMany in the middle the user has to press F2
+# again in the next field.
 
 
 class OneToManyFieldDelegate(AbstractFieldDelegate):
