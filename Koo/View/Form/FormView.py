@@ -86,6 +86,13 @@ class FormContainer(QWidget):
             self.tabWidget.setTabValid(self.tabWidget.indexOf(self), value)
 
     def isValid(self, record):
+        """
+        Chacks if the record data is valid
+
+        :param record: Record to check
+        :return: True if is valid
+        :rtype: bool
+        """
         valid = True
         if not record:
             return valid

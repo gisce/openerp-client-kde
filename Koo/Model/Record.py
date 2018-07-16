@@ -391,6 +391,14 @@ class Record(QObject):
                 self.invalidFields.append(field)
 
     def isFieldValid(self, field):
+        """
+        Checks if the field data is valid
+
+        :param field: field name to check
+        :return: True if is valid
+        :rtype: bool
+        """
+
         if field in self.invalidFields:
             return False
         else:
