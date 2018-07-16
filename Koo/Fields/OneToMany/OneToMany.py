@@ -48,7 +48,18 @@ from Koo.Model.Group import RecordGroup
 
 
 class OneToManyDialog(QDialog, OneToManyDialogUi):
-    def __init__(self, modelGroup, parent, record=None, attrs=None, creationContext=None):
+    def __init__(self, modelGroup, parent, record=None, attrs=None,
+                 creationContext=None):
+        """
+        Class constructor
+
+        :param modelGroup: Group model
+        :type modelGroup: RecordGroup
+        :param parent:
+        :param record:
+        :param attrs:
+        :param creationContext:
+        """
         QDialog.__init__(self, parent)
         OneToManyDialogUi.__init__(self)
         self.setupUi(self)
