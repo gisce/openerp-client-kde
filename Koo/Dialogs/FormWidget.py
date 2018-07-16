@@ -385,8 +385,8 @@ class FormWidget(QWidget, FormWidgetUi):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
             modification = self.screen.currentRecord().id
-            id = self.screen.save()
-            if id:
+            ident = self.screen.save()
+            if ident:
                 self.updateStatus(
                     _('<font color="green">Document saved</font>'))
                 if not modification and Settings.value('koo.auto_new'):
@@ -415,8 +415,8 @@ class FormWidget(QWidget, FormWidgetUi):
                     QMessageBox.Yes | QMessageBox.No)
         except Rpc.RpcException as e:
             QApplication.restoreOverrideCursor()
-            id = False
-        return bool(id)
+            ident = False
+        return bool(ident)
 
     def previous(self):
         if not self.modifiedSave():
