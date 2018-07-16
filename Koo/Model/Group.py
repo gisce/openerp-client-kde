@@ -41,33 +41,41 @@ try:
 except NameError:
     from sets import Set as set
 
-# @brief The RecordGroup class manages a list of records.
-#
-# Provides functions for loading, storing and creating new objects of the same type.
-# The 'fields' property stores a dictionary of dictionaries, each of which contains
-# information about a field. This information includes the data type ('type'), its name
-# ('name') and other attributes. The 'fieldObjects' property stores the classes responsible
-# for managing the values which are finally stored on the 'values' dictionary in the
-# Model
-#
-# The group can also be sorted by any of it's fields. Two sorting methods are provided:
-# SortVisibleItems and SortAllItems. SortVisibleItems is usually faster for a small
-# number of elements as sorting is handled on the client side, but only those loaded
-# are considered in the sorting. SortAllItems, sorts items in the server so all items
-# are considered. Although this would cost a lot when there are thousands of items,
-# only some of them are loaded and the rest are loaded on demand.
-#
-# Note that by default the group will handle (and eventually load) all records that match
-# the conditions imposed by 'domain' and 'filter'. Those are empty by default so creating
-# RecordGroup('res.parnter') and iterating through it's items will return all partners
-# in the database. If you want to ensure that the group is kept completely empty, you can
-# call setAllowRecordLoading( False ) which is equivalent to calling setFilter() with a filter
-# that no records match, but without the overhead of querying the server.
-#
-# RecordGroup will emit several kinds of signals on certain events.
+
 
 
 class RecordGroup(QObject):
+    """
+    # @brief The RecordGroup class manages a list of records.
+
+    Provides functions for loading, storing and creating new objects of the
+    same type.The 'fields' property stores a dictionary of dictionaries, each
+    of which contains information about a field. This information includes the
+    data type ('type'), its name ('name') and other attributes. The
+    'fieldObjects' property stores the classes responsible for managing the
+    values which are finally stored on the 'values' dictionary in the Model
+
+    The group can also be sorted by any of it's fields. Two sorting methods
+    are provided:
+    SortVisibleItems and SortAllItems.
+    SortVisibleItems is usually faster for a small number of elements as
+    sorting is handled on the client side, but only those loaded are
+    considered in the sorting. SortAllItems, sorts items in the server so all
+    items are considered. Although this would cost a lot when there are
+    thousands of items, only some of them are loaded and the rest are loaded on
+    demand.
+
+    Note that by default the group will handle (and eventually load) all
+    records that match the conditions imposed by 'domain' and 'filter'. Those
+    are empty by default so creating RecordGroup('res.parnter') and iterating
+    through it's items will return all partners in the database. If you want to
+    ensure that the group is kept completely empty, you can call
+    setAllowRecordLoading( False ) which is equivalent to calling setFilter()
+    with a filter that no records match, but without the overhead of querying
+    the server.
+
+    RecordGroup will emit several kinds of signals on certain events.
+    """
     recordsInserted = pyqtSignal(int, int)
     recordsRemoved = pyqtSignal(int, int)
     recordChangedSignal = pyqtSignal('PyQt_PyObject')
@@ -150,15 +158,21 @@ class RecordGroup(QObject):
         self.removedRecords = []
         self._onWriteFunction = ''
 
-    # @brief Sets wether data loading should be done on record chunks or one by one.
-    #
-    # Setting value to True, will make the RecordGroup ignore the current 'limit' property,
-    # and load records by one by, instead. If set to False (the default) it will load records
-    # in groups of 'limit' (80, by default).
-    #
-    # In some cases (widgets that show multiple records) it's better to load in chunks, in other
-    # cases, it's better to load one by one.
     def setLoadOneByOne(self, value):
+        """
+        Sets wether data loading should be done on record chunks or one by one.
+
+        Setting value to True, will make the RecordGroup ignore the current
+        'limit' property, and load records by one by, instead. If set to
+        False (the default) it will load records in groups of 'limit'
+        (80, by default).
+
+        In some cases (widgets that show multiple records) it's better to load
+        in chunks, in other cases, it's better to load one by one.
+        :param value:
+        :return: None
+        :rtype: None
+        """
         if value:
             self.limit = 1
         else:
@@ -219,8 +233,16 @@ class RecordGroup(QObject):
             #del self.fieldObjects[f]
         self.fieldObjects = {}
 
-    # @brief Returns a string with the name of the type of a given field. Such as 'char'.
     def fieldType(self, fieldName):
+        """
+        Returns a string with the name of the type of a given field. Such as
+        'char'.
+
+        :param fieldName: Name of the field
+        :type fieldName: str
+        :return: Field type
+        :rtype: str
+        """
         if not fieldName in self.fields:
             return None
         return self.fields[fieldName]['type']
