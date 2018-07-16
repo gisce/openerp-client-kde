@@ -523,8 +523,10 @@ class FormWidget(QWidget, FormWidgetUi):
             # has not changed since list update.
             ident = self.screen.currentRecord().id
             if ident != self.previousId:
-                ids = Rpc.session.execute('/object', 'execute', 'ir.attachment', 'search', [
-                                          ('res_model', '=', self.model), ('res_id', '=', ident)])
+                ids = Rpc.session.execute(
+                    '/object', 'execute', 'ir.attachment', 'search',
+                    [('res_model', '=', self.model), ('res_id', '=', ident)]
+                )
                 self.previousAttachments = ids
                 self.previousId = ident
             else:
