@@ -72,16 +72,16 @@ class ScreenDialog(QDialog, ScreenDialogUi):
         """
         pass
 
-    def setup(self, model, id=None):
+    def setup(self, model, ident=None):
         if self.group:
             return
         self.group = RecordGroup(model, context=self._context)
         self.group.setDomain(self._domain)
         self.screen.setRecordGroup(self.group)
         self.screen.setViewTypes(['form'])
-        if id:
+        if ident:
             self._recordAdded = False
-            self.screen.load([id])
+            self.screen.load([ident])
         else:
             self._recordAdded = True
             self.screen.new()

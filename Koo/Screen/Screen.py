@@ -797,8 +797,8 @@ class Screen(QScrollArea):
             return None
         type = self._viewQueue.typeFromIndex(self._currentView)
         if not type in self.views:
-            (id, type) = self._viewQueue.viewFromType(type)
-            self.addViewByIdAndType(id, type)
+            (ident, type) = self._viewQueue.viewFromType(type)
+            self.addViewByIdAndType(ident, type)
         return self.views[type]
 
     # @brief Returns a dictionary with all field values for the current record.
@@ -926,13 +926,18 @@ class Screen(QScrollArea):
             self.currentRecord().setValidate()
         self.display()
 
-    # @brief Returns all selected record ids.
-    #
-    # Note that if there are new unsaved records, they might all have
-    # ID=None. You're probably looking for selectedRecords() function.
-    #
-    # @see selectedRecords
+
     def selectedIds(self):
+        """
+        Returns all selected record ids.
+
+        Note that if there are new unsaved records, they might all have
+        ID=None. You're probably looking for selectedRecords() function.
+
+        see selectedRecords
+        :return:
+        """
+
         records = self.currentView().selectedRecords()
         ids = [record.id for record in records]
         return ids

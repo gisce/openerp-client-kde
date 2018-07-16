@@ -115,6 +115,11 @@ class SearchDialog(QDialog, SearchDialogUi):
         self.screen.setFocus()
 
     def find(self):
+        """
+        Searches a value
+
+        :return: None
+        """
         self.modelGroup.setFilter(self.form.value())
         self.reload()
 

@@ -224,11 +224,18 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
             if text.strip() == '':
                 self.search('')
 
-    # This function searches the given name within the available records. If none or more than
-    # one possible name matches the search dialog is shown. If only one matches we set the
-    # value and don't even show the search dialog. This is also true if the function is called
-    # with "name=''" and only one record exists in the database (hence the call from open())
     def search(self, name):
+        """
+        This function searches the given name within the available records.
+        If none or more than one possible name matches the search dialog is
+        shown. If only one matches we set the value and don't even show the
+        search dialog. This is also true if the function is called with
+        "name=''" and only one record exists in the database (hence the call
+        from open())
+
+        :param name:
+        :return:
+        """
         domain = self.record.domain(self.name)
         context = self.record.fieldContext(self.name)
         ids = Rpc.session.execute(
@@ -237,14 +244,24 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
             self.record.setValue(self.name, ids[0])
             self.display()
         else:
-            dialog = SearchDialog(self.attrs['relation'], sel_multi=False, ids=[
-                                  x[0] for x in ids], context=context, domain=domain, parent=self)
+            l_ids = [x[0] for x in ids]
+            dialog = SearchDialog(
+                self.attrs['relation'],
+                sel_multi=False,
+                ids=l_ids,
+                context=context,
+                domain=domain,
+                parent=self
+            )
             if dialog.exec_() == QDialog.Accepted and dialog.result:
-                id = dialog.result[0]
-                name = Rpc.session.execute(
-                    '/object', 'execute', self.attrs['relation'], 'name_get', [id], context)[0]
-                self.record.setValue(self.name, name)
-                self.display()
+                if len(dialog.result) == 1:
+                    ident = dialog.result[0]
+                    name = Rpc.session.execute(
+                        '/object', 'execute', self.attrs['relation'], 'name_get', [ident], context)[0]
+                    self.record.setValue(self.name, name)
+                    self.display()
+                else:
+                    self.clear()
             else:
                 self.clear()
 
