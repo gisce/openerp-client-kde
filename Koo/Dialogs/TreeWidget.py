@@ -96,6 +96,8 @@ class TreeParser:
 class TreeWidget(QWidget, TreeWidgetUi):
     shortcutsChanged = pyqtSignal()
 
+    closed = pyqtSignal()
+
     def __init__(self, view, model, domain=None, context=None, name=False, parent=None):
         QWidget.__init__(self, parent)
         TreeWidgetUi.__init__(self)

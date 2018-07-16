@@ -747,6 +747,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
         Rpc.session.logout()
         self.systemTrayIcon.setVisible(False)
 
+    @pyqtSlot()
     def closeTabForced(self):
         idx = self.tabWidget.indexOf(self.sender())
         self.tabWidget.removeTab(idx)
