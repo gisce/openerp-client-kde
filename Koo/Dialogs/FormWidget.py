@@ -381,6 +381,12 @@ class FormWidget(QWidget, FormWidgetUi):
         QApplication.restoreOverrideCursor()
 
     def save(self):
+        """
+        Save action
+
+        :return:
+        :rtype: None or boolean
+        """
         if not self.screen.currentRecord():
             return
         QApplication.setOverrideCursor(Qt.WaitCursor)
