@@ -45,18 +45,22 @@ from Koo.Common.Ui import *
 
 
 class FormWidget(QWidget, FormWidgetUi):
-    # form constructor:
-    # model -> Name of the model the form should handle
-    # res_id -> List of ids of type 'model' to load
-    # domain -> Domain the models should be in
-    # view_type -> type of view: form, tree, graph, calendar, ...
-    # view_ids -> Id's of the views 'ir.ui.view' to show
-    # context -> Context for the current data set
-    # parent -> Parent widget of the form
-    # name -> User visible title of the form
+
     closed = pyqtSignal()
 
     def __init__(self, model, res_id=False, domain=None, view_type=None, view_ids=None, context=None, parent=None, name=False):
+        """
+        Class constructor
+
+        :param model: Name of the model the form should handle
+        :param res_id: List of ids of type 'model' to load
+        :param domain: Domain the models should be in
+        :param view_type: type of view: form, tree, graph, calendar, ...
+        :param view_ids: Id's of the views 'ir.ui.view' to show
+        :param context: Context for the current data set
+        :param parent: Parent widget of the form
+        :param name: User visible title of the form
+        """
         QWidget.__init__(self, parent)
         FormWidgetUi.__init__(self)
         self.setupUi(self)
