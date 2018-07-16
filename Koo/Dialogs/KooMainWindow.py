@@ -30,11 +30,6 @@
 ##############################################################################
 
 
-import time
-from PyQt5.QtWidgets import *
-import os
-import gettext
-import base64
 import tempfile
 import subprocess
 
@@ -42,7 +37,6 @@ from .PreferencesDialog import *
 from .FullTextSearchDialog import *
 from .TipOfTheDayDialog import *
 
-from PyQt5.QtCore import *
 
 from .LoginDialog import *
 from .AdministratorPasswordDialog import *
@@ -55,6 +49,7 @@ from Koo.Common import RemoteHelp
 from Koo.View.ViewFactory import *
 
 from Koo.Plugins import *
+from gettext import gettext as _
 
 
 class MainTabWidget(QTabWidget):
