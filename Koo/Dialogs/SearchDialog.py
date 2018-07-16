@@ -126,7 +126,7 @@ class SearchDialog(QDialog, SearchDialogUi):
     def reload(self):
         self.modelGroup.update()
         self.select()
-        self.screen.update()
+        self.screen.setFocus()
 
     def select(self):
         if self.allowMultipleSelection:
