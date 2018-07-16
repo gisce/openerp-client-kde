@@ -366,7 +366,8 @@ class FormView(AbstractView):
         if not settings:
             return
         splitters = self.findChildren(QSplitter)
-        data = QByteArray.fromBase64(settings)
+        ba = QByteArray(settings.encode('utf-8'))
+        data = QByteArray.fromBase64(ba)
         stream = QDataStream(data)
         for x in splitters:
             if stream.atEnd():

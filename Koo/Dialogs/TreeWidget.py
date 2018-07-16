@@ -425,7 +425,8 @@ class TreeWidget(QWidget, TreeWidgetUi):
         if not settings:
             return
         header = self.uiTree.header()
-        header.restoreState(QByteArray.fromBase64(settings))
+        ba = QByteArray(settings.encode('utf-8'))
+        header.restoreState(QByteArray.fromBase64(ba))
 
     def actions(self):
         return []
