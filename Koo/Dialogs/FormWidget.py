@@ -405,9 +405,9 @@ class FormWidget(QWidget, FormWidgetUi):
                         name = attrs['string']
                     else:
                         name = field
-                    fields.append('<li>%s</li>' % name)
+                    fields.append('<li>{}</li>'.format(name))
                 fields.sort()
-                fields = '<ul>%s</ul>' % ''.join(fields)
+                fields = '<ul>{}</ul>'.format(''.join(fields))
                 mesage = _('<p>The following fields have an invalid value and have been highlighted in red:</p>{}<p>Please fix them before saving.</p>')
                 value = QMessageBox.question(
                     self,
