@@ -793,11 +793,17 @@ class RecordGroup(QObject):
     def domain(self):
         return self._domain
 
-    # @brief Allows setting a filter for this group of records.
-    #
-    # The filter is conatenated to the domain to further restrict the records of
-    # the group.
+
     def setFilter(self, value):
+        """
+        Allows setting a filter for this group of records.
+
+        The filter is conatenated to the domain to further restrict the records
+        of the group.
+        :param value: value of the filter
+        :return: None
+        :rtype: None
+        """
         if value == None:
             self._filter = []
         else:

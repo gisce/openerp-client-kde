@@ -277,8 +277,12 @@ class KooModel(QAbstractItemModel):
             # If we get here it means that we return the _real_ children
             fieldType = self.fieldType( parent.column(), parent.internalPointer() )
             if fieldType in ['one2many', 'many2many']:
-                value = self.value( parent.row(), parent.column(), parent.internalPointer() )
-                return value.count()
+                value = self.value(parent.row(), parent.column(), parent.internalPointer())
+                if value:
+                    return value.count()
+                else:
+                    return 0
+
             else:
                 return 0
         else:
@@ -372,15 +376,17 @@ class KooModel(QAbstractItemModel):
         if not self.group:
             return QVariant()
         if role in (Qt.DisplayRole, Qt.EditRole) or (self._showToolTips and role == Qt.ToolTipRole):
-            value = self.value( index.row(), index.column(), index.internalPointer() )
-            fieldType = self.fieldType( index.column(), index.internalPointer() )
+            value = self.value(index.row(), index.column(), index.internalPointer())
+            if value is None:
+                return QVariant()
+            fieldType = self.fieldType(index.column(), index.internalPointer())
             if fieldType in ['one2many', 'many2many']:
-                return QVariant( '(%d)' % value.count() )
+                return QVariant('(%d)' % value.count())
             elif fieldType == 'selection':
-                field = self.fields[self.field( index.column() )]
+                field = self.fields[self.field(index.column())]
                 for x in field['selection']:
                     if x[0] == value:
-                        return QVariant( str(x[1]) )
+                        return QVariant(str(x[1]))
                 return QVariant()
             elif fieldType == 'date' and value:
                 return QVariant( Calendar.dateToText( Calendar.storageToDate( value ) ) )
@@ -686,8 +692,17 @@ class KooModel(QAbstractItemModel):
         else:
             return None
 
-    # @brief Returns a Record refered by row and group parameters
+    # @brief
     def record(self, row, group):
+        """
+        Returns a Record refered by row and group parameters
+
+        :param row:
+        :type row: int
+        :param group:
+        :type group: int
+        :return:
+        """
         if not group:
             return None
         # We ensure the group has been loaded by checking if there
@@ -696,26 +711,31 @@ class KooModel(QAbstractItemModel):
         # we only have performance gains they can be removed with
         # the only drawback that the server will be queried twice.
         if not group.fields:
-            group.addFields( self.fields )
+            group.addFields(self.fields)
         if row >= group.count():
             return None
         else:
-            return group.modelByIndex( row )
+            return group.modelByIndex(row)
 
-    # @brief Returns the value from the model from the given row, column and group
-    #
-    # 'group' is usually obtained from the internalPointer() of a QModelIndex.
     def value(self, row, column, group):
+        """
+        Returns the value from the model from the given row, column and group
+
+        :param row:
+        :param column:
+        :param group: is usually obtained from the internalPointer() of a QModelIndex.
+        :return:
+        """
         # We ensure the group has been loaded by checking if there
         # are any fields
         if not group.fields:
-            group.addFields( self.fields )
+            group.addFields( self.fields)
         model = self.record(row, group)
         field = self.field(column)
         if not field or not model or not field in self.fields:
             return None
         else:
-            return model.value( field )
+            return model.value(field)
 
     def setValue(self, value, row, column, group):
         # We ensure the group has been loaded by checking if there
