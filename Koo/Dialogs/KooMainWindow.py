@@ -756,16 +756,17 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
 
     def addWindow(self, win, target):
         if target in ('current', 'background'):
-            win.closed.connect(self.closeTabForced)
+            #win.closed.connect(self.closeTabForced)
             win.shortcutsChanged.connect(self.shortcutsChanged)
             self.tabWidget.addTab(win, win.name)
             # If shift key is pressed do not show the added tab
             if target != 'background':
                 self.tabWidget.setCurrentIndex(self.tabWidget.count() - 1)
         else:
-            # When opening in a new window we make the dialog modal. This way, wizards
-            # that use this method and were called from a button, they return to the
-            # button code and it can refresh the view after the wizard has finished.
+            # When opening in a new window we make the dialog modal. This way,
+            # wizards that use this method and were called from a button, they
+            # return to the button code and it can refresh the view after the
+            # wizard has finished.
             parent = QApplication.activeModalWidget()
             if not parent:
                 parent = self
