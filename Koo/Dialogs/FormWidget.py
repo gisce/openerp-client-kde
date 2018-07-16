@@ -426,7 +426,7 @@ class FormWidget(QWidget, FormWidgetUi):
                     self,
                     _('Error'),
                     mesage.format(fields),
-                    QMessageBox.Yes | QMessageBox.No)
+                    QMessageBox.Ok)
         except Rpc.RpcException:
             QApplication.restoreOverrideCursor()
             ident = False
