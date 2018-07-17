@@ -112,10 +112,6 @@ class FormContainer(QWidget):
     def addWidget(self, widget, attributes=None, labelText=None):
         if attributes is None:
             attributes = {}
-        if widget.inherits('AbstractFieldWidget'):
-            self.fieldWidgets.append(widget)
-        if widget.inherits('FormContainer'):
-            self.containerWidgets.append(widget)
 
         colspan = int(attributes.get('colspan', 1))
         helpText = attributes.get('help', False)
