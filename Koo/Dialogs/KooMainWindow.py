@@ -30,41 +30,26 @@
 ##############################################################################
 
 
-import time
-from PyQt5.QtWidgets import *
-import os
-import gettext
-import base64
 import tempfile
 import subprocess
 
-from Koo import Rpc
-
-from . import WindowService
 from .PreferencesDialog import *
 from .FullTextSearchDialog import *
-from .DatabaseCreationDialog import DatabaseCreationDialog
-from .DatabaseDialog import *
 from .TipOfTheDayDialog import *
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from Koo.Common.Ui import *
 
 from .LoginDialog import *
 from .AdministratorPasswordDialog import *
 
 from Koo.Common.Settings import Settings
-from Koo.Common import Common
 from Koo.Common import Api
 from Koo.Common import ViewSettings
-from Koo.Common import Debug
-from Koo.Common import Icons
 from Koo.Common import RemoteHelp
 
 from Koo.View.ViewFactory import *
 
 from Koo.Plugins import *
+from gettext import gettext as _
 
 
 class MainTabWidget(QTabWidget):
@@ -745,7 +730,10 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
             Rpc.session.cache.clear()
 
     def closeEvent(self, event):
-        if QMessageBox.question(self, _("Quit"), _("Do you really want to quit ?"), _("Yes"), _("No")) == 1:
+        if QMessageBox.question(
+                self, _("Quit"), _("Do you really want to quit ?"),
+                QMessageBox.Yes|QMessageBox.No
+        ) == 1:
             event.ignore()
             return
         wid = self.tabWidget.currentWidget()
@@ -757,6 +745,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
         Rpc.session.logout()
         self.systemTrayIcon.setVisible(False)
 
+    @pyqtSlot()
     def closeTabForced(self):
         idx = self.tabWidget.indexOf(self.sender())
         self.tabWidget.removeTab(idx)
@@ -772,9 +761,10 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
             if target != 'background':
                 self.tabWidget.setCurrentIndex(self.tabWidget.count() - 1)
         else:
-            # When opening in a new window we make the dialog modal. This way, wizards
-            # that use this method and were called from a button, they return to the
-            # button code and it can refresh the view after the wizard has finished.
+            # When opening in a new window we make the dialog modal. This way,
+            # wizards that use this method and were called from a button, they
+            # return to the button code and it can refresh the view after the
+            # wizard has finished.
             parent = QApplication.activeModalWidget()
             if not parent:
                 parent = self

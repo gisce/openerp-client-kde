@@ -94,10 +94,10 @@ class ServerConfigurationDialog(QDialog, ServerConfigurationDialogUi):
     def slotAccept(self):
         url = QUrl(self.url)
         protocol = str(self.uiConnection.itemData(
-            self.uiConnection.currentIndex()).toString())
+            self.uiConnection.currentIndex()))
         url.setScheme(protocol)
         url.setHost(self.uiServer.text())
-        url.setPort(int(self.uiPort.text().toInt()[0]))
+        url.setPort(int(self.uiPort.text()))
         if url.isValid():
             # Store default settings
             Settings.setValue('login.url', str(url.toString()))

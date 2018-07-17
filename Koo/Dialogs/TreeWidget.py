@@ -96,6 +96,9 @@ class TreeParser:
 class TreeWidget(QWidget, TreeWidgetUi):
     shortcutsChanged = pyqtSignal()
 
+    closed = pyqtSignal()
+    shortcutsChanged = pyqtSignal()
+
     def __init__(self, view, model, domain=None, context=None, name=False, parent=None):
         QWidget.__init__(self, parent)
         TreeWidgetUi.__init__(self)
@@ -422,7 +425,8 @@ class TreeWidget(QWidget, TreeWidgetUi):
         if not settings:
             return
         header = self.uiTree.header()
-        header.restoreState(QByteArray.fromBase64(settings))
+        ba = QByteArray(settings.encode('utf-8'))
+        header.restoreState(QByteArray.fromBase64(ba))
 
     def actions(self):
         return []

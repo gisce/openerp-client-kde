@@ -151,11 +151,11 @@ class KooApi(Api.KooApi):
     def createWindow(self, view_ids, model, res_id=False, domain=None,
                      view_type='form', window=None, context=None, mode=None, name=False, autoReload=False,
                      target='current'):
-        WindowService.createWindow(view_ids, model, res_id, domain,
+        createWindow(view_ids, model, res_id, domain,
                                    view_type, window, context, mode, name, autoReload, target)
 
     def createWebWindow(self, url, title):
-        WindowService.createWebWindow(url, title)
+        createWebWindow(url, title)
 
     def windowCreated(self, window, target):
         win.addWindow(window, target)

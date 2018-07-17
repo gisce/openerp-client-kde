@@ -436,4 +436,5 @@ class TreeView(AbstractView):
         if not settings or self._widgetType in ('list', 'table'):
             return
         header = self.widget.header()
-        header.restoreState(QByteArray.fromBase64(settings))
+        ba = QByteArray(settings.encode('utf-8'))
+        header.restoreState(QByteArray.fromBase64(ba))
