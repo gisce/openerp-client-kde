@@ -39,8 +39,8 @@ from Koo.Rpc import Rpc
 # We store the pointer to the Tiny ModelGroup on QModelIndex.internalPointer
 # Fields order should be handled using QHeaderView
 #
-# Qt.UserRole returns the model id (database id) for the given field (QModelIndex),
-# though id() function is also provided for convenience.
+# Qt.UserRole returns the model id (database id) for the given field
+# (QModelIndex),though id() function is also provided for convenience.
 
 
 # @brief The KooModel class provides a QAbstractItemModel wrapper around
@@ -191,7 +191,6 @@ class KooModel(QAbstractItemModel):
         self.fields = fields
         self.updateVisibleFields()
 
-
     def setButtons(self, buttons):
         """
         Sets the dictionary of buttons to be shown
@@ -200,7 +199,6 @@ class KooModel(QAbstractItemModel):
         :rtype: None
         """
         self.buttons = buttons
-
 
     def setFieldsOrder(self, fields):
         """
@@ -214,7 +212,6 @@ class KooModel(QAbstractItemModel):
         """
         self.visibleFields = fields
         self.updateVisibleFields()
-
 
     def setColors(self, colors):
         """
@@ -243,7 +240,7 @@ class KooModel(QAbstractItemModel):
         """
         self.showBackgroundColor = showBackgroundColor
 
-    def setIconForField(self, icon, iconField):
+    def setIconForField(self, icon, icon_field):
         """
         Sets that the contents of field 'icon' are used as an icon
         for field 'iconField'
@@ -251,26 +248,26 @@ class KooModel(QAbstractItemModel):
         The contents (usually an icon name) of the field 'icon' is used for
         the decoration role of 'iconField'
         :param icon:
-        :param iconField:
+        :param icon_field:
         :return: None
         :rtype: None
         """
         self.icon = icon
-        self.iconField = iconField
+        self.iconField = icon_field
         self.updateVisibleFields()
 
-    def setChildrenForField(self, child, childField):
+    def setChildrenForField(self, child, child_field):
         """
         Sets that the children of field 'child' are used as an children
         for field 'childField'
 
         :param child:
-        :param childField:
+        :param child_field:
         :return: None
         :rtype: None
         """
         self.child = child
-        self.childField = childField
+        self.childField = child_field
         self.updateVisibleFields()
 
     def updateVisibleFields(self):
@@ -324,7 +321,7 @@ class KooModel(QAbstractItemModel):
         if not index.isValid():
             return 0
 
-        model = self.record( index.row(), index.internalPointer() )
+        model = self.record(index.row(), index.internalPointer())
         if model:
             return model.id
         else:
@@ -332,7 +329,7 @@ class KooModel(QAbstractItemModel):
 
     # Pure virtual functions from QAbstractItemModel
 
-    def rowCount(self, parent = QModelIndex()):
+    def rowCount(self, parent=QModelIndex()):
         if not self.group:
             return 0
 
@@ -342,11 +339,12 @@ class KooModel(QAbstractItemModel):
 
         if parent.isValid():
             # Check if this field has associated the children of another one
-            field = self.field( parent.column() )
+            field = self.field(parent.column())
+            parent_ip = parent.internalPointer()
             if field == self.childField:
-                fieldType = self.fieldTypeByName(self.child, parent.internalPointer())
+                fieldType = self.fieldTypeByName(self.child, parent_ip)
                 if fieldType in ['one2many', 'many2many']:
-                    value = self.valueByName(parent.row(), self.child, parent.internalPointer())
+                    value = self.valueByName(parent.row(), self.child, parent_ip)
                     if value:
                         return value.count()
                     else:
@@ -355,9 +353,9 @@ class KooModel(QAbstractItemModel):
                     return 0
 
             # If we get here it means that we return the _real_ children
-            fieldType = self.fieldType( parent.column(), parent.internalPointer() )
+            fieldType = self.fieldType( parent.column(), parent_ip)
             if fieldType in ['one2many', 'many2many']:
-                value = self.value(parent.row(), parent.column(), parent.internalPointer())
+                value = self.value(parent.row(), parent.column(), parent_ip)
                 if value:
                     return value.count()
                 else:
@@ -368,7 +366,7 @@ class KooModel(QAbstractItemModel):
         else:
             return self.group.count()
 
-    def columnCount(self, parent = QModelIndex()):
+    def columnCount(self, parent=QModelIndex()):
         if not self.group:
             return 0
 
@@ -376,8 +374,9 @@ class KooModel(QAbstractItemModel):
         if self.mode == self.ListMode and parent.isValid() and parent.internalPointer() != self.group:
             return 0
 
-        # We always return all visibleFields. If the element should have no children then no
-        # rows will be returned. This way we avoid duplication of calculations.
+        # We always return all visibleFields. If the element should have no
+        # children then no rows will be returned. This way we avoid
+        # duplication of calculations.
         return len(self.visibleFields)
 
     def flags(self, index):
@@ -418,37 +417,37 @@ class KooModel(QAbstractItemModel):
             return True
         if not index.isValid():
             return True
-        model = self.record( index.row(), index.internalPointer() )
+        model = self.record(index.row(), index.internalPointer())
         if not model:
             return True
-        field = self.field( index.column() )
-        fieldType = self.fieldType( index.column(), index.internalPointer() )
+        field = self.field(index.column())
+        fieldType = self.fieldType(index.column(), index.internalPointer())
 
         if fieldType == 'boolean':
-            model.setValue( field, value.toBool() )
+            model.setValue( field, bool(value))
         elif fieldType in ('float', 'float_time'):
-            model.setValue( field, value.toDouble()[0] )
+            model.setValue(field, value.toDouble()[0])
         elif fieldType == 'integer':
-            model.setValue( field, value.toInt()[0] )
+            model.setValue(field, value.toInt()[0])
         elif fieldType == 'selection':
-            value = str( value.toString() )
-            modelField = self.fields[self.field( index.column() )]
+            value = str(value.toString())
+            modelField = self.fields[self.field(index.column())]
             for x in modelField['selection']:
                 if x[1] == value:
-                    model.setValue( field, x[0] )
+                    model.setValue( field, x[0])
         elif fieldType in ('char', 'text'):
-            model.setValue( field, str( value.toString() ) )
+            model.setValue(field, str(value.toString()))
         elif fieldType == 'date':
-            model.setValue( field, Calendar.dateToStorage( value.toDate() ) )
+            model.setValue(field, Calendar.dateToStorage(value.toDate()))
         elif fieldType == 'datetime' and value:
-            model.setValue( field, Calendar.dateTimeToStorage( value.toDateTime() ) )
+            model.setValue(field, Calendar.dateTimeToStorage(value.toDateTime()))
         elif fieldType == 'time' and value:
-            model.setValue( field, Calendar.timeToStorage( value.toTime() ) )
+            model.setValue(field, Calendar.timeToStorage(value.toTime()))
         elif fieldType == 'many2many':
-            m = model.value( field )
+            m = model.value(field)
             m.clear()
             ids = [x.toInt()[0] for x in value.toList()]
-            m.load( ids )
+            m.load(ids)
         elif fieldType == 'many2one':
             value = value.toList()
             if value:
@@ -476,51 +475,51 @@ class KooModel(QAbstractItemModel):
                         return QVariant(str(x[1]))
                 return QVariant()
             elif fieldType == 'date' and value:
-                return QVariant( Calendar.dateToText( Calendar.storageToDate( value ) ) )
+                return QVariant(Calendar.dateToText(Calendar.storageToDate(value)))
             elif fieldType == 'datetime' and value:
-                return QVariant( Calendar.dateTimeToText( Calendar.storageToDateTime( value ) ) )
+                return QVariant(Calendar.dateTimeToText(Calendar.storageToDateTime(value)))
             elif fieldType == 'float':
                 # If we use the default conversion big numbers are shown
                 # in scientific notation. Also we have to respect the number
                 # of decimal digits given by the server.
-                field = self.fields[self.field( index.column() )]
+                field = self.fields[self.field(index.column())]
                 if role == Qt.EditRole:
                     thousands = False
                 else:
                     thousands = True
-                return QVariant( Numeric.floatToText(value, field.get('digits',None), thousands) )
+                return QVariant(Numeric.floatToText(value, field.get('digits',None), thousands))
             elif fieldType == 'integer':
-                return QVariant( Numeric.integerToText(value) )
+                return QVariant(Numeric.integerToText(value))
             elif fieldType == 'float_time':
-                return QVariant( Calendar.floatTimeToText(value) )
+                return QVariant(Calendar.floatTimeToText(value))
             elif fieldType == 'binary':
                 if value:
-                    return QVariant( _('%d bytes') % len(value) )
+                    return QVariant(_('%d bytes') % len(value))
                 else:
                     return QVariant()
             elif fieldType == 'boolean':
-                return QVariant( bool(value) )
+                return QVariant(bool(value))
             elif fieldType == 'button':
                 if role == Qt.ToolTipRole:
-                    fieldName = self.field( index.column() )
-                    return QVariant( self.buttons[fieldName].get('string','') )
+                    fieldName = self.field(index.column())
+                    return QVariant( self.buttons[fieldName].get('string', ''))
                 return QVariant()
             else:
-                if value == False or value == None:
+                if not value  or value is None:
                     return QVariant()
                 else:
                     # If the text has several lines put them all in a single one
-                    return QVariant( str(value).replace('\n', ' ') )
+                    return QVariant(str(value).replace('\n', ' ') )
         elif role == Qt.DecorationRole:
-            fieldType = self.fieldType( index.column(), index.internalPointer() )
+            fieldType = self.fieldType(index.column(), index.internalPointer())
             if fieldType == 'button':
-                fieldName = self.field( index.column() )
-                return QVariant( Icons.kdeIcon( self.buttons[fieldName].get('icon') ) )
-            if self.field( index.column() ) == self.iconField:
+                fieldName = self.field(index.column())
+                return QVariant(Icons.kdeIcon(self.buttons[fieldName].get('icon')))
+            if self.field(index.column()) == self.iconField:
                 # Not all models necessarily have the icon so check that first
-                model = self.record( index.row(), index.internalPointer() )
+                model = self.record(index.row(), index.internalPointer())
                 if model and self.icon in model.values:
-                    return QVariant( Icons.kdeIcon( model.value( self.icon ) ) )
+                    return QVariant(Icons.kdeIcon(model.value(self.icon)))
                 else:
                     return QVariant()
             else:
@@ -531,17 +530,18 @@ class KooModel(QAbstractItemModel):
             field = self.fields[self.field( index.column() )]
             model = self.record( index.row(), index.internalPointer() )
             # We need to ensure we're not being asked about a non existent row.
-            # This happens in some special cases (an editable tree in a one2many field,
-            # such as the case of fiscal year inside sequences).
-            # Note that trying to avoid processing this function if index.row() > self.rowCount()-1
-            # works to avoid this but has problems with some tree structures (such as the menu).
+            # This happens in some special cases (an editable tree in a
+            # one2many field, such as the case of fiscal year inside sequences).
+            # Note that trying to avoid processing this function if index.row()
+            # > self.rowCount()-1 works to avoid this but has problems with
+            # some tree structures (such as the menu).
             # So we need to make the check here.
             if not model:
                 return QVariant()
             # Priorize readonly to required as if it's readonly the
             # user doesn't mind if it's required as she won't be able
             # to change it anyway.
-            if not model.isFieldValid( self.field( index.column() ) ):
+            if not model.isFieldValid(self.field(index.column())):
                 color = '#FF6969'
             elif 'readonly' in field and field['readonly']:
                 color = 'lightgrey'
@@ -549,17 +549,18 @@ class KooModel(QAbstractItemModel):
                 color = '#ddddff'
             else:
                 color = 'white'
-            return QVariant( QBrush( QColor( color ) ) )
+            return QVariant(QBrush(QColor(color)))
         elif role == Qt.ForegroundRole:
             if not self.colors:
                 return QVariant()
-            model = self.record( index.row(), index.internalPointer() )
+            model = self.record(index.row(), index.internalPointer())
             # We need to ensure we're not being asked about a non existent row.
-            # This happens in some special cases (an editable tree in a one2many field,
-            # such as the case of fiscal year inside sequences).
-            # Note that trying to avoid processing this function if index.row() > self.rowCount()-1
-            # works to avoid this but has problems with some tree structures (such as the menu).
-            # So we need to make the check here.
+            # This happens in some special cases (an editable tree in a
+            # one2many field, such as the case of fiscal year inside sequences).
+            # Note that trying to avoid processing this function if
+            # index.row() > self.rowCount()-1 works to avoid this but has
+            # problems with some tree structures (such as the menu). So we
+            # need to make the check here.
             if not model:
                 return QVariant()
             palette = QPalette()
@@ -572,18 +573,18 @@ class KooModel(QAbstractItemModel):
         elif role == Qt.TextAlignmentRole:
             fieldType = self.fieldType( index.column(), index.internalPointer() )
             if fieldType in ['integer', 'float', 'float_time', 'time', 'date', 'datetime']:
-                return QVariant( Qt.AlignRight | Qt.AlignVCenter )
+                return QVariant(Qt.AlignRight | Qt.AlignVCenter)
             else:
-                return QVariant( Qt.AlignLeft | Qt.AlignVCenter )
+                return QVariant(Qt.AlignLeft | Qt.AlignVCenter)
         elif role == KooModel.IdRole:
-            model = self.record( index.row(), index.internalPointer() )
-            return QVariant( model.id )
+            model = self.record(index.row(), index.internalPointer())
+            return QVariant(model.id)
         elif role == KooModel.ValueRole:
-            value = self.value( index.row(), index.column(), index.internalPointer() )
-            fieldType = self.fieldType( index.column(), index.internalPointer() )
+            value = self.value( index.row(), index.column(), index.internalPointer())
+            fieldType = self.fieldType( index.column(), index.internalPointer())
             if fieldType in ['one2many', 'many2many']:
                 # By now, return the same as DisplayRole for these
-                return QVariant( '(%d)' % value.count() )
+                return QVariant( '(%d)' % value.count())
             elif fieldType == 'selection':
                 # By now, return the same as DisplayRole for these
                 field = self.fields[self.field( index.column() )]
