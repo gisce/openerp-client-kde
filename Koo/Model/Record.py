@@ -225,6 +225,8 @@ class Record(QObject):
 
     def updateStateAttributes(self):
         state = self.values.get('state', 'draft')
+        if not state:
+            state = 'draft'
         for key in self.group.fieldObjects:
             self.setStateAttributes(key, state)
 
