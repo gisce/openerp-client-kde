@@ -79,6 +79,21 @@ class ManyToManyFieldWidget(AbstractFieldWidget, ManyToManyFieldWidgetUi):
         self.latestMatch = None
         self.searching = False
 
+    def save(self):
+        """
+        Dumb method
+        :return: None
+        :rtype: None
+        """
+        pass
+
+    def cancel(self):
+        """
+        Dumb method
+        :return: None
+        :rtype: None
+        """
+
     def initGui(self):
         if self.record:
             group = self.record.value(self.name)
