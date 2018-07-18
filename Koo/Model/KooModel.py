@@ -95,14 +95,16 @@ class KooModel(QAbstractItemModel):
         # updateVisibleFields().
         self.visibleFields = []
 
-    # @brief Sets the RecordGroup associated with this Qt Model
-    #
-    # Fields should already be set and can't be added after this
-    # call
     def setRecordGroup(self, group):
+        """
+        Sets the RecordGroup associated with this Qt Model
+
+        Fields should already be set and can't be added after this call
+        :param group:
+        :return: None
+        :rtype: None
+        """
         self.modelAboutToBeReset.emit()
-        # @xtorello toreview debug
-        # from pudb.remote import set_trace; set_trace(term_size=(200, 40), host='0.0.0.0', port=6900)
 
         if self.group:
             self.group.recordsInserted[int, int].disconnect(self.recordsInserted)
@@ -124,16 +126,30 @@ class KooModel(QAbstractItemModel):
         self.modelReset.emit()
         self.updateVisibleFields()
 
-    # @brief Returns the current RecordGroup associated with this Qt Model
     def recordGroup(self):
+        """
+        Returns the current RecordGroup associated with this Qt Model
+        :return:
+        """
         return self.group
 
-    # @brief Sets the model as read-only.
     def setReadOnly(self, value):
+        """
+        Sets the model as read-only.
+
+        :param value: True if its readonly
+        :type value: bool
+        :return: None
+        :rtype: None
+        """
         self._readOnly = value
 
-    # @brief Returns whether the model is read-only or read-write.
     def isReadOnly(self):
+        """
+        Returns whether the model is read-only or read-write.
+
+        :return:
+        """
         return self._readOnly
 
     def reset(self):
@@ -164,60 +180,107 @@ class KooModel(QAbstractItemModel):
     # self.emit( SIGNAL('rowsAboutToBeRemoved(QModelIndex,int,int)'), QModelIndex(), start, end )
     # self.emit( SIGNAL('rowsRemoved(QModelIndex,int,int)'), QModelIndex(), start, end )
 
-    # @brief Sets the dictionary of fields that should be loaded
     def setFields(self, fields):
+        """
+        Sets the dictionary of fields that should be loaded
+
+        :param fields:
+        :return: None
+        :rtype: None
+        """
         self.fields = fields
         self.updateVisibleFields()
 
-    # @brief Sets the dictionary of buttons to be shown
+
     def setButtons(self, buttons):
+        """
+        Sets the dictionary of buttons to be shown
+        :param buttons:
+        :return: None
+        :rtype: None
+        """
         self.buttons = buttons
 
-    # @brief Sets the order in which fields should be put in the model.
-    #
-    # If this function is never called fields are put in alphabetical
-    # order.
+
     def setFieldsOrder(self, fields):
+        """
+        Sets the order in which fields should be put in the model.
+
+        If this function is never called fields are put in alphabetical order.
+
+        :param fields:
+        :return:None
+        :rtype: None
+        """
         self.visibleFields = fields
         self.updateVisibleFields()
 
-    # @brief Sets the dictionary of colors
-    #
-    # The dictionary is of the form 'color' : 'expression', where
-    # 'expression' is a python boolean expression that will be passed
-    # to the model, and thus can use model context information.
+
     def setColors(self, colors):
+        """
+        Sets the dictionary of colors
+
+        The dictionary is of the form 'color' : 'expression', where
+        'expression' is a python boolean expression that will be passed
+        to the model, and thus can use model context information.
+
+        :param colors:
+        :return:
+        """
         self.colors = colors
 
-    # @brief Sets whether the background color should be returned in
-    # data() or not.
-    #
-    # Setting this to True (default) will make the call to data() with
-    # Qt.BackgroundRole to return the appropiate background color
-    # if fields are read only or required.
     def setShowBackgroundColor(self, showBackgroundColor):
+        """
+        @brief Sets whether the background color should be returned in
+        data() or not.
+
+        Setting this to True (default) will make the call to data() with
+        Qt.BackgroundRole to return the appropiate background color
+        if fields are read only or required.
+
+        :param showBackgroundColor:
+        :return:
+        """
         self.showBackgroundColor = showBackgroundColor
 
-    # @brief Sets that the contents of field 'icon' are used as an icon
-    # for field 'iconField'
-    #
-    # The contents (usually an icon name) of the field 'icon' is used for
-    # the decoration role of 'iconField'
     def setIconForField(self, icon, iconField):
+        """
+        Sets that the contents of field 'icon' are used as an icon
+        for field 'iconField'
+
+        The contents (usually an icon name) of the field 'icon' is used for
+        the decoration role of 'iconField'
+        :param icon:
+        :param iconField:
+        :return: None
+        :rtype: None
+        """
         self.icon = icon
         self.iconField = iconField
         self.updateVisibleFields()
 
-    # @brief Sets that the children of field 'child' are used as an children
-    # for field 'childField'
     def setChildrenForField(self, child, childField):
+        """
+        Sets that the children of field 'child' are used as an children
+        for field 'childField'
+
+        :param child:
+        :param childField:
+        :return: None
+        :rtype: None
+        """
         self.child = child
         self.childField = childField
         self.updateVisibleFields()
 
-    # Updates the list of visible fields. The list is kept sorted and icon
-    # and child fields are excluded if they have been specified.
     def updateVisibleFields(self):
+        """
+        Updates the list of visible fields. The list is kept sorted and icon
+        and child fields are excluded if they have been specified.
+
+        :return: None
+        :rtype: None
+        """
         if not self.visibleFields:
             self.visibleFields = list(self.fields.keys())[:]
         if self.icon in self.visibleFields:
@@ -225,20 +288,37 @@ class KooModel(QAbstractItemModel):
         if self.child in self.visibleFields:
             del self.visibleFields[self.visibleFields.index(self.child)]
 
-    # @brief Set the model to the specified mode
-    #
-    # mode parameter can be TreeMode or ListMode, this is not %100
-    # necessary in most cases, but it also avoids some checks in many cases
-    # so at least it can provide some speed improvements.
     def setMode(self, mode):
+        """
+        Set the model to the specified mode
+
+        :param mode:mode parameter can be TreeMode or ListMode, this is not
+        %100 necessary in most cases, but it also avoids some checks in many
+        cases so at least it can provide some speed improvements.
+        :return: None
+        :rtype: None
+        """
         self.mode = mode
 
-    # @brief Sets whether tooltips should be shown or not.
     def setShowToolTips(self, show):
+        """
+        Sets whether tooltips should be shown or not.
+
+        :param show:
+        :return: None
+        :rtype: None
+        """
         self._showToolTips = show
 
-    # @brief Returns the model id corresponding to index
     def id(self, index):
+        """
+        Returns the model id corresponding to index
+
+        :param index:
+        :return: Model id
+        :rtype: int
+        """
+
         if not self.group:
             return 0
         if not index.isValid():
@@ -326,7 +406,14 @@ class KooModel(QAbstractItemModel):
             return defaultFlags | Qt.ItemIsEditable
 
     def setData(self, index, value, role):
+        """
 
+        :param index:
+        :param value:
+        :type value: QVariant
+        :param role:
+        :return:
+        """
         if role != Qt.EditRole:
             return True
         if not index.isValid():
@@ -665,8 +752,13 @@ class KooModel(QAbstractItemModel):
                 return QVariant( font )
         return QVariant()
 
-    # @brief Returns the field name for the given column
     def field(self, column):
+        """
+        Returns the field name for the given column
+
+        :param column:
+        :return:
+        """
         if column >= len(self.visibleFields):
             return None
         else:
@@ -676,8 +768,14 @@ class KooModel(QAbstractItemModel):
     # the 'group' parameter and use 'self.group' instead as this improves performance
     # as in some cases we won't force loading a record just to know a field type.
 
-    # @brief Returns the field type for the given column and group
     def fieldType(self, column, group):
+        """
+        Returns the field type for the given column and group
+
+        :param column:
+        :param group:
+        :return:
+        """
         field = self.field(column)
         if not field:
             return None
@@ -747,7 +845,6 @@ class KooModel(QAbstractItemModel):
         if field and model:
             model.setValue( field, value )
 
-
     def valueByName(self, row, field, group):
         # We ensure the group has been loaded by checking if there
         # are any fields
@@ -760,19 +857,29 @@ class KooModel(QAbstractItemModel):
         else:
             return model.value( field )
 
-    # @brief Returns the id of the model pointed by index.
-    #
-    # The index can point to any field of the model.
+
     def id(self, index):
+        """
+        Returns the id of the model pointed by index.
+
+        :param index: The index can point to any field of the model.
+        :return:
+        """
         model = self.record( index.row(), index.internalPointer() )
         if model:
             return model.id
         else:
             return -1
 
-    # @brief Returns a QModelIndex pointing to the first field of a given
-    # record id
+
     def indexFromId(self, id):
+        """
+        Returns a QModelIndex pointing to the first field of a given
+        record id
+
+        :param id:
+        :return:
+        """
         if not self.group:
             return QModelIndex()
 
@@ -784,15 +891,19 @@ class KooModel(QAbstractItemModel):
     def recordFromIndex(self, index):
         return self.record( index.row(), index.internalPointer() )
 
-    # @brief Returns a QModelIndex pointing to the first field of a given
-    # record
     def indexFromRecord(self, record):
+        """
+        Returns a QModelIndex pointing to the first field of a given record
+        :param record:
+        :return:
+        """
         if not self.group:
             return QModelIndex()
         row = self.group.indexOfRecord( record )
         if row >= 0:
             return self.index( row, 0 )
         return QModelIndex()
+
 
 class KooGroupedModel( QAbstractProxyModel ):
     def __getattr__(self, name):
