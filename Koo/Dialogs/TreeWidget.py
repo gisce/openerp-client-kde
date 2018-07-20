@@ -402,8 +402,8 @@ class TreeWidget(QWidget, TreeWidgetUi):
         item = self.uiShortcuts.currentIndex()
         if not item.isValid():
             return None
-        id = item.data(Qt.UserRole).toInt()[0]
-        return id
+        ident = item.data(Qt.UserRole)
+        return ident
 
     # There's no reason why a menu can't be closed, is it?
     def canClose(self):
