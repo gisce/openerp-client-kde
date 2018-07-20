@@ -289,6 +289,7 @@ class TreeView(AbstractView):
         if self.selecting:
             return
         self.currentRecord = self.treeModel.recordFromIndex(current)
+        self.screen.setCurrentRecord(self.currentRecord)
         # We send the current record. Previously we sent only the id of the model, but
         # new models have id=None
         # self.currentChanged.emit(self.currentRecord)

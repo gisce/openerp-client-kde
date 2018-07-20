@@ -329,7 +329,7 @@ class KooModel(QAbstractItemModel):
 
     # Pure virtual functions from QAbstractItemModel
 
-    def rowCount(self, parent=QModelIndex()):
+    def rowCount(self, parent = QModelIndex()):
         if not self.group:
             return 0
 
@@ -366,7 +366,7 @@ class KooModel(QAbstractItemModel):
         else:
             return self.group.count()
 
-    def columnCount(self, parent=QModelIndex()):
+    def columnCount(self, parent = QModelIndex()):
         if not self.group:
             return 0
 
@@ -846,6 +846,7 @@ class KooModel(QAbstractItemModel):
         if field and model:
             model.setValue( field, value )
 
+
     def valueByName(self, row, field, group):
         # We ensure the group has been loaded by checking if there
         # are any fields
@@ -857,7 +858,6 @@ class KooModel(QAbstractItemModel):
             return None
         else:
             return model.value( field )
-
 
     def id(self, index):
         """

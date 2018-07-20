@@ -50,6 +50,7 @@ from Koo.View.ViewFactory import *
 
 from Koo.Plugins import *
 from gettext import gettext as _
+from PyQt5.uic import loadUi
 
 
 class MainTabWidget(QTabWidget):
