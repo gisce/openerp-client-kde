@@ -340,7 +340,7 @@ class KooModel(QAbstractItemModel):
         if fieldType == 'boolean':
             model.setValue( field, value.toBool() )
         elif fieldType in ('float', 'float_time'):
-            model.setValue( field, value.toDouble()[0] )
+            model.setValue( field, value.value() )
         elif fieldType == 'integer':
             model.setValue( field, value.toInt()[0] )
         elif fieldType == 'selection':
