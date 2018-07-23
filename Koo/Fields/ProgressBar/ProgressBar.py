@@ -83,8 +83,11 @@ class ProgressBarFieldDelegate(AbstractFieldDelegate):
         opts.maximum = 100
         opts.textVisible = True
         value = index.data(Qt.DisplayRole)
-        percent = float(value.split(",")[0])
-        percent = max(min(percent, 100), 0)
+        if value:
+            percent = float(value.split(",")[0])
+            percent = max(min(percent, 100), 0)
+        else:
+            percent = 0
         opts.progress = percent
         opts.text = QString('%d%%' % percent)
         # Last parameter (None) shouldn't be necessary but we put it to workaround a bug in
