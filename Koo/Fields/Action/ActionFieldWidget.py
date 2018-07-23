@@ -26,18 +26,11 @@
 #
 ##############################################################################
 
-
-import gettext
-from PyQt5.QtWidgets import *
-from Koo.Common import Api
-from Koo.Common import Common
-
-
 from Koo.Screen.Screen import Screen
 from Koo.Model.Group import RecordGroup
 
-from Koo import Rpc
 import time
+import datetime
 from Koo.Dialogs.SearchDialog import SearchDialog
 from Koo.Fields.AbstractFieldWidget import *
 
@@ -77,6 +70,7 @@ class ActionFieldWidget(AbstractFieldWidget, ActionFieldWidgetUi):
                 'context', '{}'), self.context.copy()))
             a = self.context.copy()
             a['time'] = time
+            a['datetime'] = datetime
             self.domain = Rpc.session.evaluateExpression(
                 self.action['domain'], a)
 
@@ -94,6 +88,22 @@ class ActionFieldWidget(AbstractFieldWidget, ActionFieldWidgetUi):
             elif self.action['view_type'] == 'tree':
                 pass  # TODO
         self.screen = None
+
+    def save(self):
+        """
+        Dumy save
+        :return: None
+        :rtype: None
+        """
+        pass
+
+    def cancel(self):
+        """
+        Dumy cancel
+        :return:None
+        :rtype: None
+        """
+        pass
 
     def createScreen(self):
         QApplication.setOverrideCursor(Qt.WaitCursor)
