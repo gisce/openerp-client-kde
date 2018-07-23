@@ -166,16 +166,32 @@ class Record(QObject):
 
         self.group.fieldObjects[fieldName].set_client(self, value)
 
-    # @brief Obtains the default value of a given field
     def default(self, fieldName):
+        """
+        Obtains the default value of a given field
+
+        :param fieldName:
+        :type fieldName: str
+        :return:
+        """
         return self.group.fieldObjects[fieldName].default(self)
 
-    # @brief Obtains the domain of the given field
     def domain(self, fieldName):
+        """
+        Obtains the domain of the given field
+        :param fieldName:
+        :type fieldName: str
+        :return:
+        """
         return self.group.fieldObjects[fieldName].domain(self)
 
-    # @brief Obtains the context of the given field
     def fieldContext(self, fieldName):
+        """
+        Obtains the context of the given field
+        :param fieldName:
+        :type fieldName: str
+        :return:
+        """
         # Do not checkLoad because current record is already loaded and using it
         # would cause all related (one2many and many2many) fields to be completely
         # loaded too, causing performance issues.
@@ -278,12 +294,21 @@ class Record(QObject):
                 return False
         return bool(required)
 
-    # @brief Returns True if the given field name exists in record's group.
     def fieldExists(self, fieldName):
+        """
+        Returns True if the given field name exists in record's group.
+        :param fieldName:
+        :type fieldName: str
+        :return:
+        """
         return fieldName in self.group.fieldObjects
 
-    # @brief Loads the record if it's not been loaded already.
     def ensureIsLoaded(self):
+        """
+        Loads the record if it's not been loaded already.
+        :return: True if is reloaded
+        :rtype: bool
+        """
         if not self._loaded:
             self.reload()
             return True
@@ -315,8 +340,12 @@ class Record(QObject):
             value['id'] = self.id
         return value
 
-    # @brief Marks the current record as not loaded.
     def cancel(self):
+        """
+        Marks the current record as not loaded.
+        :return: None
+        :rtype: None
+        """
         self._modified = False
         self._loaded = False
 
@@ -360,9 +389,15 @@ class Record(QObject):
             self.group.written(self.id)
         return self.id
 
-    # Used only by group.py
-    # Fills the record with the corresponding default values.
     def fillWithDefaults(self, domain=None, context=None):
+        """
+        Used only by group.py
+        Fills the record with the corresponding default values.
+        :param domain:
+        :param context:
+        :return: None
+        :rtype: None
+        """
         if domain is None:
             domain = []
         if context is None:
@@ -378,9 +413,13 @@ class Record(QObject):
             self.setDefaults(val)
             self.updateAttributes()
 
-    # @brief Obtains the value of the 'name' field for the record by calling model's
-    # name_get function in the server.
     def name(self):
+        """
+        Obtains the value of the 'name' field for the record by calling model's
+        name_get function in the server.
+        :return:
+        """
+
         name = self.rpc.name_get([self.id], Rpc.session.context)[0]
         return name
 
@@ -436,21 +475,33 @@ class Record(QObject):
                 self.setFieldValid(name, True)
         return ok
 
-    # @brief Returns the context with which the record has been loaded.
     def context(self):
+        """
+        Returns the context with which the record has been loaded.
+        :return:
+        """
         return self.group.context()
 
-    # @brief Returns a dict with the default value of each field
-    # { 'field': defaultValue }
     def defaults(self):
+        """
+        Returns a dict with the default value of each field
+        { 'field': defaultValue}
+        :return: dict with de default value of each field
+        :rtype: dict
+        """
+
         self.ensureIsLoaded()
         value = dict([(name, field.default(self))
                       for name, field in list(self.group.fieldObjects.items())])
         return value
 
-    # @brief Sets the default values for each field from a dict
-    # { 'field': defaultValue }
     def setDefaults(self, val):
+        """
+        Sets the default values for each field from a dict
+        { 'field': defaultValue }
+        :param val:
+        :return:
+        """
         self.createMissingFields()
         for fieldname, value in list(val.items()):
             if fieldname not in self.group.fieldObjects:
@@ -528,7 +579,6 @@ class Record(QObject):
             # modified (as it's not, it's just reloaded).
             self.set(value, signal=False)
 
-
     def evaluateExpression(self, dom, checkLoad=True, firstTry=True):
         """
         Evaluates the string expression given by dom. Before passing the dom
@@ -581,10 +631,14 @@ class Record(QObject):
                 val = False
         return val
 
-    # @brief Evaluates the given condition.
-    # The function will return a boolean, result of applying a condition of the form ('field','=','value') or
-    # [('field','=','value')]
     def evaluateCondition(self, condition):
+        """
+        Evaluates the given condition.
+        The function will return a boolean, result of applying a condition of
+        the form ('field','=','value') or [('field','=','value')]
+        :param condition:
+        :return:
+        """
         # Consider the case when 'condition' is a list
         if isinstance(condition, list):
             result = True
@@ -659,14 +713,20 @@ class Record(QObject):
             if 'focus' in response:
                 self.setFocus.emit(response['focus'])
 
-    # This functions is called whenever a field with 'change_default'
-    # attribute set to True is modified. The function sets all conditional
-    # defaults to each field.
-    # Conditional defaults is a mechanism by which the user can establish
-    # default values on fields, depending on the value of another field (
-    # the 'change_default' field). An example of this case is the zip field
-    # in the partner model.
+
     def setConditionalDefaults(self, field, value):
+        """
+        This functions is called whenever a field with 'change_default'
+        attribute set to True is modified. The function sets all conditional
+        defaults to each field.
+        Conditional defaults is a mechanism by which the user can establish
+        default values on fields, depending on the value of another field (
+        the 'change_default' field). An example of this case is the zip field
+        in the partner model.
+        :param field:
+        :param value:
+        :return:
+        """
         ir = RpcProxy('ir.values')
         values = ir.get('default', '%s=%s' % (field, value),
                         [(self.group.resource, False)], False, {})
@@ -675,9 +735,13 @@ class Record(QObject):
             data[fname] = value
         self.setDefaults(data)
 
-    # @brief Returns True if the record is loaded and has values for all the
-    # fields the Group requires.
     def isFullyLoaded(self):
+        """
+        Returns True if the record is loaded and has values for all the fields
+        the Group requires.
+        :return:
+        :rtype: bool
+        """
         if not self._loaded:
             return False
         if set(self.values.keys()) == set(self.group.fieldObjects.keys()):
@@ -685,15 +749,20 @@ class Record(QObject):
         else:
             return False
 
-    # @brief Returns True if the Record handles information of a wizard.
     def isWizard(self):
+        """
+        Returns True if the Record handles information of a wizard.
+        :return:
+        """
         return self.group.isWizard()
 
-    # @brief Returns the list of field names the record should have (according to
-    # group requirements) but it doesn't.
     def missingFields(self):
+        """
+        Returns the list of field names the record should have (according to
+        group requirements) but it doesn't.
+        :return:
+        """
         return list(set(self.group.fieldObjects.keys()) - set(self.values.keys()))
-
 
     def createMissingFields(self):
         """
