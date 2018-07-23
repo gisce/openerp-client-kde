@@ -153,3 +153,6 @@ class TestRecord(unittest.TestCase):
         self.assertEqual(["name"], rec.missingFields())
         rec.set({"name": "ok"})
         self.assertEqual(rec.missingFields(), [])
+
+if __name__ == '__main__':
+    unittest.main()
