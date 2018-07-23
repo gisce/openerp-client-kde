@@ -426,7 +426,7 @@ class KooModel(QAbstractItemModel):
         if fieldType == 'boolean':
             model.setValue( field, bool(value))
         elif fieldType in ('float', 'float_time'):
-            model.setValue(field, value.toDouble()[0])
+            model.setValue(field, value.value())
         elif fieldType == 'integer':
             model.setValue(field, value.toInt()[0])
         elif fieldType == 'selection':
@@ -436,11 +436,11 @@ class KooModel(QAbstractItemModel):
                 if x[1] == value:
                     model.setValue( field, x[0])
         elif fieldType in ('char', 'text'):
-            model.setValue(field, str(value.toString()))
+            model.setValue(field, str(value))
         elif fieldType == 'date':
             model.setValue(field, Calendar.dateToStorage(value.toDate()))
         elif fieldType == 'datetime' and value:
-            model.setValue(field, Calendar.dateTimeToStorage(value.toDateTime()))
+            model.setValue(field, Calendar.dateTimeToStorage(value.value()))
         elif fieldType == 'time' and value:
             model.setValue(field, Calendar.timeToStorage(value.toTime()))
         elif fieldType == 'many2many':
