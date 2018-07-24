@@ -107,6 +107,11 @@ class WizardPage(QDialog):
         self.result = (button, self.datas)
         self.accept()
 
+    def save(self):
+        pass
+
+    def cancel(self):
+        pass
 # @brief The Wizard class shows a step by step wizard with the provided information.
 
 

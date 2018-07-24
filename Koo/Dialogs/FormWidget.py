@@ -190,6 +190,12 @@ class FormWidget(QWidget, FormWidgetUi):
             self.subscriber.subscribe(
                 'updated_model:%s' % model, self.autoReload)
 
+    def save(self):
+        pass
+
+    def cancel(self):
+        pass
+
     def notifyRecordModified(self):
         self.updateStatus(_('<font color="blue">Document modified</font>'))
 

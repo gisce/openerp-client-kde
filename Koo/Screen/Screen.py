@@ -142,6 +142,21 @@ class Screen(QScrollArea):
         # @xtorello toreview signal to method integration
         self.currentChangedSignal.connect(self.currentChanged)
 
+    def save(self):
+        """
+        Dummy save
+        :return: None
+        :rtype: None
+        """
+        pass
+
+    def cancel(self):
+        """
+        Dummy cancel
+        :return: None
+        :rtype: No
+        """
+        pass
 
     def showEvent(self, event):
         if self._firstTimeShown:
