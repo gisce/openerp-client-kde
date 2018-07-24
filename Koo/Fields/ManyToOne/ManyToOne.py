@@ -490,7 +490,7 @@ class ManyToOneFieldDelegate(AbstractFieldDelegate):
             model.setValue(self.name, False)
             return
 
-        if str(kooModel.data(index, Qt.DisplayRole).toString()) == str(editor.text()):
+        if str(kooModel.data(index, Qt.DisplayRole).value()) == str(editor.text()):
             return
 
         domain = model.domain(self.name)
