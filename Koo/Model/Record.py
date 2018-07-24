@@ -36,7 +36,7 @@ from .Field import ToManyField
 import gettext
 from Koo.Common import Debug
 
-from PyQt4.QtCore import *
+from PyQt5.QtCore import *
 
 #ConcurrencyCheckField = '__last_update'
 ConcurrencyCheckField = 'read_delta'
@@ -62,10 +62,14 @@ class EvalEnvironment(object):
 
 
 class Record(QObject):
-    def __init__(self, id, group, parent=None, new=False):
+    recordChanged = pyqtSignal('PyQt_PyObject')
+    recordModified = pyqtSignal('PyQt_PyObject')
+    setFocus = pyqtSignal('QString')
+
+    def __init__(self, ident, group, parent=None, new=False):
         QObject.__init__(self, group)
         self.rpc = group.rpc
-        self.id = id
+        self.id = ident
         self._loaded = False
         self.parent = parent
         self.group = group
@@ -78,6 +82,7 @@ class Record(QObject):
         self.new = new
 
     def __del__(self):
+        # @xtorello toreview
         self.rpc = None
         self.modified_fields = None
         self.parent = None
@@ -85,8 +90,14 @@ class Record(QObject):
         for key, value in self.values.items():
             from .Group import RecordGroup
             if isinstance(value, RecordGroup):
-                #value.parent.fieldObjects[key].disconnect( SIGNAL('modified'), value )
-                value.__del__()
+                try:
+                    # value.parent.fieldObjects[key].disconnect( SIGNAL('modified'), value )
+                    value.parent.fields()[key].disconnect()
+                    value.__del__()
+                except Exception as e:
+                    # print (e)
+                    pass
+
         self.values = {}
         self.invalidFields = []
         if self.id == 2:
@@ -107,40 +118,98 @@ class Record(QObject):
         # return '<Record %s@%s>' % (self.id, self.group.resource)
         return '<Record %s>' % self.id
 
-    # @brief Establishes the value for a given field
     def setValue(self, fieldName, value):
+        """
+        Establishes the value for a given field
+
+        :param fieldName:
+        :param value:
+        :return: None
+        """
+
+        record = self
         if not fieldName in self.values:
             self.group.ensureRecordLoaded(self)
-        self.group.fieldObjects[fieldName].set_client(self, value)
+            x = 0
+            while self.group.records[x].id != self.id:
+                x += 1
+            record = self.group.records[x]
+        self.group.fieldObjects[fieldName].set_client(record, value)
 
-    # @brief Obtains the value of a given field
     def value(self, fieldName):
+        """
+        Obtains the value of a given field
+
+        :param fieldName: Name of the field
+        :type fieldName: str
+        :return: Value of the field
+        :rtype: int, list, tuple
+        """
+        record = self
+        field = self.group.fieldObjects[fieldName]
         if not fieldName in self.values:
             self.group.ensureRecordLoaded(self)
-        return self.group.fieldObjects[fieldName].get_client(self)
+            x = 0
+            while self.group.records[x].id != self.id:
+                x += 1
+            record = self.group.records[x]
+        return field.get_client(record)
 
-    # @brief Establishes the default value for a given field
     def setDefault(self, fieldName, value):
+        """
+        Establishes the default value for a given field
+
+        :param fieldName:
+        :param value:
+        :return: None
+        """
+
         self.group.fieldObjects[fieldName].set_client(self, value)
 
-    # @brief Obtains the default value of a given field
     def default(self, fieldName):
+        """
+        Obtains the default value of a given field
+
+        :param fieldName:
+        :type fieldName: str
+        :return:
+        """
         return self.group.fieldObjects[fieldName].default(self)
 
-    # @brief Obtains the domain of the given field
     def domain(self, fieldName):
+        """
+        Obtains the domain of the given field
+        :param fieldName:
+        :type fieldName: str
+        :return:
+        """
         return self.group.fieldObjects[fieldName].domain(self)
 
-    # @brief Obtains the context of the given field
     def fieldContext(self, fieldName):
+        """
+        Obtains the context of the given field
+        :param fieldName:
+        :type fieldName: str
+        :return:
+        """
         # Do not checkLoad because current record is already loaded and using it
         # would cause all related (one2many and many2many) fields to be completely
         # loaded too, causing performance issues.
         return self.group.fieldObjects[fieldName].context(self, checkLoad=False)
 
-    # @brief Returns whether the record has been modified or not
     def isModified(self):
-        return self.modified
+        """
+        Returns whether the record has been modified or not
+        :return: True if  the record been modified
+        :rtype: bool
+        """
+        mod = self.modified
+        for key_name, value in self.values.items():
+            from .Group import RecordGroup
+            if isinstance(value, RecordGroup):
+                if value.isModified():
+                    mod = True
+        return mod
 
     def fields(self):
         return self.group.fieldObjects
@@ -151,32 +220,40 @@ class Record(QObject):
     def stateAttributes(self, fieldName):
         if fieldName not in self._stateAttributes:
             if fieldName in self.group.fieldObjects:
-                self._stateAttributes[fieldName] = self.group.fieldObjects[fieldName].attrs.copy(
-                )
+                # @xtorello toreview
+                # self._stateAttributes[fieldName] = {}
+                self._stateAttributes[fieldName] = self.group.fieldObjects[fieldName].attrs.copy()
             else:
                 self._stateAttributes[fieldName] = {}
         return self._stateAttributes[fieldName]
 
     def setStateAttributes(self, fieldName, state='draft'):
+        # @xtorello toreview
         field = self.group.fieldObjects[fieldName]
-        stateChanges = dict(field.attrs.get('states', {}).get(state, []))
+        stateChanges = dict(field.attrs.get('states', {}).get(state[0], []))
         for key in ('readonly', 'required'):
             if key in stateChanges:
                 self.stateAttributes(fieldName)[key] = stateChanges[key]
             else:
-                self.stateAttributes(fieldName)[
-                    key] = field.attrs.get(key, False)
+                self.stateAttributes(fieldName)[key] = field.attrs.get(
+                    key, False
+                )
 
     def updateStateAttributes(self):
         state = self.values.get('state', 'draft')
+        if not state:
+            state = 'draft'
         for key in self.group.fieldObjects:
             self.setStateAttributes(key, state)
 
     def updateAttributes(self):
         self.updateStateAttributes()
         for fieldName in self.group.fieldObjects:
+            # @xtorello toreview
             attributes = self.group.fieldObjects[fieldName].attrs.get(
-                'attrs', '{}')
+                'attrs', '{}'
+            )
+
             try:
                 attributeChanges = eval(attributes)
             except:
@@ -191,6 +268,7 @@ class Record(QObject):
                 value = self.evaluateCondition(condition)
                 if value:
                     self.stateAttributes(fieldName)[attribute] = value
+
 
     def isFieldReadOnly(self, fieldName):
         readOnly = self.stateAttributes(fieldName).get('readonly', False)
@@ -216,12 +294,21 @@ class Record(QObject):
                 return False
         return bool(required)
 
-    # @brief Returns True if the given field name exists in record's group.
     def fieldExists(self, fieldName):
+        """
+        Returns True if the given field name exists in record's group.
+        :param fieldName:
+        :type fieldName: str
+        :return:
+        """
         return fieldName in self.group.fieldObjects
 
-    # @brief Loads the record if it's not been loaded already.
     def ensureIsLoaded(self):
+        """
+        Loads the record if it's not been loaded already.
+        :return: True if is reloaded
+        :rtype: bool
+        """
         if not self._loaded:
             self.reload()
             return True
@@ -235,29 +322,45 @@ class Record(QObject):
         # Iterate over self.group.fields to avoid objects of type BinarySizeField
         # which shouldn't be treated as a normal field.
         for name in self.group.fields:
+            if not name in self.values:
+                continue
+
             field = self.group.fieldObjects[name]
             # The record may not have all the fields the group has.
             # This is because there may have been a switch view to a form
             # but not for this record.
-            if not name in self.values:
-                continue
-            if not name in self.values:
-                continue
-            if (get_readonly or not self.isFieldReadOnly(name)) \
-                    and (not get_modifiedonly or field.name in self.modified_fields):
+            from .Group import RecordGroup
+            if isinstance(self.values[name], RecordGroup) and self.values[name].isModified():
+                value[name] = field.get(self, readonly=get_readonly, modified=get_modifiedonly)
+            elif (get_readonly or not self.isFieldReadOnly(name)) \
+                    and (not get_modifiedonly or field.name in self.modified_fields) :
                 value[name] = field.get(
                     self, readonly=get_readonly, modified=get_modifiedonly)
         if includeid:
             value['id'] = self.id
         return value
 
-    # @brief Marks the current record as not loaded.
     def cancel(self):
+        """
+        Marks the current record as not loaded.
+        :return: None
+        :rtype: None
+        """
         self._modified = False
         self._loaded = False
 
-    # @brief Save the record to the database. It doesn't matter if the record is new or already exists.
     def save(self, reload=True):
+        """
+        Save the record to the database. It doesn't matter if the record is
+        new or already exists.
+
+        :param reload:
+        :return:
+        """
+
+        from .Group import RecordGroup
+        print("Record.save")
+
         self.ensureIsLoaded()
         if not self.id:
             value = self.get(get_readonly=False)
@@ -272,15 +375,29 @@ class Record(QObject):
             if not self.rpc.write([self.id], value, context):
                 return False
         self._loaded = False
+
+        # Delete elements
+        for key_name, value in self.values.items():
+            if isinstance(value, RecordGroup):
+                if value.removedRecords:
+                    model = value.resource
+                    ids = value.removedRecords
+                    Rpc.RpcProxy(model).unlink(ids)
         if reload:
             self.reload()
         if self.group:
             self.group.written(self.id)
         return self.id
 
-    # Used only by group.py
-    # Fills the record with the corresponding default values.
     def fillWithDefaults(self, domain=None, context=None):
+        """
+        Used only by group.py
+        Fills the record with the corresponding default values.
+        :param domain:
+        :param context:
+        :return: None
+        :rtype: None
+        """
         if domain is None:
             domain = []
         if context is None:
@@ -296,9 +413,13 @@ class Record(QObject):
             self.setDefaults(val)
             self.updateAttributes()
 
-    # @brief Obtains the value of the 'name' field for the record by calling model's
-    # name_get function in the server.
     def name(self):
+        """
+        Obtains the value of the 'name' field for the record by calling model's
+        name_get function in the server.
+        :return:
+        """
+
         name = self.rpc.name_get([self.id], Rpc.session.context)[0]
         return name
 
@@ -311,6 +432,14 @@ class Record(QObject):
                 self.invalidFields.append(field)
 
     def isFieldValid(self, field):
+        """
+        Checks if the field data is valid
+
+        :param field: field name to check
+        :return: True if is valid
+        :rtype: bool
+        """
+
         if field in self.invalidFields:
             return False
         else:
@@ -323,11 +452,14 @@ class Record(QObject):
             change = change or not self.isFieldValid(fname)
             self.setFieldValid(fname, True)
         if change:
-            self.emit(SIGNAL('recordChanged( PyQt_PyObject )'), self)
+            self.recordChanged.emit(self)
         return change
 
-    # @brief Returns True if all fields are valid. Otherwise it returns False.
     def validate(self):
+        """
+        Returns True if all fields are valid. Otherwise it returns False.
+        :return:
+        """
         self.ensureIsLoaded()
         ok = True
         for name in self.group.fieldObjects:
@@ -343,40 +475,68 @@ class Record(QObject):
                 self.setFieldValid(name, True)
         return ok
 
-    # @brief Returns the context with which the record has been loaded.
     def context(self):
+        """
+        Returns the context with which the record has been loaded.
+        :return:
+        """
         return self.group.context()
 
-    # @brief Returns a dict with the default value of each field
-    # { 'field': defaultValue }
     def defaults(self):
+        """
+        Returns a dict with the default value of each field
+        { 'field': defaultValue}
+        :return: dict with de default value of each field
+        :rtype: dict
+        """
+
         self.ensureIsLoaded()
         value = dict([(name, field.default(self))
                       for name, field in list(self.group.fieldObjects.items())])
         return value
 
-    # @brief Sets the default values for each field from a dict
-    # { 'field': defaultValue }
     def setDefaults(self, val):
+        """
+        Sets the default values for each field from a dict
+        { 'field': defaultValue }
+        :param val:
+        :return:
+        """
         self.createMissingFields()
         for fieldname, value in list(val.items()):
             if fieldname not in self.group.fieldObjects:
                 continue
             self.group.fieldObjects[fieldname].setDefault(self, value)
         self._loaded = True
-        self.emit(SIGNAL('recordChanged( PyQt_PyObject )'), self)
-        self.emit(SIGNAL('recordModified( PyQt_PyObject )'), self)
+        self.recordChanged.emit(self)
+        self.recordModified.emit(self)
 
-    # This functions simply emits a signal indicating that
-    # the model has changed. This is mainly used by fields
-    # so they don't have to emit the signal, but relay in
-    # model emiting it itself.
     def changed(self):
+        """
+        This functions simply emits a signal indicating that
+        the model has changed. This is mainly used by fields
+        so they don't have to emit the signal, but relay in
+        model emiting it itself.
+
+        :return: None
+        :rtype: None
+        """
+
         self.updateAttributes()
-        self.emit(SIGNAL('recordChanged( PyQt_PyObject )'), self)
-        self.emit(SIGNAL('recordModified( PyQt_PyObject )'), self)
+        self.recordChanged.emit(self)
+        self.recordModified.emit(self)
 
     def set(self, val, modified=False, signal=True):
+        """
+        Sets the value on the record
+
+        :param val: Value to set on the Record
+        :param modified: True if it's modified from the last value
+        :param signal: Enables signal propagation
+        :return: None
+        :rtype: None
+        """
+
         # Ensure there are values for all fields in the group
         self.createMissingFields()
 
@@ -399,9 +559,9 @@ class Record(QObject):
         self.modified = modified
         if not self.modified:
             self.modified_fields = {}
-        self.emit(SIGNAL('recordChanged( PyQt_PyObject )'), self)
+        self.recordChanged.emit(self)
         if signal:
-            self.emit(SIGNAL('recordModified( PyQt_PyObject )'), self)
+            self.recordModified.emit(self)
 
     def reload(self):
         if not self.id:
@@ -419,11 +579,19 @@ class Record(QObject):
             # modified (as it's not, it's just reloaded).
             self.set(value, signal=False)
 
-    # @brief Evaluates the string expression given by dom.
-    # Before passing the dom expression to Rpc.session.evaluateExpression
-    # a context with 'current_date', 'time', 'context', 'active_id' and
-    # 'parent' (if applies) is prepared.
     def evaluateExpression(self, dom, checkLoad=True, firstTry=True):
+        """
+        Evaluates the string expression given by dom. Before passing the dom
+        expression to Rpc.session.evaluateExpression a context with
+        'current_date', 'time', 'context', 'active_id' and 'parent'
+        (if applies) is prepared.
+
+        :param dom:
+        :param checkLoad:
+        :param firstTry:
+        :return:
+        """
+
         if not isinstance(dom, str):
             return dom
         if checkLoad:
@@ -463,10 +631,14 @@ class Record(QObject):
                 val = False
         return val
 
-    # @brief Evaluates the given condition.
-    # The function will return a boolean, result of applying a condition of the form ('field','=','value') or
-    # [('field','=','value')]
     def evaluateCondition(self, condition):
+        """
+        Evaluates the given condition.
+        The function will return a boolean, result of applying a condition of
+        the form ('field','=','value') or [('field','=','value')]
+        :param condition:
+        :return:
+        """
         # Consider the case when 'condition' is a list
         if isinstance(condition, list):
             result = True
@@ -509,12 +681,17 @@ class Record(QObject):
             return True
         return False
 
-    # This function is called by the field when it's changed
-    # and has a 'on_change' attribute. The 'callback' parameter
-    # is the function that has to be executed on the server.
-    # So the function specified is called on the server whenever
-    # the field changes.
     def callOnChange(self, callback):
+        """
+        This function is called by the field when it's changed and has a
+        'on_change' attribute. The 'callback' parameter is the function that
+        has to be executed on the server. So the function specified is called
+        on the server whenever the field changes.
+
+        :param callback:
+        :return:
+        """
+
         match = re.match('^(.*?)\((.*)\)$', callback)
         if not match:
             raise Exception('ERROR: Wrong on_change trigger: %s' % callback)
@@ -534,16 +711,22 @@ class Record(QObject):
             if warning:
                 Notifier.notifyWarning(warning['title'], warning['message'])
             if 'focus' in response:
-                self.emit(SIGNAL('setFocus(QString)'), response['focus'])
+                self.setFocus.emit(response['focus'])
 
-    # This functions is called whenever a field with 'change_default'
-    # attribute set to True is modified. The function sets all conditional
-    # defaults to each field.
-    # Conditional defaults is a mechanism by which the user can establish
-    # default values on fields, depending on the value of another field (
-    # the 'change_default' field). An example of this case is the zip field
-    # in the partner model.
+
     def setConditionalDefaults(self, field, value):
+        """
+        This functions is called whenever a field with 'change_default'
+        attribute set to True is modified. The function sets all conditional
+        defaults to each field.
+        Conditional defaults is a mechanism by which the user can establish
+        default values on fields, depending on the value of another field (
+        the 'change_default' field). An example of this case is the zip field
+        in the partner model.
+        :param field:
+        :param value:
+        :return:
+        """
         ir = RpcProxy('ir.values')
         values = ir.get('default', '%s=%s' % (field, value),
                         [(self.group.resource, False)], False, {})
@@ -552,9 +735,13 @@ class Record(QObject):
             data[fname] = value
         self.setDefaults(data)
 
-    # @brief Returns True if the record is loaded and has values for all the
-    # fields the Group requires.
     def isFullyLoaded(self):
+        """
+        Returns True if the record is loaded and has values for all the fields
+        the Group requires.
+        :return:
+        :rtype: bool
+        """
         if not self._loaded:
             return False
         if set(self.values.keys()) == set(self.group.fieldObjects.keys()):
@@ -562,18 +749,29 @@ class Record(QObject):
         else:
             return False
 
-    # @brief Returns True if the Record handles information of a wizard.
     def isWizard(self):
+        """
+        Returns True if the Record handles information of a wizard.
+        :return:
+        """
         return self.group.isWizard()
 
-    # @brief Returns the list of field names the record should have (according to
-    # group requirements) but it doesn't.
     def missingFields(self):
+        """
+        Returns the list of field names the record should have (according to
+        group requirements) but it doesn't.
+        :return:
+        """
         return list(set(self.group.fieldObjects.keys()) - set(self.values.keys()))
 
-    # @brief Creates entries in the values dictionary for fields
-    # returned by missingFields()
     def createMissingFields(self):
+        """
+        Creates entries in the values dictionary for fields
+        returned by missingFields()
+
+        :return:
+        """
+
         # Try to avoid some CPU cycles because this function is called in value()
         # function which will be called lots of times.
         if len(self.group.fieldObjects) == len(self.values):

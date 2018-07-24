@@ -29,7 +29,7 @@
 import os
 
 try:
-    from PyQt4 import uic
+    from PyQt5 import uic
     isUicAvailable = True
 except:
     isUicAvailabe = False

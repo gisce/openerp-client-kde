@@ -26,10 +26,11 @@
 ##############################################################################
 
 from Koo.Common import Common
+from PyQt5.QtWidgets import *
 from . import FormWidget
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 (AttachmentDialogUi, AttachmentDialogBase) = loadUiType(
@@ -79,8 +80,8 @@ class AttachmentDialog(QMainWindow, AttachmentDialogUi):
         self.actions = ['New', 'Save', 'Delete', 'Next', 'Previous', 'Switch']
         for x in self.actions:
             action = eval('self.action' + x)
-            self.connect(action, SIGNAL('triggered()'), self.callChildView)
-        self.connect(self.actionClose, SIGNAL('triggered()'), self.slotClose)
+            action.triggered.connect(self.callChildView)
+        self.actionClose.triggered.connect(self.slotClose)
         self.updateEnabledActions()
 
     def updateEnabledActions(self):

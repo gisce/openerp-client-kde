@@ -28,8 +28,9 @@
 ##############################################################################
 
 from Koo.Search.AbstractSearchWidget import *
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 
 class SelectionSearchWidget(AbstractSearchWidget):
@@ -54,7 +55,8 @@ class SelectionSearchWidget(AbstractSearchWidget):
 
     def value(self):
         value = self.uiCombo.itemData(self.uiCombo.currentIndex())
-        if value.isValid():
+
+        if value and value.isValid():
             return [(self.name, '=', str(value.toString()))]
         else:
             return []

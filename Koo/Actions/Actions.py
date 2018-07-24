@@ -28,6 +28,7 @@
 ##############################################################################
 
 import os
+from PyQt5.QtWidgets import *
 import time
 import base64
 import datetime
@@ -40,11 +41,14 @@ from Koo.Printer import *
 
 from Koo.Common import Api
 from Koo.Common import Common
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 
 class ExecuteReportThread(QThread):
+    error = pyqtSignal()
+    warning = pyqtSignal()
+
     def __init__(self, name, data, context=None, parent=None):
         QThread.__init__(self, parent)
         if context is None:
@@ -63,12 +67,12 @@ class ExecuteReportThread(QThread):
                 ids = self.session.call(
                     '/object', 'execute', self.datas['model'], 'search', [])
             except Rpc.RpcException as e:
-                self.emit(SIGNAL('error'), (_('Error: %s') %
+                self.error.emit((_('Error: %s') %
                                             str(e.type), e.message, e.data))
                 return
 
             if ids == []:
-                self.emit(SIGNAL('warning'), _('Nothing to print.'))
+                self.warning.emit(_('Nothing to print.'))
                 return
             self.datas['id'] = ids[0]
         try:
@@ -85,12 +89,12 @@ class ExecuteReportThread(QThread):
                     time.sleep(1)
                     attempt += 1
                 if attempt > 200:
-                    self.emit(SIGNAL('warning'), _(
+                    self.warning.emit(_(
                         'Printing aborted. Delay too long.'))
                     return False
             Printer.printData(val)
         except Rpc.RpcException as e:
-            self.emit(SIGNAL('error'), (_('Error: %s') %
+            self.error.emit((_('Error: %s') %
                                         str(e.type), e.message, e.data))
 
 # @brief Executes the given report.

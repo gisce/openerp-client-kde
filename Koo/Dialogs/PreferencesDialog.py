@@ -28,8 +28,9 @@
 ##############################################################################
 
 import gettext
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo import Rpc
@@ -51,7 +52,7 @@ class PreferencesDialog(QDialog, PreferencesDialogUi):
         PreferencesDialogUi.__init__(self)
         self.setupUi(self)
 
-        self.connect(self.pushAccept, SIGNAL('clicked()'), self.slotAccept)
+        self.pushAccept.clicked.connect(self.slotAccept)
 
         self.setWindowTitle(_('User Preferences'))
         QApplication.setOverrideCursor(Qt.WaitCursor)

@@ -26,8 +26,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo.Common import Common
@@ -47,16 +48,16 @@ class UrlFieldWidget(AbstractFieldWidget, UrlFieldWidgetUi):
         self.scSearch = QShortcut(self.uiUrl)
         self.scSearch.setKey(Shortcuts.SearchInField)
         self.scSearch.setContext(Qt.WidgetShortcut)
-        self.connect(self.scSearch, SIGNAL('activated()'), self.openUrl)
+        self.scSearch.activated.connect(self.openUrl)
 
         self.scClear = QShortcut(self.uiUrl)
         self.scClear.setKey(Shortcuts.ClearInField)
         self.scClear.setContext(Qt.WidgetShortcut)
-        self.connect(self.scClear, SIGNAL('activated()'), self.clear)
+        self.scClear.activated.connect(self.clear)
 
         self.uiUrl.setMaxLength(int(attrs.get('size', 16)))
-        self.connect(self.pushOpenUrl, SIGNAL('clicked()'), self.openUrl)
-        self.connect(self.uiUrl, SIGNAL('editingFinished()'), self.modified)
+        self.pushOpenUrl.clicked.connect(self.openUrl)
+        self.uiUrl.editingFinished.connect(self.modified)
         self.installPopupMenu(self.uiUrl)
 
     def storeValue(self):

@@ -25,8 +25,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 from Koo.Common import Api
 from Koo.Common import Common
 from Koo.Plugins import *
@@ -116,18 +117,26 @@ class Action(QAction):
         Plugins.execute(self._data, self._model,
                         currentId, selectedIds, context)
 
-# @brief The ActionFactory class is a factory that creates Action objects to execute
-# actions on the server. Typically those shown in the toolbar and menus for an specific
-# model
-
 
 class ActionFactory:
-    # @brief Creates a list of Action objects given a parent, model and definition.
-    #
-    # The 'definition' parameter is the 'toolbar' parameter returned by server function
-    # fields_view_get.
+    """
+    The ActionFactory class is a factory that creates Action objects
+    to execute actions on the server. Typically those shown in the toolbar and
+    menus for an specific model
+    """
+
     @staticmethod
     def create(parent, definition, model):
+        """
+        Creates a list of Action objects given a parent, model and definition.
+
+        The 'definition' parameter is the 'toolbar' parameter returned by
+        server function fields_view_get.
+        :param parent:
+        :param definition:
+        :param model:
+        :return:
+        """
         if not definition:
             # If definition is not set we initialize it appropiately
             # to be able to add the 'Print Screen' action.
@@ -145,6 +154,22 @@ class ActionFactory:
             'type': 'ir.actions.report.xml'
         })
 
+        # Save action
+        definition['action'].append({
+            'name': 'save',
+            'string': _('Save'),
+            'shortcut': 'S',
+            'action': parent.parentWidget().save,
+        })
+
+        # Cancel action
+        definition['action'].append({
+            'name': 'cancel',
+            'string': _('Cancel'),
+            'shortcut': 'C',
+            'action': parent.parentWidget().cancel,
+        })
+
         actions = []
         for icontype in ('print', 'action', 'relate'):
             for tool in definition[icontype]:
@@ -156,16 +181,29 @@ class ActionFactory:
                 action.setModel(model)
 
                 number = len(actions)
+
                 shortcut = 'Ctrl+'
-                if number > 9:
-                    shortcut += 'Shift+'
-                    number -= 10
-                if number < 10:
-                    shortcut += str(number)
+
+                # Add save shortcut with Ctrl + S
+                if tool['name'] in ["save", "cancel"]:
+                    shortcut += tool['shortcut']
                     action.setShortcut(QKeySequence(shortcut))
                     action.setToolTip(action.text() + ' (%s)' % shortcut)
+                    action.setIcon(QIcon(":/images/{}.png".format(tool['name'])))
+                    action.triggered.connect(tool['action'])
+
+                else:
+                    if number > 9:
+                        shortcut += 'Shift+'
+                        number -= 10
+                    if number < 10:
+                        shortcut += str(number)
+                        action.setShortcut(QKeySequence(shortcut))
+                        action.setToolTip(action.text() + ' (%s)' % shortcut)
+
 
                 actions.append(action)
+
 
         plugs = Plugins.list(model)
         for p in sorted(list(plugs.keys()), key=lambda x: plugs[x].get('string', '')):

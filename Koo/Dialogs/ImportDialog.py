@@ -27,8 +27,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 import gettext
 from Koo.Common import Common
@@ -122,17 +123,14 @@ class ImportDialog(QDialog, ImportDialogUi):
         self.uiFileFormat.setCurrentIndex(0)
         self.updateFileFormat()
 
-        self.connect(self.pushImport, SIGNAL('clicked()'), self.import_)
-        self.connect(self.pushClose, SIGNAL('clicked()'), self.reject)
-        self.connect(self.pushAdd, SIGNAL('clicked()'), self.slotAdd)
-        self.connect(self.pushRemove, SIGNAL('clicked()'), self.slotRemove)
-        self.connect(self.pushRemoveAll, SIGNAL(
-            'clicked()'), self.slotRemoveAll)
-        self.connect(self.pushAutoDetect, SIGNAL(
-            'clicked()'), self.slotAutoDetect)
-        self.connect(self.pushOpenFile, SIGNAL('clicked()'), self.slotOpenFile)
-        self.connect(self.uiFileFormat, SIGNAL(
-            'currentIndexChanged(int)'), self.updateFileFormat)
+        self.pushImport.clicked.connect(self.import_)
+        self.pushClose.clicked.connect(self.reject)
+        self.pushAdd.clicked.connect(self.slotAdd)
+        self.pushRemove.clicked.connect(self.slotRemove)
+        self.pushRemoveAll.clicked.connect(self.slotRemoveAll)
+        self.pushAutoDetect.clicked.connect(self.slotAutoDetect)
+        self.pushOpenFile.clicked.connect(self.slotOpenFile)
+        self.uiFileFormat.currentIndexChanged[int].connect(self.updateFileFormat)
 
     def fileFormat(self):
         index = self.uiFileFormat.currentIndex()
@@ -210,7 +208,7 @@ class ImportDialog(QDialog, ImportDialogUi):
         QApplication.restoreOverrideCursor()
 
     def slotOpenFile(self):
-        fileName = QFileDialog.getOpenFileName(self, _('File to import'))
+        fileName = QFileDialog.getOpenFileName(self, _('File to import'))[0]
         if fileName.isNull():
             return
         self.uiFileName.setText(fileName)

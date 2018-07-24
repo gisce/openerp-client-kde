@@ -28,6 +28,7 @@
 ##############################################################################
 
 import gettext
+from PyQt5.QtWidgets import *
 
 from Koo.Common import Api
 from Koo.Common.Settings import *
@@ -37,15 +38,21 @@ import os
 import sys
 from Koo.Common import Debug
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo.Common.Paths import *
 
 try:
+    QString = unicode
+except NameError:
+    # Python 3
+    QString = str
+
+try:
     if Settings.value('kde.enabled'):
-        from PyKDE4.kdecore import ki18n
+        from PyKDE5.kdecore import ki18n
         isKdeAvailable = True
     else:
         isKdeAvailable = False
@@ -128,7 +135,7 @@ class SelectionDialog(QDialog, SelectionDialogUi):
             item.setText(x)
             item.value = values[x]
             self.uiList.addItem(item)
-        self.connect(self.pushAccept, SIGNAL('clicked()'), self.selected)
+        self.pushAccept.clicked.connect(self.selected)
 
     def selected(self):
         self.result = ""
@@ -219,8 +226,8 @@ class ErrorDialog(QDialog, ErrorDialogUi):
         from Koo.Common import RemoteHelp
         self.pushRemoteHelp.setVisible(RemoteHelp.isRemoteHelpAvailable())
 
-        self.connect(self.pushSend, SIGNAL('clicked()'), self.send)
-        self.connect(self.pushRemoteHelp, SIGNAL('clicked()'), self.remoteHelp)
+        self.pushSend.clicked.connect(self.send)
+        self.pushRemoteHelp.clicked.connect(self.remoteHelp)
 
     def done(self, r):
         QDialog.done(self, r)
@@ -289,8 +296,8 @@ class LostConnectionDialog(QDialog, LostConnectionDialogUi):
 
         self.timer = QTimer()
         self.timer.setInterval(1000)
-        self.connect(self.timer, SIGNAL('timeout()'), self.updateMessage)
-        self.connect(self, SIGNAL('rejected()'), self.stopTimer)
+        self.timer.timeout.connect(self.updateMessage)
+        self.rejected.connect(self.stopTimer)
         self.timer.start()
 
     def updateMessage(self):
@@ -341,7 +348,7 @@ class ProgressDialog(QDialog, ProgressDialogUi):
 
     def start(self):
         self.timer = QTimer()
-        self.connect(self.timer, SIGNAL('timeout()'), self.timeout)
+        self.timer.timeout.connect(self.timeout)
         self.timer.start(2000)
 
     def timeout(self):

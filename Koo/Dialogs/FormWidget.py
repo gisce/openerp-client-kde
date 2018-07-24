@@ -26,10 +26,6 @@
 #
 ##############################################################################
 
-import types
-import gettext
-
-from Koo import Rpc
 from .SearchDialog import *
 from .ExportDialog import *
 from .ImportDialog import *
@@ -38,32 +34,36 @@ from .GoToIdDialog import *
 from .BatchUpdateDialog import *
 from .BatchInsertDialog import *
 
-from Koo.Common import Api
-from Koo.Common import Common
-from Koo.Common.Settings import *
 from Koo.Common import Help
-import copy
 
 from Koo.Screen.Screen import *
 from Koo.Model.Group import RecordGroup
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
 from Koo.Common.Ui import *
+from gettext import gettext as _
 
 (FormWidgetUi, FormWidgetBase) = loadUiType(Common.uiPath('formcontainer.ui'))
 
 
 class FormWidget(QWidget, FormWidgetUi):
-    # form constructor:
-    # model -> Name of the model the form should handle
-    # res_id -> List of ids of type 'model' to load
-    # domain -> Domain the models should be in
-    # view_type -> type of view: form, tree, graph, calendar, ...
-    # view_ids -> Id's of the views 'ir.ui.view' to show
-    # context -> Context for the current data set
-    # parent -> Parent widget of the form
-    # name -> User visible title of the form
-    def __init__(self, model, res_id=False, domain=None, view_type=None, view_ids=None, context=None, parent=None, name=False):
+
+    closed = pyqtSignal()
+    shortcutsChanged = pyqtSignal()
+
+    def __init__(self, model, res_id=False, domain=None, view_type=None,
+                 view_ids=None, context=None, parent=None, name=False):
+        """
+        Class constructor
+
+        :param model: Name of the model the form should handle
+        :param res_id: List of ids of type 'model' to load
+        :param domain: Domain the models should be in
+        :param view_type: type of view: form, tree, graph, calendar, ...
+        :param view_ids: Id's of the views 'ir.ui.view' to show
+        :param context: Context for the current data set
+        :param parent: Parent widget of the form
+        :param name: User visible title of the form
+        """
         QWidget.__init__(self, parent)
         FormWidgetUi.__init__(self)
         self.setupUi(self)
@@ -75,14 +75,16 @@ class FormWidget(QWidget, FormWidgetUi):
         if context is None:
             context = {}
 
-        # This variable holds the id used to update status (and show number of attachments)
-        # If it doesn't change we won't update the number of attachments, avoiding some server
-        # calls.
+        # This variable holds the id used to update status (and show number of
+        # attachments)
+        # If it doesn't change we won't update the number of attachments,
+        # avoiding some server calls.
         self.previousId = False
         self.previousAttachments = False
 
-        # Workaround: In some cases (detected in some CRM actions) view_type and view_ids
-        # may contain duplicate entries. Here we remove duplicates (ensuring lists order is kept).
+        # Workaround: In some cases (detected in some CRM actions) view_type
+        # and view_ids may contain duplicate entries. Here we remove duplicates
+        # (ensuring lists order is kept).
         if view_type:
             new_view_ids = []
             new_view_type = []
@@ -116,7 +118,7 @@ class FormWidget(QWidget, FormWidgetUi):
             action = ViewFactory.viewAction(view, self)
             if not action:
                 continue
-            self.connect(action, SIGNAL('triggered()'), self.switchView)
+            action.triggered.connect(self.switchView)
             self._switchViewMenu.addAction(action)
             self._viewActionGroup.addAction(action)
 
@@ -124,18 +126,16 @@ class FormWidget(QWidget, FormWidgetUi):
         if Settings.value('koo.sort_mode') == 'visible_items':
             self.group.setSortMode(RecordGroup.SortVisibleItems)
         self.group.setDomain(domain)
-        self.connect(self.group, SIGNAL('modified'), self.notifyRecordModified)
+        self.group.modified.connect(self.notifyRecordModified)
 
         self.screen.setRecordGroup(self.group)
         self.screen.setEmbedded(False)
-        self.connect(self.screen, SIGNAL('activated()'), self.switchToForm)
-        self.connect(self.screen, SIGNAL(
-            'currentChanged()'), self.updateStatus)
-        self.connect(self.screen, SIGNAL('closed()'), self.closeWidget)
-        self.connect(self.screen, SIGNAL(
-            'recordMessage(int,int,int)'), self.updateRecordStatus)
-        self.connect(self.screen, SIGNAL(
-            'statusMessage(QString)'), self.updateStatus)
+        self.screen.activated.connect(self.switchToForm)
+        # @xtorello toreview not-clear signal<->slot
+        self.screen.currentChangedSignal.connect(self.updateStatus)
+        self.screen.closed.connect(self.closeWidget)
+        self.screen.recordMessage[int, int, int].connect(self.updateRecordStatus)
+        self.screen.statusMessage['QString'].connect(self.updateStatus)
 
         self._allowOpenInNewWindow = True
 
@@ -180,7 +180,7 @@ class FormWidget(QWidget, FormWidgetUi):
         self.updateSwitchView()
 
         self.reloadTimer = QTimer(self)
-        self.connect(self.reloadTimer, SIGNAL('timeout()'), self.autoReload)
+        self.reloadTimer.timeout.connect(self.autoReload)
         self.pendingReload = False
 
         # We always use the Subscriber as the class itself will handle
@@ -190,6 +190,12 @@ class FormWidget(QWidget, FormWidgetUi):
             self.subscriber.subscribe(
                 'updated_model:%s' % model, self.autoReload)
 
+    def save(self):
+        pass
+
+    def cancel(self):
+        pass
+
     def notifyRecordModified(self):
         self.updateStatus(_('<font color="blue">Document modified</font>'))
 
@@ -198,15 +204,18 @@ class FormWidget(QWidget, FormWidgetUi):
     # value is != 0 Subscription based reloads are always used if available.
     def setAutoReload(self, value):
         if value:
-            # We use both, timer and subscriber as in some cases information may change
-            # only virtually: Say change the color of a row depending on current time.
-            # If the value is negative we don't start the timer but keep subscription,
-            # so this allows setting -1 in autorefresh when you don't want timed updates
-            # but only when data is changed in the server.
+            # We use both, timer and subscriber as in some cases information
+            # may change only virtually: Say change the color of a row
+            # depending on current time.
+            # If the value is negative we don't start the timer but keep
+            # subscription, so this allows setting -1 in autorefresh when you
+            # don't want timed updates but only when data is changed in the
+            # server.
             if value > 0:
                 self.reloadTimer.start(int(value) * 1000)
             if not Settings.value('koo.auto_reload'):
-                # Do not subscribe again if that was already done in the constructor
+                # Do not subscribe again if that was already done in the
+                # constructor
                 self.subscriber.subscribe(
                     'updated_model:%s' % self.model, self.autoReload)
         else:
@@ -239,8 +248,7 @@ class FormWidget(QWidget, FormWidgetUi):
                 QApplication.setOverrideCursor(Qt.WaitCursor)
                 try:
                     window = AttachmentDialog(self.model, id, self)
-                    self.connect(window, SIGNAL('destroyed()'),
-                                 self.attachmentsClosed)
+                    window.destroyed.connect(self.attachmentsClosed)
                 except Rpc.RpcException as e:
                     QApplication.restoreOverrideCursor()
                     return
@@ -354,7 +362,8 @@ class FormWidget(QWidget, FormWidgetUi):
         self.screen.new()
 
     def duplicate(self):
-        # Store selected ids before executing modifiedSave() because, there, the selection is lost.
+        # Store selected ids before executing modifiedSave() because, there,
+        # the selection is lost.
         selectedIds = self.screen.selectedIds()
 
         if not self.modifiedSave():
@@ -386,13 +395,19 @@ class FormWidget(QWidget, FormWidgetUi):
         QApplication.restoreOverrideCursor()
 
     def save(self):
+        """
+        Save action
+
+        :return:
+        :rtype: None or boolean
+        """
         if not self.screen.currentRecord():
             return
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
             modification = self.screen.currentRecord().id
-            id = self.screen.save()
-            if id:
+            ident = self.screen.save()
+            if ident:
                 self.updateStatus(
                     _('<font color="green">Document saved</font>'))
                 if not modification and Settings.value('koo.auto_new'):
@@ -410,16 +425,19 @@ class FormWidget(QWidget, FormWidgetUi):
                         name = attrs['string']
                     else:
                         name = field
-                    fields.append('<li>%s</li>' % name)
+                    fields.append('<li>{}</li>'.format(name))
                 fields.sort()
-                fields = '<ul>%s</ul>' % ''.join(fields)
-                value = QMessageBox.question(self, _('Error'),
-                                             _('<p>The following fields have an invalid value and have been highlighted in red:</p>%s<p>Please fix them before saving.</p>') % fields,
-                                             _('Ok'))
-        except Rpc.RpcException as e:
+                fields = '<ul>{}</ul>'.format(''.join(fields))
+                mesage = _('<p>The following fields have an invalid value and have been highlighted in red:</p>{}<p>Please fix them before saving.</p>')
+                QMessageBox.question(
+                    self,
+                    _('Error'),
+                    mesage.format(fields),
+                    QMessageBox.Ok)
+        except Rpc.RpcException:
             QApplication.restoreOverrideCursor()
-            id = False
-        return bool(id)
+            ident = False
+        return bool(ident)
 
     def previous(self):
         if not self.modifiedSave():
@@ -499,22 +517,32 @@ class FormWidget(QWidget, FormWidgetUi):
         self.screen.load(dialog.result)
 
     def updateStatus(self, message=''):
+        """
+        Updates the status message of the form (bottom right)
+
+        :param message: Message
+        :return: None
+        :rtype: None
+        """
         if self.model and self.screen.currentRecord() and self.screen.currentRecord().id:
-            # We don't need to query the server for the number of attachments if current record
+            # We don't need to query the server for the number of attachments
+            # if current record
             # has not changed since list update.
-            id = self.screen.currentRecord().id
-            if id != self.previousId:
-                ids = Rpc.session.execute('/object', 'execute', 'ir.attachment', 'search', [
-                                          ('res_model', '=', self.model), ('res_id', '=', id)])
+            ident = self.screen.currentRecord().id
+            if ident != self.previousId:
+                ids = Rpc.session.execute(
+                    '/object', 'execute', 'ir.attachment', 'search',
+                    [('res_model', '=', self.model), ('res_id', '=', ident)]
+                )
                 self.previousAttachments = ids
-                self.previousId = id
+                self.previousId = ident
             else:
                 ids = self.previousAttachments
         else:
             ids = []
             self.previousId = False
             self.previousAttachments = ids
-        message = (_("(%s attachments) ") % len(ids)) + message
+        message = (_("({} attachments) ").format(len(ids))) + str(message)
         self.uiStatus.setText(message)
 
     def updateSwitchView(self):
@@ -568,10 +596,10 @@ class FormWidget(QWidget, FormWidgetUi):
             else:
                 return False
         else:
-            # If a new record was created but not modified, isModified() will return
-            # False but we want to cancel new records anyway.
-            # We call screen.cancel() directly as we don't want to trigger an updateStatus()
-            # which will result in a server request.
+            # If a new record was created but not modified, isModified()
+            # will return False but we want to cancel new records anyway.
+            # We call screen.cancel() directly as we don't want to trigger
+            # an updateStatus() which will result in a server request.
             self.screen.cancel()
         return True
 
@@ -632,7 +660,7 @@ class FormWidget(QWidget, FormWidgetUi):
         self.screen.storeViewSettings()
         self.reloadTimer.stop()
         self.subscriber.unsubscribe()
-        self.emit(SIGNAL('closed()'))
+        self.closed.emit()
 
     def canClose(self, urgent=False):
         if self.modifiedSave():
@@ -666,11 +694,8 @@ class FormWidget(QWidget, FormWidgetUi):
         QApplication.restoreOverrideCursor()
 
     def __del__(self):
-        pass
-        """ to review @xtorello
         self.group.__del__()
         del self.group
-        """
 
     def batchButton(self):
         viewTypes = self.viewTypes

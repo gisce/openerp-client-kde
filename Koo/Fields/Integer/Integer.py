@@ -27,11 +27,12 @@
 ##############################################################################
 
 from Koo.Fields.AbstractFieldWidget import *
+from PyQt5.QtWidgets import *
 from Koo.Fields.AbstractFieldDelegate import *
 from Koo.Common.Numeric import *
 from Koo.Common import Shortcuts
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 
 class IntegerFieldWidget(AbstractFieldWidget):
@@ -48,9 +49,9 @@ class IntegerFieldWidget(AbstractFieldWidget):
         self.scClear = QShortcut(self.widget)
         self.scClear.setKey(Shortcuts.ClearInField)
         self.scClear.setContext(Qt.WidgetShortcut)
-        self.connect(self.scClear, SIGNAL('activated()'), self.clear)
+        self.scClear.activated.connect(self.clear)
 
-        self.connect(self.widget, SIGNAL('editingFinished()'), self.calculate)
+        self.widget.editingFinished.connect(self.calculate)
         self.installPopupMenu(self.widget)
 
     def calculate(self):

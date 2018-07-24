@@ -28,6 +28,7 @@
 ##############################################################################
 
 import os
+from PyQt5.QtWidgets import *
 import re
 import tempfile
 
@@ -38,25 +39,31 @@ from Koo.Common import Common
 from Koo.Common.Settings import *
 from .FieldPreferencesDialog import *
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 
-# @brief AbstractFieldWidget is the base class for all field widgets in Koo.
-# In order to create a new field widget, that is: a widget that appears in a
-# auto-generated form you need to inherit from this class and implement some
-# of it's functions.
-#
-# The Widget handles a field from a record. You can access the record
-# using the property 'record' and the field name using the property 'name'.
-#
 class AbstractFieldWidget(QWidget):
+    """
+    AbstractFieldWidget is the base class for all field widgets in Koo.
+    In order to create a new field widget, that is: a widget that appears in a
+    auto-generated form you need to inherit from this class and implement some
+    of it's functions.
 
-    # @brief Creates a new AbstractFieldWidget and receives the following parameters
-    #  parent:     The QWidget parent of this QWidget
-    #  view:       Holds the reference to the view the widget is in
-    #  attributes: Holds some extra attributes such as read-only and others
+    The Widget handles a field from a record. You can access the record
+    using the property 'record' and the field name using the property 'name'.
+    """
+
     def __init__(self, parent, view, attributes):
+        """
+        Creates a new AbstractFieldWidget and receives the following parameters
+
+        :param parent: Parent of this QWidget
+        :type parent: QWidget
+        :param view: Holds the reference to the view the widget is in
+        :param attributes: Holds some extra attributes such as read-only and others
+        """
+
         QWidget.__init__(self, parent)
 
         self.attrs = attributes
@@ -105,7 +112,7 @@ class AbstractFieldWidget(QWidget):
         if not keys:
             return
         shortcut = QShortcut(QKeySequence(keys), self)
-        self.connect(shortcut, SIGNAL('activated()'), self.setFocus)
+        shortcut.activated.connect(self.setFocus)
 
     def initialize(self):
         self.addShortcut(eval(self.attrs.get('use', '{}')).get('shortcut', ''))
@@ -134,22 +141,33 @@ class AbstractFieldWidget(QWidget):
         helpWidget.show()
         QApplication.restoreOverrideCursor()
 
-    # @brief This function is called the first time the widget is shown.
-    #
-    # It can be used by widgets to initialize GUI elements that are slow to
-    # execute. The advantage of using this function is that if the user never
-    # sees the widget (because it's in another tab, for example), it will never
-    # be called, improving form loading time.
-    #
-    # It's ensured that this function is called before any call to showValue() or
-    # storeValue() happens.
     def initGui(self):
+        """
+        This function is called the first time the widget is shown.
+
+        It can be used by widgets to initialize GUI elements that are slow to
+        execute. The advantage of using this function is that if the user never
+        sees the widget (because it's in another tab, for example), it will
+        never be called, improving form loading time.
+
+        It's ensured that this function is called before any call to
+        showValue() or storeValue() happens.
+        :return: None
+        :rtype: None
+        """
+
         return
 
-    # @brief Sets the default value to the field.
-    #
-    # Note that this requires a call to the server.
+
     def setToDefault(self):
+        """
+        Sets the default value to the field.
+
+        Note that this requires a call to the server.
+        :return: False if can't set the default value
+        :rtype: None or bool
+        """
+
         try:
             model = self.record.group.resource
             res = Rpc.session.call('/object', 'execute',
@@ -202,8 +220,15 @@ class AbstractFieldWidget(QWidget):
         os.close(fd)
         Common.openFile(fileName)
 
-    # @brief Opens the FieldPreferencesDialog to set the current value as default for this field.
     def setAsDefault(self):
+        """
+        Opens the FieldPreferencesDialog to set the current value as default
+        for this field.
+
+        :return: None
+        :rtype: None
+        """
+
         if not self.view:
             return
         deps = []
@@ -228,56 +253,108 @@ class AbstractFieldWidget(QWidget):
         else:
             self.setColor('normal')
 
-    # @brief This function is called when the widget has to be Read-Only.
-    # When implementing a new widget, please use setEnabled( not ro ) instead
-    # of read-only. The gray color gives information to the user so she knows
-    # the field can't be modified
+
     def setReadOnly(self, ro):
+        """
+        This function is called when the widget has to be Read-Only.
+        When implementing a new widget, please use setEnabled( not ro ) instead
+        of read-only. The gray color gives information to the user so she knows
+        the field can't be modified
+
+        :param ro: Read only of the filed
+        :type ro: bool
+        :return: None
+        :rtype: None
+        """
         self._readOnly = ro
         self.updateColor()
 
-    # @brief This function returns True if the field is read-only. False otherwise.
     def isReadOnly(self):
+        """
+        This function returns True if the field is read-only. False otherwise.
+        :return: If the field is read only
+        :rtype: bool
+        """
+
         return self._readOnly
 
-    # @brief Updates the background color depending on widget state.
-    #
-    # Possible states are: invalid, readonly, required and normal.
     def refresh(self):
+        """
+        Updates the background color depending on widget state.
+
+        Possible states are: invalid, readonly, required and normal.
+
+        :return: None
+        :rtype: None
+        """
+
         self.setReadOnly(self._readOnly)
 
-    # @brief Use it in your widget to return the widget in which you want the color
-    # indicating the obligatory, normal, ... etc flags to be set.
-    # By default colorWidget() returns self.
     def colorWidget(self):
+        """
+        Use it in your widget to return the widget in which you want the color
+        indicating the obligatory, normal, ... etc flags to be set.
+
+
+        :return: returns self.
+        :rtype: AbstractFieldWidget
+        """
+
         return self
 
-    # @brief Use this function to return the menuEntries your widget wants to show
-    # just before the context menu is shown. Return a list of tuples in the form:
-    # [ (_('Menu text'), function/slot to connect the entry, True (for enabled) or False (for disabled) )]
     def menuEntries(self):
+        """
+        Use this function to return the menuEntries your widget wants to show
+        just before the context menu is shown.
+
+        :return:  Return a list of tuples in the form:
+        [ (_('Menu text'), function/slot to connect the entry,
+        True (for enabled) or False (for disabled) )]
+        :rtype: List[Tuple]
+        """
+
         return []
 
-    # @brief Sets the background color to the widget returned by colorWidget().
-    # name should contain the current state ('invalid', 'readonly', 'required' or 'normal')
-    #
-    # The appropiate color for each state is stored in self.colors dictionary.
     def setColor(self, name):
+        """
+        Sets the background color to the widget returned by colorWidget().
+        name should contain the current state ('invalid', 'readonly',
+        'required' or 'normal')
+
+        The appropiate color for each state is stored in self.colors dictionary.
+        :param name: Name of the filed
+        :type name: str
+        :return:
+        """
+
         color = QColor(self.colors.get(name, 'white'))
         palette = QPalette()
         palette.setColor(QPalette.Active, QPalette.Base, color)
         self.colorWidget().setPalette(palette)
 
-    # @brief Installs the eventFilter on the given widget so the popup
-    # menu will be shown on ContextMenu event. Also data on the widget will
-    # be stored in the record when the widget receives the FocusOut event.
     def installPopupMenu(self, widget):
+        """
+        Installs the eventFilter on the given widget so the popup
+        menu will be shown on ContextMenu event. Also data on the widget will
+        be stored in the record when the widget receives the FocusOut event.
+
+        :param widget: Widget to install the event filter
+        :return: None
+        :rtype: None
+        """
+
         widget.installEventFilter(self)
 
-    # @brief Reimplements eventFilter to show the context menu and store
-    # information when the widget loses the focus. This function will be
-    # used on the widget you give to installPopupMenu.
     def eventFilter(self, target, event):
+        """
+        Reimplements eventFilter to show the context menu and store
+        information when the widget loses the focus. This function will be
+        used on the widget you give to installPopupMenu.
+
+        :param target:
+        :param event:
+        :return:
+        """
         if event.type() == QEvent.ContextMenu:
             self.showPopupMenu(target, event.globalPos())
             return True
@@ -286,9 +363,15 @@ class AbstractFieldWidget(QWidget):
                 self.store()
         return False
 
-    # @brief Shows a popup menu with default and widget specific
-    # entries.
     def showPopupMenu(self, parent, position):
+        """
+        Shows a popup menu with default and widget specific entries.
+        
+        :param parent:
+        :param position:
+        :return: None
+        :rtype: None
+        """
         entries = self.defaultMenuEntries[:]
         new = self.menuEntries()
 
@@ -312,37 +395,56 @@ class AbstractFieldWidget(QWidget):
             if title:
                 item = QAction(title, menu)
                 if slot:
-                    self.connect(item, SIGNAL("triggered()"), slot)
+                    item.triggered.connect(slot)
                 item.setEnabled(enabled)
                 menu.addAction(item)
             else:
                 menu.addSeparator()
         menu.popup(position)
 
-    # @brief Call this function/slot when your widget changes the
-    # value. This is needed for the onchange option in the
-    # server modules. Usually you'll call it on lostFocus if
-    # there's a TextBox or on selection, etc.
     def modified(self):
+        """
+        Call this function/slot when your widget changes the value. This is
+        needed for the onchange option in the server modules. Usually you'll c
+        all it on lostFocus if there's a TextBox or on selection, etc.
+
+        :return: None
+        :rtype: None
+        """
+
         if not self.record:
             return
         self.store()
 
-    # @brief Override this function. This will be called by display()
-    # when it wants the value to be shown in the widget
     def showValue(self):
+        """
+        Override this function. This will be called by display() when it wants
+        the value to be shown in the widget
+
+        :return: None
+        """
+
         pass
 
-    # @brief Override this function. It will be used whenever there
-    # is no model or have created a new record.
     def clear(self):
+        """
+        Override this function. It will be used whenever there is no model or
+        have created a new record.
+
+        :return: None
+        """
         pass
 
-    # @brief This function displays the current value of the field in the record
-    # in the widget.
-    #
-    # Do not reimplement this function, override clear() and showValue() instead
     def display(self):
+        """
+        This function displays the current value of the field in the record
+        in the widget.
+
+        Do not reimplement this function, override clear() and showValue() instead
+        :return: None
+        :rtype: None
+        """
+
         if not self.record:
             self._readOnly = True
             self.clear()
@@ -364,21 +466,40 @@ class AbstractFieldWidget(QWidget):
     def reset(self):
         self.refresh()
 
-    # @brief Sets the current record for the widget.
     def load(self, record):
+        """
+        Sets the current record for the widget.
+
+        :param record:
+        :return: None
+        :rtype: None
+        """
+
         self.record = record
         self.display()
 
-    # @brief Stores information in the widget to the record.
-    # Reimplement this function in your widget.
     def storeValue(self):
+        """
+        Stores information in the widget to the record.
+        Reimplement this function in your widget.
+
+        :return: None
+        :rtype: None
+        """
+
         pass
 
-    # @brief Stores information in the widget to the record.
-    # This is the function you should call when you want the field
-    # to store information back into the model. This function may
-    # NOT store information if it has not changed.
     def store(self):
+        """
+        Stores information in the widget to the record.
+        This is the function you should call when you want the field
+        to store information back into the model. This function may
+
+        NOT store information if it has not changed.
+        :return: None
+        :rtype: None
+        """
+
         if not self._isUpToDate:
             return
         self.storeValue()

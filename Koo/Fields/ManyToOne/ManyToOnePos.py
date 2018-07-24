@@ -25,8 +25,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo.Common import Api
@@ -51,7 +52,7 @@ class ManyToOnePosFieldWidget(AbstractFieldWidget, ManyToOnePosFieldWidgetUi):
 
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
 
-        self.connect(self.screen, SIGNAL('currentChanged()'), self.selected)
+        self.screen.currentChanged.connect(self.selected)
 
         self.installPopupMenu(self.screen)
         self.old = None

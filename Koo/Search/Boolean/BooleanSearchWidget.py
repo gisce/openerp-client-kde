@@ -28,10 +28,11 @@
 ##############################################################################
 
 from Koo.Common import Common
+from PyQt5.QtWidgets import *
 
 from Koo.Search.AbstractSearchWidget import *
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 
 class BooleanSearchWidget(AbstractSearchWidget):
@@ -50,8 +51,8 @@ class BooleanSearchWidget(AbstractSearchWidget):
 
     def value(self):
         value = self.uiCombo.itemData(self.uiCombo.currentIndex())
-        if value.type() == QVariant.Bool:
-            return [(self.name, '=', int(value.toBool()))]
+        if type(value) == bool:
+            return [(self.name, '=', int(value))]
         return []
 
     def clear(self):

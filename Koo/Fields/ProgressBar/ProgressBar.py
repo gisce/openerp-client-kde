@@ -25,13 +25,20 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 
 from Koo.Common import Common
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
 
+
+try:
+    QString = unicode
+except NameError:
+    # Python 3
+    QString = str
 
 class ProgressBarFieldWidget(AbstractFieldWidget):
     def __init__(self, parent, view, attrs={}):
@@ -64,19 +71,23 @@ class ProgressBarFieldDelegate(AbstractFieldDelegate):
 
     def paint(self, painter, option, index):
         # Paint background
-        itemOption = QStyleOptionViewItemV4(option)
+        itemOption = QStyleOptionViewItem(option)
         # Last parameter (None) shouldn't be necessary but we put it to workaround a bug in
         # KStyle which expects always four parameters, wheareas QStyle makes it optional.
         QApplication.style().drawControl(QStyle.CE_ItemViewItem, itemOption, painter, None)
 
         # Paint ProgressBar
-        opts = QStyleOptionProgressBarV2()
+        opts = QStyleOptionProgressBar()
         opts.rect = option.rect
         opts.minimum = 1
         opts.maximum = 100
         opts.textVisible = True
-        percent, ok = index.data(Qt.DisplayRole).toDouble()
-        percent = max(min(percent, 100), 0)
+        value = index.data(Qt.DisplayRole)
+        if value:
+            percent = float(value.split(",")[0])
+            percent = max(min(percent, 100), 0)
+        else:
+            percent = 0
         opts.progress = percent
         opts.text = QString('%d%%' % percent)
         # Last parameter (None) shouldn't be necessary but we put it to workaround a bug in

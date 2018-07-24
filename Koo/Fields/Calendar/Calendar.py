@@ -27,13 +27,14 @@
 ##############################################################################
 
 from Koo.Common import Common
+from PyQt5.QtWidgets import *
 from Koo.Common import Shortcuts
 
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
 from Koo.Common.Calendar import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 (DateFieldWidgetUi, DateFieldWidgetBase) = loadUiType(Common.uiPath('calendar.ui'))
@@ -49,17 +50,16 @@ class DateFieldWidget(AbstractFieldWidget, DateFieldWidgetUi):
         self.scSearch = QShortcut(self.uiDate)
         self.scSearch.setKey(Shortcuts.SearchInField)
         self.scSearch.setContext(Qt.WidgetShortcut)
-        self.connect(self.scSearch, SIGNAL('activated()'), self.showCalendar)
+        self.scSearch.activated.connect(self.showCalendar)
 
         self.scClear = QShortcut(self.uiDate)
         self.scClear.setKey(Shortcuts.ClearInField)
         self.scClear.setContext(Qt.WidgetShortcut)
-        self.connect(self.scClear, SIGNAL('activated()'), self.clear)
+        self.scClear.activated.connect(self.clear)
 
-        self.connect(self.pushCalendar, SIGNAL("clicked()"), self.showCalendar)
+        self.pushCalendar.clicked.connect(self.showCalendar)
         self.dateTime = False
-        self.connect(self.uiDate, SIGNAL(
-            'editingFinished()'), self.updateValue)
+        self.uiDate.editingFinished.connect(self.updateValue)
         self.installPopupMenu(self.uiDate)
 
     def updateValue(self):
@@ -114,7 +114,7 @@ class DateFieldWidget(AbstractFieldWidget, DateFieldWidgetUi):
 
     def showCalendar(self):
         popup = PopupCalendarWidget(self.uiDate, self.dateTime)
-        self.connect(popup, SIGNAL('selected()'), self.store)
+        popup.selected.connect(self.store)
 
     def setText(self, text):
         self.uiDate.setCursorPosition(0)
@@ -161,8 +161,7 @@ class TimeFieldWidget(AbstractFieldWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.uiTime)
         self.installPopupMenu(self.uiTime)
-        self.connect(self.uiTime, SIGNAL(
-            'editingFinished()'), self.updateValue)
+        self.uiTime.editingFinished.connect(self.updateValue)
 
     def updateValue(self):
         self.modified()
@@ -221,8 +220,7 @@ class FloatTimeFieldWidget(AbstractFieldWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.uiTime)
         self.installPopupMenu(self.uiTime)
-        self.connect(self.uiTime, SIGNAL(
-            'editingFinished()'), self.updateValue)
+        self.uiTime.editingFinished.connect(self.updateValue)
 
     def updateValue(self):
         self.modified()

@@ -1,0 +1,12 @@
+sudo: false
+language: python
+python:
+  - "3.5"
+install:
+  - pip install erppeek coveralls
+  - pip install -e .
+script:
+  - coverage run ./tests/test.py
+after_success:
+  - coveralls
+  - coverage report

@@ -32,14 +32,17 @@ import os
 import sys
 from Koo import Rpc
 from . import Debug
-from PyQt4.QtCore import QDir, QUrl
-
-# @brief The ConfigurationManager class handles Koo settings information.
-# Those settings can be specified in the command line, .koorc configuration file
-# or koo server module.
+from PyQt5.QtCore import QDir, QUrl
+import traceback
 
 
 class Settings(object):
+    """
+    The ConfigurationManager class handles Koo settings information.
+    Those settings can be specified in the command line, .koorc configuration
+    file or koo server module.
+    """
+
     rcFile = False
     options = {
         'login.db': 'test',
@@ -78,9 +81,14 @@ class Settings(object):
         'koo.enable_event_filters': False,  # Not recommended for performance reasons
     }
 
-    # @brief Stores current settings in the appropiate config file.
     @staticmethod
     def saveToFile():
+        """
+        Stores current settings in the appropiate config file.
+        
+        :return: True
+        :rtype: bool
+        """
         if not Settings.rcFile:
             # If no file was specified we try to read it from environment
             # variable o standard path
@@ -100,7 +108,7 @@ class Settings(object):
 
                 # Do not store 'open' settings unless the 'always' flag is
                 # present.
-                value = Settings.options[option]
+                value = str(Settings.options[option])
                 if optionSection == 'open' and not Settings.value('open.always'):
                     value = ''
 
@@ -109,17 +117,19 @@ class Settings(object):
             # Set umask='077' to ensure file permissions used are '600'.
             # This way we can store passwords and other information safely.
             oldUmask = os.umask(63)
-            f = open(Settings.rcFile, 'wb')
             try:
-                parser.write(f)
-            except:
+                with open(Settings.rcFile, 'w') as f:
+                    parser.write(f)
+            except Exception as e:
                 Debug.warning('Unable to write config file %s !' %
                               Settings.rcFile)
+
             finally:
                 f.close()
             os.umask(oldUmask)
-        except:
+        except Exception as e:
             Debug.warning('Unable to write config file %s !' % Settings.rcFile)
+
         return True
 
     # @brief Loads settings from the appropiate config file.

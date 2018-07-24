@@ -26,7 +26,8 @@
 #
 ##############################################################################
 
-from PyQt4.QtGui import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
@@ -47,8 +48,7 @@ class CheckBoxFormWidget(AbstractFieldWidget):
         # occupy the space they need.
         layout.addStretch()
         self.installPopupMenu(self.widget)
-        self.connect(self.widget, SIGNAL(
-            'stateChanged(int)'), self.callModified)
+        self.widget.stateChanged[int].connect(self.callModified)
 
     def callModified(self, value):
         self.modified()
@@ -81,7 +81,7 @@ class BooleanFieldDelegate(AbstractFieldDelegate):
 
     def paint(self, painter, option, index):
         # Paint background
-        itemOption = QStyleOptionViewItemV4(option)
+        itemOption = QStyleOptionViewItem(option)
         QApplication.style().drawControl(QStyle.CE_ItemViewItem, itemOption, painter)
 
         # Paint CheckBox

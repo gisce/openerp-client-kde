@@ -28,6 +28,7 @@
 ##############################################################################
 
 from xml.parsers import expat
+from PyQt5.QtWidgets import *
 
 from .SearchWidgetFactory import *
 from .AbstractSearchWidget import *
@@ -35,8 +36,8 @@ from Koo.Common import Common
 from Koo.Common import Api
 from Koo import Rpc
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from Koo.Common.Ui import *
 
 

@@ -28,11 +28,12 @@
 ##############################################################################
 
 from Koo.Common import Common
+from PyQt5.QtWidgets import *
 from Koo.Common.Numeric import *
 
 from Koo.Search.AbstractSearchWidget import *
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from Koo.Common.Ui import *
 
 
@@ -48,8 +49,8 @@ class IntegerSearchWidget(AbstractSearchWidget):
         layout.addWidget(self.uiStart)
         layout.addWidget(label)
         layout.addWidget(self.uiEnd)
-        self.connect(self.uiStart, SIGNAL('returnPressed()'), self.calculate)
-        self.connect(self.uiEnd, SIGNAL('returnPressed()'), self.calculate)
+        self.uiStart.returnPressed.connect(self.calculate)
+        self.uiEnd.returnPressed.connect(self.calculate)
         self.focusWidget = self.uiStart
 
     def calculate(self):

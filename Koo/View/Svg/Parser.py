@@ -28,8 +28,8 @@
 from .SvgView import SvgView
 from Koo.View.AbstractParser import *
 from Koo.Fields.FieldWidgetFactory import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 from Koo.Common import Common
 

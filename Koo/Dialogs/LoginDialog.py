@@ -25,8 +25,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 from Koo.Common import Common
 from Koo.Common import Url
@@ -62,15 +63,12 @@ class LoginDialog(QDialog, LoginDialogUi):
         QTimer.singleShot(0, self.initGui)
 
     def initGui(self):
-        self.connect(self.pushCancel, SIGNAL("clicked()"), self.slotCancel)
-        self.connect(self.pushAccept, SIGNAL("clicked()"), self.slotAccept)
-        self.connect(self.pushChange, SIGNAL("clicked()"), self.slotChange)
-        self.connect(self.uiDatabase, SIGNAL(
-            'currentIndexChanged(int)'), self.checkWallet)
-        self.connect(self.pushCreateDatabase, SIGNAL(
-            "clicked()"), self.createDatabase)
-        self.connect(self.pushRestoreDatabase, SIGNAL(
-            "clicked()"), self.restoreDatabase)
+        self.pushCancel.clicked.connect(self.slotCancel)
+        self.pushAccept.clicked.connect(self.slotAccept)
+        self.pushChange.clicked.connect(self.slotChange)
+        self.uiDatabase.currentIndexChanged[int].connect(self.checkWallet)
+        self.pushCreateDatabase.clicked.connect(self.createDatabase)
+        self.pushRestoreDatabase.clicked.connect(self.restoreDatabase)
 
         uid = 0
         self.uiNoConnection.hide()
@@ -133,7 +131,7 @@ class LoginDialog(QDialog, LoginDialogUi):
 
     def checkWallet(self):
         if Common.isKdeAvailable:
-            from PyKDE4.kdeui import KWallet
+            from PyKDE5.kdeui import KWallet
             KWallet.Wallet.NetworkWallet()
             wallet = KWallet.Wallet.openWallet(
                 KWallet.Wallet.NetworkWallet(), self.winId())
@@ -197,7 +195,7 @@ class LoginDialog(QDialog, LoginDialogUi):
                         storeWallet = False
 
                 if storeWallet:
-                    from PyKDE4.kdeui import KWallet
+                    from PyKDE5.kdeui import KWallet
                     KWallet.Wallet.NetworkWallet()
                     wallet = KWallet.Wallet.openWallet(
                         KWallet.Wallet.NetworkWallet(), self.winId())

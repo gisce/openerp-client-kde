@@ -28,6 +28,7 @@
 ##############################################################################
 
 import gettext
+from PyQt5.QtWidgets import *
 from xml.parsers import expat
 
 from .ExportDialog import *
@@ -44,8 +45,8 @@ from Koo.Fields.FieldDelegateFactory import *
 from Koo.Model.KooModel import KooModel
 from Koo.Model.Group import *
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 # @brief The TreeParser class parses the arch (XML) of tree views.
@@ -93,6 +94,11 @@ class TreeParser:
 
 
 class TreeWidget(QWidget, TreeWidgetUi):
+    shortcutsChanged = pyqtSignal()
+
+    closed = pyqtSignal()
+    shortcutsChanged = pyqtSignal()
+
     def __init__(self, view, model, domain=None, context=None, name=False, parent=None):
         QWidget.__init__(self, parent)
         TreeWidgetUi.__init__(self)
@@ -172,8 +178,7 @@ class TreeWidget(QWidget, TreeWidgetUi):
         self.uiTree.setModel(self.treeModel)
         self.uiList.setModel(self.listModel)
 
-        self.connect(self.uiTree, SIGNAL(
-            'activated( QModelIndex )'), self.open)
+        self.uiTree.activated[QModelIndex].connect(self.open)
 
         for column in range(len(parser.fieldsOrder)):
             fieldName = parser.fieldsOrder[column]
@@ -188,22 +193,15 @@ class TreeWidget(QWidget, TreeWidgetUi):
         self.treeState = {}
         if self.toolbar:
             # Save index states if we're showing uiList widget only, otherwise we don't need it.
-            self.connect(self.uiTree, SIGNAL(
-                'expanded( QModelIndex )'), self.saveIndexState)
-            self.connect(self.uiTree, SIGNAL(
-                'collapsed( QModelIndex )'), self.saveIndexState)
+            self.uiTree.expanded[QModelIndex].connect(self.saveIndexState)
+            self.uiTree.collapsed[QModelIndex].connect(self.saveIndexState)
 
-        self.connect(self.pushShortcuts, SIGNAL(
-            'clicked()'), self.editShortcuts)
-        self.connect(self.pushAddShortcut, SIGNAL(
-            'clicked()'), self.addShortcut)
-        self.connect(self.pushRemoveShortcut, SIGNAL(
-            'clicked()'), self.removeShortcut)
-        self.connect(self.pushExpand, SIGNAL('clicked()'), self.expand)
-        self.connect(self.uiShortcuts, SIGNAL(
-            'activated(QModelIndex)'), self.goToShortcut)
-        self.connect(self.uiList.selectionModel(), SIGNAL(
-            'currentChanged(QModelIndex, QModelIndex)'), self.mainMenuClicked)
+        self.pushShortcuts.clicked.connect(self.editShortcuts)
+        self.pushAddShortcut.clicked.connect(self.addShortcut)
+        self.pushRemoveShortcut.clicked.connect(self.removeShortcut)
+        self.pushExpand.clicked.connect(self.expand)
+        self.uiShortcuts.activated[QModelIndex].connect(self.goToShortcut)
+        self.uiList.selectionModel().currentChanged[QModelIndex, QModelIndex].connect(self.mainMenuClicked)
 
         if name:
             self.name = name
@@ -258,7 +256,8 @@ class TreeWidget(QWidget, TreeWidgetUi):
         item = self.uiList.currentIndex()
         if not item.isValid():
             return
-        id = item.data(Qt.UserRole).toInt()[0]
+        value = item.data(Qt.UserRole)
+        id = value if isinstance(value, int) else item.data(Qt.UserRole).toInt()[0]
         if not id:
             return
         m = self.group[id]
@@ -299,7 +298,7 @@ class TreeWidget(QWidget, TreeWidgetUi):
             # kept in sync.
             if self.model == 'ir.ui.menu':
                 self.shortcutsGroup.update()
-                self.emit(SIGNAL('shortcutsChanged'), self.model)
+                self.shortcutsChanged.emit(self.model)
         except Rpc.RpcException as e:
             pass
         QApplication.restoreOverrideCursor()
@@ -341,7 +340,7 @@ class TreeWidget(QWidget, TreeWidgetUi):
         Rpc.session.execute('/object', 'execute',
                             'ir.ui.view_sc', 'unlink', [id], self.context)
         self.shortcutsGroup.update()
-        self.emit(SIGNAL('shortcutsChanged'), self.model)
+        self.shortcutsChanged.emit(self.model)
 
     def editShortcuts(self):
         domain = [('user_id', '=', Rpc.session.uid),
@@ -362,7 +361,7 @@ class TreeWidget(QWidget, TreeWidgetUi):
             Rpc.session.execute('/object', 'execute', 'ir.ui.view_sc', 'create', {
                                 'resource': self.model, 'user_id': uid, 'res_id': id, 'name': name}, self.context)
         self.shortcutsGroup.update()
-        self.emit(SIGNAL('shortcutsChanged'), self.model)
+        self.shortcutsChanged.emit(self.model)
 
     def goToShortcut(self, index):
         id = self.currentShortcutId()
@@ -403,8 +402,8 @@ class TreeWidget(QWidget, TreeWidgetUi):
         item = self.uiShortcuts.currentIndex()
         if not item.isValid():
             return None
-        id = item.data(Qt.UserRole).toInt()[0]
-        return id
+        ident = item.data(Qt.UserRole)
+        return ident
 
     # There's no reason why a menu can't be closed, is it?
     def canClose(self):
@@ -426,7 +425,8 @@ class TreeWidget(QWidget, TreeWidgetUi):
         if not settings:
             return
         header = self.uiTree.header()
-        header.restoreState(QByteArray.fromBase64(settings))
+        ba = QByteArray(settings.encode('utf-8'))
+        header.restoreState(QByteArray.fromBase64(ba))
 
     def actions(self):
         return []

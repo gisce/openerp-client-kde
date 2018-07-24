@@ -28,6 +28,7 @@
 ##############################################################################
 
 from xml.parsers import expat
+from PyQt5.QtWidgets import *
 
 import sys
 import gettext
@@ -40,8 +41,8 @@ from Koo.Common import Common
 from Koo.Common import Api
 from Koo import Rpc
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from Koo.Common.Ui import *
 
 
@@ -154,6 +155,45 @@ class SearchFormParser(object):
 
 class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
     # @brief Constructs a new SearchFormWidget.
+    performSearch = pyqtSignal()
+    keyDownPressed = pyqtSignal()
+
+    # @xtorello 2review slot?
+    # @pyqtSlot()
+    def search(self):
+        if self.isCustomSearch():
+            # Do not emit the signal if the server raises an exception with the search
+            # which unfortunately can happen in some cases such as some searches with properties.
+            # (ie. [('property_product_pricelist.name','ilike','a')])
+            value = self.value()
+            proxy = Rpc.RpcProxy(self.model, useExecute=False)
+            try:
+                proxy.search(value, 0, False, False, Rpc.session.context)
+            except Rpc.RpcException as e:
+                number = 0
+                for item in value:
+                    if not isinstance(item, tuple):
+                        continue
+
+                    valid = True
+                    try:
+                        self.uiCustomContainer.setItemValid
+                        proxy.search([item], 0, False, False,
+                                     Rpc.session.context)
+                    except Rpc.RpcException as e:
+                        valid = False
+
+                    self.uiCustomContainer.setItemValid(number, valid)
+                    number += 1
+
+                QMessageBox.warning(self, _('Search Error'), _(
+                    'Some items of custom search cannot be used. Please, change those in red and try again.'))
+                return
+
+            self.uiCustomContainer.setAllItemsValid(True)
+
+        self.performSearch.emit()
+
     def __init__(self, parent=None):
         AbstractSearchWidget.__init__(self, '', parent)
         SearchFormWidgetUi.__init__(self)
@@ -191,15 +231,14 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
         self.pushSave.hide()
         self.uiStoredFilters.hide()
 
-        self.connect(self.pushExpander, SIGNAL(
-            'clicked()'), self.toggleExpansion)
-        self.connect(self.pushClear, SIGNAL('clicked()'), self.clear)
-        self.connect(self.pushSearch, SIGNAL('clicked()'), self.search)
-        self.connect(self.pushSwitchView, SIGNAL('clicked()'), self.toggleView)
-        self.connect(self.actionSave, SIGNAL('triggered()'), self.save)
-        self.connect(self.actionManage, SIGNAL('triggered()'), self.manage)
-        self.connect(self.uiStoredFilters, SIGNAL(
-            'currentIndexChanged(int)'), self.setStoredFilter)
+        self.pushExpander.clicked.connect(self.toggleExpansion)
+        self.pushClear.clicked.connect(self.clear)
+        self.pushSearch.clicked.connect(self.search)
+        self.pushSwitchView.clicked.connect(self.toggleView)
+        self.actionSave.triggered.connect(self.save)
+        self.actionManage.triggered.connect(self.manage)
+        self.uiStoredFilters.currentIndexChanged[int].connect(self.setStoredFilter)
+
 
     def setStoredFilter(self, index):
         if index >= 0:
@@ -292,8 +331,7 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
 
         self.widgets = parser.parse(xml)
         for widget in list(self.widgets.values()):
-            self.connect(widget, SIGNAL('keyDownPressed()'),
-                         self, SIGNAL('keyDownPressed()'))
+            widget.keyDownPressed.connect(self.keyDownPressed)
 
         for x in domain:
             if len(x) >= 2 and x[0] in self.widgets and x[1] == '=':
@@ -320,40 +358,6 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):
             self.search()
-
-    def search(self):
-        if self.isCustomSearch():
-            # Do not emit the signal if the server raises an exception with the search
-            # which unfortunately can happen in some cases such as some searches with properties.
-            # (ie. [('property_product_pricelist.name','ilike','a')])
-            value = self.value()
-            proxy = Rpc.RpcProxy(self.model, useExecute=False)
-            try:
-                proxy.search(value, 0, False, False, Rpc.session.context)
-            except Rpc.RpcException as e:
-                number = 0
-                for item in value:
-                    if not isinstance(item, tuple):
-                        continue
-
-                    valid = True
-                    try:
-                        self.uiCustomContainer.setItemValid
-                        proxy.search([item], 0, False, False,
-                                     Rpc.session.context)
-                    except Rpc.RpcException as e:
-                        valid = False
-
-                    self.uiCustomContainer.setItemValid(number, valid)
-                    number += 1
-
-                QMessageBox.warning(self, _('Search Error'), _(
-                    'Some items of custom search cannot be used. Please, change those in red and try again.'))
-                return
-
-            self.uiCustomContainer.setAllItemsValid(True)
-
-        self.emit(SIGNAL('search()'))
 
     # @brief Shows Search and Clear buttons.
     def showButtons(self):
@@ -409,15 +413,21 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
         for x in list(self.widgets.values()):
             x.clear()
 
-    # @brief Returns a domain-like list for the current search parameters.
-    #
-    # Note you can optionally give a 'domain' parameter which will be added to
-    # the filters the widget will return.
+
     def value(self, domain=[]):
+        """
+        Returns a domain-like list for the current search parameters.
+
+        Note you can optionally give a 'domain' parameter which will be added to
+        the filters the widget will return.
+        :param domain:
+        :return:
+        """
+
         index = self.uiStoredFilters.currentIndex()
         if index > 0:
-            id = self.uiStoredFilters.itemData(index).toInt()[0]
-            storedDomain = eval(self._storedFilters[id]['domain'])
+            ident = self.uiStoredFilters.itemData(index).toInt()[0]
+            storedDomain = eval(self._storedFilters[ident]['domain'])
             domain = domain + storedDomain
 
         if self.pushSwitchView.isChecked():

@@ -26,12 +26,12 @@
 #
 ##############################################################################
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 
 try:
-    from PyQt4.QtWebKit import *
-
+    from PyQt5.QtWebKitWidgets import QWebPage, QWebView
     isHelpWidgetAvailable = True
 except:
     isHelpWidgetAvailable = False
@@ -54,7 +54,7 @@ if isHelpWidgetAvailable:
                 self.page().networkAccessManager())
             self.page().setNetworkAccessManager(self.manager)
             self.page().setLinkDelegationPolicy(QWebPage.DelegateExternalLinks)
-            self.connect(self, SIGNAL('linkClicked(QUrl)'), self.openLink)
+            self.linkClicked[QUrl].connect(self.openLink)
 
             # Determine appropiate position for the popup
             screenHeight = QApplication.desktop().screenGeometry().height()

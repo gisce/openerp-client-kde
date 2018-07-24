@@ -31,6 +31,7 @@
 
 # Added so py2exe properly packs xml.etree.ElementTree
 from xml.etree.ElementTree import parse, SubElement
+from PyQt5.QtWidgets import *
 
 import sys
 import os
@@ -69,8 +70,8 @@ Localization.initializeTranslations(Settings.value('client.language'))
 
 imports = {}
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common import Notifier, Common
 from Koo.Common import DBus
 
@@ -84,8 +85,8 @@ Notifier.lostConnectionErrorHandler = Common.lostConnectionError
 
 # Main application loop
 if Common.isKdeAvailable:
-    from PyKDE4.kdecore import ki18n, KAboutData, KCmdLineArgs
-    from PyKDE4.kdeui import KApplication
+    from PyKDE5.kdecore import ki18n, KAboutData, KCmdLineArgs
+    from PyKDE5.kdeui import KApplication
 
     appName = "Koo"
     catalog = ""
@@ -150,11 +151,11 @@ class KooApi(Api.KooApi):
     def createWindow(self, view_ids, model, res_id=False, domain=None,
                      view_type='form', window=None, context=None, mode=None, name=False, autoReload=False,
                      target='current'):
-        WindowService.createWindow(view_ids, model, res_id, domain,
+        createWindow(view_ids, model, res_id, domain,
                                    view_type, window, context, mode, name, autoReload, target)
 
     def createWebWindow(self, url, title):
-        WindowService.createWebWindow(url, title)
+        createWebWindow(url, title)
 
     def windowCreated(self, window, target):
         win.addWindow(window, target)

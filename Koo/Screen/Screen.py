@@ -27,6 +27,7 @@
 ##############################################################################
 
 import xml.dom.minidom
+from PyQt5.QtWidgets import *
 
 from Koo.Rpc import RpcProxy
 from Koo import Rpc
@@ -39,8 +40,8 @@ from Koo.Common import Common
 from Koo.Common.Settings import *
 from Koo.Common.ViewSettings import *
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 from Koo.Search import SearchFormWidget
 from Koo.Plugins import *
@@ -49,24 +50,37 @@ from .Action import *
 from .ViewQueue import *
 
 
-# @brief The Screen class is a widget that provides an easy way of handling multiple views.
-#
-# This class is capable of managing various views of the same model and provides
-# functions for moving to the next and previous record.
-#
-# If neither setViewTypes() nor setViewIds() are called, form and tree views (in this order)
-# will be used. If you use only a single 'id' and say it's a 'tree', one you try to switchView
-# the default 'form' view will be shown. If you only want to show the 'tree' view, use
-# setViewTypes( [] ) or setViewTypes( ['tree'] )
-# When you add a new view by it's ID the type of the given view is removed from the list of
-# view types. (See: addViewById() )
-#
-# A Screen can emit four different signals:
-#   activated() -> Emited each time a record is activated (such as a double click on a list).
-#   closed() -> Emited when a view asks for the screen to be closed (such as a 'close' button on a form).
-#   currentChanged() -> Emited when the current record has been modified.
-#   recordMessage(int,int,int) -> Emited each time the current record changes (such as moving to previous or next).
 class Screen(QScrollArea):
+    """
+    The Screen class is a widget that provides an easy way of handling
+    multiple views.
+
+    This class is capable of managing various views of the same model and
+    provides functions for moving to the next and previous record.
+
+    If neither setViewTypes() nor setViewIds() are called, form and tree views
+    (in this order) will be used. If you use only a single 'id' and say it's a
+    'tree', one you try to switchView the default 'form' view will be shown. If
+    you only want to show the 'tree' view, use setViewTypes( [] ) or
+    setViewTypes( ['tree'] )
+
+    When you add a new view by it's ID the type of the given view is removed
+    from the list of view types. (See: addViewById() )
+
+    A Screen can emit four different signals:
+        activated() -> Emited each time a record is activated (such as a
+        double click on a list).
+        closed() -> Emited when a view asks for the screen to be closed (such
+        as a 'close' button on a form).
+        currentChanged() -> Emited when the current record has been modified.
+        recordMessage(int,int,int) -> Emited each time the current record
+        changes (such as moving to previous or next).
+    """
+    activated = pyqtSignal()
+    closed = pyqtSignal()
+    currentChangedSignal = pyqtSignal()
+    recordMessage = pyqtSignal(int, int, int)
+    statusMessage = pyqtSignal('QString')
 
     def __init__(self, parent=None):
         QScrollArea.__init__(self, parent)
@@ -81,9 +95,9 @@ class Screen(QScrollArea):
         self.container.show()
 
         self.searchForm = SearchFormWidget(self.container)
-        self.connect(self.searchForm, SIGNAL('search()'), self.search)
-        self.connect(self.searchForm, SIGNAL(
-            'keyDownPressed()'), self.setFocusToView)
+        # @xtorello toreview
+        self.searchForm.performSearch.connect(self.search)
+        self.searchForm.keyDownPressed.connect(self.setFocusToView)
         self.searchForm.hide()
         self.containerView = None
 
@@ -124,6 +138,25 @@ class Screen(QScrollArea):
         # The first time Screen is shown it will try to setCurrentRecord
         # if none is selected.
         self._firstTimeShown = True
+
+        # @xtorello toreview signal to method integration
+        self.currentChangedSignal.connect(self.currentChanged)
+
+    def save(self):
+        """
+        Dummy save
+        :return: None
+        :rtype: None
+        """
+        pass
+
+    def cancel(self):
+        """
+        Dummy cancel
+        :return: None
+        :rtype: No
+        """
+        pass
 
     def showEvent(self, event):
         if self._firstTimeShown:
@@ -293,12 +326,9 @@ class Screen(QScrollArea):
     # @brief Sets the current widget of the Screen
     def setView(self, widget):
         if self.containerView:
-            self.disconnect(self.containerView, SIGNAL(
-                "activated()"), self.activate)
-            self.disconnect(self.containerView, SIGNAL(
-                "currentChanged(PyQt_PyObject)"), self.currentChanged)
-            self.disconnect(self.containerView, SIGNAL(
-                "statusMessage(QString)"), self, SIGNAL("statusMessage(QString)"))
+            self.containerView.activated.disconnect(self.activate)
+            self.containerView.currentChanged['PyQt_PyObject'].disconnect(self.currentChanged)
+            self.containerView.statusMessage['QString'].disconnect(self.statusMessage['QString'])
             self.containerView.hide()
 
         self.containerView = widget
@@ -307,11 +337,10 @@ class Screen(QScrollArea):
         # form it produces an ugly flickering.
         self.loadSearchForm()
         self.containerView.show()
-        self.connect(widget, SIGNAL("activated()"), self.activate)
-        self.connect(widget, SIGNAL(
-            "currentChanged(PyQt_PyObject)"), self.currentChanged)
-        self.connect(widget, SIGNAL("statusMessage(QString)"),
-                     self, SIGNAL("statusMessage(QString)"))
+        # @xtorello toreview zzz
+        widget.activated.connect(self.activate)
+        widget.currentChanged['PyQt_PyObject'].connect(self.currentChanged)
+        widget.statusMessage['QString'].connect(self.statusMessage['QString'])
 
         # Set focus proxy so other widgets can try to setFocus to us
         # and the focus is set to the expected widget.
@@ -321,10 +350,13 @@ class Screen(QScrollArea):
         self.updateGeometry()
 
     def activate(self):
-        self.emit(SIGNAL('activated()'))
+        self.activated.emit()
 
     def close(self):
-        self.emit(SIGNAL('closed()'))
+        # @xtorello @xbarnada TODO revisar si hi ha canvis pendents d'aplicar abans de tancar
+        ## veure FormWidget.canClose / modifiedSave
+        print ("tancant")
+        self.closed.emit()
 
     # @brief Searches with the current parameters of the search form and loads the
     # models that fit the criteria.
@@ -356,14 +388,20 @@ class Screen(QScrollArea):
             self.searchForm.setEnabled(True)
 
     # Slot to recieve the signal from a view when the current item changes
+    @pyqtSlot()
     def currentChanged(self, model):
         self.setCurrentRecord(model)
-        self.emit(SIGNAL('currentChanged()'))
+        self.currentChanged.emit()
         self.updateSearchFormStatus()
 
-    # @brief Sets the RecordGroup this Screen should show.
-    # @param group RecordGroup object.
     def setRecordGroup(self, group):
+        """
+        @brief Sets the RecordGroup this Screen should show.
+
+        :param group: group RecordGroup object
+        :return: None
+        :rtype: None
+        """
         if not group:
             self.group = None
             self._currentRecord = None
@@ -398,8 +436,12 @@ class Screen(QScrollArea):
         else:
             self._firstTimeShown = True
 
-    # @brief Returns a reference the current record (Record).
     def currentRecord(self):
+        """
+        Returns a reference the current record (Record).
+        :return:
+        """
+
         # Checking _currentRecordPosition before count() can save a search() call to the server because
         # count() will execute a search() in the server if no items have been loaded yet. What happens is
         # that the first time a screen with a TreeView is shown currentRecord() will be called but there
@@ -420,10 +462,15 @@ class Screen(QScrollArea):
             # fields haven't been created yet??)
             return self._currentRecord
 
-    # @brief Sets the current record.
-    #
-    # Note that value will be a reference to the Record.
     def setCurrentRecord(self, value):
+        """
+        Sets the current record.
+
+        Note that value will be a reference to the Record.
+        :param value:
+        :return:
+        """
+
         if self.group and self.group.recordExists(value):
             pos = self.group.indexOfRecord(value)
         else:
@@ -446,14 +493,19 @@ class Screen(QScrollArea):
             count = self.group.count()
         else:
             count = 0
-        self.emit(SIGNAL('recordMessage(int,int,int)'), pos, count, id)
+        self.recordMessage.emit(pos, count, id)
         if self._currentRecord:
             if self.currentView():
                 self.currentView().setSelected(self._currentRecord)
 
-    # @brief Switches the current view to the previous one. If viewType (such as 'calendar')
-    # is given it will switch to that view type.
     def switchView(self, viewType=None):
+        """
+        Switches the current view to the previous one. If viewType (such as 'calendar')
+        is given it will switch to that view type.
+        :param viewType:
+        :return:
+        """
+
         if self.currentView():
             self.currentView().store()
 
@@ -603,7 +655,7 @@ class Screen(QScrollArea):
         self.actions = ActionFactory.create(self, actions, self.resource)
         if self.actions:
             for action in self.actions:
-                self.connect(action, SIGNAL('triggered()'), self.triggerAction)
+                action.triggered.connect(self.triggerAction)
             # If there's only one action it will be the 'Print Screen' action
             # that is added "manually" by ActionFactory. In those cases in which
             # Print Screen is the only action we won't show it in the toolbar. We
@@ -665,15 +717,18 @@ class Screen(QScrollArea):
     def setOnWriteFunction(self, functionName):
         self.group.setOnWriteFunction(functionName)
 
-    # @brief Stores all modified models.
     def save(self):
+        """
+        Stores all modified models.
+        :return:
+        """
         if not self.currentRecord():
             return False
         self.currentView().store()
 
-        id = False
+        ident = False
         if self.currentRecord().validate():
-            id = self.currentRecord().save(reload=True)
+            ident = self.currentRecord().save(reload=True)
         else:
             self.currentView().display(self.currentRecord(), self.group)
             return False
@@ -681,7 +736,7 @@ class Screen(QScrollArea):
         if self.currentView().showsMultipleRecords():
             for record in self.group.modifiedRecords():
                 if record.validate():
-                    id = record.save(reload=True)
+                    ident = record.save(reload=True)
                 else:
                     self.setCurrentRecord(record)
                     self.display()
@@ -689,7 +744,7 @@ class Screen(QScrollArea):
             self.display()
 
         self.display()
-        return id
+        return ident
 
     # @brief Reload current model and refreshes the view.
     #
@@ -746,14 +801,19 @@ class Screen(QScrollArea):
                 self.setCurrentRecord(None)
             self.display()
 
-    # @brief Returns a reference to the current view.
     def currentView(self):
+        """
+        Returns a reference to the current view.
+
+        :return:
+        """
+
         if self._currentView < 0:
             return None
         type = self._viewQueue.typeFromIndex(self._currentView)
         if not type in self.views:
-            (id, type) = self._viewQueue.viewFromType(type)
-            self.addViewByIdAndType(id, type)
+            (ident, type) = self._viewQueue.viewFromType(type)
+            self.addViewByIdAndType(ident, type)
         return self.views[type]
 
     # @brief Returns a dictionary with all field values for the current record.
@@ -774,11 +834,16 @@ class Screen(QScrollArea):
         else:
             return self.currentRecord().isModified()
 
-    # @brief Removes all selected ids.
-    #
-    # If unlink is False (the default) records are only removed from the list. If
-    # unlink is True records will be removed from the server too.
     def remove(self, unlink=False):
+        """
+        Removes all selected ids.
+
+        :param unlink: If unlink is False (the default) records are only removed
+        from the list.
+        :type unlink: bool
+        :return:If unlink is True records will be removed from the server too.
+        :rtype: bool
+        """
         records = self.selectedRecords()
         if unlink and records:
             # Remove records with id None as they would cause an exception
@@ -798,10 +863,10 @@ class Screen(QScrollArea):
                     return False
 
         if records:
-            # Set no current record, so refreshes in the middle of the removal process
-            # (caused by signals) do not crash.
-            # Note that we want to ensure there are ids to remove so we don't setCurrentRecord(None)
-            # if it's not strictly necessary.
+            # Set no current record, so refreshes in the middle of the removal
+            # process (caused by signals) do not crash.
+            # Note that we want to ensure there are ids to remove so we don't
+            # setCurrentRecord(None) if it's not strictly necessary.
             idx = self._currentRecordPosition
             self.setCurrentRecord(None)
             self.group.remove(records)
@@ -829,6 +894,14 @@ class Screen(QScrollArea):
     # @brief Displays the record with id 'id' or refreshes the current record if
     # no id is given.
     def display(self, id=None):
+        """
+        Displays the record with id 'id' or refreshes the current record if
+        no id is given.
+
+        :param id:
+        :return:
+        """
+
         if id:
             self.setCurrentRecord(self.group[id])
         if self.views:
@@ -868,13 +941,18 @@ class Screen(QScrollArea):
             self.currentRecord().setValidate()
         self.display()
 
-    # @brief Returns all selected record ids.
-    #
-    # Note that if there are new unsaved records, they might all have
-    # ID=None. You're probably looking for selectedRecords() function.
-    #
-    # @see selectedRecords
+
     def selectedIds(self):
+        """
+        Returns all selected record ids.
+
+        Note that if there are new unsaved records, they might all have
+        ID=None. You're probably looking for selectedRecords() function.
+
+        see selectedRecords
+        :return:
+        """
+
         records = self.currentView().selectedRecords()
         ids = [record.id for record in records]
         return ids

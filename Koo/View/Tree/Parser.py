@@ -34,8 +34,8 @@ from Koo.Model import KooModel
 
 from .TreeView import *
 from Koo.Common.Ui import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 from Koo.Fields.FieldWidgetFactory import *
 from Koo.Fields.FieldDelegateFactory import *

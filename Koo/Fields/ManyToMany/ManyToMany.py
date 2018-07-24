@@ -26,8 +26,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo.Common import Api
@@ -53,31 +54,45 @@ class ManyToManyFieldWidget(AbstractFieldWidget, ManyToManyFieldWidgetUi):
 
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
-        self.connect(self.pushAdd, SIGNAL("clicked()"), self.slotAdd)
-        self.connect(self.pushRemove, SIGNAL("clicked()"), self.remove)
-        self.connect(self.uiText, SIGNAL('editingFinished()'), self.match)
+        self.pushAdd.clicked.connect(self.slotAdd)
+        self.pushRemove.clicked.connect(self.remove)
+        self.uiText.editingFinished.connect(self.match)
 
         self.scSearch = QShortcut(self.uiText)
         self.scSearch.setKey(Shortcuts.SearchInField)
         self.scSearch.setContext(Qt.WidgetShortcut)
-        self.connect(self.scSearch, SIGNAL('activated()'), self.add)
+        self.scSearch.activated.connect(self.add)
 
         self.scClear = QShortcut(self.screen)
         self.scClear.setKey(Shortcuts.ClearInField)
         self.scClear.setContext(Qt.WidgetWithChildrenShortcut)
-        self.connect(self.scClear, SIGNAL('activated()'), self.remove)
+        self.scClear.activated.connect(self.remove)
 
-        self.connect(self.screen, SIGNAL('activated()'), self.open)
+        self.screen.activated.connect(self.open)
 
-        self.connect(self.pushBack, SIGNAL("clicked()"), self.previous)
-        self.connect(self.pushForward, SIGNAL("clicked()"), self.__next__)
-        self.connect(self.screen, SIGNAL(
-            'recordMessage(int,int,int)'), self.setLabel)
+        self.pushBack.clicked.connect(self.previous)
+        self.pushForward.clicked.connect(self.__next__)
+        self.screen.recordMessage[int, int, int].connect(self.setLabel)
 
         self.installPopupMenu(self.uiText)
         self.old = None
         self.latestMatch = None
         self.searching = False
+
+    def save(self):
+        """
+        Dumb method
+        :return: None
+        :rtype: None
+        """
+        pass
+
+    def cancel(self):
+        """
+        Dumb method
+        :return: None
+        :rtype: None
+        """
 
     def initGui(self):
         if self.record:

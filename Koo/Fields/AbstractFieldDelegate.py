@@ -26,9 +26,10 @@
 ##############################################################################
 
 from Koo import Rpc
+from PyQt5.QtWidgets import *
 from .FieldPreferencesDialog import *
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 # @brief AbstractFieldDelegate is the base class for all delegates used in Koo.
 # Delegates are used by editable lists but could be used by any Model/View based
@@ -97,7 +98,7 @@ class AbstractFieldDelegate(QStyledItemDelegate):
             if title:
                 item = QAction(title, menu)
                 if slot:
-                    self.connect(item, SIGNAL("triggered()"), slot)
+                    item.triggered.connect(slot)
                 item.setEnabled(enabled)
                 menu.addAction(item)
             else:

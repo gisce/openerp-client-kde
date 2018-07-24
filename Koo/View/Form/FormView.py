@@ -27,6 +27,7 @@
 ##############################################################################
 
 import os
+from PyQt5.QtWidgets import *
 import re
 import tempfile
 
@@ -36,8 +37,8 @@ from Koo import Rpc
 
 from Koo.View.AbstractView import *
 from Koo.Fields.AbstractFieldWidget import *
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 # @brief The FormTabWidget class is the widget used instead of QTabWidget in forms.
 #
@@ -85,6 +86,13 @@ class FormContainer(QWidget):
             self.tabWidget.setTabValid(self.tabWidget.indexOf(self), value)
 
     def isValid(self, record):
+        """
+        Chacks if the record data is valid
+
+        :param record: Record to check
+        :return: True if is valid
+        :rtype: bool
+        """
         valid = True
         if not record:
             return valid
@@ -104,10 +112,6 @@ class FormContainer(QWidget):
     def addWidget(self, widget, attributes=None, labelText=None):
         if attributes is None:
             attributes = {}
-        if widget.inherits('AbstractFieldWidget'):
-            self.fieldWidgets.append(widget)
-        if widget.inherits('FormContainer'):
-            self.containerWidgets.append(widget)
 
         colspan = int(attributes.get('colspan', 1))
         helpText = attributes.get('help', False)
@@ -154,8 +158,7 @@ class FormContainer(QWidget):
 
             label.setText(str(
                 '<small><a style="color: %s" href="help">?</a></small> %s' % (color, labelText)))
-            self.connect(label, SIGNAL(
-                'linkActivated(QString)'), widget.showHelp)
+            label.linkActivated['QString'].connect(widget.showHelp)
 
             self.layout.addWidget(label, self.row, self.column)
             self.column = self.column + 1
@@ -174,6 +177,11 @@ class FormContainer(QWidget):
 
 
 class FormView(AbstractView):
+    # @xtorello toreview
+    activated = pyqtSignal()
+    currentChanged = pyqtSignal('PyQt_PyObject')
+    statusMessage = pyqtSignal('QString')
+
     def __init__(self, parent=None):
         AbstractView.__init__(self, parent)
         # We still depend on the parent being a screen because of ButtonFieldWidget
@@ -247,16 +255,12 @@ class FormView(AbstractView):
         # be reset to its previous state. Take a look at OneToMany implementation to see what's needed
         # in such buttons.
         if self.record:
-            self.disconnect(self.record, SIGNAL(
-                'recordChanged(PyQt_PyObject)'), self.updateDisplay)
-            self.disconnect(self.record, SIGNAL(
-                'setFocus(QString)'), self.setFieldFocus)
+            self.record.recordChanged['PyQt_PyObject'].disconnect(self.updateDisplay)
+            self.record.setFocus['QString'].disconnect(self.setFieldFocus)
         self.record = currentRecord
         if self.record:
-            self.connect(self.record, SIGNAL(
-                'recordChanged(PyQt_PyObject)'), self.updateDisplay)
-            self.connect(self.record, SIGNAL(
-                'setFocus(QString)'), self.setFieldFocus)
+            self.record.recordChanged['PyQt_PyObject'].connect(self.updateDisplay)
+            self.record.setFocus['QString'].connect(self.setFieldFocus)
         self.updateDisplay(self.record)
 
     def setFieldFocus(self, fieldName):
@@ -358,7 +362,8 @@ class FormView(AbstractView):
         if not settings:
             return
         splitters = self.findChildren(QSplitter)
-        data = QByteArray.fromBase64(settings)
+        ba = QByteArray(settings.encode('utf-8'))
+        data = QByteArray.fromBase64(ba)
         stream = QDataStream(data)
         for x in splitters:
             if stream.atEnd():

@@ -26,11 +26,11 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyKDE4.kdecore import *
-from PyKDE4.kdeui import *
-from PyKDE4.plasma import *
-from PyKDE4.plasmascript import Runner
+from PyQt5.QtCore import *
+from PyKDE5.kdecore import *
+from PyKDE5.kdeui import *
+from PyKDE5.plasma import *
+from PyKDE5.plasmascript import Runner
 
 from Koo import Rpc
 from Koo.Common.Settings import Settings
@@ -41,6 +41,12 @@ import re
 import math
 import subprocess
 
+
+try:
+    QString = unicode
+except NameError:
+    # Python 3
+    QString = str
 
 class KooRunner(Runner):
     def __init__(self, parent, args=None):

@@ -25,8 +25,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 import re
 from Koo.Common import Common
@@ -78,8 +79,8 @@ class ServerConfigurationDialog(QDialog, ServerConfigurationDialogUi):
             self.uiConnection.addItem(
                 _("Pyro SSL (faster)"), QVariant('PYROLOCSSL'))
         result = False
-        self.connect(self.pushCancel, SIGNAL("clicked()"), self.reject)
-        self.connect(self.pushAccept, SIGNAL("clicked()"), self.slotAccept)
+        self.pushCancel.clicked.connect(self.reject)
+        self.pushAccept.clicked.connect(self.slotAccept)
 
     def setUrl(self, url):
         self.url = url
@@ -93,10 +94,10 @@ class ServerConfigurationDialog(QDialog, ServerConfigurationDialogUi):
     def slotAccept(self):
         url = QUrl(self.url)
         protocol = str(self.uiConnection.itemData(
-            self.uiConnection.currentIndex()).toString())
+            self.uiConnection.currentIndex()))
         url.setScheme(protocol)
         url.setHost(self.uiServer.text())
-        url.setPort(int(self.uiPort.text().toInt()[0]))
+        url.setPort(int(self.uiPort.text()))
         if url.isValid():
             # Store default settings
             Settings.setValue('login.url', str(url.toString()))

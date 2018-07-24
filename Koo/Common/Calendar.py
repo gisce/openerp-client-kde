@@ -35,8 +35,9 @@
 #
 # Also a calendar popup is provided for use in widgets.
 #
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from .Ui import *
 import math
 import locale
@@ -264,6 +265,8 @@ def storageToDateTime(text):
 class PopupCalendarWidget(QWidget, PopupCalendarUi):
     # @brief Constructs a PopupCalendarWidget.
     # If showTime is True, the user will be able to select the time too.
+    selected = pyqtSignal()
+
     def __init__(self, parent, showTime=False):
         QWidget.__init__(self, parent)
         PopupCalendarUi.__init__(self)
@@ -273,8 +276,7 @@ class PopupCalendarWidget(QWidget, PopupCalendarUi):
         if self.showTime:
             self.uiTime.setText(textToDateTime(
                 str(parent.text())).time().toString())
-            self.connect(self.uiTime, SIGNAL(
-                'returnPressed()'), self.storeOnParent)
+            self.uiTime.returnPressed.connect(self.storeOnParent)
         else:
             self.uiTime.hide()
             self.labelTime.hide()
@@ -293,8 +295,7 @@ class PopupCalendarWidget(QWidget, PopupCalendarUi):
             newY = QApplication.desktop().availableGeometry().bottom() - self.height()
         self.move(newX, newY)
 
-        self.connect(self.uiCalendar, SIGNAL(
-            'activated(QDate)'), self.storeOnParent)
+        self.uiCalendar.activated[QDate].connect(self.storeOnParent)
         if self.showTime:
             self.uiCalendar.setSelectedDate(
                 textToDateTime(parent.text()).date())
@@ -319,5 +320,5 @@ class PopupCalendarWidget(QWidget, PopupCalendarUi):
             else:
                 text = text + ' ' + '00:00:00'
         self.parent().setText(text)
-        self.emit(SIGNAL('selected()'))
+        self.selected.emit()
         self.close()

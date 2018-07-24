@@ -31,6 +31,7 @@
 
 # Added so py2exe properly packs xml.etree.ElementTree
 from xml.etree.ElementTree import parse, SubElement
+from PyQt5.QtWidgets import *
 
 import sys
 import os
@@ -69,8 +70,8 @@ Localization.initializeTranslations(Settings.value('client.language'))
 
 imports = {}
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common import Notifier, Common
 from Koo.Common import DBus
 
@@ -82,8 +83,8 @@ Notifier.concurrencyErrorHandler = Common.concurrencyError
 
 # Main application loop
 if Common.isKdeAvailable:
-    from PyKDE4.kdecore import ki18n, KAboutData, KCmdLineArgs
-    from PyKDE4.kdeui import KApplication
+    from PyKDE5.kdecore import ki18n, KAboutData, KCmdLineArgs
+    from PyKDE5.kdeui import KApplication
 
     appName = "Koo"
     catalog = ""
@@ -138,7 +139,7 @@ if Settings.value('koo.show_pos_toolbar'):
 
         actionNew = QAction(mainWindow)
         actionNew.setIcon(QIcon(':/images/new.png'))
-        QObject.connect(actionNew, SIGNAL('triggered()'), executeNew)
+        actionNew.triggered.connect(executeNew)
         toolBar.addAction(actionNew)
 
     if Settings.value('koo.show_pos_button_switch_view', True):
@@ -148,8 +149,7 @@ if Settings.value('koo.show_pos_toolbar'):
 
         actionSwitchView = QAction(mainWindow)
         actionSwitchView.setIcon(QIcon(':/images/switch_view.png'))
-        QObject.connect(actionSwitchView, SIGNAL(
-            'triggered()'), executeSwitchView)
+        actionSwitchView.triggered.connect(executeSwitchView)
         toolBar.addAction(actionSwitchView)
 
     mainWindow.addToolBar(Qt.LeftToolBarArea, toolBar)

@@ -26,7 +26,8 @@
 #
 ##############################################################################
 
-from PyQt4.QtGui import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
@@ -44,8 +45,7 @@ class BooleanFieldWidget(AbstractFieldWidget):
         layout.addWidget(self.widget)
         layout.setAlignment(Qt.AlignLeft)
         self.installPopupMenu(self.widget)
-        self.connect(self.widget, SIGNAL(
-            'stateChanged(int)'), self.callModified)
+        self.widget.stateChanged[int].connect(self.callModified)
 
     def callModified(self, value):
         self.modified()
@@ -79,7 +79,7 @@ class BooleanFieldDelegate(AbstractFieldDelegate):
 
     def paint(self, painter, option, index):
         # Paint background
-        itemOption = QStyleOptionViewItemV4(option)
+        itemOption = QStyleOptionViewItem(option)
         # Last parameter (None) shouldn't be necessary but we put it to workaround a bug in
         # KStyle which expects always four parameters, wheareas QStyle makes it optional.
         QApplication.style().drawControl(QStyle.CE_ItemViewItem, itemOption, painter, None)
@@ -87,7 +87,7 @@ class BooleanFieldDelegate(AbstractFieldDelegate):
         # Paint CheckBox
         op = QStyleOptionButton()
         op.rect = option.rect
-        value = index.data(Qt.DisplayRole).toBool()
+        value = index.data(Qt.DisplayRole)
         if value:
             op.state = QStyle.State_On
         else:

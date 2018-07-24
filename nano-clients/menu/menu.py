@@ -29,6 +29,7 @@
 
 
 from Koo.Common import Localization
+from PyQt5.QtWidgets import *
 Localization.initializeTranslations()
 
 from Koo import Rpc
@@ -37,7 +38,7 @@ from Koo.Model.Group import *
 from Koo.Model.KooModel import *
 
 import sys
-from PyQt4.QtGui import *
+from PyQt5.QtGui import *
 
 
 class MenuDialog(QDialog):
@@ -131,7 +132,7 @@ class MenuDialog(QDialog):
         #widget.setViewMode( QListView.IconMode )
         #widget.setGridSize( QSize( 100, 100 ) )
         layout.addWidget(widget)
-        layout.setMargin(0)
+        layout.setContentsMargins(0, 0, 0, 0)
         widget.setModel(self.model)
 
 

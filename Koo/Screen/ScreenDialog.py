@@ -26,8 +26,9 @@
 ##############################################################################
 
 from Koo.Common.Ui import *
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 
 from Koo.Common import Common
 
@@ -47,8 +48,8 @@ class ScreenDialog(QDialog, ScreenDialogUi):
         self.setMinimumWidth(800)
         self.setMinimumHeight(600)
 
-        self.connect(self.pushOk, SIGNAL("clicked()"), self.accepted)
-        self.connect(self.pushCancel, SIGNAL("clicked()"), self.rejected)
+        self.pushOk.clicked.connect(self.accepted)
+        self.pushCancel.clicked.connect(self.rejected)
         self.group = None
         self.record = None
         self.recordId = None
@@ -56,16 +57,31 @@ class ScreenDialog(QDialog, ScreenDialogUi):
         self._context = {}
         self._domain = []
 
-    def setup(self, model, id=None):
+    def save(self):
+        """
+        Dumy save method
+
+        :return: None
+        """
+        pass
+
+    def cancel(self):
+        """
+        Dumy cancel method
+        :return:
+        """
+        pass
+
+    def setup(self, model, ident=None):
         if self.group:
             return
         self.group = RecordGroup(model, context=self._context)
         self.group.setDomain(self._domain)
         self.screen.setRecordGroup(self.group)
         self.screen.setViewTypes(['form'])
-        if id:
+        if ident:
             self._recordAdded = False
-            self.screen.load([id])
+            self.screen.load([ident])
         else:
             self._recordAdded = True
             self.screen.new()

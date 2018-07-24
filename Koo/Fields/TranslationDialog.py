@@ -26,8 +26,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo import Rpc
@@ -54,7 +55,7 @@ class TranslationDialog(QDialog, TranslationDialogUi):
         TranslationDialogUi.__init__(self)
         self.setupUi(self)
 
-        self.connect(self.pushAccept, SIGNAL('clicked()'), self.slotAccept)
+        self.pushAccept.clicked.connect(self.slotAccept)
         self.id = id
         self.model = model
         self.fieldName = fieldName

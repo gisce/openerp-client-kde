@@ -25,8 +25,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 from .ServerConfigurationDialog import *
 from Koo.Common.Settings import *
@@ -42,9 +43,9 @@ class AdministratorPasswordDialog(QDialog, AdministratorPasswordDialogUi):
         AdministratorPasswordDialogUi.__init__(self)
         self.setupUi(self)
 
-        self.connect(self.pushChange, SIGNAL('clicked()'), self.slotChange)
-        self.connect(self.pushAccept, SIGNAL('clicked()'), self.slotAccept)
-        self.connect(self.pushCancel, SIGNAL('clicked()'), self.reject)
+        self.pushChange.clicked.connect(self.slotChange)
+        self.pushAccept.clicked.connect(self.slotAccept)
+        self.pushCancel.clicked.connect(self.reject)
 
         url = QUrl(Settings.value('login.url'))
         url.setUserName('')

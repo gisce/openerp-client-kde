@@ -26,23 +26,27 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
+from PyQt5.QtCore import *
 from Koo.Rpc import RpcProxy, Rpc
 from Koo import Rpc
 import base64
 from Koo.Common import Numeric
 
 
-class StringField:
+class StringField(object):
     def __init__(self, parent, attrs):
         self.parent = parent
         self.attrs = attrs
         self.name = attrs['name']
 
-    # This function is in charge of executing "on_change" and
-    # "change_defalt" events and setting the appropiate record
-    # as modified.
     def changed(self, record):
+        """
+        This function is in charge of executing "on_change" and "change_defalt"
+        events and setting the appropiate record as modified.
+
+        :param record:
+        :return:
+        """
         record.modified = True
         record.modified_fields.setdefault(self.name)
         record.changed()
@@ -65,10 +69,15 @@ class StringField:
             context.update(fieldContext)
         return context
 
-    # Checks if the current value is valid and sets stateAttributes on the record.
-    #
-    # Here it's checked if the field is required but is empty.
     def validate(self, record):
+        """
+        Checks if the current value is valid and sets stateAttributes on the record.
+
+        Here it's checked if the field is required but is empty.
+        :param record:
+        :return:
+        """
+
         ok = True
         # We ensure that the field is read-write. In some cases there might be
         # forms in which a readonly field is marked as required. For example,
@@ -81,8 +90,18 @@ class StringField:
         record.setFieldValid(self.name, ok)
         return ok
 
-    # Stores the value from the server
     def set(self, record, value, test_state=True, modified=False):
+        """
+        Stores the value from the server
+
+        :param record:
+        :type record: Record
+        :param value:
+        :param test_state:
+        :param modified:
+        :return: None
+        :rtype: None
+        """
         record.values[self.name] = value
         if modified:
             record.modified = True
@@ -92,15 +111,29 @@ class StringField:
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         return record.values.get(self.name, False)
 
-    # Stores the value for the client widget
     def set_client(self, record, value, test_state=True):
+        """
+        Stores the value for the client widget
+
+        :param record:
+        :type record: Record
+        :param value:
+        :param test_state:
+        :return: None
+        :rtype: None
+        """
         internal = record.values.get(self.name, False)
-        self.set(record, value, test_state)
+        modified = (internal or False) != value
+        self.set(record, value, test_state, modified)
         if (internal or False) != (record.values.get(self.name, False) or False):
             self.changed(record)
 
-    # Returns the value for the client widget
     def get_client(self, record):
+        """
+        Returns the value for the client widget
+        :param record:
+        :return:
+        """
         return record.values.get(self.name, False)
 
     def setDefault(self, record, value):
@@ -181,7 +214,7 @@ class BinaryField(StringField):
             c.update(record.context())
             value = record.rpc.read([record.id], [self.name], c)[0][self.name]
             if value:
-                record.values[self.name] = base64.decodestring(value)
+                record.values[self.name] = base64.b64decode(value)
             else:
                 record.values[self.name] = ''
         return record.values[self.name]
@@ -198,6 +231,28 @@ class BinaryField(StringField):
                 record.values[self.sizeName] = ''
         if self.attrs.get('on_change', False):
             record.callOnChange(self.attrs['on_change'])
+
+    def validate(self, record):
+        """
+        Validates the binary field,it checks the field value or the field.size
+
+        :param record: Record to validate
+        :return: True if is valid
+        :rtype: bool
+        """
+        ok = True
+
+        # We ensure that the field is read-write. In some cases there might be
+        # forms in which a readonly field is marked as required. For example,
+        # banks some fields inside partner change readonlyness depending on the
+        # value of a selection field.
+
+        if not record.isFieldReadOnly(self.name):
+            if record.isFieldRequired(self.name):
+                if not record.values.get(self.name, record.values.get(self.sizeName)):
+                    ok = False
+        record.setFieldValid(self.name, ok)
+        return ok
 
 
 class BinarySizeField(StringField):
@@ -225,9 +280,11 @@ class FloatField(StringField):
         internal = record.values[self.name]
         self.set(record, value, test_state)
         digits = self.attrs.get('digits', (14, 2))
-        # Use floatToText as the comparison we inherited from the GTK client failed for us in some cases
-        # were python was considering the difference between 145,13 and 145,12 as 0,009999999 instead of 0,01
-        # Converting to string the numbers with the appropiate number of digits make it much easier.
+        # Use floatToText as the comparison we inherited from the GTK client
+        # failed for us in some cases were python was considering the difference
+        # between 145,13 and 145,12 as 0,009999999 instead of 0,01
+        # Converting to string the numbers with the appropiate number of
+        # digits make it much easier.
         if Numeric.floatToText(internal, digits) != Numeric.floatToText(record.values[self.name], digits):
             if not record.isFieldReadOnly(self.name):
                 self.changed(record)
@@ -254,6 +311,14 @@ class ManyToOneField(StringField):
         return False
 
     def get_client(self, record):
+        """
+        Returns the value of the record
+
+        :param record:
+        :type record: Record
+        :return:
+        """
+
         if record.values[self.name]:
             return record.values[self.name][1]
         return False
@@ -280,29 +345,38 @@ class ManyToOneField(StringField):
         if internal != record.values[self.name]:
             self.changed(record)
 
-# This is the base class for ManyToManyField and OneToManyField
-# The only difference between these classes is the 'get()' method.
-# In the case of ManyToMany we always return all elements because
-# it only stores the relation between two records which already exist.
-# In the case of OneToMany we only return those objects that have
-# been modified because the pointed object stores the relation to the
-# parent.
-
 
 class ToManyField(QObject, StringField):
+    """
+    This is the base class for ManyToManyField and OneToManyField
+    The only difference between these classes is the 'get()' method.
+    In the case of ManyToMany we always return all elements because
+    it only stores the relation between two records which already exist.
+    In the case of OneToMany we only return those objects that have
+    been modified because the pointed object stores the relation to the
+    parent.
+    """
+
     def __init__(self, parent, attrs):
-        QObject.__init__(self)
-        self.parent = parent
+        StringField.__init__(self,parent,attrs)
+        # QObject.__init__(self)
+        #super().__init__(parent,attrs)
+        #self.parent = parent
         self.attrs = attrs
         self.name = attrs['name']
 
     def create(self, record):
+        pass
+        # @xtorello toreview
+
         from Koo.Model.Group import RecordGroup
-        group = RecordGroup(resource=self.attrs['relation'], fields={
-        }, parent=record, context=self.context(record, eval=False))
+        group = RecordGroup(
+            resource=self.attrs['relation'], fields={}, parent=record,
+            context=self.context(record, eval=False)
+        )
         group.setDomainForEmptyGroup()
         group.tomanyfield = self
-        self.connect(group, SIGNAL('modified'), self.groupModified)
+        group.modified.connect(self.groupModified)
         return group
 
     def groupModified(self):
@@ -317,19 +391,21 @@ class ToManyField(QObject, StringField):
 
     def set(self, record, value, test_state=False, modified=False):
         from Koo.Model.Group import RecordGroup
-        # We can't add the context here as it might cause an infinite loop in some cases where
-        # a field of the parent appears in the context, and the parent is just being loaded.
-        # This has crashed when switching view of the 'account.invoice.line' one2many field
-        # in 'account.invoice' view.
+        # We can't add the context here as it might cause an infinite loop in
+        # some cases where a field of the parent appears in the context,
+        # and the parent is just being loaded.
+        # This has crashed when switching view of the 'account.invoice.line'
+        # one2many field in 'account.invoice' view.
         group = RecordGroup(resource=self.attrs['relation'], fields={
         }, parent=record, context=self.context(record, eval=False))
         group.tomanyfield = self
-        self.connect(group, SIGNAL('modified'), self.groupModified)
+        group.modified.connect(self.groupModified)
         group.setDomain([('id', 'in', value)])
         group.load(value)
         record.values[self.name] = group
         if modified:
             self.changed(record)
+
 
     def set_client(self, record, value, test_state=False):
         self.set(record, value, test_state=test_state)
@@ -347,6 +423,12 @@ class ToManyField(QObject, StringField):
 
 
 class OneToManyField(ToManyField):
+    # @xtorello toreview
+
+    def __init__(self, parent, attrs):
+        # QObject.__init__(self)
+        super().__init__(parent,attrs)
+
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         if not record.values[self.name]:
             return []
@@ -391,6 +473,8 @@ class OneToManyField(ToManyField):
 
 
 class ManyToManyField(ToManyField):
+    # @xtorello toreview
+
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         if not record.values[self.name]:
             return []
@@ -400,6 +484,7 @@ class ManyToManyField(ToManyField):
         if not record.values[self.name]:
             return []
         return record.values[self.name].ids()
+
 
 
 class ReferenceField(StringField):
@@ -437,13 +522,17 @@ class ReferenceField(StringField):
             record.modified_fields.setdefault(self.name)
 
 
-# @brief The FieldFactory class provides a means of creating the appropiate object
-#  to handle a given field type.
-#
-#  By default some classes exist for many file types
-#  but if you create new types or want to replace current implementations you can
-#  do it too.
+# @xtorello xxx
 class FieldFactory:
+    """
+    The FieldFactory class provides a means of creating the appropiate object
+    to handle a given field type.
+
+    By default some classes exist for many file types but if you create new
+    types or want to replace current implementations you can do it too.
+    """
+
+
     # The types property holds the class that will be called whenever a new
     #  object has to be created for a given field type.
     #  By default there's a number of field types but new ones can be easily
@@ -471,6 +560,9 @@ class FieldFactory:
         # We do not support relational fields treated as selection ones
         if fieldType == 'selection' and 'relation' in attributes:
             fieldType = 'many2one'
+
+        if fieldType == "one2many" or fieldType == "many2many":
+            return FieldFactory.types[fieldType](parent,attributes)
 
         if fieldType in FieldFactory.types:
             return FieldFactory.types[fieldType](parent, attributes)

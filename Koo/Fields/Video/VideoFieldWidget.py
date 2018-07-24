@@ -27,13 +27,14 @@
 
 
 from Koo.Common import Common
+from PyQt5.QtWidgets import *
 
 from Koo.Fields.AbstractFieldWidget import *
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 try:
-    from PyQt4.phonon import *
+    from PyQt5.phonon import *
     phononAvailable = True
 except:
     phononAvailable = False
@@ -62,17 +63,17 @@ class VideoFieldWidget(AbstractFieldWidget, VideoFieldWidgetUi):
 
         self.installPopupMenu(self.uiVideo)
 
-        self.connect(self.pushPlay, SIGNAL('clicked()'), self.play)
-        self.connect(self.pushPause, SIGNAL('clicked()'), self.pause)
-        self.connect(self.pushStop, SIGNAL('clicked()'), self.stop)
-        self.connect(self.pushLoad, SIGNAL('clicked()'), self.loadVideo)
-        self.connect(self.pushSave, SIGNAL('clicked()'), self.save)
-        self.connect(self.pushRemove, SIGNAL('clicked()'), self.remove)
+        self.pushPlay.clicked.connect(self.play)
+        self.pushPause.clicked.connect(self.pause)
+        self.pushStop.clicked.connect(self.stop)
+        self.pushLoad.clicked.connect(self.loadVideo)
+        self.pushSave.clicked.connect(self.save)
+        self.pushRemove.clicked.connect(self.remove)
 
     def loadVideo(self):
         try:
             filename = QFileDialog.getOpenFileName(
-                self, _('Select the file to attach'))
+                self, _('Select the file to attach'))[0]
             if filename.isNull():
                 return
             if self.isBinary():
@@ -86,7 +87,7 @@ class VideoFieldWidget(AbstractFieldWidget, VideoFieldWidgetUi):
                 self, _('Error'), _('Error reading the file'))
 
     def save(self):
-        filename = QFileDialog.getSaveFileName(self, _('Save as...'))
+        filename = QFileDialog.getSaveFileName(self, _('Save as...'))[0]
         try:
             if filename:
                 fp = file(filename, 'wb+')

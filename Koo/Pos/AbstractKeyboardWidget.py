@@ -16,8 +16,9 @@
 #   Free Software Foundation, Inc.,
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 
 # @brief The AbstactKeyboardWidget provides an abstract class for creating virtual
 # on-screen keyboards.
@@ -26,22 +27,24 @@ from PyQt4.QtGui import *
 class AbstractKeyboardWidget(QWidget):
     # @brief Creates a KeyboardWidget that will send keyboard events to it's parent. It will
     # also be positioned in the screen acording to its parent coordinates.
+    tabKeyPressed = pyqtSignal()
+
     def __init__(self, parent):
         QWidget.__init__(self, parent)
 
     # @brief Initializes keyboard by connecting buttons to slots. Setting window flags. And
     # positioning it in the screen.
     def init(self):
-        self.connect(self.pushEscape, SIGNAL('clicked()'), self.escape)
+        self.pushEscape.clicked.connect(self.escape)
         if hasattr(self, 'pushCaps'):
-            self.connect(self.pushCaps, SIGNAL('clicked()'), self.caps)
+            self.pushCaps.clicked.connect(self.caps)
         else:
             self.pushCaps = None
         buttons = self.findChildren(QPushButton)
         for button in buttons:
             if button in (self.pushCaps, self.pushEscape):
                 continue
-            self.connect(button, SIGNAL('clicked()'), self.clicked)
+            button.clicked.connect(self.clicked)
 
         self.setWindowFlags(Qt.Popup)
         self.setWindowModality(Qt.ApplicationModal)
@@ -89,7 +92,7 @@ class AbstractKeyboardWidget(QWidget):
         if key == Qt.Key_Tab:
             event = QKeyEvent(QEvent.KeyPress, key, Qt.NoModifier, text)
             QApplication.sendEvent(self.parent(), event)
-            self.emit(SIGNAL('tabKeyPressed'))
+            self.tabKeyPressed.emit()
             return
         event = QKeyEvent(QEvent.KeyPress, key, Qt.NoModifier, text)
         QApplication.sendEvent(self.parent(), event)

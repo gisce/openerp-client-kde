@@ -25,8 +25,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
 from Koo.Common import Api
@@ -52,13 +53,13 @@ class ButtonFieldWidget(AbstractFieldWidget):
         if 'icon' in attributes:
             self.button.setIcon(Icons.kdeIcon(attributes['icon']))
 
-        self.connect(self.button, SIGNAL('clicked()'), self.click)
+        self.button.clicked.connect(self.click)
 
     def addShortcut(self, keys):
         if not keys:
             return
         shortcut = QShortcut(QKeySequence(keys), self)
-        self.connect(shortcut, SIGNAL('activated()'), self.button.click)
+        shortcut.activated.connect(self.button.click)
 
     def executeButton(self, screen, id):
         type = self.attrs.get('type', 'workflow')

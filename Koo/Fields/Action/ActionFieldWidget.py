@@ -26,19 +26,19 @@
 #
 ##############################################################################
 
-
-import gettext
-from Koo.Common import Api
-from Koo.Common import Common
-
-
 from Koo.Screen.Screen import Screen
 from Koo.Model.Group import RecordGroup
 
-from Koo import Rpc
 import time
+import datetime
 from Koo.Dialogs.SearchDialog import SearchDialog
 from Koo.Fields.AbstractFieldWidget import *
+
+try:
+    QString = unicode
+except NameError:
+    # Python 3
+    QString = str
 
 (ActionFieldWidgetUi, ActionFieldWidgetBase) = loadUiType(Common.uiPath('paned.ui'))
 
@@ -70,6 +70,7 @@ class ActionFieldWidget(AbstractFieldWidget, ActionFieldWidgetUi):
                 'context', '{}'), self.context.copy()))
             a = self.context.copy()
             a['time'] = time
+            a['datetime'] = datetime
             self.domain = Rpc.session.evaluateExpression(
                 self.action['domain'], a)
 
@@ -88,6 +89,22 @@ class ActionFieldWidget(AbstractFieldWidget, ActionFieldWidgetUi):
                 pass  # TODO
         self.screen = None
 
+    def save(self):
+        """
+        Dumy save
+        :return: None
+        :rtype: None
+        """
+        pass
+
+    def cancel(self):
+        """
+        Dumy cancel
+        :return:None
+        :rtype: None
+        """
+        pass
+
     def createScreen(self):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
@@ -99,7 +116,7 @@ class ActionFieldWidget(AbstractFieldWidget, ActionFieldWidgetUi):
                 self.screen.setToolbarVisible(True)
             else:
                 self.screen.setToolbarVisible(False)
-            self.connect(self.screen, SIGNAL('activated()'), self.switch)
+            self.screen.activated.connect(self.switch)
             mode = (self.action['view_mode'] or 'form,tree').split(',')
             # if self.view_id:
             #self.screen.setViewIds( self.view_id )
@@ -111,9 +128,9 @@ class ActionFieldWidget(AbstractFieldWidget, ActionFieldWidgetUi):
             layout.setContentsMargins(0, 0, 0, 0)
             layout.addWidget(self.screen)
 
-            self.connect(self.pushSearch, SIGNAL('clicked()'), self.slotSearch)
-            self.connect(self.pushSwitchView, SIGNAL('clicked()'), self.switch)
-            self.connect(self.pushOpen, SIGNAL('clicked()'), self.slotOpen)
+            self.pushSearch.clicked.connect(self.slotSearch)
+            self.pushSwitchView.clicked.connect(self.switch)
+            self.pushOpen.clicked.connect(self.slotOpen)
 
             self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         except Rpc.RpcException as e:

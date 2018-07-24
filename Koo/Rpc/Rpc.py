@@ -26,9 +26,9 @@
 #
 ##############################################################################
 
-from PyQt4.QtCore import *
+from PyQt5.QtCore import *
 try:
-    from PyQt4.QtNetwork import *
+    from PyQt5.QtNetwork import *
     isQtNetworkAvailable = True
 except:
     isQtNetworkAvailable = False
@@ -53,6 +53,7 @@ import sys
 import os
 
 import traceback
+from gettext import gettext as _
 
 ConcurrencyCheckField = '__last_update'
 
@@ -69,7 +70,7 @@ class RpcProtocolException(RpcException):
     def __init__(self, backtrace):
         self.code = None
         self.args = (backtrace,)
-        self.info = str(str(backtrace), 'utf-8')
+        self.info = backtrace
         self.backtrace = backtrace
 
 
@@ -300,12 +301,13 @@ class XmlRpcConnection(Connection):
         self.url += '/xmlrpc'
 
     def call(self, obj, method, *args):
-        remote = xmlrpc.client.ServerProxy(self.url + obj)
+        remote = xmlrpc.client.ServerProxy(self.url + obj, allow_none=True)
         function = getattr(remote, method)
         try:
             if self.authorized:
                 result = function(self.databaseName, self.uid,
                                   self.password, *args)
+
             else:
                 result = function(*args)
         except socket.error as err:
@@ -333,6 +335,9 @@ def createConnection(url):
 
 
 class AsynchronousSessionCall(QThread):
+    exception = pyqtSignal('PyQt_PyObject')
+    called = pyqtSignal('PyQt_PyObject')
+
     def __init__(self, session, parent=None):
         QThread.__init__(self, parent)
         self.session = session.copy()
@@ -356,7 +361,7 @@ class AsynchronousSessionCall(QThread):
         self.obj = obj
         self.method = method
         self.args = args
-        self.connect(self, SIGNAL('finished()'), self.hasFinished)
+        self.finished.connect(self.hasFinished)
         self.start()
 
     def call(self, callback, obj, method, *args):
@@ -366,7 +371,7 @@ class AsynchronousSessionCall(QThread):
         self.obj = obj
         self.method = method
         self.args = args
-        self.connect(self, SIGNAL('finished()'), self.hasFinished)
+        self.finished.connect(self.hasFinished)
         self.start()
 
     def hasFinished(self):
@@ -380,9 +385,9 @@ class AsynchronousSessionCall(QThread):
                     Notifier.notifyWarning(*self.warning)
                 else:
                     raise self.exception
-            self.emit(SIGNAL('exception(PyQt_PyObject)'), self.exception)
+            self.exception.emit(self.exception)
         else:
-            self.emit(SIGNAL('called(PyQt_PyObject)'), self.result)
+            self.called.emit(self.result)
 
         if self.callback:
             self.callback(self.result, self.exception)
@@ -442,68 +447,97 @@ class Session:
         self.cache = None
         self.threads = []
 
-    # This function removes all finished threads from the list of running
-    # threads and appends the one provided.
-    # We keep a reference to all threads started because otherwise their
-    # C++ counterparts would be freed by garbage collector. User can also
-    # keep a reference to it when she calls callAsync or executeAsync but
-    # with this mechanism she's not forced to it.
-    # The only inconvenience we could find is that we kept some thread
-    # objects for much too long in memory, but that doesn't seem worrisome
-    # by now.
+
     def appendThread(self, thread):
+        """
+        This function removes all finished threads from the list of running
+        threads and appends the one provided.
+        We keep a reference to all threads started because otherwise their
+        C++ counterparts would be freed by garbage collector. User can also
+        keep a reference to it when she calls callAsync or executeAsync but
+        with this mechanism she's not forced to it.
+        The only inconvenience we could find is that we kept some thread
+        objects for much too long in memory, but that doesn't seem worrisome
+        by now.
+
+        :param thread:
+        :return: None
+        :rtype: None
+        """
         self.threads = [x for x in self.threads if x.isRunning()]
         self.threads.append(thread)
 
-    # @brief Calls asynchronously the specified method on the given object on the server.
-    #
-    # When the response to the request arrives the callback function is called with the
-    # returned value as the first parameter. It returns an AsynchronousSessionCall instance
-    # that can be used to keep track to what query a callback refers to, consider that as
-    # a call id.
-    # If there is an error during the call it simply rises an exception. See
-    # execute() if you want exceptions to be handled by the notification mechanism.
-    # @param callback Function that has to be called when the result returns from the server.
-    # @param exceptionCallback Function that has to be called when an exception returns from the server.
-    # @param obj Object name (string) that contains the method
-    # @param method Method name (string) to call
-    # @param args Argument list for the given method
-    #
-    # Example of usage:
-    # \code
-    # from Koo import Rpc
-    # def returned(self, value):
-    # 	print value
-    # Rpc.session.login('http://admin:admin\@localhost:8069', 'database')
-    # Rpc.session.post( returned, '/object', 'execute', 'ir.attachment', 'read', [1,2,3])
-    # Rpc.session.logout()
-    # \endcode
+
     def callAsync(self, callback, obj, method, *args):
+        """
+        Calls asynchronously the specified method on the given object on the
+        server.
+
+        When the response to the request arrives the callback function is
+        called with the returned value as the first parameter. It returns an
+        AsynchronousSessionCall instance that can be used to keep track to what
+        query a callback refers to, consider that as a call id.
+        If there is an error during the call it simply rises an exception. See
+        execute() if you want exceptions to be handled by the notification
+        mechanism.
+
+        Example of usage:
+            from Koo import Rpc
+            def returned(self, value):
+                print value
+            Rpc.session.login('http://admin:admin\@localhost:8069', 'database')
+            Rpc.session.post( returned, '/object', 'execute', 'ir.attachment', 'read', [1,2,3])
+            Rpc.session.logout()
+
+        :param callback: Function that has to be called when the result returns
+        from the server.
+        :param obj: Object name (string) that contains the method
+        :type obj: str
+        :param method: Method name (string) to call
+        :type method: str
+        :param exceptionCallback: Function that has to be called when an
+        exception returns from the server.
+        :param args: Argument list for the given method
+        :return:
+        """
         caller = AsynchronousSessionCall(self)
         caller.call(callback, obj, method, *args)
         self.appendThread(caller)
         return caller
 
-    # @brief Same as callAsync() but uses the notify mechanism to notify
-    # exceptions.
-    #
-    # Note that you'll need to bind gettext as texts sent to
-    # the notify module are localized.
     def executeAsync(self, callback, obj, method, *args):
+        """
+        Same as callAsync() but uses the notify mechanism to notify exceptions.
+
+        Note that you'll need to bind gettext as texts sent to
+        the notify module are localized.
+        :param callback:
+        :param obj:
+        :param method:
+        :param args:
+        :return:
+        """
         caller = AsynchronousSessionCall(self)
         caller.execute(callback, obj, method, *args)
         self.appendThread(caller)
         return caller
 
-    # @brief Calls the specified method
-    # on the given object on the server.
-    #
-    # If there is an error during the call it simply rises an exception. See
-    # execute() if you want exceptions to be handled by the notification mechanism.
-    # @param obj Object name (string) that contains the method
-    # @param method Method name (string) to call
-    # @param args Argument list for the given method
+
     def call(self, obj, method, *args):
+        """
+        Calls the specified method on the given object on the server.
+
+        If there is an error during the call it simply rises an exception. See
+        execute() if you want exceptions to be handled by the notification
+        mechanism.
+
+        :param obj: Object name (string) that contains the method
+        :type obj: str
+        :param method: Method name to call
+        :type method: str
+        :param args: Argument list for the given method
+        :return:
+        """
         if not self.open:
             raise RpcException(_('Not logged in'))
         if self.cache:
@@ -514,12 +548,18 @@ class Session:
             self.cache.add(value, obj, method, *args)
         return value
 
-    # @brief Same as call() but uses the notify mechanism to notify
-    # exceptions.
-    #
-    # Note that you'll need to bind gettext as texts sent to
-    # the notify module are localized.
     def execute(self, obj, method, *args):
+        """
+        Same as call() but uses the notify mechanism to notify exceptions.
+
+        Note that you'll need to bind gettext as texts sent to the notify
+        module are localized.
+
+        :param obj:
+        :param method:
+        :param args:
+        :return:
+        """
         count = 1
         while True:
             try:
@@ -542,12 +582,18 @@ class Session:
                 raise
             count += 1
 
-    # @brief Logs in the given server with specified name and password.
-    # @param url url string such as 'http://admin:admin\@localhost:8069'.
-    # Admited protocols are 'http', 'https' and 'socket'
-    # @param db string with the database name
-    # Returns Session.Exception, Session.InvalidCredentials or Session.LoggedIn
     def login(self, url, db):
+        """
+        Logs in the given server with specified name and password.
+
+        :param url: Admited protocols are 'http', 'https' and 'socket'
+        url string such as 'http://admin:admin\@localhost:8069'.
+        :type url: str
+        :param db: string with the database name
+        :type db: str
+        :return:
+        :raises: Session.Exception, Session.InvalidCredentials or Session.LoggedIn
+        """
         url = QUrl(url)
         _url = str(url.scheme()) + '://' + \
             str(url.host()) + ':' + str(url.port())
@@ -580,19 +626,30 @@ class Session:
         self.reloadContext()
         return Session.LoggedIn
 
-    # @brief Reloads the session context
-    #
-    # Useful when some user parameters such as language are changed.
+
     def reloadContext(self):
+        """
+        Reloads the session context
+
+        Useful when some user parameters such as language are changed.
+        :return:
+        """
         self.context = self.execute(
             '/object', 'execute', 'res.users', 'context_get') or {}
 
-    # @brief Returns whether the login function has been called and was successfull
     def logged(self):
+        """
+        Returns whether the login function has been called and was successfull
+        :return:
+        """
         return self.open
 
-    # @brief Logs out of the server.
     def logout(self):
+        """
+        Logs out of the server.
+        :return: None
+        :rtype: None
+        """
         if self.open:
             self.open = False
             self.userName = None
@@ -602,9 +659,15 @@ class Session:
             if self.cache:
                 self.cache.clear()
 
-    # @brief Uses eval to evaluate the expression, using the defined context
-    # plus the appropiate 'uid' in it.
     def evaluateExpression(self, expression, context=None):
+        """
+        Uses eval to evaluate the expression, using the defined context plus
+        the appropiate 'uid' in it.
+
+        :param expression:
+        :param context:
+        :return:
+        """
         if context is None:
             context = {}
         context['uid'] = self.uid
@@ -637,13 +700,20 @@ class Session:
 session = Session()
 session.cache = ActionViewCache()
 
-# @brief The Database class handles queries that don't require a previous login, served by the db server object
-
 
 class Database:
-    # @brief Obtains the list of available databases from the given URL. None if there
-    # was an error trying to fetch the list.
+    """
+    The Database class handles queries that don't require a previous login,
+    served by the db server object
+    """
+
     def list(self, url):
+        """
+        Obtains the list of available databases from the given URL. None if
+        there was an error trying to fetch the list.
+        :param url:
+        :return:
+        """
         try:
             call = self.call(url, 'list')
         except RpcServerException as e:
@@ -658,16 +728,26 @@ class Database:
         finally:
             return call
 
-    # @brief Calls the specified method
-    # on the given object on the server. If there is an error
-    # during the call it simply rises an exception
     def call(self, url, method, *args):
+        """
+        Calls the specified method on the given object on the server. If there
+        is an error during the call it simply rises an exception
+        :param url:
+        :param method:
+        :param args:
+        :return:
+        """
         con = createConnection(url)
         return con.call('/db', method, *args)
 
-    # @brief Same as call() but uses the notify mechanism to notify
-    # exceptions.
     def execute(self, url, method, *args):
+        """
+        Same as call() but uses the notify mechanism to notify exceptions.
+        :param url:
+        :param method:
+        :param args:
+        :return:
+        """
         res = False
         try:
             res = self.call(url, method, *args)
@@ -678,13 +758,17 @@ class Database:
 
 database = Database()
 
-# @brief The RpcProxy class allows wrapping a server object only by giving it's name.
-#
-# For example:
-# obj = RpcProxy('ir.values')
+
 
 
 class RpcProxy(object):
+    """
+    The RpcProxy class allows wrapping a server object only by giving it's
+    name.
+
+    For example:
+    obj = RpcProxy('ir.values')
+    """
     def __init__(self, resource, useExecute=True):
         self.resource = resource
         self.__attrs = {}
@@ -711,10 +795,15 @@ class RpcFunction(object):
 
 
 if isQtNetworkAvailable:
-    # @brief RpcReply class extends QNetworkReply and adds a new 'openerp://' protocol to access content through the current Rpc.session connection.
-    #
-    # URL should be of the form openerp://res.model/function/path_sent_to_the_function
+
     class RpcReply(QNetworkReply):
+        """
+        RpcReply class extends QNetworkReply and adds a new
+        'openerp://' protocol to access content through the current Rpc.session
+        connection.
+
+        URL should be of the form openerp://res.model/function/path_sent_to_the_function
+        """
         def __init__(self, parent, url, operation):
             QNetworkReply.__init__(self, parent)
 
@@ -780,8 +869,12 @@ if isQtNetworkAvailable:
                 self.offset = end
                 return data
 
-    # @brief RpcNetworkAccessManager class extends QNetworkAccessManager and adds a new 'openerp://' protocol to access content through the current Rpc.session connection.
     class RpcNetworkAccessManager(QNetworkAccessManager):
+        """
+        RpcNetworkAccessManager class extends QNetworkAccessManager and adds
+        a new 'openerp://' protocol to access content through the current
+        Rpc.session connection.
+        """
         def __init__(self, oldManager):
             QNetworkAccessManager.__init__(self)
             self.oldManager = oldManager
