@@ -62,13 +62,17 @@ def error(text):
     except:
         print("Error trying to print error message.")
 
-# The DebugEventFilter class has been used to find a problem with an invisible
-# widget that was created, not inserted in any layout and that didn't allow to
-# click widgets below it. I'm leaving the code by now as it might be useful in the
-# future. Simply uncommenting the installEventFilter line will do.
+#
 
 
 class DebugEventFilter(QObject):
+    """
+    The DebugEventFilter class has been used to find a problem with an
+    invisible widget that was created, not inserted in any layout and that
+    didn't allow to click widgets below it. I'm leaving the code by now as it
+    might be useful in the future. Simply uncommenting the installEventFilter
+    line will do.
+    """
     def __init__(self, parent=None):
         QObject.__init__(self, parent)
 
@@ -126,8 +130,12 @@ def installExceptionHook():
 
 
 def debug_trace():
-    '''Set a tracepoint in the Python debugger that works with Qt.
-    Removes "QCoreApplication::exec: The event loop is already running" messages while in pdb'''
+    """
+    Set a tracepoint in the Python debugger that works with Qt.
+    Removes "QCoreApplication::exec: The event loop is already running"
+    messages while in pdb
+    :return:
+    """
     from PyQt5.QtCore import pyqtRemoveInputHook
     from pdb import set_trace
     pyqtRemoveInputHook()

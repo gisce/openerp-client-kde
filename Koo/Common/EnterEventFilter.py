@@ -19,21 +19,34 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
-# @brief The EnterEventFilter class provides an eventFilter that treats
-# Enter key events as if they were Tab Key hits. Exceptions are buttons
-# (in which it's replaced with space) and QTextEdits in which it's the event
-# is sent as is.
-#
-# To install it in an application use 'app.installEventFilter( Koo.Common.EnterEventFilter( mainWindow ) )'
+# @brief
 
 
 class EnterEventFilter(QObject):
-    # @brief Creates a new EnterEventFilter object.
+    """
+    The EnterEventFilter class provides an eventFilter that treats
+    Enter key events as if they were Tab Key hits. Exceptions are buttons
+    (in which it's replaced with space) and QTextEdits in which it's the event
+    is sent as is.
+
+    To install it in an application use 'app.installEventFilter
+    ( Koo.Common.EnterEventFilter( mainWindow ) )'
+    """
+
     def __init__(self, parent=None):
+        """
+        Creates a new EnterEventFilter object.
+        :param parent:
+        """
         QObject.__init__(self, parent)
 
-    # @brief Reimplements eventFilter() to send the Tab Key press
     def eventFilter(self, obj, event):
+        """
+        Reimplements eventFilter() to send the Tab Key press
+        :param obj:
+        :param event:
+        :return:
+        """
         if event.type() in (QEvent.KeyPress, QEvent.KeyRelease) and event.key() in (Qt.Key_Return, Qt.Key_Enter):
             if isinstance(obj, QPushButton) or isinstance(obj, QToolButton):
                 event = QKeyEvent(event.type(), Qt.Key_Space, event.modifiers(

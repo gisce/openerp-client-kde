@@ -505,6 +505,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
                 Settings.loadFromServer()
                 if Settings.value('koo.stylesheet_code'):
                     QApplication.instance().setStyleSheet(Settings.value('koo.stylesheet_code'))
+                print("cache enabled:{}".format(Settings.value('koo.use_cache')))
                 if Settings.value('koo.use_cache'):
                     Rpc.session.cache = Rpc.Cache.ActionViewCache()
                 else:

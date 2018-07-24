@@ -40,10 +40,12 @@ from Koo.Common import Icons
 from Koo.Screen.Screen import Screen
 from Koo.Model.Group import RecordGroup
 
-# @brief The WizardPage class shows a QDialog with the information givenin one wizard step.
-
 
 class WizardPage(QDialog):
+    """
+    The WizardPage class shows a QDialog with the information givenin one
+    wizard step.
+    """
     def __init__(self, arch, fields, state, name, datas, parent=None):
         QDialog.__init__(self, parent)
         self.setModal(True)
@@ -112,10 +114,11 @@ class WizardPage(QDialog):
 
     def cancel(self):
         pass
-# @brief The Wizard class shows a step by step wizard with the provided information.
-
 
 class Wizard(QObject):
+    """
+    The Wizard class shows a step by step wizard with the provided information.
+    """
     def __init__(self, action, datas, state='init', parent=None, context=None):
         QObject.__init__(self, parent)
         if context is None:
@@ -187,10 +190,17 @@ class Wizard(QObject):
             self.state = res['state']
         self.step()
 
-# @brief Executes the wizard with the provided information.
-
 
 def execute(action, datas, state='init', parent=None, context=None):
+    """
+    Executes the wizard with the provided information.
+    :param action:
+    :param datas:
+    :param state:
+    :param parent:
+    :param context:
+    :return:
+    """
     if context is None:
         context = {}
     w = Wizard(action, datas, state, parent, context)

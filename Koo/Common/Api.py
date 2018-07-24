@@ -25,39 +25,91 @@
 #
 ##############################################################################
 
-# @brief KooApi class provides an interface several Koo components relay on being
-# available for their proper use.
-
 
 class KooApi(object):
-    # @brief Executes the given actionId (which can be a report, keword, etc.).
+    """
+    KooApi class provides an interface several Koo components relay on being
+    available for their proper use.
+    """
     def execute(self, actionId, data={}, type=None, context={}):
+        """
+        Executes the given actionId (which can be a report, keword, etc.).
+        :param actionId:
+        :param data:
+        :param type:
+        :param context:
+        :return:
+        """
         pass
 
-    # @brief Executes the server action to open a report.
     def executeReport(self, name, data={}, context={}):
+        """
+        Executes the server action to open a report.
+        :param name:
+        :param data:
+        :param context:
+        :return:
+        """
         return True
 
-    # @brief Executes the given server action (which can ba report, keyword, etc.).
     def executeAction(self, action, data={}, context={}):
+        """
+        Executes the given server action (which can ba report, keyword, etc.).
+        :param action:
+        :param data:
+        :param context:
+        :return:
+        """
         pass
 
-    # @brief Executes the given server keyword action.
     def executeKeyword(self, keyword, data={}, context={}):
+        """
+        Executes the given server keyword action.
+        :param keyword:
+        :param data:
+        :param context:
+        :return:
+        """
         return False
 
-    # @brief Opens a new window (a new tab with Koo application) with the given model.
     def createWindow(self, view_ids, model, res_id=False, domain=None,
-                     view_type='form', window=None, context=None, mode=None, name=False, autoReload=False,
-                     target='current'):
+                     view_type='form', window=None, context=None, mode=None,
+                     name=False, autoReload=False, target='current'):
+        """
+        Opens a new window (a new tab with Koo application) with the given
+        model.
+        :param view_ids:
+        :param model:
+        :param res_id:
+        :param domain:
+        :param view_type:
+        :param window:
+        :param context:
+        :param mode:
+        :param name:
+        :param autoReload:
+        :param target:
+        :return:
+        """
         pass
 
-    # @brief Opens a new window (a new tab with Koo application) with the given url.
     def createWebWindow(self, url, title):
+        """
+        Opens a new window (a new tab with Koo application) with the given url.
+        :param url:
+        :param title:
+        :return:
+        """
         pass
 
-    # @brief This callback function is (should be) executed each time a new window (tab in Koo) is opened.
     def windowCreated(self, window, target):
+        """
+        This callback function is (should be) executed each time a new window
+        (tab in Koo) is opened.
+        :param window:
+        :param target:
+        :return:
+        """
         pass
 
 

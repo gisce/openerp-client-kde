@@ -28,11 +28,15 @@
 import os
 import sys
 
-# @brief This helper function searches all available modules in a given directory.
-# It's used to scan the Plugins, Fields, View and Search directories.
-
 
 def scan(module, directory):
+    """
+    This helper function searches all available modules in a given directory.
+    It's used to scan the Plugins, Fields, View and Search directories.
+    :param module:
+    :param directory:
+    :return:
+    """
     pluginImports = __import__(module, globals(), locals())
     # Check if it's being run using py2exe or py2app environment
     frozen = getattr(sys, 'frozen', None)

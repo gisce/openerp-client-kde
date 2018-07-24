@@ -27,24 +27,30 @@
 
 from Koo import Rpc
 
-# @brief ViewSettings class allows storing and retrieving of view state
-# information such as column size and ordering in QListViews and the such.
-#
-# Settings are stored as a string (not unicode) and in most cases
-# end up converted to/from a QByteArray; hence the need of ensuring
-# we use str instead of unicode. That's why we enforce str() in a
-# couple of places.
-
 
 class ViewSettings:
+    """
+    ViewSettings class allows storing and retrieving of view state
+    information such as column size and ordering in QListViews and the such.
+
+    Settings are stored as a string (not unicode) and in most cases
+    end up converted to/from a QByteArray; hence the need of ensuring
+    we use str instead of unicode. That's why we enforce str() in a
+    couple of places.
+    """
     cache = {}
     databaseName = None
     uid = None
     hasSettingsModule = True
 
-    # @brief Stores settings for the given view id.
     @staticmethod
     def store(id, settings):
+        """
+        Stores settings for the given view id.
+        :param id:
+        :param settings:
+        :return:
+        """
         if not id:
             return
 
@@ -89,9 +95,14 @@ class ViewSettings:
                 'data': settings
             })
 
-    # @brief Loads information for the given view id.
+    # @brief
     @staticmethod
     def load(id):
+        """
+        Loads information for the given view id.
+        :param id:
+        :return:
+        """
         if not id:
             return None
 
@@ -130,17 +141,23 @@ class ViewSettings:
 
         return settings
 
-    # @brief Checks if connection has changed and clears cache and hasSettingsModule flag
     @staticmethod
     def checkConnection():
+        """
+        Checks if connection has changed and clears cache and hasSettingsModule flag
+        :return:
+        """
         if ViewSettings.databaseName != Rpc.session.databaseName or ViewSettings.uid != Rpc.session.uid:
             ViewSettings.clear()
 
-    # @brief Clears cache and resets state. This means that after installing the koo
-    # module you don't have to close session and login again because
-    # hasSettingsModule is reset to True.
     @staticmethod
     def clear():
+        """
+        Clears cache and resets state. This means that after installing the koo
+        module you don't have to close session and login again because
+        hasSettingsModule is reset to True.
+        :return:
+        """
         ViewSettings.databaseName = Rpc.session.databaseName
         ViewSettings.uid = Rpc.session.uid
         ViewSettings.hasSettingsModule = True

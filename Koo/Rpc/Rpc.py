@@ -698,6 +698,7 @@ class Session:
 
 
 session = Session()
+print("p1")
 session.cache = ActionViewCache()
 
 

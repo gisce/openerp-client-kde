@@ -69,6 +69,7 @@ class ActionViewCache(AbstractCache):
         self.cache = {}
 
     def exists(self, obj, method, *args):
+        print("cache exists: obj:{} method:{} args:{}".format(obj, method, args))
         if method == 'execute' and len(args) >= 3 and args[1] == 'search':
             # In cases where search filter only is equal to [('id','in',[])] we will optimize and return
             # an empty list. This is a usual call produced by empty many2many or one2many relations so it's

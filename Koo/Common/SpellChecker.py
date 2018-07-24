@@ -41,9 +41,11 @@ except:
     enchantAvailable = False
 
 
-# @brief The SpellCheckHighlighter class highlights invalid words for a given language using
-# enchant spell checker library.
 class SpellCheckHighlighter(QSyntaxHighlighter):
+    """
+    The SpellCheckHighlighter class highlights invalid words for a given language using
+    enchant spell checker library.
+    """
     def __init__(self, parent, language):
         QSyntaxHighlighter.__init__(self, parent)
         self._language = language
