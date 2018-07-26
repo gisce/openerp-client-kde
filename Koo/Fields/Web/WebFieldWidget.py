@@ -25,23 +25,17 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from Koo.Common.Ui import *
-# @xtorello toreview
-# from PyQt5.QtWebKit import *
-"""
 from PyQt5.QtNetwork import *
-
-from Koo.Common import Common
 from Koo.Fields.AbstractFieldWidget import *
 
 (WebFieldWidgetUi, WebFieldWidgetBase) = loadUiType(Common.uiPath('web.ui'))
 
-# @brief The CookieJar class inherits QNetworkCookieJar to make a couple of functions public.
-
 
 class CookieJar(QNetworkCookieJar):
+    """
+    The CookieJar class inherits QNetworkCookieJar to make a couple of
+    functions public.
+    """
     def __init__(self, parent=None):
         QNetworkCookieJar.__init__(self, parent)
 
