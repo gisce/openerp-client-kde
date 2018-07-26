@@ -588,8 +588,7 @@ class FormWidget(QWidget, FormWidgetUi):
             value = QMessageBox.question(
                 self, _('Question'),
                 _('<p>You have modified the following fields in current record:</p>%s<p>Do you want to save the changes?</p>') % fields,
-                QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel,
-                2, 2)
+                QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
             if value == 0:
                 return self.save()
             elif value == 1:
