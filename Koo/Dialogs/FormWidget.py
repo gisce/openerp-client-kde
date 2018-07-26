@@ -387,12 +387,12 @@ class FormWidget(QWidget, FormWidgetUi):
         newId = None
         newIds = []
         currentId = self.screen.currentId()
-        for id in selectedIds:
+        for ident in selectedIds:
             copyId = Rpc.session.execute(
-                '/object', 'execute', self.model, 'copy', id, {},
+                '/object', 'execute', self.model, 'copy', ident, {},
                 Rpc.session.context)
             newIds.append(copyId)
-            if id == currentId:
+            if ident == currentId:
                 newId = copyId
 
         # Ensure the copy of the currently selected ID is the first of the list
