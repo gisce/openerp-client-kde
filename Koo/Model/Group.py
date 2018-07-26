@@ -487,10 +487,8 @@ class RecordGroup(QObject):
     def enableSignals(self):
         self._signalsEnabled = True
 
-    # @xtorello toreview or True
     @pyqtSlot('PyQt_PyObject')
     def recordChanged(self, record):
-        # @xtorello toreview or True
         if self._signalsEnabled:
             self.recordChangedSignal.emit(record)
         if self.parent:
