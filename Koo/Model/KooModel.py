@@ -378,20 +378,20 @@ class KooModel(QAbstractItemModel):
             if index.isValid():
                 defaultFlags = defaultFlags | Qt.ItemIsDragEnabled
 
-        field = self.fields.get( self.field( index.column() ) )
+        field = self.fields.get(self.field(index.column()))
         if not field:
             # Buttons
-            fieldName = self.field( index.column() )
-            record = self.record( index.row(), index.internalPointer() )
+            fieldName = self.field(index.column())
+            record = self.record(index.row(), index.internalPointer())
             state = 'draft'
             if record and record.fieldExists('state'):
                 state = record.value('state')
-            states = self.buttons[fieldName].get('states','').split(',')
+            states = self.buttons[fieldName].get('states', '').split(',')
             if state in states:
                 return defaultFlags
             return Qt.NoItemFlags
 
-        if self._readOnly or ( 'readonly' in field and field['readonly'] ):
+        if self._readOnly or ('readonly' in field and field['readonly']):
             return defaultFlags
         else:
             return defaultFlags | Qt.ItemIsEditable
@@ -443,8 +443,8 @@ class KooModel(QAbstractItemModel):
         elif fieldType == 'many2one':
             value = value.toList()
             if value:
-                value = [ int(value[0].toInt()[0]), str(value[1].toString()) ]
-            model.setValue( field, value )
+                value = [int(value[0].toInt()[0]), str(value[1].toString())]
+            model.setValue(field, value)
         else:
             print("Unable to store value of type: ", fieldType)
 
@@ -479,7 +479,7 @@ class KooModel(QAbstractItemModel):
                     thousands = False
                 else:
                     thousands = True
-                return QVariant(Numeric.floatToText(value, field.get('digits',None), thousands))
+                return QVariant(Numeric.floatToText(value, field.get('digits', None), thousands))
             elif fieldType == 'integer':
                 return QVariant(Numeric.integerToText(value))
             elif fieldType == 'float_time':
@@ -501,7 +501,7 @@ class KooModel(QAbstractItemModel):
                     return QVariant()
                 else:
                     # If the text has several lines put them all in a single one
-                    return QVariant(str(value).replace('\n', ' ') )
+                    return QVariant(str(value).replace('\n', ' '))
         elif role == Qt.DecorationRole:
             fieldType = self.fieldType(index.column(), index.internalPointer())
             if fieldType == 'button':
@@ -556,14 +556,14 @@ class KooModel(QAbstractItemModel):
             if not model:
                 return QVariant()
             palette = QPalette()
-            color = palette.color( QPalette.WindowText )
+            color = palette.color(QPalette.WindowText)
             for (c, expression) in self.colors:
                 if model.evaluateExpression( expression, checkLoad=False ):
                     color = c
                     break
-            return QVariant( QBrush( QColor( color ) ) )
+            return QVariant(QBrush(QColor(color)))
         elif role == Qt.TextAlignmentRole:
-            fieldType = self.fieldType( index.column(), index.internalPointer() )
+            fieldType = self.fieldType(index.column(), index.internalPointer())
             if fieldType in ['integer', 'float', 'float_time', 'time', 'date', 'datetime']:
                 return QVariant(Qt.AlignRight | Qt.AlignVCenter)
             else:
@@ -579,51 +579,51 @@ class KooModel(QAbstractItemModel):
                 return QVariant( '(%d)' % value.count())
             elif fieldType == 'selection':
                 # By now, return the same as DisplayRole for these
-                field = self.fields[self.field( index.column() )]
+                field = self.fields[self.field(index.column())]
                 for x in field['selection']:
                     if x[0] == value:
-                        return QVariant( str(x[1]) )
+                        return QVariant(str(x[1]))
                 return QVariant()
             elif fieldType == 'date' and value:
-                return QVariant( Calendar.storageToDate( value ) )
+                return QVariant(Calendar.storageToDate(value))
             elif fieldType == 'datetime' and value:
-                return QVariant( Calendar.storageToDateTime( value ) )
+                return QVariant(Calendar.storageToDateTime(value))
             elif fieldType == 'float':
                 # If we use the default conversion big numbers are shown
                 # in scientific notation. Also we have to respect the number
                 # of decimal digits given by the server.
-                field = self.fields[self.field( index.column() )]
-                return QVariant( Numeric.floatToText(value, field.get('digits',None) ) )
+                field = self.fields[self.field(index.column())]
+                return QVariant(Numeric.floatToText(value, field.get('digits',None)))
             elif fieldType == 'float_time':
-                return QVariant( value )
+                return QVariant(value)
             elif fieldType == 'binary':
                 if value:
-                    return QVariant( QByteArray.fromBase64( value ) )
+                    return QVariant(QByteArray.fromBase64(value))
                 else:
                     return QVariant()
             elif fieldType == 'boolean':
-                return QVariant( bool(value) )
+                return QVariant(bool(value))
             else:
-                if value == False or value == None:
+                if not value:
                     return QVariant()
                 else:
-                    return QVariant( str(value) )
+                    return QVariant(str(value))
         else:
             return QVariant()
 
-    def index(self, row, column, parent = QModelIndex() ):
+    def index(self, row, column, parent=QModelIndex()):
         if not self.group:
             return QModelIndex()
         if parent.isValid():
             # Consider childField
-            field = self.field( parent.column() )
+            field = self.field(parent.column())
             if field == self.childField:
                 field = self.child
 
-            value = self.valueByName( parent.row(), field, parent.internalPointer() )
-            return self.createIndex( row, column, value )
+            value = self.valueByName( parent.row(), field, parent.internalPointer())
+            return self.createIndex( row, column, value)
         else:
-            return self.createIndex( row, column, self.group )
+            return self.createIndex( row, column, self.group)
 
     def parent(self, index):
         if not self.group:
@@ -646,13 +646,13 @@ class KooModel(QAbstractItemModel):
         model = group.parent
         parent = group.parent.group
 
-        if not parent.recordExists( model ):
+        if not parent.recordExists(model):
             # Though it should not normally happen, when you reload
             # in the main menu we receive calls in which the model
             # is not in the list.
             return QModelIndex()
 
-        row = parent.indexOfRecord( model )
+        row = parent.indexOfRecord(model)
         for x, y in list(model.values.items()):
             if y == group:
                 field = x
@@ -674,15 +674,15 @@ class KooModel(QAbstractItemModel):
             return QModelIndex()
 
     def mimeTypes(self):
-        return QStringList( [ 'text/plain' ] )
+        return QStringList(['text/plain'])
 
     def mimeData(self, indexes):
         data = QMimeData()
         d = []
         for index in indexes:
             if index.column() == 0:
-                d.append( self.id( index ) )
-        data.setText( str( d[0] ) )
+                d.append(self.id(index))
+        data.setText(str(d[0]))
         return data
 
     def dropMimeData(self, data, action, row, column, parent):
@@ -722,9 +722,9 @@ class KooModel(QAbstractItemModel):
     # Plain virtual functions from QAbstractItemModel
 
     def sort(self, column, order):
-        QApplication.setOverrideCursor( Qt.WaitCursor )
+        QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
-            self.group.sort( self.field( column ), order )
+            self.group.sort(self.field(column), order)
         except Rpc.RpcException as e:
             pass
         QApplication.restoreOverrideCursor()
@@ -733,16 +733,16 @@ class KooModel(QAbstractItemModel):
         if orientation == Qt.Vertical:
             return QVariant()
         if role == Qt.DisplayRole:
-            field = self.fields.get( self.field( section ) )
+            field = self.fields.get(self.field(section))
             if not field:
-                field = self.buttons.get( self.field( section ) )
-            return QVariant( Common.normalizeLabel( str( field['string'] ) ) )
+                field = self.buttons.get(self.field(section))
+            return QVariant(Common.normalizeLabel(str(field['string'])))
         elif role == Qt.FontRole and not self._readOnly:
-            fieldName = self.field( section )
-            if self.group.fieldExists( fieldName ) and self.group.isFieldRequired( fieldName ):
+            fieldName = self.field(section)
+            if self.group.fieldExists(fieldName) and self.group.isFieldRequired(fieldName):
                 font = QFont()
-                font.setBold( True )
-                return QVariant( font )
+                font.setBold(True)
+                return QVariant(font)
         return QVariant()
 
     def field(self, column):
@@ -758,8 +758,9 @@ class KooModel(QAbstractItemModel):
             return self.visibleFields[column]
 
     # Note that in both fieldType() and fieldTypeByName() functions we ignore
-    # the 'group' parameter and use 'self.group' instead as this improves performance
-    # as in some cases we won't force loading a record just to know a field type.
+    # the 'group' parameter and use 'self.group' instead as this improves
+    # performance as in some cases we won't force loading a record just to know
+    # a field type.
 
     def fieldType(self, column, group):
         """
