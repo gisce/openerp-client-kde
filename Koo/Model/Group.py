@@ -417,12 +417,21 @@ class RecordGroup(QObject):
         ctx.update(self._context)
         return ctx
 
-    # @brief Sets the context that will be used for RPC calls.
     def setContext(self, context):
+        """
+        Sets the context that will be used for RPC calls.
+        :param context:
+        :return:
+        """
         self._context = context.copy()
 
-    # @brief Adds a record to the list
     def add(self, record, position=-1):
+        """
+        Adds a record to the list
+        :param record:
+        :param position:
+        :return:
+        """
         if not record.group is self:
             fields = {}
             for mf in record.group.fields:
@@ -441,11 +450,18 @@ class RecordGroup(QObject):
         record.recordModified['PyQt_PyObject'].connect(self.recordModified)
         return record
 
-    # @brief Creates a new record of the same type of the records in the group.
-    #
-    # If 'default' is true, the record is filled in with default values.
-    # 'domain' and 'context' are only used if default is true.
     def create(self, default=True, position=-1, domain=None, context=None):
+        """
+        Creates a new record of the same type of the records in the group.
+
+        If 'default' is true, the record is filled in with default values.
+        'domain' and 'context' are only used if default is true.
+        :param default:
+        :param position:
+        :param domain:
+        :param context:
+        :return:
+        """
         if domain is None:
             domain = []
         if context is None:
@@ -577,12 +593,16 @@ class RecordGroup(QObject):
         self.addFields(fields)
         self._allFieldsLoaded = True
 
-    # @brief Adds the specified fields to the record group
-    #
-    # Note that it updates 'fields' and 'fieldObjects' in the group.
-    # 'fields' is a dict of dicts as typically returned by 'fields_get'
-    # server function.
     def addFields(self, fields):
+        """
+        Adds the specified fields to the record group
+
+        Note that it updates 'fields' and 'fieldObjects' in the group.
+        'fields' is a dict of dicts as typically returned by 'fields_get'
+        server function.
+        :param fields:
+        :return:
+        """
         to_add = []
         for f in list(fields.keys()):
             if not f in self.fields:
@@ -594,8 +614,12 @@ class RecordGroup(QObject):
         self.loadFieldObjects(to_add)
         return to_add
 
-    # @brief Ensures all records in the group are loaded.
     def ensureAllLoaded(self):
+        """
+        Ensures all records in the group are loaded.
+        :return: None
+        :rtype: None
+        """
         ids = self.unloadedIds()
         if not ids:
             return
@@ -609,9 +633,13 @@ class RecordGroup(QObject):
                 r = self.recordById(v['id'])
                 r.set(v, signal=False)
 
-    # @brief Returns the list of ids that have not been loaded yet. The list
-    # won't include new records as those have id 0 or None.
     def unloadedIds(self):
+        """
+        Returns the list of ids that have not been loaded yet. The list
+        won't include new records as those have id 0 or None.
+        :return: List of ids
+        :rtype: list(int)
+        """
         self.ensureUpdated()
         ids = []
         for x in self.records:
@@ -622,8 +650,12 @@ class RecordGroup(QObject):
                 ids.append(x)
         return ids
 
-    # @brief Returns the list of loaded records. The list won't include new records.
     def loadedRecords(self):
+        """
+        Returns the list of loaded records. The list won't include new records.
+        :return: List of loaded records
+        :rtype: list(int)
+        """
         records = []
         for x in self.records:
             if isinstance(x, Record):
@@ -631,8 +663,12 @@ class RecordGroup(QObject):
                     records.append(x)
         return records
 
-    # @brief Returns a list with all ids.
     def ids(self):
+        """
+        Returns a list with all ids.
+        :return:
+        :rtype: list
+        """
         ids = []
         for x in self.records:
             if isinstance(x, Record):
@@ -641,8 +677,12 @@ class RecordGroup(QObject):
                 ids.append(x)
         return ids
 
-    # @brief Returns a list with all new records.
     def newRecords(self):
+        """
+        Returns a list with all new records.
+        :return:
+        :rtype: list
+        """
         records = []
         for x in self.records:
             if not isinstance(x, Record):
@@ -652,8 +692,12 @@ class RecordGroup(QObject):
             records.append(x)
         return records
 
-    # @brief Returns the number of records in this group.
     def count(self):
+        """
+        Returns the number of records in this group.
+        :return: Number of records in this group.
+        :rtype: int
+        """
         self.ensureUpdated()
         return len(self.records)
 
@@ -662,10 +706,14 @@ class RecordGroup(QObject):
         self.ensureAllLoaded()
         return iter(self.records)
 
-    # @brief Returns the record with id 'id'. You can use [] instead.
-    # Note that it will check if the record is loaded and load it if not.
-    def modelById(self, id):
-        record = self.recordById(id)
+    def modelById(self, ident):
+        """
+        Returns the record with id 'id'. You can use [] instead.
+        Note that it will check if the record is loaded and load it if not.
+        :param ident:
+        :return:
+        """
+        record = self.recordById(ident)
         if not record:
             return None
         return record
