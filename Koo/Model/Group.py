@@ -259,10 +259,9 @@ class RecordGroup(QObject):
         :return:
         """
 
-        print("RecordGroup.save")
         for record in self.records:
             if isinstance(record, Record):
-                saved = record.save()
+                record.save()
 
     def modifiedRecords(self):
         """
