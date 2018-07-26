@@ -27,22 +27,10 @@
 ##############################################################################
 
 from Koo.Rpc import RpcProxy
-from Koo import Rpc
 from Koo.Common.Settings import *
 from .Record import Record
 from . import Field
-
-
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-
-try:
-    set()
-except NameError:
-    from sets import Set as set
-
-
-
 
 class RecordGroup(QObject):
     """
