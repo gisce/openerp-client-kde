@@ -62,7 +62,6 @@ def scan(module, directory):
         # plugins.
         pluginsPath = os.path.dirname(pluginImports.__loader__.path)
         zipFiles = get_zipfiles(os.path.dirname(pluginImports.__loader__.path))
-        #zipFiles = pluginImports.__loader__._files
         moduleDir = os.sep.join(module.split('.'))
         files = [zipFiles[file][0] for file in zipFiles if moduleDir in file]
         files = [file for file in files if '__init__.py' in file]
