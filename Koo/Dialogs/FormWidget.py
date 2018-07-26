@@ -310,7 +310,7 @@ class FormWidget(QWidget, FormWidgetUi):
             if self.pendingReload:
                 self.reload()
             self.updateSwitchView()
-        except Rpc.RpcException as e:
+        except Rpc.RpcException:
             pass
         QApplication.restoreOverrideCursor()
 
