@@ -154,13 +154,10 @@ class KooModel(QAbstractItemModel):
 
     def reset(self):
         pass
-        # @xtorello toreview todo https://stackoverflow.com/questions/14756645/how-to-reset-model-in-qt
 
     def recordsInserted(self, start, end):
         if self._updatesEnabled:
             self.reset()
-        # self.emit( SIGNAL('rowsAboutToBeInserted(QModelIndex,int,int)'), QModelIndex(), start, end )
-        # self.emit( SIGNAL('rowsInserted(QModelIndex,int,int)'), QModelIndex(), start, end )
 
     def recordChanged(self, record):
         if not record:
@@ -174,11 +171,6 @@ class KooModel(QAbstractItemModel):
 
     def recordsRemoved(self, start, end):
         return None
-        # @xtorello toreview
-    # if self._updatesEnabled:
-    # self.reset()
-    # self.emit( SIGNAL('rowsAboutToBeRemoved(QModelIndex,int,int)'), QModelIndex(), start, end )
-    # self.emit( SIGNAL('rowsRemoved(QModelIndex,int,int)'), QModelIndex(), start, end )
 
     def setFields(self, fields):
         """
