@@ -42,6 +42,12 @@ from PyQt5.QtCore import *
 from Koo.Common.Ui import *
 from gettext import gettext as _
 
+try:
+    from PyQt5.QtWebKitWidgets import QWebPage, QWebView
+    isHelpWidgetAvailable = True
+except:
+    isHelpWidgetAvailable = False
+
 (FormWidgetUi, FormWidgetBase) = loadUiType(Common.uiPath('formcontainer.ui'))
 
 
