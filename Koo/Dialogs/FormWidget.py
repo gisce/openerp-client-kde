@@ -477,7 +477,8 @@ class FormWidget(QWidget, FormWidgetUi):
         # Do not reload automatically if it's an editable list
         # By explicitly disallowing this it makes the global
         # koo module auto_reload option to be usable.
-        if self.screen.currentView().showsMultipleRecords() and not self.screen.currentView().isReadOnly():
+        if self.screen.currentView().showsMultipleRecords() and \
+                not self.screen.currentView().isReadOnly():
             return
         # Do not reload automatically if there are any modified records
         # However, we take note that there's a pending reload which
@@ -536,10 +537,11 @@ class FormWidget(QWidget, FormWidgetUi):
         :return: None
         :rtype: None
         """
-        if self.model and self.screen.currentRecord() and self.screen.currentRecord().id:
+        if self.model and \
+                self.screen.currentRecord() and \
+                self.screen.currentRecord().id:
             # We don't need to query the server for the number of attachments
-            # if current record
-            # has not changed since list update.
+            # if current record has not changed since list update.
             ident = self.screen.currentRecord().id
             if ident != self.previousId:
                 ids = Rpc.session.execute(
