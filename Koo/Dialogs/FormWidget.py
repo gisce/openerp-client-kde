@@ -256,7 +256,7 @@ class FormWidget(QWidget, FormWidgetUi):
                 try:
                     window = AttachmentDialog(self.model, id, self)
                     window.destroyed.connect(self.attachmentsClosed)
-                except Rpc.RpcException as e:
+                except Rpc.RpcException:
                     QApplication.restoreOverrideCursor()
                     return
                 QApplication.restoreOverrideCursor()
