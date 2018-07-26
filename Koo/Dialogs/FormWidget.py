@@ -295,9 +295,10 @@ class FormWidget(QWidget, FormWidgetUi):
                     target = 'background'
                 else:
                     target = 'current'
-                for id in selectedIds:
-                    Api.instance.createWindow(None, self.model, [id],
-                                              view_type='form', mode='form,tree', target=target)
+                for ident in selectedIds:
+                    Api.instance.createWindow(
+                        None, self.model, [ident],
+                        view_type='form', mode='form,tree', target=target)
             else:
                 sender = self.sender()
                 name = str(sender.objectName())
