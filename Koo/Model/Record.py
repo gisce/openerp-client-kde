@@ -88,11 +88,10 @@ class Record(QObject):
             from .Group import RecordGroup
             if isinstance(value, RecordGroup):
                 try:
-                    # value.parent.fieldObjects[key].disconnect( SIGNAL('modified'), value )
+
                     value.parent.fields()[key].disconnect()
                     value.__del__()
-                except Exception as e:
-                    # print (e)
+                except Exception:
                     pass
 
         self.values = {}
