@@ -108,8 +108,15 @@ class StringField(object):
             record.modified = True
             record.modified_fields.setdefault(self.name)
 
-    # Return the value to write to the server
     def get(self, record, checkLoad=True, readonly=True, modified=False):
+        """
+        Return the value to write to the server
+        :param record:
+        :param checkLoad:
+        :param readonly:
+        :param modified:
+        :return:
+        """
         return record.values.get(self.name, False)
 
     def set_client(self, record, value, test_state=True):
@@ -545,10 +552,16 @@ class FieldFactory:
         'boolean': IntegerField,
     }
 
-    # This function creates a new instance of the appropiate class
-    # for the given field type.
     @staticmethod
     def create(fieldType, parent, attributes):
+        """
+        This function creates a new instance of the appropiate class
+        for the given field type.
+        :param fieldType:
+        :param parent:
+        :param attributes:
+        :return:
+        """
         # We do not support relational fields treated as selection ones
         if fieldType == 'selection' and 'relation' in attributes:
             fieldType = 'many2one'
