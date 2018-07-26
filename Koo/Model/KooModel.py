@@ -789,7 +789,6 @@ class KooModel(QAbstractItemModel):
         else:
             return None
 
-    # @brief
     def record(self, row, group):
         """
         Returns a Record refered by row and group parameters
