@@ -869,7 +869,6 @@ class KooModel(QAbstractItemModel):
         else:
             return -1
 
-
     def indexFromId(self, id):
         """
         Returns a QModelIndex pointing to the first field of a given
@@ -887,7 +886,7 @@ class KooModel(QAbstractItemModel):
         return QModelIndex()
 
     def recordFromIndex(self, index):
-        return self.record( index.row(), index.internalPointer() )
+        return self.record(index.row(), index.internalPointer())
 
     def indexFromRecord(self, record):
         """
@@ -919,52 +918,52 @@ class KooGroupedModel( QAbstractProxyModel ):
         QAbstractProxyModel.setSourceModel(self, model)
         self.group = model.group
 
-    def mapFromSource( self, index ):
+    def mapFromSource(self, index):
         model = self.sourceModel()
         newRow = 0
         previous = False
         for y in range(0, index.row()):
-            value = model.value( y, 0, self.group)
+            value = model.value(y, 0, self.group)
             if value != previous:
                 newRow += 1
                 previous = value
-        return self.createIndex( newRow, index.column() )
+        return self.createIndex(newRow, index.column())
 
-    def mapToSource( self, index ):
+    def mapToSource(self, index):
         model = self.sourceModel()
         previous = None
         newRow = 0
         for y in range(0, self.group.count()):
-            value = model.value( y, 0, self.group)
+            value = model.value(y, 0, self.group)
             if value != previous:
                 newRow += 1
                 if newRow == index.row():
                     break
-        return self.createIndex( y, index.column() )
+        return self.createIndex(y, index.column())
 
     def recordGroup(self):
         return self.sourceModel().recordGroup()
 
     def setRecordGroup(self, recordGroup):
-        return self.sourceModel().setRecordGroup( recordGroup )
+        return self.sourceModel().setRecordGroup(recordGroup)
 
     def isReadOnly(self):
         return self.sourceModel().isReadOnly()
 
-    def rowCount(self, parent = QModelIndex()):
+    def rowCount(self, parent=QModelIndex()):
         model = self.sourceModel()
         newRow = 0
         previous = None
         for y in range(0, self.group.count()):
-            value = model.value( y, 0, self.group )
+            value = model.value(y, 0, self.group)
             if value != previous:
                 newRow += 1
         return newRow
 
-    def columnCount(self, parent = QModelIndex()):
-        return self.sourceModel().columnCount( parent )
+    def columnCount(self, parent=QModelIndex()):
+        return self.sourceModel().columnCount(parent)
 
-    def index(self, row, column, parent = QModelIndex() ):
-        return self.createIndex( row, column, parent )
+    def index(self, row, column, parent=QModelIndex()):
+        return self.createIndex(row, column, parent)
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:
