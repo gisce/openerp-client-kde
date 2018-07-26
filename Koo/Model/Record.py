@@ -111,7 +111,6 @@ class Record(QObject):
         return self.group.fieldObjects.get(name, False)
 
     def __repr__(self):
-        # return '<Record %s@%s>' % (self.id, self.group.resource)
         return '<Record %s>' % self.id
 
     def setValue(self, fieldName, value):
@@ -189,8 +188,8 @@ class Record(QObject):
         :return:
         """
         # Do not checkLoad because current record is already loaded and using it
-        # would cause all related (one2many and many2many) fields to be completely
-        # loaded too, causing performance issues.
+        # would cause all related (one2many and many2many) fields to be
+        # completely loaded too, causing performance issues.
         return self.group.fieldObjects[fieldName].context(self, checkLoad=False)
 
     def isModified(self):
@@ -264,7 +263,6 @@ class Record(QObject):
                 value = self.evaluateCondition(condition)
                 if value:
                     self.stateAttributes(fieldName)[attribute] = value
-
 
     def isFieldReadOnly(self, fieldName):
         readOnly = self.stateAttributes(fieldName).get('readonly', False)
