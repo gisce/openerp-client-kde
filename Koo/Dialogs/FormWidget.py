@@ -758,12 +758,16 @@ class FormWidget(QWidget, FormWidgetUi):
         buttonString = selectionDialog.result[0]
         buttonName = selectionDialog.result[1]
 
-        if QMessageBox.question(self, _("Batch Update"), _("Do you really want to push button '%s' of all selected records?") % buttonString, _("Yes"), _("No")) == 1:
+        if QMessageBox.question(
+                self, _("Batch Update"),
+                _("Do you really want to push button '%s' of all selected records?") % buttonString,
+                QMessageBox.Yes|QMessageBox.No
+        ) == 1:
             return
 
-        for id in self.screen.selectedIds():
-            screen.display(id)
-            screen.currentView().widgets[buttonName].executeButton(screen, id)
+        for ident in self.screen.selectedIds():
+            screen.display(ident)
+            screen.currentView().widgets[buttonName].executeButton(screen, ident)
 
         self.reload()
 
