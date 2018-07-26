@@ -585,9 +585,11 @@ class FormWidget(QWidget, FormWidgetUi):
                 fields.append('<li>%s</li>' % name)
             fields.sort()
             fields = '<ul>%s</ul>' % ''.join(fields)
-            value = QMessageBox.question(self, _('Question'),
-                                         _('<p>You have modified the following fields in current record:</p>%s<p>Do you want to save the changes?</p>') % fields,
-                                         _('Save'), _('Discard'), _('Cancel'), 2, 2)
+            value = QMessageBox.question(
+                self, _('Question'),
+                _('<p>You have modified the following fields in current record:</p>%s<p>Do you want to save the changes?</p>') % fields,
+                QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel,
+                2, 2)
             if value == 0:
                 return self.save()
             elif value == 1:
