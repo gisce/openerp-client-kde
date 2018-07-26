@@ -71,7 +71,8 @@ class StringField(object):
 
     def validate(self, record):
         """
-        Checks if the current value is valid and sets stateAttributes on the record.
+        Checks if the current value is valid and sets stateAttributes on the
+        record.
 
         Here it's checked if the field is required but is empty.
         :param record:
@@ -358,7 +359,7 @@ class ToManyField(QObject, StringField):
     """
 
     def __init__(self, parent, attrs):
-        StringField.__init__(self,parent,attrs)
+        StringField.__init__(self, parent, attrs)
         # QObject.__init__(self)
         #super().__init__(parent,attrs)
         #self.parent = parent
@@ -423,11 +424,9 @@ class ToManyField(QObject, StringField):
 
 
 class OneToManyField(ToManyField):
-    # @xtorello toreview
 
     def __init__(self, parent, attrs):
-        # QObject.__init__(self)
-        super().__init__(parent,attrs)
+        super().__init__(parent, attrs)
 
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         if not record.values[self.name]:
@@ -452,8 +451,6 @@ class OneToManyField(ToManyField):
         return result
 
     def setDefault(self, record, value):
-        from Koo.Model.Group import RecordGroup
-
         group = record.values[self.name]
 
         if value and len(value):
@@ -486,7 +483,6 @@ class ManyToManyField(ToManyField):
         return record.values[self.name].ids()
 
 
-
 class ReferenceField(StringField):
     def get_client(self, record):
         if record.values[self.name]:
@@ -508,11 +504,9 @@ class ReferenceField(StringField):
         if not value:
             record.values[self.name] = False
             return
-        ref_model, id = value.split(',')
-        # id must be an integer
-        id = int(id)
+        ref_model, ident = value.split(',')
         Rpc2 = RpcProxy(ref_model)
-        result = Rpc2.name_get([id], Rpc.session.context)
+        result = Rpc2.name_get([int(ident)], Rpc.session.context)
         if result:
             record.values[self.name] = ref_model, result[0]
         else:
@@ -522,7 +516,6 @@ class ReferenceField(StringField):
             record.modified_fields.setdefault(self.name)
 
 
-# @xtorello xxx
 class FieldFactory:
     """
     The FieldFactory class provides a means of creating the appropiate object
@@ -532,11 +525,10 @@ class FieldFactory:
     types or want to replace current implementations you can do it too.
     """
 
-
     # The types property holds the class that will be called whenever a new
-    #  object has to be created for a given field type.
-    #  By default there's a number of field types but new ones can be easily
-    #  created or existing ones replaced.
+    # object has to be created for a given field type.
+    # By default there's a number of field types but new ones can be easily
+    # created or existing ones replaced.
     types = {
         'char': StringField,
         'binary': BinaryField,
