@@ -80,7 +80,6 @@ class Record(QObject):
         self.new = new
 
     def __del__(self):
-        # @xtorello toreview
         self.rpc = None
         self.modified_fields = None
         self.parent = None
