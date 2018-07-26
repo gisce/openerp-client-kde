@@ -108,7 +108,7 @@ class RecordGroup(QObject):
         self.maximumLimit = self.limit
         self.rpc = RpcProxy(resource)
 
-        if fields == None:
+        if fields is None:
             self.fields = {}
         else:
             self.fields = fields
@@ -181,13 +181,11 @@ class RecordGroup(QObject):
         return self._onWriteFunction
 
     def __del__(self):
-        # @xtorello toreview
         if self.parent:
-            # @xtorello TODO toreview
             try:
                 self.modified.disconnect()
                 self.tomanyfield = None
-            except:
+            except Exception:
                 pass
 
         self.rpc = None
@@ -199,20 +197,18 @@ class RecordGroup(QObject):
             if not isinstance(r, Record):
                 continue
 
-            # @xtorello TODO toreview
             try:
                 r.recordChanged.disconnect()
-            except:
+            except Exception:
                 pass
 
             r.__del__()
         self.records = []
         for f in self.fieldObjects:
-            # @xtorello TODO toreview
             try:
                 self.fieldObjects[f].parent = None
                 self.disconnect()
-            except:
+            except Exception:
                 pass
 
             # @xtorello toreview
