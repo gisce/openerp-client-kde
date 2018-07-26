@@ -28,17 +28,15 @@
 
 import re
 import time
-#import exceptions
 from Koo import Rpc
 from Koo.Common import Notifier
 from Koo.Rpc import RpcProxy
 from .Field import ToManyField
-import gettext
 from Koo.Common import Debug
 
 from PyQt5.QtCore import *
 
-#ConcurrencyCheckField = '__last_update'
+# ConcurrencyCheckField = '__last_update'
 ConcurrencyCheckField = 'read_delta'
 
 
