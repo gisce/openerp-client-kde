@@ -311,8 +311,8 @@ class RecordGroup(QObject):
                         m.reload()
             if cont:
                 continue
-            # TODO: Should we reconsider this? Do we need/want to reload. Probably we
-            # only want to add the id to the list.
+            # TODO: Should we reconsider this? Do we need/want to reload.
+            # Probably we only want to add the id to the list.
             record = Record(id, self, parent=self.parent)
             record.recordChanged['PyQt_PyObject'].connect(self.recordChanged)
             record.recordModified['PyQt_PyObject'].connect(self.recordModified)
@@ -366,13 +366,13 @@ class RecordGroup(QObject):
         if addOnTop:
             start = 0
             # Discard from 'ids' those that are already loaded.
-            # If we didn't do that, some records could be repeated if the programmer
-            # doesn't verify that, and we'd end up in errors because when records are
-            # actually loaded they're only checked against a single appearance of the
-            # id in the list of records.
+            # If we didn't do that, some records could be repeated if the
+            # programmer doesn't verify that, and we'd end up in errors
+            # because when records are actually loaded they're only checked
+            # against a single appearance of the id in the list of records.
             #
-            # Note we don't use sets to discard ids, because we want to keep the order
-            # their order and because it can cause infinite recursion.
+            # Note we don't use sets to discard ids, because we want to keep
+            # the order their order and because it can cause infinite recursion.
             currentIds = self.ids()
             for ident in ids:
                 if ident not in currentIds:
@@ -386,9 +386,9 @@ class RecordGroup(QObject):
                 if ident not in currentIds:
                     self.records.append(ident)
             end = len(self.records) - 1
-        # We consider the group is updated because otherwise calling count() would
-        # force an update() which would cause one2many relations to load elements
-        # when we only want to know how many are there.
+        # We consider the group is updated because otherwise calling count()
+        # would force an update() which would cause one2many relations to
+        # load elements when we only want to know how many are there.
         self.updated = True
         self.recordsInserted.emit(start, end)
 
