@@ -265,7 +265,8 @@ class FormWidget(QWidget, FormWidgetUi):
                 context = self.context.copy()
                 context.update(Rpc.session.context)
                 action = Rpc.session.execute(
-                    '/object', 'execute', 'ir.attachment', 'action_get', context)
+                    '/object', 'execute', 'ir.attachment', 'action_get',
+                    context)
                 action['domain'] = [
                     ('res_model', '=', self.model), ('res_id', '=', id)]
                 context['default_res_model'] = self.model
