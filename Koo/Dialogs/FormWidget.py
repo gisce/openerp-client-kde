@@ -458,7 +458,7 @@ class FormWidget(QWidget, FormWidgetUi):
         try:
             self.screen.displayPrevious()
             self.updateStatus()
-        except Rpc.RpcException as e:
+        except Rpc.RpcException:
             pass
         QApplication.restoreOverrideCursor()
 
@@ -504,7 +504,7 @@ class FormWidget(QWidget, FormWidgetUi):
             self.screen.reload()
             self.updateStatus()
             self.pendingReload = False
-        except Rpc.RpcException as e:
+        except Rpc.RpcException:
             pass
         QApplication.restoreOverrideCursor()
 
@@ -513,7 +513,7 @@ class FormWidget(QWidget, FormWidgetUi):
         try:
             self.screen.cancel()
             self.updateStatus()
-        except Rpc.RpcException as e:
+        except Rpc.RpcException:
             pass
         QApplication.restoreOverrideCursor()
 
