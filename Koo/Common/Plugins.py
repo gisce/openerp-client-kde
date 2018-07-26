@@ -28,7 +28,21 @@
 import os
 import sys
 
-# @brief
+
+def get_zipfiles(directory):
+    """
+    Return a list of the zip files on the directory
+
+    :param directory: Directory to list
+    :return: List of the zipfiles on the directory
+    :rtype: list(str)
+    """
+
+    ret = []
+    for file in os.listdir(directory):
+        if file.endswith(".zip"):
+            ret.append(os.path.join(directory, file))
+    return ret
 
 
 def scan(module, directory):
@@ -42,14 +56,15 @@ def scan(module, directory):
     pluginImports = __import__(module, globals(), locals())
     # Check if it's being run using py2exe or py2app environment
     frozen = getattr(sys, 'frozen', None)
-    """ @xtorello toreview
     if frozen == 'macosx_app' or hasattr(pluginImports, '__loader__'):
-        # If it's run using py2exe or py2app environment, all files will be in a single
-        # zip file and we can't use listdir() to find all available plugins.
-        zipFiles = pluginImports.__loader__._files
+        # If it's run using py2exe or py2app environment, all files will be in
+        # a single zip file and we can't use listdir() to find all available
+        # plugins.
+        pluginsPath = os.path.dirname(pluginImports.__loader__.path)
+        zipFiles = get_zipfiles(os.path.dirname(pluginImports.__loader__.path))
+        #zipFiles = pluginImports.__loader__._files
         moduleDir = os.sep.join(module.split('.'))
-        files = [zipFiles[file][0]
-                 for file in list(zipFiles.keys()) if moduleDir in file]
+        files = [zipFiles[file][0] for file in zipFiles if moduleDir in file]
         files = [file for file in files if '__init__.py' in file]
         for file in files:
             d = os.path.dirname(file)
@@ -59,8 +74,6 @@ def scan(module, directory):
             __import__('%s.%s' % (module, newModule),
                        globals(), locals(), [newModule])
     else:
-    """ 
-    if True:
         for i in os.listdir(directory):
             path = os.path.join(directory, i, '__init__.py')
             if os.path.isfile(path):
