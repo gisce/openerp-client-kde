@@ -47,8 +47,9 @@ class CookieJar(QNetworkCookieJar):
 
 
 class WebFieldWidget(AbstractFieldWidget, WebFieldWidgetUi):
-    def __init__(self, parent, model, attrs={}):
-        pass
+    def __init__(self, parent, model, attrs=None):
+        if attrs is None:
+            attrs = {}
         AbstractFieldWidget.__init__(self, parent, model, attrs)
         WebFieldWidgetUi.__init__(self)
         self.setupUi(self)
