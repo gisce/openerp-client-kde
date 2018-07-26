@@ -572,7 +572,7 @@ class FormWidget(QWidget, FormWidgetUi):
             pos = '_'
             if position >= 0:
                 pos = str(position + 1)
-            if value == None:
+            if value is None:
                 # Value will be None only when it's called by the constructor
                 edit = _('No document selected')
             else:
