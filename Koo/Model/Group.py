@@ -1039,7 +1039,8 @@ class RecordGroup(QObject):
                 # We're not able to sort 2many fields
                 sortingResult = self.SortingNotPossible
             elif field_type == 'many2one':
-                # This works only if '#407667' is fixed, but it was fixed in 2010-02-03
+                # This works only if '#407667' is fixed, but it was fixed in
+                # 2010-02-03
                 orderby = '"%s"' % field
                 if order == Qt.AscendingOrder:
                     orderby += " ASC"
@@ -1047,27 +1048,31 @@ class RecordGroup(QObject):
                     orderby += " DESC"
                 try:
                     ids = Rpc.session.call(
-                        '/koo', 'search', self.resource, self._domain + self._filter, 0, 0, orderby, self._context)
+                        '/koo', 'search',
+                        self.resource,
+                        self._domain + self._filter, 0, 0, orderby,
+                        self._context
+                    )
                     sortingResult = self.SortingPossible
                     sorted = True
                 except:
                     sortingResult = self.SortingOnlyGroups
 
             # We check whether the field is stored or not. In case the server
-            # is not _ready_ we consider it's stored and we'll catch the exception
-            # later.
+            # is not _ready_ we consider it's stored and we'll catch the
+            # exception later.
             stored = self.fields[field].get('stored', True)
             if not stored:
                 sortingResult = self.SortingNotPossible
 
             if not sorted and sortingResult != self.SortingNotPossible:
-                # A lot of the work done here should be done on the server by core OpenERP
-                # functions. This means this runs slower than it should due to network and
-                # serialization latency. Even more, we lack some information to make it
-                # work well.
+                # A lot of the work done here should be done on the server by
+                # core OpenERP functions. This means this runs slower than it
+                # should due to network and serialization latency. Even more,
+                # we lack some information to make it work well.
 
-                # Ensure the field is quoted, otherwise fields such as 'to' can't be sorted
-                # and return an exception.
+                # Ensure the field is quoted, otherwise fields such as 'to'
+                # can't be sorted and return an exception.
                 orderby = '"%s"' % field
                 if order == Qt.AscendingOrder:
                     orderby += " ASC"
