@@ -246,8 +246,8 @@ class RecordGroup(QObject):
             self.fieldObjects[fname] = Field.FieldFactory.create(
                 fvalue['type'], self, fvalue)
             if fvalue['type'] in ('binary', 'image'):
-                self.fieldObjects['%s.size' % fname] = Field.FieldFactory.create(
-                    'binary-size', self, fvalue)
+                val = Field.FieldFactory.create('binary-size', self, fvalue)
+                self.fieldObjects['%s.size' % fname] = val
 
     def save(self):
         """
