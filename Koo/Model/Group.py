@@ -717,38 +717,59 @@ class RecordGroup(QObject):
         return record
     __getitem__ = modelById
 
-    # @brief Returns the record at the specified row number.
     def modelByIndex(self, row):
+        """
+        Returns the record at the specified row number.
+        :param row:
+        :return:
+        """
         record = self.recordByIndex(row)
         return record
 
-    # @brief Returns the row number of the given record. Note that
-    # the record must be in the group. Otherwise an exception is risen.
     def indexOfRecord(self, record):
+        """
+        Returns the row number of the given record. Note that
+        the record must be in the group. Otherwise an exception is risen.
+        :param record:
+        :return:
+        """
         if record in self.records:
             return self.records.index(record)
         else:
             return -1
 
-    # @brief Returns the row number of the given id.
-    # If the id doesn't exist it returns -1.
-    def indexOfId(self, id):
+    def indexOfId(self, ident):
+        """
+        Returns the row number of the given id.
+        If the id doesn't exist it returns -1.
+        :param ident:
+        :return: Row number of the id, if no exists -1
+        :rtype: int
+        """
         i = 0
         for record in self.records:
             if isinstance(record, Record):
-                if record.id == id:
+                if record.id == ident:
                     return i
-            elif record == id:
+            elif record == ident:
                 return i
             i += 1
         return -1
 
-    # @brief Returns True if the given record exists in the group.
     def recordExists(self, record):
+        """
+        Returns True if the given record exists in the group.
+        :param record:
+        :return:
+        """
         return record in self.records
 
-    # @brief Returns True if the given field name exists in the group.
     def fieldExists(self, fieldName):
+        """
+        Returns True if the given field name exists in the group.
+        :param fieldName:
+        :return:
+        """
         return fieldName in self.fieldObjects
 
     def recordById(self, id):
@@ -788,8 +809,12 @@ class RecordGroup(QObject):
         newRecord.changed()
         return newRecord
 
-    # @brief Returns a Record object for the given row.
     def recordByIndex(self, row):
+        """
+        Returns a Record object for the given row.
+        :param row:
+        :return:
+        """
         record = self.records[row]
         if isinstance(record, Record):
             return record
@@ -800,8 +825,11 @@ class RecordGroup(QObject):
             self.records[row] = record
             return record
 
-    # @brief Returns True if the RecordGroup handles information of a wizard.
     def isWizard(self):
+        """
+        Returns True if the RecordGroup handles information of a wizard.
+        :return:
+        """
         return self.resource.startswith('wizard.')
 
     def ensureRecordLoaded(self, record):
@@ -853,8 +881,12 @@ class RecordGroup(QObject):
         # for mod in new:
         # mod.setDefaults(values)
 
-    # @brief Allows setting the domain for this group of records.
     def setDomain(self, value):
+        """
+        Allows setting the domain for this group of records.
+        :param value:
+        :return:
+        """
         # In some (rare) cases we receive {} as domain. So let's just test
         # 'not value', and that should work in all cases, not only when value
         # is None.
@@ -865,10 +897,12 @@ class RecordGroup(QObject):
         if Settings.value('koo.load_on_open', True):
             self.updated = False
 
-    # @brief Returns the current domain.
     def domain(self):
+        """
+        Returns the current domain.
+        :return:
+        """
         return self._domain
-
 
     def setFilter(self, value):
         """
@@ -886,25 +920,36 @@ class RecordGroup(QObject):
             self._filter = value
         self.updated = False
 
-    # @brief Returns the current filter.
+    # @brief
     def filter(self):
+        """
+        Returns the current filter.
+        :return:
+        """
         return self._filter
 
-    # @brief Disables record loading by setting domain to [('id','in',[])]
-    #
-    # RecordGroup will optimize the case when domain + filter = [('id','in',[])]
-    # by not even querying the server and searching ids. It will simply consider
-    # the result is [] and thus the group will be kept empty.
-    #
-    # Domain may be changed using setDomain() function.
     def setDomainForEmptyGroup(self):
+        """
+        Disables record loading by setting domain to [('id','in',[])]
+
+        RecordGroup will optimize the case when domain + filter =
+        [('id','in',[])] by not even querying the server and searching ids. It
+        will simply consider the result is [] and thus the group will be kept
+        empty.
+
+        Domain may be changed using setDomain() function.
+        :return:
+        """
         if self.isModified():
             return
         self.setDomain([('id', 'in', [])])
         self.clear()
 
-    # @brief Returns True if domain is [('id','in',[])]
     def isDomainForEmptyGroup(self):
+        """
+        Returns True if domain is [('id','in',[])]
+        :return:
+        """
         return self.domain() == [('id', 'in', [])]
 
     def update(self):
@@ -933,8 +978,14 @@ class RecordGroup(QObject):
             return
         self.update()
 
-    # @brief Sorts the group by the given field name.
     def sort(self, field, order):
+        """
+        Sorts the group by the given field name.
+
+        :param field:
+        :param order:
+        :return:
+        """
         self.toBeSortedField = field
         self.toBeSortedOrder = order
         if self._sortMode == self.SortAllItems:
@@ -942,8 +993,13 @@ class RecordGroup(QObject):
         else:
             self.sortVisible(field, order)
 
-    # Sorts the records in the group using ALL records in the database
     def sortAll(self, field, order):
+        """
+        Sorts the records in the group using ALL records in the database
+        :param field:
+        :param order:
+        :return:
+        """
         if self.updated and field == self.sortedField and order == self.sortedOrder:
             return
 
@@ -1020,33 +1076,43 @@ class RecordGroup(QObject):
 
                 try:
                     # Use call to catch exceptions
-                    ids = Rpc.session.call('/object', 'execute', self.resource, 'search',
-                                           self._domain + self._filter, 0, 0, orderby, self._context)
-                except:
+                    ids = Rpc.session.call(
+                        '/object', 'execute', self.resource, 'search',
+                        self._domain + self._filter, 0, 0, orderby,
+                        self._context)
+                except Exception:
                     # In functional fields not stored in the database this will
                     # cause an exception :(
                     sortingResult = self.SortingNotPossible
 
         if sortingResult != self.SortingNotPossible:
             self.clear()
-            # The load function will be in charge of loading and sorting elements
+            # The load function will be in charge of loading and sorting
+            # elements
             self.load(ids)
         elif oldSortedField == self.sortedField or not self.ids():
-            # If last sorted field was the same as the current one, possibly only filter crierias have changed
-            # so we might need to reload in this case.
-            # If sorting is not possible, but no data was loaded yet, we load by model default field and order.
-            # Otherwise, a view might not load any data.
+            # If last sorted field was the same as the current one, possibly
+            # only filter crierias have changed so we might need to reload in
+            # this case.
+            # If sorting is not possible, but no data was loaded yet, we load
+            # by model default field and order. Otherwise, a view might not
+            # load any data.
             ids = self.rpc.search(
                 self._domain + self._filter, 0, 0, False, self._context)
             self.clear()
-            # The load function will be in charge of loading and sorting elements
+            # The load function will be in charge of loading and sorting
+            # elements
             self.load(ids)
 
-        # @xtorello toreview
         self.sorting.emit(sortingResult)
 
-    # Sorts the records of the group taking into account only loaded fields.
     def sortVisible(self, field, order):
+        """
+        Sorts the records of the group taking into account only loaded fields.
+        :param field:
+        :param order:
+        :return:
+        """
         if self.updated and field == self.sortedField and order == self.sortedOrder:
             return
 
@@ -1105,16 +1171,19 @@ class RecordGroup(QObject):
                 if not record:
                     self.freeRecord(record)
 
-    # @brief Removes a record from the list (but not the record from the database).
-    #
-    # This function is used to take care signals are disconnected.
     def freeRecord(self, record):
+        """
+        Removes a record from the list (but not the record from the database).
+
+        This function is used to take care signals are disconnected.
+        :param record:
+        :return:
+        """
         self.records.remove(record)
         if isinstance(record, Record):
             record.recordChanged['PyQt_PyObject'].disconnect(self.recordChanged)
             record.recordModified['PyQt_PyObject'].disconnect(self.recordModified)
 
-    # @brief Returns True if any of the records in the group has been modified.
     def isModified(self):
         """
         Returns True if any of the records in the group has been modified.
@@ -1127,20 +1196,29 @@ class RecordGroup(QObject):
                     return True
         return False
 
-    # @brief Returns True if the given record has been modified.
-    def isRecordModified(self, id):
+    def isRecordModified(self, ident):
+        """
+        Returns True if the given record has been modified.
+        :param id:
+        :return:
+        """
         for record in self.records:
             if isinstance(record, Record):
-                if record.id == id:
+                if record.id == ident:
                     return record.isModified()
-            elif record == id:
+            elif record == ident:
                 return False
         return False
 
-    # @brief Returns True if the given field is required in the RecordGroup, otherwise returns False.
-    # Note that this is a flag for the whole group, but each record could have different values depending
-    # on its state.
     def isFieldRequired(self, fieldName):
+        """
+        Returns True if the given field is required in the RecordGroup,
+        otherwise returns False.
+        Note that this is a flag for the whole group, but each record could
+        have different values depending on its state.
+        :param fieldName:
+        :return:
+        """
         required = self.fields[fieldName].get('required', False)
         if isinstance(required, bool):
             return required
