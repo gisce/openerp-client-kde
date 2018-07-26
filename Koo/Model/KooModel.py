@@ -777,10 +777,15 @@ class KooModel(QAbstractItemModel):
             return 'button'
         return self.group.fields[ field ]['type']
 
-    # @brief Returns the field type for the given column and group
     def fieldTypeByName(self, field, group):
+        """
+        Returns the field type for the given column and group
+        :param field:
+        :param group:
+        :return:
+        """
         if field in self.group.fields:
-            return self.group.fields[ field ]['type']
+            return self.group.fields[field]['type']
         else:
             return None
 
