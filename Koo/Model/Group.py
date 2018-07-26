@@ -32,6 +32,7 @@ from .Record import Record
 from . import Field
 from PyQt5.QtCore import *
 
+
 class RecordGroup(QObject):
     """
     # @brief The RecordGroup class manages a list of records.
@@ -80,7 +81,8 @@ class RecordGroup(QObject):
     SortingOnlyGroups = 2
     SortingNotPossibleModified = 3
 
-    def __init__(self, resource, fields=None, ids=None, parent=None, context=None):
+    def __init__(self, resource, fields=None, ids=None, parent=None,
+                 context=None):
         """
         Creates a new RecordGroup object.
 
