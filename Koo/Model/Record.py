@@ -614,9 +614,9 @@ class Record(QObject):
             # If evaluateExpression raises a NameError exception like this one:
             # NameError: name 'unit_amount' is not defined
             # It may be because not all fields are loaded yet, so we'll ensure
-            # the model is loaded and re-evaluate. If that doesn't solve the problem
-            # (that is firstTry == False) then raise the exception because it's
-            # really an issue on the view definition.
+            # the model is loaded and re-evaluate. If that doesn't solve the
+            # problem (that is firstTry == False) then raise the exception
+            # because it's really an issue on the view definition.
             if firstTry:
                 self.group.ensureRecordLoaded(self)
                 val = self.evaluateExpression(dom, checkLoad, firstTry=False)
@@ -767,8 +767,8 @@ class Record(QObject):
         :return:
         """
 
-        # Try to avoid some CPU cycles because this function is called in value()
-        # function which will be called lots of times.
+        # Try to avoid some CPU cycles because this function is called in
+        # value() function which will be called lots of times.
         if len(self.group.fieldObjects) == len(self.values):
             return
         for key in self.missingFields():
