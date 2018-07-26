@@ -199,10 +199,17 @@ class FormWidget(QWidget, FormWidgetUi):
     def notifyRecordModified(self):
         self.updateStatus(_('<font color="blue">Document modified</font>'))
 
-    # @brief Establishes that every value seconds a reload should be scheduled.
-    # If value is < 0 only Subscription based reloads are executed. Note that if
-    # value is != 0 Subscription based reloads are always used if available.
+
     def setAutoReload(self, value):
+        """
+        Establishes that every value seconds a reload should be scheduled.
+        If value is < 0 only Subscription based reloads are executed. Note
+        that if value is != 0 Subscription based reloads are always used if
+        available.
+        :param value:
+        :return: None
+        :rtype: None
+        """
         if value:
             # We use both, timer and subscriber as in some cases information
             # may change only virtually: Say change the color of a row
