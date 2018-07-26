@@ -308,13 +308,14 @@ class Record(QObject):
             return True
         return False
 
-    def get(self, get_readonly=True, includeid=False, checkLoad=True, get_modifiedonly=False):
+    def get(self, get_readonly=True, includeid=False, checkLoad=True,
+            get_modifiedonly=False):
         if checkLoad:
             self.ensureIsLoaded()
         value = {}
 
-        # Iterate over self.group.fields to avoid objects of type BinarySizeField
-        # which shouldn't be treated as a normal field.
+        # Iterate over self.group.fields to avoid objects of type
+        # BinarySizeField which shouldn't be treated as a normal field.
         for name in self.group.fields:
             if not name in self.values:
                 continue
