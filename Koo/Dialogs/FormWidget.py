@@ -348,7 +348,7 @@ class FormWidget(QWidget, FormWidgetUi):
                     self.updateStatus(_('Resource not removed !'))
                 else:
                     self.updateStatus(_('Resource removed.'))
-            except Rpc.RpcException as e:
+            except Rpc.RpcException:
                 pass
             QApplication.restoreOverrideCursor()
 
