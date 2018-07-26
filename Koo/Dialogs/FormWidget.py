@@ -737,8 +737,8 @@ class FormWidget(QWidget, FormWidgetUi):
             queue.setup(viewTypes, viewIds)
             type = ''
             while type != 'form':
-                id, type = next(queue)
-            screen.setupViews(['form'], [id])
+                ident, type = next(queue)
+            screen.setupViews(['form'], [ident])
         else:
             screen.setupViews(['form'], [False])
 
