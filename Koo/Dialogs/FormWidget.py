@@ -340,7 +340,7 @@ class FormWidget(QWidget, FormWidgetUi):
         value = QMessageBox.question(
             self, _('Question'), _(
             'Are you sure you want to remove these records?'),
-            QMessageBox.Yes|QMessageBox.No)
+            QMessageBox.Yes |QMessageBox.No)
         if value == 0:
             QApplication.setOverrideCursor(Qt.WaitCursor)
             try:
