@@ -374,9 +374,6 @@ class ToManyField(QObject, StringField):
         self.name = attrs['name']
 
     def create(self, record):
-        pass
-        # @xtorello toreview
-
         from Koo.Model.Group import RecordGroup
         group = RecordGroup(
             resource=self.attrs['relation'], fields={}, parent=record,
@@ -413,7 +410,6 @@ class ToManyField(QObject, StringField):
         record.values[self.name] = group
         if modified:
             self.changed(record)
-
 
     def set_client(self, record, value, test_state=False):
         self.set(record, value, test_state=test_state)
