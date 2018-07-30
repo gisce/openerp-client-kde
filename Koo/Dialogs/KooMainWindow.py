@@ -394,7 +394,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
 
     def changeCompany(self):
         action = self.sender()
-        company_id = action.data().toInt()[0]
+        company_id = action.data()
         users = Rpc.RpcProxy('res.users')
         users.write([Rpc.session.uid], {
             'company_id': company_id,
