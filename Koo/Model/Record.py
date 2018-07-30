@@ -147,7 +147,7 @@ class Record(QObject):
         """
         record = self
         field = self.group.fieldObjects[fieldName]
-        if not fieldName in self.values:
+        if fieldName not in self.values:
             self.group.ensureRecordLoaded(self)
             x = 0
             while self.group.records[x].id != self.id:
