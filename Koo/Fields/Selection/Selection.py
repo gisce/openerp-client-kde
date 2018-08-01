@@ -133,7 +133,7 @@ class SelectionFieldDelegate(AbstractFieldDelegate):
         return widget
 
     def setEditorData(self, editor, index):
-        value = index.data(Qt.EditRole).toString()
+        value = index.data(Qt.EditRole)
         editor.setCurrentIndex(editor.findText(value))
 
     def setModelData(self, editor, model, index):
