@@ -41,7 +41,7 @@ class AbstractView(QWidget):
         self.id = False
         self._onWrite = ''
 
-     def viewType(self):
+    def viewType(self):
         """
         This function should return the type of view the class handles. Such
         as 'tree' or 'from'.
