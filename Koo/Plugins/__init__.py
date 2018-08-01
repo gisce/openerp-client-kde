@@ -37,13 +37,17 @@ import os
 class Plugins:
     plugins = {}
 
-    # @brief This function obtains the list of all available plugins by iterating
-    # over every subdirectory inside Plugins/
-    #
-    # This means that some plugins are activated the first time this function is
-    # called.
     @staticmethod
     def list(model=None):
+        """
+        This function obtains the list of all available plugins by iterating
+        over every subdirectory inside Plugins/
+
+        This means that some plugins are activated the first time this function
+        is called.
+        :param model:
+        :return:
+        """
         # Search for all available plugins
         # Scan only once
         if not Plugins.plugins:
@@ -59,9 +63,18 @@ class Plugins:
                 plugins[name] = plugin
         return plugins
 
-    # @brief Executes the given plugin.
     @staticmethod
     def execute(plugin, model, id, ids, context):
+        """
+        Executes the given plugin.
+
+        :param plugin:
+        :param model:
+        :param id:
+        :param ids:
+        :param context:
+        :return:
+        """
         plugins = Plugins.list()
         action = plugins[plugin]['action']
         action(model, id, ids, context)
