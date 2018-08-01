@@ -28,17 +28,15 @@
 
 import re
 import time
-#import exceptions
 from Koo import Rpc
 from Koo.Common import Notifier
 from Koo.Rpc import RpcProxy
 from .Field import ToManyField
-import gettext
 from Koo.Common import Debug
 
 from PyQt5.QtCore import *
 
-#ConcurrencyCheckField = '__last_update'
+# ConcurrencyCheckField = '__last_update'
 ConcurrencyCheckField = 'read_delta'
 
 
@@ -82,7 +80,6 @@ class Record(QObject):
         self.new = new
 
     def __del__(self):
-        # @xtorello toreview
         self.rpc = None
         self.modified_fields = None
         self.parent = None
@@ -91,11 +88,10 @@ class Record(QObject):
             from .Group import RecordGroup
             if isinstance(value, RecordGroup):
                 try:
-                    # value.parent.fieldObjects[key].disconnect( SIGNAL('modified'), value )
+
                     value.parent.fields()[key].disconnect()
                     value.__del__()
-                except Exception as e:
-                    # print (e)
+                except Exception:
                     pass
 
         self.values = {}
@@ -115,7 +111,6 @@ class Record(QObject):
         return self.group.fieldObjects.get(name, False)
 
     def __repr__(self):
-        # return '<Record %s@%s>' % (self.id, self.group.resource)
         return '<Record %s>' % self.id
 
     def setValue(self, fieldName, value):
@@ -193,8 +188,8 @@ class Record(QObject):
         :return:
         """
         # Do not checkLoad because current record is already loaded and using it
-        # would cause all related (one2many and many2many) fields to be completely
-        # loaded too, causing performance issues.
+        # would cause all related (one2many and many2many) fields to be
+        # completely loaded too, causing performance issues.
         return self.group.fieldObjects[fieldName].context(self, checkLoad=False)
 
     def isModified(self):
@@ -269,7 +264,6 @@ class Record(QObject):
                 if value:
                     self.stateAttributes(fieldName)[attribute] = value
 
-
     def isFieldReadOnly(self, fieldName):
         readOnly = self.stateAttributes(fieldName).get('readonly', False)
         if isinstance(readOnly, bool):
@@ -314,13 +308,14 @@ class Record(QObject):
             return True
         return False
 
-    def get(self, get_readonly=True, includeid=False, checkLoad=True, get_modifiedonly=False):
+    def get(self, get_readonly=True, includeid=False, checkLoad=True,
+            get_modifiedonly=False):
         if checkLoad:
             self.ensureIsLoaded()
         value = {}
 
-        # Iterate over self.group.fields to avoid objects of type BinarySizeField
-        # which shouldn't be treated as a normal field.
+        # Iterate over self.group.fields to avoid objects of type
+        # BinarySizeField which shouldn't be treated as a normal field.
         for name in self.group.fields:
             if not name in self.values:
                 continue
@@ -619,9 +614,9 @@ class Record(QObject):
             # If evaluateExpression raises a NameError exception like this one:
             # NameError: name 'unit_amount' is not defined
             # It may be because not all fields are loaded yet, so we'll ensure
-            # the model is loaded and re-evaluate. If that doesn't solve the problem
-            # (that is firstTry == False) then raise the exception because it's
-            # really an issue on the view definition.
+            # the model is loaded and re-evaluate. If that doesn't solve the
+            # problem (that is firstTry == False) then raise the exception
+            # because it's really an issue on the view definition.
             if firstTry:
                 self.group.ensureRecordLoaded(self)
                 val = self.evaluateExpression(dom, checkLoad, firstTry=False)
@@ -772,8 +767,8 @@ class Record(QObject):
         :return:
         """
 
-        # Try to avoid some CPU cycles because this function is called in value()
-        # function which will be called lots of times.
+        # Try to avoid some CPU cycles because this function is called in
+        # value() function which will be called lots of times.
         if len(self.group.fieldObjects) == len(self.values):
             return
         for key in self.missingFields():
