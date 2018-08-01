@@ -28,15 +28,24 @@
 from Koo.Common import Common
 from Koo import Rpc
 
-# @brief The addInformationToFile function makes use of Nepomuk adds semantic information to the given file.
-#
-# Note you need to provide the model and ids this file was generated from. You can
-# optionally provide the fields too.
-#
-# If Nepomuk is not available (it doesn't work on Windows nor Mac) it just won't do anything.
+# @brief
 
 
 def addInformationToFile(fileName, model, ids, field=None):
+    """
+    The addInformationToFile function makes use of Nepomuk adds semantic
+    information to the given file.
+
+    Note you need to provide the model and ids this file was generated from.
+    You canoptionally provide the fields too.
+
+    If Nepomuk is not available (it doesn't work on Windows nor Mac) it just won't do anything.
+    :param fileName:
+    :param model:
+    :param ids:
+    :param field:
+    :return:
+    """
     if not Common.isKdeAvailable:
         return
     if not isinstance(ids, list):

@@ -141,10 +141,17 @@ def executeReport(name, data, context=None):
     QApplication.restoreOverrideCursor()
     return True
 
-# @brief Executes the given action id (it could be a report, wizard, etc).
-
 
 def execute(act_id, datas, type=None, context=None):
+    """
+    Executes the given action id (it could be a report, wizard, etc).
+
+    :param act_id:
+    :param datas:
+    :param type:
+    :param context:
+    :return:
+    """
     if context is None:
         context = {}
     ctx = Rpc.session.context.copy()
@@ -159,10 +166,17 @@ def execute(act_id, datas, type=None, context=None):
                               type, 'read', [act_id], False, ctx)[0]
     Api.instance.executeAction(res, datas, context)
 
-# @brief Executes the given action (it could be a report, wizard, etc).
-
 
 def executeAction(action, datas, context=None):
+    """
+    Executes the given action (it could be a report, wizard, etc).
+
+    :param action:
+    :param datas:
+    :param context:
+    :return:
+    """
+
     if context is None:
         context = {}
     if 'type' not in action:
@@ -243,10 +257,18 @@ def executeAction(action, datas, context=None):
     elif action['type'] == 'ir.actions.act_url':
         Api.instance.createWebWindow(action.get('url'), action.get('name'))
 
-# @brief Executes the given keyword action (it could be a report, wizard, etc).
+# @brief
 
 
 def executeKeyword(keyword, data=None, context=None):
+    """
+    Executes the given keyword action (it could be a report, wizard, etc).
+
+    :param keyword:
+    :param data:
+    :param context:
+    :return:
+    """
     if data is None:
         data = {}
     if context is None:

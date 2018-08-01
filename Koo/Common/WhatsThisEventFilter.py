@@ -20,16 +20,18 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from Koo.Common import Shortcuts
 
-# @brief
-
 
 class WhatsThisEventFilter(QObject):
-    """The WhatsThisEventFilter class provides an eventFilter that allows
+    """
+    The WhatsThisEventFilter class provides an eventFilter that allows
     viewing the What's This information of the current widget by pressing a key.
 
-    This is mostly interesting for viewing help of form fields. By default the shortcut is F10.
+    This is mostly interesting for viewing help of form fields. By default the
+    shortcut is F10.
 
-    To install it in an application use 'app.installEventFilter( Koo.Common.WhatsThisEventFilter( mainWindow ) )'"""
+    To install it in an application use
+    'app.installEventFilter( Koo.Common.WhatsThisEventFilter( mainWindow ) )'
+    """
 
     def __init__(self, parent=None):
         """

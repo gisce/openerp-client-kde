@@ -44,28 +44,40 @@ import locale
 from . import Common
 import re
 
-# @brief Converts a QDate object into a Python string
-
 
 def dateToText(date):
+    """
+    Converts a QDate object into a Python string
+    :param date:
+    :return:
+    """
     return str(date.toString('dd/MM/yyyy'))
-
-# @brief Converts a QTime object into a Python string
 
 
 def timeToText(time):
+    """
+    Converts a QTime object into a Python string
+    :param time:
+    :return:
+    """
     return str(time.toString('hh:mm:ss'))
-
-# @brief Converts a QDateTime object into a Python string
 
 
 def dateTimeToText(dateTime):
+    """
+    Converts a QDateTime object into a Python string
+    :param dateTime:
+    :return:
+    """
     return str(dateTime.toString('dd/MM/yyyy hh:mm:ss'))
-
-# @brief Converts a float (type floatTime) into a Python string
 
 
 def floatTimeToText(value):
+    """
+    Converts a float (type floatTime) into a Python string
+    :param value:
+    :return:
+    """
     # Ensure the value is a float. This way we also accept strings here.
     value = float(value)
     t = '%02d:%02d' % (math.floor(abs(value)),
@@ -74,40 +86,51 @@ def floatTimeToText(value):
         t = '-' + t
     return t
 
-# @brief Converts a QDate object into a Python string ready to be sent to the
-# server.
-
 
 def dateToStorage(date):
+    """
+    Converts a QDate object into a Python string ready to be sent to the server.
+    :param date:
+    :return:
+    """
     if date.isValid():
         return str(date.toString('yyyy-MM-dd'))
     else:
         return False
 
-# @brief Converts a QTime object into a Python string ready to be sent to the
-# server.
 
 
 def timeToStorage(time):
+    """
+    Converts a QTime object into a Python string ready to be sent to the server.
+    :param time:
+    :return:
+    """
     if time.isValid():
         return str(time.toString('hh:mm:ss'))
     else:
         return False
 
-# @brief Converts a QDateTime object into a Python string ready to be sent to
-# the server.
-
 
 def dateTimeToStorage(dateTime):
+    """
+    Converts a QDateTime object into a Python string ready to be sent to the
+    server.
+    :param dateTime:
+    :return:
+    """
     if dateTime.isValid():
         return str(dateTime.toString('yyyy-MM-dd hh:mm:ss'))
     else:
         return False
 
-# @brief Converts a Python string or QString into a QDate object
-
 
 def textToDate(text):
+    """
+    Converts a Python string or QString into a QDate object
+    :param text:
+    :return:
+    """
     text = str(text).strip()
     if text == '=':
         return QDate.currentDate()
@@ -141,10 +164,13 @@ def textToDate(text):
             break
     return date
 
-# @brief Converts a Python string or QString into a QTime object
-
 
 def textToTime(text):
+    """
+    Converts a Python string or QString into a QTime object
+    :param text:
+    :return:
+    """
     text = str(text).strip()
     if text == '=':
         return QTime.currentTime()
@@ -165,10 +191,13 @@ def textToTime(text):
                 text[0:2], text[2:4], text[4:6]), 'h:m:s')
     return time
 
-# @brief Converts a Python string or QString into a QDateTime object
-
 
 def textToDateTime(text):
+    """
+    Converts a Python string or QString into a QDateTime object
+    :param text:
+    :return:
+    """
     text = str(text).strip()
     if text == '=':
         return QDateTime.currentDateTime()
@@ -192,10 +221,13 @@ def internalTextToFloatTime(text):
     except:
         return 0.0
 
-# @brief Converts a Python string into a float (floatTime)
-
 
 def textToFloatTime(text):
+    """
+    Converts a Python string into a float (floatTime)
+    :param text:
+    :return:
+    """
     text = str(text).strip()
     time = 0.0
     last_operation = None
@@ -213,10 +245,13 @@ def textToFloatTime(text):
             time = value
     return time
 
-# @brief Converts a Python string comming from the server into a QDate object
-
 
 def storageToDate(text):
+    """
+    Converts a Python string comming from the server into a QDate object
+    :param text:
+    :return:
+    """
     if text:
         date = QDate.fromString(text, 'yyyy-MM-dd')
         if date.isValid():
@@ -226,19 +261,25 @@ def storageToDate(text):
     else:
         return QDate()
 
-# @brief Converts a Python string comming from the server into a QTime object
-
 
 def storageToTime(text):
+    """
+    Converts a Python string comming from the server into a QTime object
+    :param text:
+    :return:
+    """
     if text:
         return QTime.fromString(text, 'h:m:s')
     else:
         return QTime()
 
-# @brief Converts a Python string comming from the server into a QDateTime object
-
 
 def storageToDateTime(text):
+    """
+    Converts a Python string comming from the server into a QDateTime object
+    :param text:
+    :return:
+    """
     if text:
         return QDateTime.fromString(text, 'yyyy-MM-dd h:m:s')
     else:
@@ -247,27 +288,37 @@ def storageToDateTime(text):
 
 (PopupCalendarUi, PopupCalendarBase) = loadUiType(Common.uiPath('datetime.ui'))
 
-# @brief The PopupCalendarWidget class provides a simple way to show a calendar
-# where the user can pick up a date.
-#
-# You simply need to call PopupCalendarWidget(widget) where widget
-# should be a QLineEdit or similar. The Popup will fill in the date itself.
-#
-# If you want the user to be able to select date and time, specify showTime=True
-# when constructing the object.
-#
-# You may force the pop-up to store and close with the storeOnParent() function.
-#
-# Of course, PopupCalendarWidget uses the other ToTime and ToText helper functions.
+# @brief
 #
 
 
 class PopupCalendarWidget(QWidget, PopupCalendarUi):
-    # @brief Constructs a PopupCalendarWidget.
-    # If showTime is True, the user will be able to select the time too.
+    """
+    The PopupCalendarWidget class provides a simple way to show a calendar
+    where the user can pick up a date.
+
+    You simply need to call PopupCalendarWidget(widget) where widget should be
+    a QLineEdit or similar. The Popup will fill in the date itself.
+
+    If you want the user to be able to select date and time, specify
+    showTime=True when constructing the object.
+
+    You may force the pop-up to store and close with the storeOnParent()
+    function.
+
+    Of course, PopupCalendarWidget uses the other ToTime and ToText helper
+    functions.
+    """
+
     selected = pyqtSignal()
 
     def __init__(self, parent, showTime=False):
+        """
+        Constructs a PopupCalendarWidget.
+        If showTime is True, the user will be able to select the time too.
+        :param parent:
+        :param showTime:
+        """
         QWidget.__init__(self, parent)
         PopupCalendarUi.__init__(self)
         self.setupUi(self)
@@ -308,9 +359,12 @@ class PopupCalendarWidget(QWidget, PopupCalendarUi):
         else:
             self.uiCalendar.setFocus()
 
-    # @brief Stores the currently selected date (or date and time) in the parent widget
-    # and closes the popup. It also emits a 'selected()' signal.
     def storeOnParent(self):
+        """
+        Stores the currently selected date (or date and time) in the parent
+        widget and closes the popup. It also emits a 'selected()' signal.
+        :return:
+        """
         date = self.uiCalendar.selectedDate()
         text = dateToText(date)
         if self.showTime:

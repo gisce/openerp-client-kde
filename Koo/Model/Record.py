@@ -354,7 +354,6 @@ class Record(QObject):
         """
 
         from .Group import RecordGroup
-        print("Record.save")
 
         self.ensureIsLoaded()
         if not self.id:

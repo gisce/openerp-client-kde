@@ -132,9 +132,12 @@ class Settings(object):
 
         return True
 
-    # @brief Loads settings from the appropiate config file.
     @staticmethod
     def loadFromFile():
+        """
+        Loads settings from the appropiate config file.
+        :return:
+        """
         if not Settings.rcFile:
             # If no file was specified we try to read it from environment
             # variable o standard path
@@ -160,9 +163,13 @@ class Settings(object):
             Debug.warning('Unable to read config file %s !' % Settings.rcFile)
         return True
 
-    # @brief Loads settings from Windows registry.
     @staticmethod
     def loadFromRegistry():
+        """
+        Loads settings from Windows registry.
+        :return:
+        """
+
         if os.name != 'nt':
             return
 
@@ -179,32 +186,52 @@ class Settings(object):
         value, value_type = winreg.QueryValueEx(key, "Language")
         Settings.options['client.language'] = languages.get(value, False)
 
-    # @brief Sets the value for the given key.
     @staticmethod
     def setValue(key, value):
+        """
+        Sets the value for the given key.
+        :param key:
+        :param value:
+        :return:
+        """
         Settings.options[key] = value
 
-    # @brief Returns the value for the given key.
-    #
-    # If defaultValue parameter is given, defaultValue is returned if the key does not exist.
-    # If type is given, it will convert the value to the given type.
     @staticmethod
     def value(key, defaultValue=None, toType=None):
+        """
+        Returns the value for the given key.
+
+        If defaultValue parameter is given, defaultValue is returned if the
+        key does not exist.
+        If type is given, it will convert the value to the given type.
+        :param key:
+        :param defaultValue:
+        :param toType:
+        :return:
+        """
         value = Settings.options.get(key, defaultValue)
         if toType == int:
             return int(value)
         return value
 
-    # @brief Returns the value associated with the given key. If the key has no valu
-    # returns defaultValue
     @staticmethod
     def get(key, defaultValue=None):
+        """
+        Returns the value associated with the given key. If the key has no valu
+        returns defaultValue
+        :param key:
+        :param defaultValue:
+        :return:
+        """
         return Settings.options.get(key, defaultValue)
 
-    # @brief Tries to load settings from koo server module.
-    # If the module is not installed, no exception or error is thrown.
     @staticmethod
     def loadFromServer():
+        """
+        Tries to load settings from koo server module.
+        If the module is not installed, no exception or error is thrown.
+        :return:
+        """
         try:
             settings = Rpc.session.call(
                 '/object', 'execute', 'nan.koo.settings', 'get_settings')

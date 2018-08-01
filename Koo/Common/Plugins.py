@@ -28,8 +28,6 @@
 import os
 import sys
 
-# @brief
-
 
 def scan(module, directory):
     """

@@ -27,15 +27,18 @@
 
 import locale
 
-# @brief This function converts a string into an integer allowing
-#  operations (+, -, /, *).
-#
-#  The formula is calculated and the output is returned by
-#  the function. If the formula contains floating point
-#  values or results they're converted into integer at the end.
-
 
 def textToInteger(text):
+    """
+    This function converts a string into an integer allowing
+    operations (+, -, /, *).
+
+    The formula is calculated and the output is returned by
+    the function. If the formula contains floating point
+    values or results they're converted into integer at the end.
+    :param text:
+    :return:
+    """
     chars = ['+', '-', '/', '*', '.', '(', ')', ',']
     chars = chars + [str(x) for x in range(10)]
     text = text.replace(',', '.')
@@ -44,14 +47,17 @@ def textToInteger(text):
     except:
         return False
 
-# @brief This function converts a string into a float allowing
-#  operations (+, -, /, *).
-#
-#  The formula is calculated and the output is returned by
-#  the function.
-
 
 def textToFloat(text):
+    """
+    This function converts a string into a float allowing
+    operations (+, -, /, *).
+
+    The formula is calculated and the output is returned by
+    the function.
+    :param text:
+    :return:
+    """
     chars = ['+', '-', '/', '*', '.', '(', ')', ',']
     chars = chars + [str(x) for x in range(10)]
     newtext = text.replace(',', '.')
@@ -71,11 +77,16 @@ def textToFloat(text):
                 pass
     return value
 
-# @brief This function converts a float into text. By default the number
-# of decimal digits is 2.
-
 
 def floatToText(number, digits=None, thousands=False):
+    """
+    This function converts a float into text. By default the number
+    of decimal digits is 2.
+    :param number:
+    :param digits:
+    :param thousands:
+    :return:
+    """
     if isinstance(number, int):
         number = float(number)
     if not isinstance(number, float):
@@ -96,29 +107,39 @@ def floatToText(number, digits=None, thousands=False):
         return ('%.' + d + 'f') % number
 
 
-# @brief This function converts an integer into text.
 def integerToText(number):
+    """
+    This function converts an integer into text.
+    :param number:
+    :return:
+    """
     if isinstance(number, float):
         number = int(number)
     if not isinstance(number, int):
         number = 0
     return '%d' % number
 
-# @brief This function returns True if the given value can be converted into
-# a float number. Otherwise it returns False.
-
 
 def isNumeric(value):
+    """
+    This function returns True if the given value can be converted into
+    a float number. Otherwise it returns False.
+    :param value:
+    :return:
+    """
     try:
         return float(value) or True
     except (ValueError, TypeError) as e:
         return False
 
-# @brief This function converts the given paramter (which should be a number) into
-# a human readable storage value, ie. bytes, Kb, Mb, Gb, Tb.
-
 
 def bytesToText(number):
+    """
+    This function converts the given paramter (which should be a number) into
+    a human readable storage value, ie. bytes, Kb, Mb, Gb, Tb.
+    :param number:
+    :return:
+    """
     number = float(number)
     texts = [_('%d bytes'), _('%.2f Kb'), _(
         '%.2f Mb'), _('%.2f Gb'), _('%.2f Tb')]

@@ -75,11 +75,14 @@ from Koo.Common import common_rc
 # so by no we have to add Koo/Common to sys.path
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-# @brief Returns a dictionary with all the attributes found in a XML with their
-# name as key and the corresponding value.
-
 
 def nodeAttributes(node):
+    """
+    Returns a dictionary with all the attributes found in a XML with their name
+    as key and the corresponding value.
+    :param node:
+    :return:
+    """
     result = {}
     attrs = node.attributes
     if attrs is None:
@@ -115,14 +118,16 @@ def sendEMail(to, subject, body):
 
 (SelectionDialogUi, SelectionDialogBase) = loadUiType(uiPath('win_selection.ui'))
 
-# @brief The SelectionDialog class shows a dialog prompting the user to choose
-# among a list of items.
-#
-# The selected value is stored in the 'result' property.
-# @see selection()
 
 
 class SelectionDialog(QDialog, SelectionDialogUi):
+    """
+    The SelectionDialog class shows a dialog prompting the user to choose
+    among a list of items.
+
+    The selected value is stored in the 'result' property.
+    @see selection()
+    """
     def __init__(self, title, values, parent=None):
         QDialog.__init__(self, parent)
         SelectionDialogUi.__init__(self)
@@ -143,16 +148,24 @@ class SelectionDialog(QDialog, SelectionDialogUi):
         self.result = (str(item.text()), item.value)
         self.accept()
 
-# @brief Shows the SelectionDialog
-#
-# It returns the selected item or False if none was selected.
-#
-# No dialog will be shown if the dictionary of values is empty. If alwaysask
-# is False (the default) no dialog is shown and the only element is returned
-# as selected.
+# @brief
 
 
 def selection(title, values, alwaysask=False):
+    """
+    Shows the SelectionDialog
+
+    It returns the selected item or False if none was selected.
+
+    No dialog will be shown if the dictionary of values is empty. If alwaysask
+    is False (the default) no dialog is shown and the only element is returned
+    as selected.
+
+    :param title:
+    :param values:
+    :param alwaysask:
+    :return:
+    """
     if len(values) == 0:
         return None
     elif len(values) == 1 and (not alwaysask):
@@ -164,19 +177,25 @@ def selection(title, values, alwaysask=False):
     else:
         return False
 
-# @brief Shows a warning dialog. Function used by the notifier in the Koo application.
-
 
 def warning(title, message):
+    """
+    Shows a warning dialog. Function used by the notifier in the Koo
+    application.
+    :param title:
+    :param message:
+    :return:
+    """
     QApplication.setOverrideCursor(Qt.ArrowCursor)
     QMessageBox.warning(None, title, message)
     QApplication.restoreOverrideCursor()
 
-# @brief The ConcurrencyErrorDialog class provices a Dialog used when a
-# concurrency error is received from the server.
-
 
 class ConcurrencyErrorDialog(QMessageBox):
+    """
+    The ConcurrencyErrorDialog class provices a Dialog used when a
+    concurrency error is received from the server.
+    """
     def __init__(self, parent=None):
         QMessageBox.__init__(self, parent)
         self.setIcon(QMessageBox.Warning)
@@ -187,10 +206,16 @@ class ConcurrencyErrorDialog(QMessageBox):
         self.addButton(_('Compare'), QMessageBox.ActionRole)
         self.addButton(_('Do not save'), QMessageBox.RejectRole)
 
-# @brief Shows the ConcurrencyErrorDialog. Function used by the notifier in the Koo application.
-
 
 def concurrencyError(model, id, context):
+    """
+    Shows the ConcurrencyErrorDialog. Function used by the notifier in the
+    Koo application.
+    :param model:
+    :param id:
+    :param context:
+    :return:
+    """
     QApplication.setOverrideCursor(Qt.ArrowCursor)
     dialog = ConcurrencyErrorDialog()
     result = dialog.exec_()
@@ -205,15 +230,16 @@ def concurrencyError(model, id, context):
 
 (ErrorDialogUi, ErrorDialogBase) = loadUiType(uiPath('error.ui'))
 
-# @brief The ErrorDialog class shows the error dialog used everywhere in Koo.
-#
-# The dialog shows two tabs. One with a short description of the problem and the
-# second one with the details, usually a backtrace.
-#
-# @see error()
-
 
 class ErrorDialog(QDialog, ErrorDialogUi):
+    """
+    The ErrorDialog class shows the error dialog used everywhere in Koo.
+
+    The dialog shows two tabs. One with a short description of the problem and
+    the second one with the details, usually a backtrace.
+
+    @see error()
+    """
     def __init__(self, title, message, details='', parent=None):
         QDialog.__init__(self, parent)
         ErrorDialogUi.__init__(self)
@@ -264,8 +290,14 @@ class ErrorDialog(QDialog, ErrorDialogUi):
         self.pushSend.setEnabled(False)
 
 
-# @brief Shows the ErrorDialog. Function used by the notifier in the Koo application.
 def error(title, message, details=''):
+    """
+    Shows the ErrorDialog. Function used by the notifier in the Koo application.
+    :param title:
+    :param message:
+    :param details:
+    :return:
+    """
     QApplication.setOverrideCursor(Qt.ArrowCursor)
     dialog = ErrorDialog(str(title), str(message), str(details))
     dialog.exec_()
@@ -275,14 +307,19 @@ def error(title, message, details=''):
 (LostConnectionDialogUi, LostConnectionDialogBase) = loadUiType(
     uiPath('lostconnection.ui'))
 
-# @brief The LostConnectionDialog class shows the error dialog used when connection with the server has been lost.
-#
-# The show a counter which is decreased every seconds and waits for 10 seconds before retrying.
-#
-# @see lostConnectionError()
+# @brief
 
 
 class LostConnectionDialog(QDialog, LostConnectionDialogUi):
+    """
+    The LostConnectionDialog class shows the error dialog used when connection
+    with the server has been lost.
+
+    The show a counter which is decreased every seconds and waits for 10
+    seconds before retrying.
+
+    @see lostConnectionError()
+    """
     def __init__(self, count, parent=None):
         QDialog.__init__(self, parent)
         LostConnectionDialogUi.__init__(self)
@@ -312,8 +349,12 @@ class LostConnectionDialog(QDialog, LostConnectionDialogUi):
         self.timer.stop()
 
 
-# @brief Shows the ErrorDialog. Function used by the notifier in the Koo application.
 def lostConnectionError(count):
+    """
+    Shows the ErrorDialog. Function used by the notifier in the Koo application.
+    :param count:
+    :return:
+    """
     QApplication.setOverrideCursor(Qt.ArrowCursor)
     dialog = LostConnectionDialog(count)
     if dialog.exec_() == QDialog.Rejected:
@@ -328,17 +369,21 @@ def lostConnectionError(count):
 
 (ProgressDialogUi, ProgressDialogBase) = loadUiType(uiPath('progress.ui'))
 
-# @brief The ProgressDialog class shows a progress bar moving left and right until you stop it.
-#
-# To use it:
-# 1) Create a dialog (eg. dlg = ProgressDialog(self))
-# 2) Call the start function (eg. dlg.start() )
-# 3) Call the stop function when the operation has finished (eg. dlg.stop() )
-# Take into account that the dialog will only show after a couple of seconds. This way, it
-# only appears on long running tasks.
 
 
 class ProgressDialog(QDialog, ProgressDialogUi):
+    """
+    The ProgressDialog class shows a progress bar moving left and right until
+    you stop it.
+
+    To use it:
+    1) Create a dialog (eg. dlg = ProgressDialog(self))
+    2) Call the start function (eg. dlg.start() )
+    3) Call the stop function when the operation has finished (eg. dlg.stop() )
+    Take into account that the dialog will only show after a couple of seconds.
+    This way, it
+    only appears on long running tasks.
+    """
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         ProgressDialogUi.__init__(self)
@@ -359,10 +404,13 @@ class ProgressDialog(QDialog, ProgressDialogUi):
         self.timer.stop()
         self.accept()
 
-# @brief Opens the given file with system's default application.
-
 
 def openFile(fileName):
+    """
+    Opens the given file with system's default application.
+    :param fileName:
+    :return:
+    """
     if os.name == 'nt':
         os.startfile(fileName)
     elif os.uname()[0] == 'Darwin':
@@ -370,13 +418,16 @@ def openFile(fileName):
     else:
         os.spawnlp(os.P_NOWAIT, 'xdg-open', 'xdg-open', fileName)
 
-# @brief Converts GTK accelerators to Qt ones.
-# GTK uses underscore as accelerator in labels and buttons whereas Qt uses
-# ampersand. This function will convert a text prepared for a GTK label into
-# a valid Qt one.
-
 
 def normalizeLabel(text):
+    """
+    Converts GTK accelerators to Qt ones.
+    GTK uses underscore as accelerator in labels and buttons whereas Qt uses
+    ampersand. This function will convert a text prepared for a GTK label into
+    a valid Qt one.
+    :param text:
+    :return:
+    """
     # If text is False, we ensure a string is returned.
     if not text:
         return ''
@@ -401,12 +452,16 @@ def normalizeLabel(text):
     return res
 
 
-# @brief This function converts a string into a boolean.
-#
-# Given that OpenERP has changed the way it handles booleans in view definitions
-# it's a bit complicated to properly evaluate it. At first only "1" and "0" were
-# used, for example.
 def stringToBool(text):
+    """
+    This function converts a string into a boolean.
+
+    Given that OpenERP has changed the way it handles booleans in view definitions
+    it's a bit complicated to properly evaluate it. At first only "1" and "0" were
+    used, for example.
+    :param text:
+    :return:
+    """
     if isinstance(text, str) or isinstance(text, str):
         text = text.strip()
         if text.lower() == 'true' or text == '1':
@@ -415,12 +470,15 @@ def stringToBool(text):
             return False
     return bool(text)
 
-# @brief This function simplifies HTML as returned by TextEdit.toHtml() function by
-# removing <html>, <head> and <body> tags, so resulting text integrates better when
-# used in a web page.
-
 
 def simplifyHtml(html):
+    """
+    This function simplifies HTML as returned by TextEdit.toHtml() function by
+    removing <html>, <head> and <body> tags, so resulting text integrates
+    better when used in a web page.
+    :param html:
+    :return:
+    """
     if isinstance(html, QString):
         html = str(html)
     if '<p' in html:

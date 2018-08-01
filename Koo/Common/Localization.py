@@ -28,10 +28,13 @@
 from . import Paths
 import os
 
-# @brief Initializes gettext translation system.
-
 
 def initializeTranslations(language=None):
+    """
+    Initializes gettext translation system.
+    :param language:
+    :return:
+    """
     import locale
     import gettext
 
@@ -70,10 +73,13 @@ def initializeTranslations(language=None):
 
     lang.install()
 
-# @brief Initializes Qt translation system.
-
 
 def initializeQtTranslations(language=None):
+    """
+    Initializes Qt translation system.
+    :param language:
+    :return:
+    """
     from PyQt5.QtCore import QTranslator, QCoreApplication, QLocale
     if not language:
         language = str(QLocale.system().name())

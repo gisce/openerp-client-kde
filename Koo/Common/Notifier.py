@@ -54,30 +54,47 @@ warningHandler = None
 concurrencyErrorHandler = None
 lostConnectionErrorHandler = None
 
-# @brief Calls the function that has been registered to handle errors.
-
 
 def notifyError(title, message, detail):
+    """
+    Calls the function that has been registered to handle errors.
+    :param title:
+    :param message:
+    :param detail:
+    :return:
+    """
     if errorHandler:
         errorHandler(title, message, detail)
 
-# @brief Calls the function that has been registered to handle warnings.
-
 
 def notifyWarning(title, message):
+    """
+    Calls the function that has been registered to handle warnings.
+    :param title:
+    :param message:
+    :return:
+    """
     if warningHandler:
         warningHandler(title, message)
 
-# @brief Calls the function that has been registered to handle concurrency errors.
-
 
 def notifyConcurrencyError(model, id, context):
+    """
+    Calls the function that has been registered to handle concurrency errors.
+    :param model:
+    :param id:
+    :param context:
+    :return:
+    """
     if concurrencyErrorHandler:
         return concurrencyErrorHandler(model, id, context)
 
-# @brief Calls the function that has been registered to handle lost connection errors.
-
 
 def notifyLostConnection(count):
+    """
+    Calls the function that has been registered to handle lost connection errors.
+    :param count:
+    :return:
+    """
     if lostConnectionErrorHandler:
         return lostConnectionErrorHandler(count)
