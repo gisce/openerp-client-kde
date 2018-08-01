@@ -27,21 +27,10 @@
 ##############################################################################
 
 from Koo.Rpc import RpcProxy
-from Koo import Rpc
 from Koo.Common.Settings import *
 from .Record import Record
 from . import Field
-
-
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-
-try:
-    set()
-except NameError:
-    from sets import Set as set
-
-
 
 
 class RecordGroup(QObject):
@@ -92,7 +81,8 @@ class RecordGroup(QObject):
     SortingOnlyGroups = 2
     SortingNotPossibleModified = 3
 
-    def __init__(self, resource, fields=None, ids=None, parent=None, context=None):
+    def __init__(self, resource, fields=None, ids=None, parent=None,
+                 context=None):
         """
         Creates a new RecordGroup object.
 
@@ -118,7 +108,7 @@ class RecordGroup(QObject):
         self.maximumLimit = self.limit
         self.rpc = RpcProxy(resource)
 
-        if fields == None:
+        if fields is None:
             self.fields = {}
         else:
             self.fields = fields
@@ -191,13 +181,11 @@ class RecordGroup(QObject):
         return self._onWriteFunction
 
     def __del__(self):
-        # @xtorello toreview
         if self.parent:
-            # @xtorello TODO toreview
             try:
                 self.modified.disconnect()
                 self.tomanyfield = None
-            except:
+            except Exception:
                 pass
 
         self.rpc = None
@@ -209,20 +197,18 @@ class RecordGroup(QObject):
             if not isinstance(r, Record):
                 continue
 
-            # @xtorello TODO toreview
             try:
                 r.recordChanged.disconnect()
-            except:
+            except Exception:
                 pass
 
             r.__del__()
         self.records = []
         for f in self.fieldObjects:
-            # @xtorello TODO toreview
             try:
                 self.fieldObjects[f].parent = None
                 self.disconnect()
-            except:
+            except Exception:
                 pass
 
             # @xtorello toreview
@@ -260,8 +246,8 @@ class RecordGroup(QObject):
             self.fieldObjects[fname] = Field.FieldFactory.create(
                 fvalue['type'], self, fvalue)
             if fvalue['type'] in ('binary', 'image'):
-                self.fieldObjects['%s.size' % fname] = Field.FieldFactory.create(
-                    'binary-size', self, fvalue)
+                val = Field.FieldFactory.create('binary-size', self, fvalue)
+                self.fieldObjects['%s.size' % fname] = val
 
     def save(self):
         """
@@ -273,10 +259,9 @@ class RecordGroup(QObject):
         :return:
         """
 
-        print("RecordGroup.save")
         for record in self.records:
             if isinstance(record, Record):
-                saved = record.save()
+                record.save()
 
     def modifiedRecords(self):
         """
@@ -326,8 +311,8 @@ class RecordGroup(QObject):
                         m.reload()
             if cont:
                 continue
-            # TODO: Should we reconsider this? Do we need/want to reload. Probably we
-            # only want to add the id to the list.
+            # TODO: Should we reconsider this? Do we need/want to reload.
+            # Probably we only want to add the id to the list.
             record = Record(id, self, parent=self.parent)
             record.recordChanged['PyQt_PyObject'].connect(self.recordChanged)
             record.recordModified['PyQt_PyObject'].connect(self.recordModified)
@@ -381,13 +366,13 @@ class RecordGroup(QObject):
         if addOnTop:
             start = 0
             # Discard from 'ids' those that are already loaded.
-            # If we didn't do that, some records could be repeated if the programmer
-            # doesn't verify that, and we'd end up in errors because when records are
-            # actually loaded they're only checked against a single appearance of the
-            # id in the list of records.
+            # If we didn't do that, some records could be repeated if the
+            # programmer doesn't verify that, and we'd end up in errors
+            # because when records are actually loaded they're only checked
+            # against a single appearance of the id in the list of records.
             #
-            # Note we don't use sets to discard ids, because we want to keep the order
-            # their order and because it can cause infinite recursion.
+            # Note we don't use sets to discard ids, because we want to keep
+            # the order their order and because it can cause infinite recursion.
             currentIds = self.ids()
             for ident in ids:
                 if ident not in currentIds:
@@ -401,9 +386,9 @@ class RecordGroup(QObject):
                 if ident not in currentIds:
                     self.records.append(ident)
             end = len(self.records) - 1
-        # We consider the group is updated because otherwise calling count() would
-        # force an update() which would cause one2many relations to load elements
-        # when we only want to know how many are there.
+        # We consider the group is updated because otherwise calling count()
+        # would force an update() which would cause one2many relations to
+        # load elements when we only want to know how many are there.
         self.updated = True
         self.recordsInserted.emit(start, end)
 
@@ -432,12 +417,21 @@ class RecordGroup(QObject):
         ctx.update(self._context)
         return ctx
 
-    # @brief Sets the context that will be used for RPC calls.
     def setContext(self, context):
+        """
+        Sets the context that will be used for RPC calls.
+        :param context:
+        :return:
+        """
         self._context = context.copy()
 
-    # @brief Adds a record to the list
     def add(self, record, position=-1):
+        """
+        Adds a record to the list
+        :param record:
+        :param position:
+        :return:
+        """
         if not record.group is self:
             fields = {}
             for mf in record.group.fields:
@@ -456,11 +450,18 @@ class RecordGroup(QObject):
         record.recordModified['PyQt_PyObject'].connect(self.recordModified)
         return record
 
-    # @brief Creates a new record of the same type of the records in the group.
-    #
-    # If 'default' is true, the record is filled in with default values.
-    # 'domain' and 'context' are only used if default is true.
     def create(self, default=True, position=-1, domain=None, context=None):
+        """
+        Creates a new record of the same type of the records in the group.
+
+        If 'default' is true, the record is filled in with default values.
+        'domain' and 'context' are only used if default is true.
+        :param default:
+        :param position:
+        :param domain:
+        :param context:
+        :return:
+        """
         if domain is None:
             domain = []
         if context is None:
@@ -486,10 +487,8 @@ class RecordGroup(QObject):
     def enableSignals(self):
         self._signalsEnabled = True
 
-    # @xtorello toreview or True
     @pyqtSlot('PyQt_PyObject')
     def recordChanged(self, record):
-        # @xtorello toreview or True
         if self._signalsEnabled:
             self.recordChangedSignal.emit(record)
         if self.parent:
@@ -592,12 +591,16 @@ class RecordGroup(QObject):
         self.addFields(fields)
         self._allFieldsLoaded = True
 
-    # @brief Adds the specified fields to the record group
-    #
-    # Note that it updates 'fields' and 'fieldObjects' in the group.
-    # 'fields' is a dict of dicts as typically returned by 'fields_get'
-    # server function.
     def addFields(self, fields):
+        """
+        Adds the specified fields to the record group
+
+        Note that it updates 'fields' and 'fieldObjects' in the group.
+        'fields' is a dict of dicts as typically returned by 'fields_get'
+        server function.
+        :param fields:
+        :return:
+        """
         to_add = []
         for f in list(fields.keys()):
             if not f in self.fields:
@@ -609,8 +612,12 @@ class RecordGroup(QObject):
         self.loadFieldObjects(to_add)
         return to_add
 
-    # @brief Ensures all records in the group are loaded.
     def ensureAllLoaded(self):
+        """
+        Ensures all records in the group are loaded.
+        :return: None
+        :rtype: None
+        """
         ids = self.unloadedIds()
         if not ids:
             return
@@ -624,9 +631,13 @@ class RecordGroup(QObject):
                 r = self.recordById(v['id'])
                 r.set(v, signal=False)
 
-    # @brief Returns the list of ids that have not been loaded yet. The list
-    # won't include new records as those have id 0 or None.
     def unloadedIds(self):
+        """
+        Returns the list of ids that have not been loaded yet. The list
+        won't include new records as those have id 0 or None.
+        :return: List of ids
+        :rtype: list(int)
+        """
         self.ensureUpdated()
         ids = []
         for x in self.records:
@@ -637,8 +648,12 @@ class RecordGroup(QObject):
                 ids.append(x)
         return ids
 
-    # @brief Returns the list of loaded records. The list won't include new records.
     def loadedRecords(self):
+        """
+        Returns the list of loaded records. The list won't include new records.
+        :return: List of loaded records
+        :rtype: list(int)
+        """
         records = []
         for x in self.records:
             if isinstance(x, Record):
@@ -646,8 +661,12 @@ class RecordGroup(QObject):
                     records.append(x)
         return records
 
-    # @brief Returns a list with all ids.
     def ids(self):
+        """
+        Returns a list with all ids.
+        :return:
+        :rtype: list
+        """
         ids = []
         for x in self.records:
             if isinstance(x, Record):
@@ -656,8 +675,12 @@ class RecordGroup(QObject):
                 ids.append(x)
         return ids
 
-    # @brief Returns a list with all new records.
     def newRecords(self):
+        """
+        Returns a list with all new records.
+        :return:
+        :rtype: list
+        """
         records = []
         for x in self.records:
             if not isinstance(x, Record):
@@ -667,8 +690,12 @@ class RecordGroup(QObject):
             records.append(x)
         return records
 
-    # @brief Returns the number of records in this group.
     def count(self):
+        """
+        Returns the number of records in this group.
+        :return: Number of records in this group.
+        :rtype: int
+        """
         self.ensureUpdated()
         return len(self.records)
 
@@ -677,47 +704,72 @@ class RecordGroup(QObject):
         self.ensureAllLoaded()
         return iter(self.records)
 
-    # @brief Returns the record with id 'id'. You can use [] instead.
-    # Note that it will check if the record is loaded and load it if not.
-    def modelById(self, id):
-        record = self.recordById(id)
+    def modelById(self, ident):
+        """
+        Returns the record with id 'id'. You can use [] instead.
+        Note that it will check if the record is loaded and load it if not.
+        :param ident:
+        :return:
+        """
+        record = self.recordById(ident)
         if not record:
             return None
         return record
     __getitem__ = modelById
 
-    # @brief Returns the record at the specified row number.
     def modelByIndex(self, row):
+        """
+        Returns the record at the specified row number.
+        :param row:
+        :return:
+        """
         record = self.recordByIndex(row)
         return record
 
-    # @brief Returns the row number of the given record. Note that
-    # the record must be in the group. Otherwise an exception is risen.
     def indexOfRecord(self, record):
+        """
+        Returns the row number of the given record. Note that
+        the record must be in the group. Otherwise an exception is risen.
+        :param record:
+        :return:
+        """
         if record in self.records:
             return self.records.index(record)
         else:
             return -1
 
-    # @brief Returns the row number of the given id.
-    # If the id doesn't exist it returns -1.
-    def indexOfId(self, id):
+    def indexOfId(self, ident):
+        """
+        Returns the row number of the given id.
+        If the id doesn't exist it returns -1.
+        :param ident:
+        :return: Row number of the id, if no exists -1
+        :rtype: int
+        """
         i = 0
         for record in self.records:
             if isinstance(record, Record):
-                if record.id == id:
+                if record.id == ident:
                     return i
-            elif record == id:
+            elif record == ident:
                 return i
             i += 1
         return -1
 
-    # @brief Returns True if the given record exists in the group.
     def recordExists(self, record):
+        """
+        Returns True if the given record exists in the group.
+        :param record:
+        :return:
+        """
         return record in self.records
 
-    # @brief Returns True if the given field name exists in the group.
     def fieldExists(self, fieldName):
+        """
+        Returns True if the given field name exists in the group.
+        :param fieldName:
+        :return:
+        """
         return fieldName in self.fieldObjects
 
     def recordById(self, id):
@@ -757,8 +809,12 @@ class RecordGroup(QObject):
         newRecord.changed()
         return newRecord
 
-    # @brief Returns a Record object for the given row.
     def recordByIndex(self, row):
+        """
+        Returns a Record object for the given row.
+        :param row:
+        :return:
+        """
         record = self.records[row]
         if isinstance(record, Record):
             return record
@@ -769,8 +825,11 @@ class RecordGroup(QObject):
             self.records[row] = record
             return record
 
-    # @brief Returns True if the RecordGroup handles information of a wizard.
     def isWizard(self):
+        """
+        Returns True if the RecordGroup handles information of a wizard.
+        :return:
+        """
         return self.resource.startswith('wizard.')
 
     def ensureRecordLoaded(self, record):
@@ -822,8 +881,12 @@ class RecordGroup(QObject):
         # for mod in new:
         # mod.setDefaults(values)
 
-    # @brief Allows setting the domain for this group of records.
     def setDomain(self, value):
+        """
+        Allows setting the domain for this group of records.
+        :param value:
+        :return:
+        """
         # In some (rare) cases we receive {} as domain. So let's just test
         # 'not value', and that should work in all cases, not only when value
         # is None.
@@ -834,10 +897,12 @@ class RecordGroup(QObject):
         if Settings.value('koo.load_on_open', True):
             self.updated = False
 
-    # @brief Returns the current domain.
     def domain(self):
+        """
+        Returns the current domain.
+        :return:
+        """
         return self._domain
-
 
     def setFilter(self, value):
         """
@@ -855,25 +920,36 @@ class RecordGroup(QObject):
             self._filter = value
         self.updated = False
 
-    # @brief Returns the current filter.
+    # @brief
     def filter(self):
+        """
+        Returns the current filter.
+        :return:
+        """
         return self._filter
 
-    # @brief Disables record loading by setting domain to [('id','in',[])]
-    #
-    # RecordGroup will optimize the case when domain + filter = [('id','in',[])]
-    # by not even querying the server and searching ids. It will simply consider
-    # the result is [] and thus the group will be kept empty.
-    #
-    # Domain may be changed using setDomain() function.
     def setDomainForEmptyGroup(self):
+        """
+        Disables record loading by setting domain to [('id','in',[])]
+
+        RecordGroup will optimize the case when domain + filter =
+        [('id','in',[])] by not even querying the server and searching ids. It
+        will simply consider the result is [] and thus the group will be kept
+        empty.
+
+        Domain may be changed using setDomain() function.
+        :return:
+        """
         if self.isModified():
             return
         self.setDomain([('id', 'in', [])])
         self.clear()
 
-    # @brief Returns True if domain is [('id','in',[])]
     def isDomainForEmptyGroup(self):
+        """
+        Returns True if domain is [('id','in',[])]
+        :return:
+        """
         return self.domain() == [('id', 'in', [])]
 
     def update(self):
@@ -902,8 +978,14 @@ class RecordGroup(QObject):
             return
         self.update()
 
-    # @brief Sorts the group by the given field name.
     def sort(self, field, order):
+        """
+        Sorts the group by the given field name.
+
+        :param field:
+        :param order:
+        :return:
+        """
         self.toBeSortedField = field
         self.toBeSortedOrder = order
         if self._sortMode == self.SortAllItems:
@@ -911,8 +993,13 @@ class RecordGroup(QObject):
         else:
             self.sortVisible(field, order)
 
-    # Sorts the records in the group using ALL records in the database
     def sortAll(self, field, order):
+        """
+        Sorts the records in the group using ALL records in the database
+        :param field:
+        :param order:
+        :return:
+        """
         if self.updated and field == self.sortedField and order == self.sortedOrder:
             return
 
@@ -952,7 +1039,8 @@ class RecordGroup(QObject):
                 # We're not able to sort 2many fields
                 sortingResult = self.SortingNotPossible
             elif field_type == 'many2one':
-                # This works only if '#407667' is fixed, but it was fixed in 2010-02-03
+                # This works only if '#407667' is fixed, but it was fixed in
+                # 2010-02-03
                 orderby = '"%s"' % field
                 if order == Qt.AscendingOrder:
                     orderby += " ASC"
@@ -960,27 +1048,31 @@ class RecordGroup(QObject):
                     orderby += " DESC"
                 try:
                     ids = Rpc.session.call(
-                        '/koo', 'search', self.resource, self._domain + self._filter, 0, 0, orderby, self._context)
+                        '/koo', 'search',
+                        self.resource,
+                        self._domain + self._filter, 0, 0, orderby,
+                        self._context
+                    )
                     sortingResult = self.SortingPossible
                     sorted = True
                 except:
                     sortingResult = self.SortingOnlyGroups
 
             # We check whether the field is stored or not. In case the server
-            # is not _ready_ we consider it's stored and we'll catch the exception
-            # later.
+            # is not _ready_ we consider it's stored and we'll catch the
+            # exception later.
             stored = self.fields[field].get('stored', True)
             if not stored:
                 sortingResult = self.SortingNotPossible
 
             if not sorted and sortingResult != self.SortingNotPossible:
-                # A lot of the work done here should be done on the server by core OpenERP
-                # functions. This means this runs slower than it should due to network and
-                # serialization latency. Even more, we lack some information to make it
-                # work well.
+                # A lot of the work done here should be done on the server by
+                # core OpenERP functions. This means this runs slower than it
+                # should due to network and serialization latency. Even more,
+                # we lack some information to make it work well.
 
-                # Ensure the field is quoted, otherwise fields such as 'to' can't be sorted
-                # and return an exception.
+                # Ensure the field is quoted, otherwise fields such as 'to'
+                # can't be sorted and return an exception.
                 orderby = '"%s"' % field
                 if order == Qt.AscendingOrder:
                     orderby += " ASC"
@@ -989,33 +1081,43 @@ class RecordGroup(QObject):
 
                 try:
                     # Use call to catch exceptions
-                    ids = Rpc.session.call('/object', 'execute', self.resource, 'search',
-                                           self._domain + self._filter, 0, 0, orderby, self._context)
-                except:
+                    ids = Rpc.session.call(
+                        '/object', 'execute', self.resource, 'search',
+                        self._domain + self._filter, 0, 0, orderby,
+                        self._context)
+                except Exception:
                     # In functional fields not stored in the database this will
                     # cause an exception :(
                     sortingResult = self.SortingNotPossible
 
         if sortingResult != self.SortingNotPossible:
             self.clear()
-            # The load function will be in charge of loading and sorting elements
+            # The load function will be in charge of loading and sorting
+            # elements
             self.load(ids)
         elif oldSortedField == self.sortedField or not self.ids():
-            # If last sorted field was the same as the current one, possibly only filter crierias have changed
-            # so we might need to reload in this case.
-            # If sorting is not possible, but no data was loaded yet, we load by model default field and order.
-            # Otherwise, a view might not load any data.
+            # If last sorted field was the same as the current one, possibly
+            # only filter crierias have changed so we might need to reload in
+            # this case.
+            # If sorting is not possible, but no data was loaded yet, we load
+            # by model default field and order. Otherwise, a view might not
+            # load any data.
             ids = self.rpc.search(
                 self._domain + self._filter, 0, 0, False, self._context)
             self.clear()
-            # The load function will be in charge of loading and sorting elements
+            # The load function will be in charge of loading and sorting
+            # elements
             self.load(ids)
 
-        # @xtorello toreview
         self.sorting.emit(sortingResult)
 
-    # Sorts the records of the group taking into account only loaded fields.
     def sortVisible(self, field, order):
+        """
+        Sorts the records of the group taking into account only loaded fields.
+        :param field:
+        :param order:
+        :return:
+        """
         if self.updated and field == self.sortedField and order == self.sortedOrder:
             return
 
@@ -1074,16 +1176,19 @@ class RecordGroup(QObject):
                 if not record:
                     self.freeRecord(record)
 
-    # @brief Removes a record from the list (but not the record from the database).
-    #
-    # This function is used to take care signals are disconnected.
     def freeRecord(self, record):
+        """
+        Removes a record from the list (but not the record from the database).
+
+        This function is used to take care signals are disconnected.
+        :param record:
+        :return:
+        """
         self.records.remove(record)
         if isinstance(record, Record):
             record.recordChanged['PyQt_PyObject'].disconnect(self.recordChanged)
             record.recordModified['PyQt_PyObject'].disconnect(self.recordModified)
 
-    # @brief Returns True if any of the records in the group has been modified.
     def isModified(self):
         """
         Returns True if any of the records in the group has been modified.
@@ -1096,20 +1201,29 @@ class RecordGroup(QObject):
                     return True
         return False
 
-    # @brief Returns True if the given record has been modified.
-    def isRecordModified(self, id):
+    def isRecordModified(self, ident):
+        """
+        Returns True if the given record has been modified.
+        :param id:
+        :return:
+        """
         for record in self.records:
             if isinstance(record, Record):
-                if record.id == id:
+                if record.id == ident:
                     return record.isModified()
-            elif record == id:
+            elif record == ident:
                 return False
         return False
 
-    # @brief Returns True if the given field is required in the RecordGroup, otherwise returns False.
-    # Note that this is a flag for the whole group, but each record could have different values depending
-    # on its state.
     def isFieldRequired(self, fieldName):
+        """
+        Returns True if the given field is required in the RecordGroup,
+        otherwise returns False.
+        Note that this is a flag for the whole group, but each record could
+        have different values depending on its state.
+        :param fieldName:
+        :return:
+        """
         required = self.fields[fieldName].get('required', False)
         if isinstance(required, bool):
             return required

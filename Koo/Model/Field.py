@@ -71,7 +71,8 @@ class StringField(object):
 
     def validate(self, record):
         """
-        Checks if the current value is valid and sets stateAttributes on the record.
+        Checks if the current value is valid and sets stateAttributes on the
+        record.
 
         Here it's checked if the field is required but is empty.
         :param record:
@@ -107,8 +108,15 @@ class StringField(object):
             record.modified = True
             record.modified_fields.setdefault(self.name)
 
-    # Return the value to write to the server
     def get(self, record, checkLoad=True, readonly=True, modified=False):
+        """
+        Return the value to write to the server
+        :param record:
+        :param checkLoad:
+        :param readonly:
+        :param modified:
+        :return:
+        """
         return record.values.get(self.name, False)
 
     def set_client(self, record, value, test_state=True):
@@ -358,7 +366,7 @@ class ToManyField(QObject, StringField):
     """
 
     def __init__(self, parent, attrs):
-        StringField.__init__(self,parent,attrs)
+        StringField.__init__(self, parent, attrs)
         # QObject.__init__(self)
         #super().__init__(parent,attrs)
         #self.parent = parent
@@ -366,9 +374,6 @@ class ToManyField(QObject, StringField):
         self.name = attrs['name']
 
     def create(self, record):
-        pass
-        # @xtorello toreview
-
         from Koo.Model.Group import RecordGroup
         group = RecordGroup(
             resource=self.attrs['relation'], fields={}, parent=record,
@@ -406,7 +411,6 @@ class ToManyField(QObject, StringField):
         if modified:
             self.changed(record)
 
-
     def set_client(self, record, value, test_state=False):
         self.set(record, value, test_state=test_state)
         self.changed(record)
@@ -423,11 +427,9 @@ class ToManyField(QObject, StringField):
 
 
 class OneToManyField(ToManyField):
-    # @xtorello toreview
 
     def __init__(self, parent, attrs):
-        # QObject.__init__(self)
-        super().__init__(parent,attrs)
+        super().__init__(parent, attrs)
 
     def get(self, record, checkLoad=True, readonly=True, modified=False):
         if not record.values[self.name]:
@@ -452,8 +454,6 @@ class OneToManyField(ToManyField):
         return result
 
     def setDefault(self, record, value):
-        from Koo.Model.Group import RecordGroup
-
         group = record.values[self.name]
 
         if value and len(value):
@@ -486,7 +486,6 @@ class ManyToManyField(ToManyField):
         return record.values[self.name].ids()
 
 
-
 class ReferenceField(StringField):
     def get_client(self, record):
         if record.values[self.name]:
@@ -508,11 +507,9 @@ class ReferenceField(StringField):
         if not value:
             record.values[self.name] = False
             return
-        ref_model, id = value.split(',')
-        # id must be an integer
-        id = int(id)
+        ref_model, ident = value.split(',')
         Rpc2 = RpcProxy(ref_model)
-        result = Rpc2.name_get([id], Rpc.session.context)
+        result = Rpc2.name_get([int(ident)], Rpc.session.context)
         if result:
             record.values[self.name] = ref_model, result[0]
         else:
@@ -522,7 +519,6 @@ class ReferenceField(StringField):
             record.modified_fields.setdefault(self.name)
 
 
-# @xtorello xxx
 class FieldFactory:
     """
     The FieldFactory class provides a means of creating the appropiate object
@@ -532,11 +528,10 @@ class FieldFactory:
     types or want to replace current implementations you can do it too.
     """
 
-
     # The types property holds the class that will be called whenever a new
-    #  object has to be created for a given field type.
-    #  By default there's a number of field types but new ones can be easily
-    #  created or existing ones replaced.
+    # object has to be created for a given field type.
+    # By default there's a number of field types but new ones can be easily
+    # created or existing ones replaced.
     types = {
         'char': StringField,
         'binary': BinaryField,
@@ -553,10 +548,16 @@ class FieldFactory:
         'boolean': IntegerField,
     }
 
-    # This function creates a new instance of the appropiate class
-    # for the given field type.
     @staticmethod
     def create(fieldType, parent, attributes):
+        """
+        This function creates a new instance of the appropiate class
+        for the given field type.
+        :param fieldType:
+        :param parent:
+        :param attributes:
+        :return:
+        """
         # We do not support relational fields treated as selection ones
         if fieldType == 'selection' and 'relation' in attributes:
             fieldType = 'many2one'

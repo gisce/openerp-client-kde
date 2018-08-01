@@ -42,6 +42,12 @@ from PyQt5.QtCore import *
 from Koo.Common.Ui import *
 from gettext import gettext as _
 
+try:
+    from PyQt5.QtWebKitWidgets import QWebPage, QWebView
+    isHelpWidgetAvailable = True
+except:
+    isHelpWidgetAvailable = False
+
 (FormWidgetUi, FormWidgetBase) = loadUiType(Common.uiPath('formcontainer.ui'))
 
 
@@ -199,10 +205,17 @@ class FormWidget(QWidget, FormWidgetUi):
     def notifyRecordModified(self):
         self.updateStatus(_('<font color="blue">Document modified</font>'))
 
-    # @brief Establishes that every value seconds a reload should be scheduled.
-    # If value is < 0 only Subscription based reloads are executed. Note that if
-    # value is != 0 Subscription based reloads are always used if available.
+
     def setAutoReload(self, value):
+        """
+        Establishes that every value seconds a reload should be scheduled.
+        If value is < 0 only Subscription based reloads are executed. Note
+        that if value is != 0 Subscription based reloads are always used if
+        available.
+        :param value:
+        :return: None
+        :rtype: None
+        """
         if value:
             # We use both, timer and subscriber as in some cases information
             # may change only virtually: Say change the color of a row
@@ -249,7 +262,7 @@ class FormWidget(QWidget, FormWidgetUi):
                 try:
                     window = AttachmentDialog(self.model, id, self)
                     window.destroyed.connect(self.attachmentsClosed)
-                except Rpc.RpcException as e:
+                except Rpc.RpcException:
                     QApplication.restoreOverrideCursor()
                     return
                 QApplication.restoreOverrideCursor()
@@ -258,7 +271,8 @@ class FormWidget(QWidget, FormWidgetUi):
                 context = self.context.copy()
                 context.update(Rpc.session.context)
                 action = Rpc.session.execute(
-                    '/object', 'execute', 'ir.attachment', 'action_get', context)
+                    '/object', 'execute', 'ir.attachment', 'action_get',
+                    context)
                 action['domain'] = [
                     ('res_model', '=', self.model), ('res_id', '=', id)]
                 context['default_res_model'] = self.model
@@ -287,9 +301,10 @@ class FormWidget(QWidget, FormWidgetUi):
                     target = 'background'
                 else:
                     target = 'current'
-                for id in selectedIds:
-                    Api.instance.createWindow(None, self.model, [id],
-                                              view_type='form', mode='form,tree', target=target)
+                for ident in selectedIds:
+                    Api.instance.createWindow(
+                        None, self.model, [ident],
+                        view_type='form', mode='form,tree', target=target)
             else:
                 sender = self.sender()
                 name = str(sender.objectName())
@@ -301,7 +316,7 @@ class FormWidget(QWidget, FormWidgetUi):
             if self.pendingReload:
                 self.reload()
             self.updateSwitchView()
-        except Rpc.RpcException as e:
+        except Rpc.RpcException:
             pass
         QApplication.restoreOverrideCursor()
 
@@ -328,8 +343,10 @@ class FormWidget(QWidget, FormWidgetUi):
         QMessageBox.information(self, _('Record log'), message)
 
     def remove(self):
-        value = QMessageBox.question(self, _('Question'), _(
-            'Are you sure you want to remove these records?'), _("Yes"), _("No"))
+        value = QMessageBox.question(
+            self, _('Question'),
+            _('Are you sure you want to remove these records?'),
+            QMessageBox.Yes | QMessageBox.No)
         if value == 0:
             QApplication.setOverrideCursor(Qt.WaitCursor)
             try:
@@ -337,7 +354,7 @@ class FormWidget(QWidget, FormWidgetUi):
                     self.updateStatus(_('Resource not removed !'))
                 else:
                     self.updateStatus(_('Resource removed.'))
-            except Rpc.RpcException as e:
+            except Rpc.RpcException:
                 pass
             QApplication.restoreOverrideCursor()
 
@@ -376,11 +393,12 @@ class FormWidget(QWidget, FormWidgetUi):
         newId = None
         newIds = []
         currentId = self.screen.currentId()
-        for id in selectedIds:
+        for ident in selectedIds:
             copyId = Rpc.session.execute(
-                '/object', 'execute', self.model, 'copy', id, {}, Rpc.session.context)
+                '/object', 'execute', self.model, 'copy', ident, {},
+                Rpc.session.context)
             newIds.append(copyId)
-            if id == currentId:
+            if ident == currentId:
                 newId = copyId
 
         # Ensure the copy of the currently selected ID is the first of the list
@@ -446,7 +464,7 @@ class FormWidget(QWidget, FormWidgetUi):
         try:
             self.screen.displayPrevious()
             self.updateStatus()
-        except Rpc.RpcException as e:
+        except Rpc.RpcException:
             pass
         QApplication.restoreOverrideCursor()
 
@@ -465,7 +483,8 @@ class FormWidget(QWidget, FormWidgetUi):
         # Do not reload automatically if it's an editable list
         # By explicitly disallowing this it makes the global
         # koo module auto_reload option to be usable.
-        if self.screen.currentView().showsMultipleRecords() and not self.screen.currentView().isReadOnly():
+        if self.screen.currentView().showsMultipleRecords() and \
+                not self.screen.currentView().isReadOnly():
             return
         # Do not reload automatically if there are any modified records
         # However, we take note that there's a pending reload which
@@ -492,7 +511,7 @@ class FormWidget(QWidget, FormWidgetUi):
             self.screen.reload()
             self.updateStatus()
             self.pendingReload = False
-        except Rpc.RpcException as e:
+        except Rpc.RpcException:
             pass
         QApplication.restoreOverrideCursor()
 
@@ -501,7 +520,7 @@ class FormWidget(QWidget, FormWidgetUi):
         try:
             self.screen.cancel()
             self.updateStatus()
-        except Rpc.RpcException as e:
+        except Rpc.RpcException:
             pass
         QApplication.restoreOverrideCursor()
 
@@ -524,10 +543,11 @@ class FormWidget(QWidget, FormWidgetUi):
         :return: None
         :rtype: None
         """
-        if self.model and self.screen.currentRecord() and self.screen.currentRecord().id:
+        if self.model and \
+                self.screen.currentRecord() and \
+                self.screen.currentRecord().id:
             # We don't need to query the server for the number of attachments
-            # if current record
-            # has not changed since list update.
+            # if current record has not changed since list update.
             ident = self.screen.currentRecord().id
             if ident != self.previousId:
                 ids = Rpc.session.execute(
@@ -558,7 +578,7 @@ class FormWidget(QWidget, FormWidgetUi):
             pos = '_'
             if position >= 0:
                 pos = str(position + 1)
-            if value == None:
+            if value is None:
                 # Value will be None only when it's called by the constructor
                 edit = _('No document selected')
             else:
@@ -585,9 +605,10 @@ class FormWidget(QWidget, FormWidgetUi):
                 fields.append('<li>%s</li>' % name)
             fields.sort()
             fields = '<ul>%s</ul>' % ''.join(fields)
-            value = QMessageBox.question(self, _('Question'),
-                                         _('<p>You have modified the following fields in current record:</p>%s<p>Do you want to save the changes?</p>') % fields,
-                                         _('Save'), _('Discard'), _('Cancel'), 2, 2)
+            value = QMessageBox.question(
+                self, _('Question'),
+                _('<p>You have modified the following fields in current record:</p>%s<p>Do you want to save the changes?</p>') % fields,
+                QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel)
             if value == 0:
                 return self.save()
             elif value == 1:
@@ -640,9 +661,12 @@ class FormWidget(QWidget, FormWidgetUi):
             return
 
         if len(dialog.newValues) != len(self.screen.selectedRecords()):
-            QMessageBox.warning(self, _('Batch Field Update'), _('The number of selected records (%(records)d) does not match the number of records to be inserted in fields (%(fields)d).') % {
-                'records': len(dialog.newValues),
-                'fields': len(self.screen.selectedRecords())
+            QMessageBox.warning(
+                self,
+                _('Batch Field Update'),
+                _('The number of selected records (%(records)d) does not match the number of records to be inserted in fields (%(fields)d).') % {
+                    'records': len(dialog.newValues),
+                    'fields': len(self.screen.selectedRecords())
             })
             return
 
@@ -713,8 +737,8 @@ class FormWidget(QWidget, FormWidgetUi):
             queue.setup(viewTypes, viewIds)
             type = ''
             while type != 'form':
-                id, type = next(queue)
-            screen.setupViews(['form'], [id])
+                ident, type = next(queue)
+            screen.setupViews(['form'], [ident])
         else:
             screen.setupViews(['form'], [False])
 
@@ -734,12 +758,16 @@ class FormWidget(QWidget, FormWidgetUi):
         buttonString = selectionDialog.result[0]
         buttonName = selectionDialog.result[1]
 
-        if QMessageBox.question(self, _("Batch Update"), _("Do you really want to push button '%s' of all selected records?") % buttonString, _("Yes"), _("No")) == 1:
+        if QMessageBox.question(
+                self, _("Batch Update"),
+                _("Do you really want to push button '%s' of all selected records?") % buttonString,
+                QMessageBox.Yes|QMessageBox.No
+        ) == 1:
             return
 
-        for id in self.screen.selectedIds():
-            screen.display(id)
-            screen.currentView().widgets[buttonName].executeButton(screen, id)
+        for ident in self.screen.selectedIds():
+            screen.display(ident)
+            screen.currentView().widgets[buttonName].executeButton(screen, ident)
 
         self.reload()
 

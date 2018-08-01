@@ -128,12 +128,12 @@ class SelectionFieldDelegate(AbstractFieldDelegate):
         widget = QComboBox(parent)
         widget.setEditable(False)
         widget.setInsertPolicy(QComboBox.InsertAtTop)
-        for (id, name) in self.attributes.get('selection', []):
-            widget.addItem(name, QVariant(id))
+        for (ident, name) in self.attributes.get('selection', []):
+            widget.addItem(name, QVariant(ident))
         return widget
 
     def setEditorData(self, editor, index):
-        value = index.data(Qt.EditRole).toString()
+        value = index.data(Qt.EditRole)
         editor.setCurrentIndex(editor.findText(value))
 
     def setModelData(self, editor, model, index):
