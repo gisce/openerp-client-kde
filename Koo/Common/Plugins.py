@@ -27,25 +27,8 @@
 
 import os
 import sys
-import zipfile
-from zipimport import zipimporter
-
-
-def get_zipfiles(directory):
-    """
-    Return a list of the zip files on the directory
-
-    :param directory: Directory to list
-    :return: List of the zipfiles on the directory
-    :rtype: list(str)
-    """
-    ret = []
-    for root, dirs, files in os.walk(directory):
-        for file in files:
-            full_path = os.path.join(root, file)
-            if full_path.endswith(".zip"):
-                ret.append(full_path)
-    return ret
+import importlib
+import zipimport
 
 
 def scan(module, directory):
@@ -59,34 +42,25 @@ def scan(module, directory):
     pluginImports = __import__(module, globals(), locals())
     # Check if it's being run using py2exe or py2app environment
     frozen = getattr(sys, 'frozen', None)
-    if frozen == 'macosx_app' or hasattr(pluginImports, '__loader__'):
+    loader = (
+            hasattr(pluginImports, '__loader__') and
+            (hasattr(pluginImports.__loader__, '_files'))
+    )
+    if frozen == 'macosx_app' or loader:
         # If it's run using py2exe or py2app environment, all files will be in
         # a single zip file and we can't use listdir() to find all available
         # plugins.
-        pluginsPath = os.path.dirname(pluginImports.__loader__.path)
-        zipFiles = get_zipfiles(os.path.dirname(pluginImports.__loader__.path))
+        zipFiles = pluginImports.__loader__._files
         moduleDir = os.sep.join(module.split('.'))
-        files = [file for file in zipFiles if moduleDir in file]
-        import importlib
-        importlib.import_module("Plugins.ViewSettings")
+        files = [file for file in list(zipFiles.keys()) if moduleDir in file]
 
-        #for zfile in files:
-        #    importer = zipimporter(zfile)
-        #    if importer.is_package(zfile):
-        #        importer.load_module("__init__")
-                #d = os.path.dirname(zfile)
-                #newModule = os.path.basename(zfile)[:-4]
-                #__import__('%s.%s' % (module, newModule),
-                #           globals(), locals(), [newModule])
-
-
-        #files = [file for file in files if '__init__.py' in file]
-        #for file in files:
-
+        files = [file for file in files if '__init__.py' in file]
+        for file in files:
+            imp = zipimport.zipimporter(file)
+            imp.load_module("__init__")
     else:
-    """ 
-    if True:
         for i in os.listdir(directory):
             path = os.path.join(directory, i, '__init__.py')
             if os.path.isfile(path):
-                __import__('%s.%s' % (module, i), globals(), locals(), [i])
+                importlib.import_module('%s.%s' % (module, i))
+
