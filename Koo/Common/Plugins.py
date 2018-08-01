@@ -27,6 +27,8 @@
 
 import os
 import sys
+import zipfile
+from zipimport import zipimporter
 
 
 def get_zipfiles(directory):
@@ -37,11 +39,12 @@ def get_zipfiles(directory):
     :return: List of the zipfiles on the directory
     :rtype: list(str)
     """
-
     ret = []
-    for file in os.listdir(directory):
-        if file.endswith(".zip"):
-            ret.append(os.path.join(directory, file))
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            full_path = os.path.join(root, file)
+            if full_path.endswith(".zip"):
+                ret.append(full_path)
     return ret
 
 
@@ -63,15 +66,23 @@ def scan(module, directory):
         pluginsPath = os.path.dirname(pluginImports.__loader__.path)
         zipFiles = get_zipfiles(os.path.dirname(pluginImports.__loader__.path))
         moduleDir = os.sep.join(module.split('.'))
-        files = [zipFiles[file][0] for file in zipFiles if moduleDir in file]
-        files = [file for file in files if '__init__.py' in file]
-        for file in files:
-            d = os.path.dirname(file)
-            if d.endswith(moduleDir):
-                continue
-            newModule = os.path.basename(os.path.dirname(file))
-            __import__('%s.%s' % (module, newModule),
-                       globals(), locals(), [newModule])
+        files = [file for file in zipFiles if moduleDir in file]
+        import importlib
+        importlib.import_module("Plugins.ViewSettings")
+
+        #for zfile in files:
+        #    importer = zipimporter(zfile)
+        #    if importer.is_package(zfile):
+        #        importer.load_module("__init__")
+                #d = os.path.dirname(zfile)
+                #newModule = os.path.basename(zfile)[:-4]
+                #__import__('%s.%s' % (module, newModule),
+                #           globals(), locals(), [newModule])
+
+
+        #files = [file for file in files if '__init__.py' in file]
+        #for file in files:
+
     else:
         for i in os.listdir(directory):
             path = os.path.join(directory, i, '__init__.py')
