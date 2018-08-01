@@ -38,10 +38,16 @@ from Koo.Common import Paths
 
 SupportAnchor = "<a href='http://www.NaN-tic.com'>NaN-tic</a>"
 
-# @brief Opens the application used for helpdesk assistant to connect to user's desktop.
+# @brief
 
 
 def remoteHelp(parent):
+    """
+    Opens the application used for helpdesk assistant to connect to user's
+    desktop.
+    :param parent:
+    :return:
+    """
     message = _("<p><b>Remote Help</b> will allow you to share your desktop with one member "
                 "of our support team. This will provide you with first class "
                 "support in real time by an application expert.</p>"

@@ -25,23 +25,17 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from Koo.Common.Ui import *
-# @xtorello toreview
-# from PyQt5.QtWebKit import *
-"""
 from PyQt5.QtNetwork import *
-
-from Koo.Common import Common
 from Koo.Fields.AbstractFieldWidget import *
 
 (WebFieldWidgetUi, WebFieldWidgetBase) = loadUiType(Common.uiPath('web.ui'))
 
-# @brief The CookieJar class inherits QNetworkCookieJar to make a couple of functions public.
-
 
 class CookieJar(QNetworkCookieJar):
+    """
+    The CookieJar class inherits QNetworkCookieJar to make a couple of
+    functions public.
+    """
     def __init__(self, parent=None):
         QNetworkCookieJar.__init__(self, parent)
 
@@ -53,8 +47,9 @@ class CookieJar(QNetworkCookieJar):
 
 
 class WebFieldWidget(AbstractFieldWidget, WebFieldWidgetUi):
-    def __init__(self, parent, model, attrs={}):
-        pass
+    def __init__(self, parent, model, attrs=None):
+        if attrs is None:
+            attrs = {}
         AbstractFieldWidget.__init__(self, parent, model, attrs)
         WebFieldWidgetUi.__init__(self)
         self.setupUi(self)
@@ -135,4 +130,3 @@ class WebFieldWidget(AbstractFieldWidget, WebFieldWidgetUi):
         self.uiWeb.page().networkAccessManager().setCookieJar(self.cookieJar)
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:
-"""

@@ -41,94 +41,146 @@ class AbstractView(QWidget):
         self.id = False
         self._onWrite = ''
 
-    # @brief This function should return the type of view the class handles. Such as 'tree' or 'from'.
     def viewType(self):
+        """
+        This function should return the type of view the class handles. Such
+        as 'tree' or 'from'.
+        :return:
+        """
         return None
 
-    # @brief This function should store the information in the model
-    # The model used should be the one given by display()
-    # which will always have been called before store().
     def store(self):
+        """
+        This function should store the information in the model
+        The model used should be the one given by display()
+        which will always have been called before store().
+        :return:
+        """
         pass
 
-    # @brief This function should display the information of the model or models
-    # currentRecord points to the record (object Record) that is currently selected
-    # models points to the model list (object RecordGroup)
-    # Example: forms only use the currentModel, while tree & charts use models
     def display(self, currentRecord, models):
+        """This function should display the information of the model or models
+        currentRecord points to the record (object Record) that is currently
+        selected models points to the model list (object RecordGroup)
+        Example: forms only use the currentModel, while tree & charts use
+        models
+        """
         pass
 
-    # @brief Not used in the TreeView, used in the FormView to
-    # set all widgets to the state of 'valid'
     def reset(self):
+        """
+        Not used in the TreeView, used in the FormView to set all widgets
+        to the state of 'valid'
+        :return:
+        """
         pass
 
-    # @brief Should return a list with the currently selected
-    # records in the view. If the view is a form, for example,
-    # the current id is returned. If it's a tree with
-    # several items selected, returns all of them.
     def selectedRecords(self):
+        """
+        Should return a list with the currently selected
+        records in the view. If the view is a form, for example,
+        the current id is returned. If it's a tree with
+        several items selected, returns all of them.
+        :return:
+        """
         return []
 
-    # @brief Selects the current record
     def setSelected(self, record):
+        """
+        Selects the current record
+        :param record:
+        :return:
+        """
         pass
 
-    # @brief This function should return False if the view modifies data
-    # or True if it doesn't
     def isReadOnly(self):
+        """
+        This function should return False if the view modifies data
+        or True if it doesn't
+        :return:
+        """
         return True
 
-    # @brief This function should be implemented if the view can be
-    # configured to be read-only or read-write.
     def setReadOnly(self, value):
+        """
+        This function should be implemented if the view can be configured
+        to be read-only or read-write.
+        :param value:
+        :return:
+        """
         return
 
-    # @brief Override this function in your view if you wish to store
-    # some settings per user and view. The function should return
-    # a python string with all the information which should be
-    # parseable afterwords by setViewSettings().
+
     def viewSettings(self):
+        """
+        Override this function in your view if you wish to store
+        some settings per user and view. The function should return
+        a python string with all the information which should be
+        parseable afterwords by setViewSettings().
+        :return:
+        """
         return ''
 
-    # @brief Override this function in your view if you wish to restore
-    # a previous configuration. The function will be called when
-    # necessary. The string given in 'settings' will be one
-    # previously returned by viewSettings().
     def setViewSettings(self, settings):
+        """
+        Override this function in your view if you wish to restore a previous
+        configuration. The function will be called when necessary. The string
+        given in 'settings' will be one previously returned by viewSettings().
+        :param settings:
+        :return:
+        """
         pass
 
-    # @brief Should return True if the view is capable of showing multiple records
-    # or False if it can only show one.
-    #
-    # For example, tree will return True whereas 'form' will return False.
-    # The default implementation returns True.
     def showsMultipleRecords(self):
+        """
+        Should return True if the view is capable of showing multiple records
+        or False if it can only show one.
+
+        For example, tree will return True whereas 'form' will return False.
+        The default implementation returns True.
+        :return:
+        """
         return True
 
-    # @brief Start editing current record.
-    #
-    # Some views (such as TreeView) need a way of being told to start edit mode.
-    # Such is the case when a new record is created as we want TreeView to start
-    # editing the newly created record. Other views such as form can simply ignore
-    # this call.
     def startEditing(self):
+        """
+        Start editing current record.
+
+        Some views (such as TreeView) need a way of being told to start edit
+        mode.
+        Such is the case when a new record is created as we want TreeView to
+        start editing the newly created record. Other views such as form can
+        simply ignore this call.
+        :return:
+        """
         return
 
-    # @brief Returns True if new records should be added at the top of the list
-    # or False if they should be added at the bottom (the default).
     def addOnTop(self):
+        """
+        Returns True if new records should be added at the top of the list or
+        False if  they should be added at the bottom (the default).
+        :return:
+        """
         return False
 
-    # @brief Returns the on_write function.
-    #
-    # This server side function can be configured in the view so it's called each
-    # time a record is created or written.
     def onWriteFunction(self):
+        """
+        Returns the on_write function.
+
+        This server side function can be configured in the view so it's called
+        each time a record is created or written.
+        :return:
+        """
         return self._onWrite
 
-    # @brief Establishes the name of the on_write function.
-    #
-    # By default it's the empty string, so no function will be called on the server.
     def setOnWriteFunction(self, value):
+        """
+        Establishes the name of the on_write function.
+
+        By default it's the empty string, so no function will be called on
+        the server.
+        :param value:
+        :return:
+        """
+
         self._onWrite = value

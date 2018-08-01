@@ -84,6 +84,8 @@ def scan(module, directory):
         #for file in files:
 
     else:
+    """ 
+    if True:
         for i in os.listdir(directory):
             path = os.path.join(directory, i, '__init__.py')
             if os.path.isfile(path):

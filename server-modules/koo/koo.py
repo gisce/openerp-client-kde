@@ -41,9 +41,9 @@ class ir_attachment(osv.osv):
 	_inherit = 'ir.attachment'
 
 	def _all_models(self, cr, uid, context={}):
-                ids = self.pool.get('ir.model').search(cr, uid, [], context=context)
-                data = self.pool.get('ir.model').read(cr, uid, ids, ['model','name'])
-                return [(x['model'], x['name']) for x in data]
+		ids = self.pool.get('ir.model').search(cr, uid, [], context=context)
+		data = self.pool.get('ir.model').read(cr, uid, ids, ['model','name'])
+		return [(x['model'], x['name']) for x in data]
 
 
 	def _record(self, cr, uid, ids, field_name, arg, context={}):
@@ -109,29 +109,29 @@ class koo_services(netsvc_service):
 			qu1 = query.where_clause
 			qu2 = query.where_clause_params
 			tables = query.tables
-			
+
 		if len(qu1):
-		    qu1 = ' where ' + ' and '.join(qu1)
+			qu1 = ' where ' + ' and '.join(qu1)
 		else:
-		    qu1 = ''
+			qu1 = ''
 
 		resortField = False
 		resortOrder = False
 		if order:
-		    pool.get(model)._check_qorder(order)
-		    m = regex_order.match( order )
-		    field = m.group(2).replace('"', '')
-		    if field in pool.get(model)._columns:
-		    	if isinstance( pool.get(model)._columns[field], fields.many2one ):
-				# DIRECT JOIN WITH NO TRANSLATION SUPPORT
-				obj = pool.get(model)._columns[field]._obj
-				rec_name = pool.get(obj)._rec_name
-				obj = pool.get(obj)._table
-				t = tables[0]
-				tables[0] = '(%s LEFT JOIN (SELECT id AS join_identifier, "%s" AS join_sort_field FROM "%s") AS left_join_subquery ON %s = join_identifier) AS %s' % (t, rec_name, obj, field, t) 
-				order = 'join_sort_field'
-				if m.group(3).strip().upper() in ('ASC', 'DESC'):
-					order += m.group(3)
+			pool.get(model)._check_qorder(order)
+			m = regex_order.match( order )
+			field = m.group(2).replace('"', '')
+			if field in pool.get(model)._columns:
+				if isinstance( pool.get(model)._columns[field], fields.many2one ):
+					# DIRECT JOIN WITH NO TRANSLATION SUPPORT
+					obj = pool.get(model)._columns[field]._obj
+					rec_name = pool.get(obj)._rec_name
+					obj = pool.get(obj)._table
+					t = tables[0]
+					tables[0] = '(%s LEFT JOIN (SELECT id AS join_identifier, "%s" AS join_sort_field FROM "%s") AS left_join_subquery ON %s = join_identifier) AS %s' % (t, rec_name, obj, field, t)
+					order = 'join_sort_field'
+					if m.group(3).strip().upper() in ('ASC', 'DESC'):
+						order += m.group(3)
 
 
 		order_by = order or pool.get(model)._order
@@ -143,20 +143,20 @@ class koo_services(netsvc_service):
 		# construct a clause for the rules :
 		d1, d2 = pool.get('ir.rule').domain_get(cr, uid, model)
 		if d1:
-		    qu1 = qu1 and qu1+' and '+d1 or ' where '+d1
-		    qu2 += d2
+			qu1 = qu1 and qu1+' and '+d1 or ' where '+d1
+			qu2 += d2
 
 		if count:
-		    cr.execute('select count(%s.id) from ' % table +
-			    ','.join(tables) +qu1 + limit_str + offset_str, qu2)
-		    res = cr.fetchall()
-		    return res[0][0]
+			cr.execute('select count(%s.id) from ' % table +
+					   ','.join(tables) +qu1 + limit_str + offset_str, qu2)
+			res = cr.fetchall()
+			return res[0][0]
 
 		# execute the "main" query to fetch the ids we were searching for
 		if group:
 			cr.execute('select %s.id, %s from ' % (table, group) + ','.join(tables) +qu1+' order by '+order_by+limit_str+offset_str, qu2)
 			res = []
-			counter = 0 
+			counter = 0
 			last_value = None
 			for record in cr.fetchall():
 				if last_value != x[1]:
@@ -250,9 +250,9 @@ class nan_koo_settings(osv.osv):
 	_columns = {
 		'name': fields.char( 'Settings Name', 50, required=True, help='Name to be given to these settings.' ),
 		'show_toolbar': fields.boolean( 'Show toolbar', help='Whether toolbar is shown on screens. Note the toolbar may be convenient but not necessary as all options are available from the Reports, Actions, Browse and Plugins menu entries.' ),
-		'tabs_position': fields.selection( [('left', 'Left'), ('top', 'Top'), 
-			('right', 'Right'), ('bottom', 'Bottom')], 'Default tabs position', required=True, 
-			help='Tabs can be on the left, top, right or bottom by default. Note that some screens may require an specific position which will override this default.' ),
+		'tabs_position': fields.selection( [('left', 'Left'), ('top', 'Top'),
+											('right', 'Right'), ('bottom', 'Bottom')], 'Default tabs position', required=True,
+										   help='Tabs can be on the left, top, right or bottom by default. Note that some screens may require an specific position which will override this default.' ),
 		'tabs_closable': fields.boolean( 'Show Close Button on Tabs', help="A close button will be shown in each tab."),
 		'stylesheet': fields.text( 'Stylesheet', help='A valid Qt Stylesheet can be provided to be applied once the user has logged in.' ),
 		'sort_mode': fields.selection( [('visible_items', 'Visible Items'), ('all_items', 'All Items')], 'Sorting Mode', help='If set to "Visible Items" only the "Limit" elements are loaded and sorting is done in the client side. If "All Items" is used, sorting is done in the server and all records are (virtually) loaded in chunks of size "Limit"'),
@@ -286,7 +286,7 @@ class nan_koo_settings(osv.osv):
 		(_check_limit, 'Limit must be greater than zero.', ['limit']),
 		(_check_interval, 'Requests refresh interval must be greater than zero.', ['requests_refresh_interval']),
 	]
-	
+
 
 	# Returns the id of the settings to load. Currently only uses user ID to
 	# decide the appropiate settings, but in the future it could use user IP
@@ -313,7 +313,7 @@ nan_koo_settings()
 
 class res_users(osv.osv):
 	_inherit = 'res.users'
-	
+
 	_columns = {
 		'koo_settings_id': fields.many2one('nan.koo.settings', 'Koo Settings'),
 	}
@@ -395,19 +395,19 @@ def new_fields_view_get(self, cr, user, view_id=None, view_type='form', context=
 		def clean(x):
 			x = x[2]
 			for key in ('report_sxw_content', 'report_rml_content',
-				'report_sxw', 'report_rml',
-				'report_sxw_content_data', 'report_rml_content_data'):
+						'report_sxw', 'report_rml',
+						'report_sxw_content_data', 'report_rml_content_data'):
 				if key in x:
 					del x[key]
 			return x
 
 		ir_values_obj = self.pool.get('ir.values')
-		resprint = ir_values_obj.get(cr, user, 'action', 'client_print_multi', 
-			[(self._name, False)], False, context)
-		resaction = ir_values_obj.get(cr, user, 'action', 'client_action_multi', 
-			[(self._name, False)], False, context)
-		resrelate = ir_values_obj.get(cr, user, 'action', 'client_action_relate', 
-			[(self._name, False)], False, context)
+		resprint = ir_values_obj.get(cr, user, 'action', 'client_print_multi',
+									 [(self._name, False)], False, context)
+		resaction = ir_values_obj.get(cr, user, 'action', 'client_action_multi',
+									  [(self._name, False)], False, context)
+		resrelate = ir_values_obj.get(cr, user, 'action', 'client_action_relate',
+									  [(self._name, False)], False, context)
 		resprint = list(map(clean, resprint))
 		resaction = list(map(clean, resaction))
 		# Standard fields_view_get function returns only those actions with multi==False.
