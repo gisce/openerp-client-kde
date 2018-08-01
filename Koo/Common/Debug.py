@@ -117,6 +117,18 @@ def exceptionHook(type, value, backtrace):
         QApplication.restoreOverrideCursor()
     from .Settings import Settings
     import traceback
+
+    from raven import Client
+
+    client = Client('sync+http://77cb0018d10842209ec638aeeffedf1a:3be0b6af34d14f7cb562b776e490ad8d@sentry.gisce.net/128')
+
+    client.captureException(
+        exc_info=(type, value, backtrace),
+        extra=Settings.options
+    )
+
+
+
     backtrace = ''.join(traceback.format_tb(backtrace))
     if Settings.value('client.debug'):
         from Koo.Common import Notifier
