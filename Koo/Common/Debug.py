@@ -27,6 +27,7 @@
 
 import gc
 from PyQt5.QtCore import *
+from raven import Client
 
 
 def printObjects():
@@ -112,11 +113,24 @@ if 'frozen' in dir(sys) and sys.frozen == "windows_exe":
 
 def exceptionHook(type, value, backtrace):
     from PyQt5.QtWidgets import QApplication
+    from Koo.Common.Version import Version
     cursor = QApplication.overrideCursor()
     if cursor:
         QApplication.restoreOverrideCursor()
     from .Settings import Settings
     import traceback
+
+    sentry_dsn = Settings.get("client.sentry_dsn")
+    if sentry_dsn:
+        client = Client(sentry_dsn)
+
+        extra = Settings.options
+        extra.update({"version": Version})
+        client.captureException(
+            exc_info=(type, value, backtrace),
+            extra=extra
+        )
+
     backtrace = ''.join(traceback.format_tb(backtrace))
     if Settings.value('client.debug'):
         from Koo.Common import Notifier
