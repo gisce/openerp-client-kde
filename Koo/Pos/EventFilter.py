@@ -21,23 +21,37 @@ from PyQt5.QtWidgets import *
 from .KeyboardWidget import *
 from .KeypadWidget import *
 
-# @brief The PosEventFilter class provides an eventFilter that shows a Keyboard for touchscreen
-# environemnts when a QLineEdit or QTextEdit gets the focus (is clicked by the user).
-#
-# In order to enable the Keyboard (and Keypad) in an application, simply install
-# it with 'app.installEventFilter( Koo.Pos.PosEventFilter( mainWindow ) )'
+# @brief
 
 
 class PosEventFilter(QObject):
-    # @brief Creates a new PosEventFilter object.
+    """
+    The PosEventFilter class provides an eventFilter that shows a Keyboard for
+    touchscreen environemnts when a QLineEdit or QTextEdit gets the
+    focus (is clicked by the user).
+
+    In order to enable the Keyboard (and Keypad) in an application, simply
+    install it with 'app.installEventFilter
+    ( Koo.Pos.PosEventFilter( mainWindow ) )'
+    """
+
     def __init__(self, parent=None):
+        """
+        Creates a new PosEventFilter object.
+        :param parent:
+        """
         QObject.__init__(self, parent)
         self.currentWidget = None
         self.keyboard = None
 
-    # @brief Reimplements eventFilter() to show a Keyboard when a QLineEdit or QTextEdit gets
-    # the focus.
     def eventFilter(self, obj, event):
+        """
+        Reimplements eventFilter() to show a Keyboard when a QLineEdit or
+        QTextEdit gets the focus.
+        :param obj:
+        :param event:
+        :return:
+        """
         if event.type() == QEvent.MouseButtonPress:
             if obj != self.currentWidget:
                 if obj.inherits('QLineEdit') or obj.inherits('QTextEdit'):
