@@ -63,7 +63,6 @@ class Settings(object):
         'client.default_path': os.path.expanduser('~'),
         'client.language': False,
         'client.debug': False,
-        'client.sentry_dsn': 'sync+http://77cb0018d10842209ec638aeeffedf1a:3be0b6af34d14f7cb562b776e490ad8d@sentry.gisce.net/128',
         'koo.print_directly': False,
         'koo.stylesheet': '',
         'koo.tabs_position': 'top',
