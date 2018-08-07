@@ -145,7 +145,7 @@ class Record(QObject):
         if fieldName not in self.values:
             self.group.ensureRecordLoaded(self)
             x = 0
-            while self.group.records[x].id != self.id:
+            while self.group.records[x] != self.id:
                 x += 1
             record = self.group.records[x]
         return field.get_client(record)
