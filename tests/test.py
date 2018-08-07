@@ -154,5 +154,27 @@ class TestRecord(unittest.TestCase):
         rec.set({"name": "ok"})
         self.assertEqual(rec.missingFields(), [])
 
+    def test_value(self):
+        """
+        Tests the value function
+
+        :return:
+        """
+        def empty_function(self):
+            pass
+        fields = {
+            "name": {"type": "integer"},
+        }
+        rg = RecordGroup("res.partner", fields)
+
+        rec = Record(1, rg)
+        rg.records = [1]
+        rg.ensureRecordLoaded = empty_function
+        #rg.recordById(1).set(1, signal=False)
+        rec.setValue("name", 1)
+
+        rec.value("name")
+
+
 if __name__ == '__main__':
     unittest.main()
