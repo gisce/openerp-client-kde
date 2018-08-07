@@ -169,7 +169,7 @@ class TestRecord(unittest.TestCase):
 
         rec = Record(1, rg)
         rg.records = [1]
-        rg.ensureRecordLoaded = empty_functionFalse)
+        rg.ensureRecordLoaded = empty_function
         rec.setValue("name", 1)
 
         rec.value("name")
