@@ -717,8 +717,9 @@ class Screen(QScrollArea):
                 action.triggered.connect(self.triggerAction)
             # If there's only one action it will be the 'Print Screen' action
             # that is added "manually" by ActionFactory. In those cases in which
-            # Print Screen is the only action we won't show it in the toolbar. We
-            # don't consider Plugins a good reason to show the toolbar either.
+            # Print Screen is the only action we won't show it in the toolbar.
+            # We don't consider Plugins a good reason to show the toolbar
+            # either.
             # This way dashboards won't show the toolbar, though the option will
             # remain available in the menu for those screens that don't have any
             # actions configured in the server, but Print Screen can be useful.
