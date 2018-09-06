@@ -310,15 +310,23 @@ class Screen(QScrollArea):
     def isReadOnly(self):
         return self._readOnly
 
-    # @brief This function is expected to be used as a slot for an Action trigger signal.
-    # (as it will check the sender). It will call the Action.execute(id,ids) function.
     def triggerAction(self):
+        """
+        This function is expected to be used as a slot for an Action trigger
+        signal.
+        (as it will check the sender). It will call the Action.execute(id,ids)
+        function.
+        :return:
+        """
         # We expect a Screen.Action here
         action = self.sender()
 
-        # If record has been modified save before executing the action. Otherwise:
-        # - With new records nothing is done without notifying the user which isn't intuitive.
-        # - With existing records it prints (for example) old values, which isn't intuitive either.
+        # If record has been modified save before executing the action.
+        # Otherwise:
+        # - With new records nothing is done without notifying the user
+        # which isn't intuitive.
+        # - With existing records it prints (for example) old values, which
+        # isn't intuitive either.
         if self.isModified():
             if not self.save():
                 return
