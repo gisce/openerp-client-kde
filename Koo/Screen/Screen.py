@@ -336,7 +336,7 @@ class Screen(QScrollArea):
         if not self.currentId() and action.type() != 'plugin':
             return
 
-        id = self.currentId()
+        ident = self.currentId()
         ids = self.selectedIds()
 
         if action.type() != 'relate':
@@ -348,7 +348,7 @@ class Screen(QScrollArea):
             # Plugins may be executed even if there's no current record.
             context.update(self.currentRecord().get())
 
-        action.execute(id, ids, context)
+        action.execute(ident, ids, context)
 
         if action.type() != 'relate':
             self.reload()
