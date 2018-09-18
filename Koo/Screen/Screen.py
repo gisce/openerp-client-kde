@@ -639,6 +639,23 @@ class Screen(QScrollArea):
             view = self.rpc.fields_view_get(False, type, self.context, True)
             return self.addView(view['arch'], view['fields'], display, toolbar=view.get('toolbar', False), id=view.get('view_id', False))
 
+    def _parse_fields(self, node, fields):
+        if node.nodeType == node.ELEMENT_NODE:
+            if node.localName == 'field':
+                attrs = Common.nodeAttributes(node)
+                if attrs.get('widget', False):
+                    if attrs['widget'] == 'one2many_list':
+                        attrs['widget'] = 'one2many'
+                    attrs['type'] = attrs['widget']
+                try:
+                    fields[attrs['name']].update(attrs)
+                except:
+                    print("-" * 30, "\n malformed tag for :", attrs)
+                    print("-" * 30)
+                    raise
+        for node2 in node.childNodes:
+            self._parse_fields(node2, fields)
+
     def addView(self, arch, fields, display=False, toolbar=None, id=False):
         """
         Adds a view given it's XML description and fields
@@ -659,24 +676,8 @@ class Screen(QScrollArea):
         if toolbar is None:
             toolbar = {}
 
-        def _parse_fields(node, fields):
-            if node.nodeType == node.ELEMENT_NODE:
-                if node.localName == 'field':
-                    attrs = Common.nodeAttributes(node)
-                    if attrs.get('widget', False):
-                        if attrs['widget'] == 'one2many_list':
-                            attrs['widget'] = 'one2many'
-                        attrs['type'] = attrs['widget']
-                    try:
-                        fields[attrs['name']].update(attrs)
-                    except:
-                        print("-" * 30, "\n malformed tag for :", attrs)
-                        print("-" * 30)
-                        raise
-            for node2 in node.childNodes:
-                _parse_fields(node2, fields)
         dom = xml.dom.minidom.parseString(arch.encode('utf-8'))
-        _parse_fields(dom, fields)
+        self._parse_fields(dom, fields)
 
         self.group.addFields(fields)
 
