@@ -669,7 +669,7 @@ class Screen(QScrollArea):
         only loaded (False)
         :param toolbar: Toolbar information as returned from fields_view_get
         server function.
-        :param id: View id. This parameter is used for storing and loading
+        :param ident: View id. This parameter is used for storing and loading
         settings for the view. If id=False, no
         :return: The view widget
         """
