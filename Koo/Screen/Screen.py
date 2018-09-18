@@ -596,13 +596,13 @@ class Screen(QScrollArea):
         :return:
         """
         if type in self.views_preload:
-            return self.addView(self.views_preload[type]['arch'], self.views_preload[type]['fields'], display, toolbar=self.views_preload[type].get('toolbar', False), id=self.views_preload[type].get('view_id', False))
+            return self.addView(self.views_preload[type]['arch'], self.views_preload[type]['fields'], display, toolbar=self.views_preload[type].get('toolbar', False), ident=self.views_preload[type].get('view_id', False))
         else:
             # By now we set toolbar to True always. Even when the Screen is embedded.
             # This way we don't force setting the embedded option in the class constructor
             # and can be set later.
             view = self.rpc.fields_view_get(id, type, self.context, True)
-            return self.addView(view['arch'], view['fields'], display, toolbar=view.get('toolbar', False), id=view.get('view_id', False))
+            return self.addView(view['arch'], view['fields'], display, toolbar=view.get('toolbar', False), ident=view.get('view_id', False))
 
     def addViewById(self, id, display=False):
         """
