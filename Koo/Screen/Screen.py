@@ -656,7 +656,7 @@ class Screen(QScrollArea):
         for node2 in node.childNodes:
             self._parse_fields(node2, fields)
 
-    def addView(self, arch, fields, display=False, toolbar=None, id=False):
+    def addView(self, arch, fields, display=False, toolbar=None, ident=False):
         """
         Adds a view given it's XML description and fields
 
@@ -683,7 +683,7 @@ class Screen(QScrollArea):
 
         self.fields = self.group.fields
 
-        view = ViewFactory.create(id, self, self.resource, dom, self.fields)
+        view = ViewFactory.create(ident, self, self.resource, dom, self.fields)
         self.viewLayout.addWidget(view)
         self.setOnWriteFunction(view.onWriteFunction())
         # Load view settings
