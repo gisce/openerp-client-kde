@@ -199,6 +199,15 @@ class FormWidget(QWidget, FormWidgetUi):
             self.subscriber.subscribe(
                 'updated_model:%s' % model, self.autoReload)
 
+    def isReadonly(self):
+        """
+        Returns if the form widget is in read only mode
+
+        :return: True if is in read only mode
+        :rtype: bool
+        """
+        return self.readonly
+
     def save(self):
         pass
 
