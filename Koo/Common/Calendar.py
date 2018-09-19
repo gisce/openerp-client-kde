@@ -288,9 +288,6 @@ def storageToDateTime(text):
 
 (PopupCalendarUi, PopupCalendarBase) = loadUiType(Common.uiPath('datetime.ui'))
 
-# @brief
-#
-
 
 class PopupCalendarWidget(QWidget, PopupCalendarUi):
     """
