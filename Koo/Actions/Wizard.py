@@ -113,6 +113,7 @@ class WizardPage(QDialog):
     def cancel(self):
         pass
 
+
 class Wizard(QObject):
     """
     The Wizard class shows a step by step wizard with the provided information.
@@ -121,7 +122,7 @@ class Wizard(QObject):
         QObject.__init__(self, parent)
         if context is None:
             context = {}
-        if not 'form' in datas:
+        if 'form' not in datas:
             datas['form'] = {}
         self.action = action
         self.datas = datas
