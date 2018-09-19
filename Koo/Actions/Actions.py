@@ -298,4 +298,4 @@ def executeKeyword(keyword, data=None, context=None):
         return None
     (name, action) = res
     Api.instance.executeAction(action, data, context=context)
-    return (name, action)
+    return name, action
