@@ -66,8 +66,8 @@ def parseArguments(args):
     Settings.loadFromFile()
     Settings.loadFromRegistry()
 
-    # Allow URL to be specified in an environment variable so user password is not
-    # visible when listing running processes.
+    # Allow URL to be specified in an environment variable so user password
+    # is not visible when listing running processes.
     if os.environ.get('KOO_URL'):
         Settings.setValue('login.url', os.environ.get('KOO_URL'))
 
