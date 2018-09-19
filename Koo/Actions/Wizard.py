@@ -29,8 +29,6 @@
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from Koo.Common.Ui import *
 
 from Koo import Rpc
 from Koo.Common import Api
