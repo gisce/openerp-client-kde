@@ -25,14 +25,9 @@
 #
 ##############################################################################
 
-import gettext
-import os
-import sys
 import optparse
 
-from . import Debug
 from .Settings import *
-from Koo import Rpc
 
 from PyQt5.QtCore import QDir, QUrl
 
