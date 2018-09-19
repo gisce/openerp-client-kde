@@ -27,14 +27,9 @@
 #
 ##############################################################################
 
-import os
 from PyQt5.QtWidgets import *
 import time
-import base64
 import datetime
-import copy
-
-from Koo import Rpc
 
 from . import Wizard
 from Koo.Printer import *
@@ -42,7 +37,6 @@ from Koo.Printer import *
 from Koo.Common import Api
 from Koo.Common import Common
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
 
 
 class ExecuteReportThread(QThread):
