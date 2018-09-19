@@ -148,8 +148,10 @@ class Wizard(QObject):
         self.progress.stop()
         QApplication.restoreOverrideCursor()
 
-        # Check if 'res' is None as it can happen with 'Split in production lots'
-        # in inventory 'Movements', for example, if no production sequence is defined.
+        # Check if 'res' is None as it can happen with
+        # 'Split in production lots'
+        # in inventory 'Movements', for example, if no production sequence is
+        # defined.
         # We'll also leave the wizard if an exception was thrown.
         if exception or not res:
             self.state = 'end'
@@ -193,6 +195,7 @@ class Wizard(QObject):
 def execute(action, datas, state='init', parent=None, context=None):
     """
     Executes the wizard with the provided information.
+
     :param action:
     :param datas:
     :param state:
@@ -200,6 +203,7 @@ def execute(action, datas, state='init', parent=None, context=None):
     :param context:
     :return:
     """
+
     if context is None:
         context = {}
     w = Wizard(action, datas, state, parent, context)
