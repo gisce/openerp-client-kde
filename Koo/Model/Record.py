@@ -195,6 +195,7 @@ class Record(QObject):
     def isModified(self):
         """
         Returns whether the record has been modified or not
+
         :return: True if  the record been modified
         :rtype: bool
         """

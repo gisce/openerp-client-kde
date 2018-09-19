@@ -911,8 +911,12 @@ class Screen(QScrollArea):
         self.currentView().store()
         return self.currentRecord().get()
 
-    # @brief Returns True if any record has been modified. Returns False otherwise.
     def isModified(self):
+        """
+        Returns True if any record has been modified. Returns False otherwise.
+
+        :return:
+        """
         if not self.currentRecord():
             return False
         self.currentView().store()
