@@ -136,12 +136,12 @@ def textToDate(text):
         return QDate.currentDate()
 
     inputFormats = [
-        'dd/MM/yyyy', 'dd-MM-yyyy', ('dd-MM-yy',
-                                     'century'), ('dd/MM/yy', 'century'),
-        ('dd-M-yy', 'century'), ('d-M-yy',
-                                 'add'), ('d-MM-yy', 'century'), 'dd.MM.yyyy',
-        ('dd.MM.yy', 'century'), 'ddMMyyyy', ('ddMMyy', 'century'), ('dd/MM', 'year'),
-        ('dd.MM', 'year'), ('ddMM', 'year'), ('dd', 'month')
+        'dd/MM/yyyy', 'dd-MM-yyyy', ('dd-MM-yy', 'century'),
+        ('dd/MM/yy', 'century'), ('dd-M-yy', 'century'),
+        ('d-M-yy', 'add'), ('d-MM-yy', 'century'), 'dd.MM.yyyy',
+        ('dd.MM.yy', 'century'), 'ddMMyyyy', ('ddMMyy', 'century'),
+        ('dd/MM', 'year'), ('dd.MM', 'year'), ('ddMM', 'year'),
+        ('dd', 'month')
     ]
     for x in inputFormats:
         if isinstance(x, tuple):
