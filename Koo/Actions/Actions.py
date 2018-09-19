@@ -91,10 +91,17 @@ class ExecuteReportThread(QThread):
             self.error.emit((_('Error: %s') %
                                         str(e.type), e.message, e.data))
 
-# @brief Executes the given report.
-
 
 def executeReport(name, data, context=None):
+    """
+    Executes the given report.
+
+    :param name:
+    :param data:
+    :param context:
+    :return:
+    """
+
     if context is None:
         context = {}
     QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -259,7 +266,8 @@ def executeKeyword(keyword, data=None, context=None):
     :param keyword:
     :param data:
     :param context:
-    :return:
+    :return: Name, action
+    :rtype: tuple
     """
     if data is None:
         data = {}
