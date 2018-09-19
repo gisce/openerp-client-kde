@@ -515,14 +515,14 @@ class Screen(QScrollArea):
         self._currentRecord = value
         self._currentRecordPosition = pos
         if value and value.id:
-            id = value.id
+            ident = value.id
         else:
-            id = -1
+            ident = -1
         if self.group:
             count = self.group.count()
         else:
             count = 0
-        self.recordMessage.emit(pos, count, id)
+        self.recordMessage.emit(pos, count, ident)
         if self._currentRecord:
             if self.currentView():
                 self.currentView().setSelected(self._currentRecord)
