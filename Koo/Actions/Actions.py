@@ -217,11 +217,11 @@ def executeAction(action, datas, context=None):
         target = action.get('target', 'current')
         if not target:
             target = 'current'
-        Api.instance.createWindow(view_ids, datas['res_model'], datas['res_id'], domain,
-                                  action['view_type'], datas.get(
-                                      'window', None), ctx,
-                                  datas['view_mode'], name=action.get('name', False), autoReload=datas['auto_refresh'],
-                                  target=target)
+        Api.instance.createWindow(
+            view_ids, datas['res_model'], datas['res_id'], domain,
+            action['view_type'], datas.get('window', None), ctx,
+            datas['view_mode'], name=action.get('name', False),
+            autoReload=datas['auto_refresh'], target=target)
 
         # for key in tools.expr_eval(action.get('context', '{}')).keys():
         #	del Rpc.session.context[key]
@@ -276,12 +276,14 @@ def executeKeyword(keyword, data=None, context=None):
     actions = None
     if 'id' in data:
         try:
-            id = data.get('id', False)
-            actions = Rpc.session.execute('/object', 'execute',
-                                          'ir.values', 'get', 'action', keyword,
-                                          [(data['model'], id)], False, Rpc.session.context)
+            ident = data.get('id', False)
+            actions = Rpc.session.execute(
+                '/object', 'execute',
+                'ir.values', 'get', 'action', keyword,
+                [(data['model'], ident)], False, Rpc.session.context
+            )
             actions = [x[2] for x in actions]
-        except Rpc.RpcException as e:
+        except Rpc.RpcException:
             return None
 
     if not actions:
