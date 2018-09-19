@@ -75,20 +75,20 @@ def parseArguments(args):
         Settings.setValue('login.url', options.url)
     if Settings.value('login.url'):
         url = QUrl(Settings.value('login.url'))
-    if not options.stylesheet is None:
+    if options.stylesheet is not None:
         Settings.setValue('koo.stylesheet', options.stylesheet)
-    if not options.pos_mode is None:
+    if options.pos_mode is not None:
         Settings.setValue('koo.pos_mode', options.pos_mode)
-    if not options.enter_as_tab is None:
+    if options.enter_as_tab is not None:
         Settings.setValue('koo.enter_as_tab', options.enter_as_tab)
-    if not options.debug is None:
+    if options.debug is not None:
         Settings.setValue('client.debug', options.debug)
-    if not options.disable_kde is None:
+    if options.disable_kde is not None:
         Settings.setValue('kde.enabled', False)
-    if not options.database is None:
+    if options.database is not None:
         Settings.setValue('login.db', options.database)
-    if not options.open_model is None:
+    if options.open_model is not None:
         Settings.setValue('open.model', options.open_model)
-    if not options.open_id is None:
+    if options.open_id is not None:
         Settings.setValue('open.id', options.open_id)
     return arguments
