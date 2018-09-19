@@ -17,22 +17,33 @@
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-
-# @brief The ArrowsEventFilter class provides an eventFilter that allows
-# moving from one widget to another using Alt + Arrow (Left, Right, Up, Down)
-# and also Alt + Minus and Alt + Plus.
-#
-# To install it in an application use 'app.installEventFilter( Koo.Common.ArrowsEventFilter( mainWindow ) )'
 
 
 class ArrowsEventFilter(QObject):
-    # @brief Creates a new ArrowsEventFilter object.
+    """
+    The ArrowsEventFilter class provides an eventFilter that allows
+    moving from one widget to another using Alt + Arrow (Left, Right, Up, Down)
+    and also Alt + Minus and Alt + Plus.
+
+    To install it in an application use
+    'app.installEventFilter( Koo.Common.ArrowsEventFilter( mainWindow ) )'
+    """
+
     def __init__(self, parent=None):
+        """
+        Creates a new ArrowsEventFilter object.
+
+        :param parent:
+        """
         QObject.__init__(self, parent)
 
-    # Get all visible and focusable child widgets of the given widget
     def allWidgets(self, object):
+        """
+        Get all visible and focusable child widgets of the given widget
+        :param object:
+        :return:
+        """
+
         if not object.isWidgetType():
             return []
         result = []
