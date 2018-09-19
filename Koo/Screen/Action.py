@@ -153,14 +153,15 @@ class ActionFactory:
             'report_name': 'printscreen.list',
             'type': 'ir.actions.report.xml'
         })
-
-        # Save action
-        definition['action'].append({
-            'name': 'save',
-            'string': _('Save'),
-            'shortcut': 'S',
-            'action': parent.parentWidget().save,
-        })
+        fwidget = parent.parentWidget()
+        if not fwidget.isReadonly():
+            # Save action
+            definition['action'].append({
+                'name': 'save',
+                'string': _('Save'),
+                'shortcut': 'S',
+                'action': parent.parentWidget().save,
+            })
 
         # Cancel action
         definition['action'].append({
