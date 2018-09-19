@@ -381,6 +381,7 @@ class Record(QObject):
             self.reload()
         if self.group:
             self.group.written(self.id)
+        self.modified = False
         return self.id
 
     def fillWithDefaults(self, domain=None, context=None):
