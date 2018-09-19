@@ -65,7 +65,7 @@ class ExecuteReportThread(QThread):
                                             str(e.type), e.message, e.data))
                 return
 
-            if ids == []:
+            if not ids:
                 self.warning.emit(_('Nothing to print.'))
                 return
             self.datas['id'] = ids[0]
@@ -105,7 +105,7 @@ def executeReport(name, data, context=None):
         if not ids:
             ids = Rpc.session.execute(
                 '/object', 'execute', datas['model'], 'search', [])
-            if ids == []:
+            if not ids:
                 QApplication.restoreOverrideCursor()
                 QMessageBox.information(
                     None, _('Information'), _('Nothing to print!'))
@@ -150,7 +150,7 @@ def execute(act_id, datas, type=None, context=None):
         context = {}
     ctx = Rpc.session.context.copy()
     ctx.update(context)
-    if type == None:
+    if type is None:
         res = Rpc.session.execute(
             '/object', 'execute', 'ir.actions.actions', 'read', [act_id], ['type'], ctx)
         if not len(res):
