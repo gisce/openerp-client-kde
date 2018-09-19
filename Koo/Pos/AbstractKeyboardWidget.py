@@ -20,11 +20,14 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 
-# @brief The AbstactKeyboardWidget provides an abstract class for creating virtual
-# on-screen keyboards.
+# @brief
 
 
 class AbstractKeyboardWidget(QWidget):
+    """
+    The AbstactKeyboardWidget provides an abstract class for creating virtual
+    on-screen keyboards.
+    """
     # @brief Creates a KeyboardWidget that will send keyboard events to it's parent. It will
     # also be positioned in the screen acording to its parent coordinates.
     tabKeyPressed = pyqtSignal()
@@ -32,9 +35,12 @@ class AbstractKeyboardWidget(QWidget):
     def __init__(self, parent):
         QWidget.__init__(self, parent)
 
-    # @brief Initializes keyboard by connecting buttons to slots. Setting window flags. And
-    # positioning it in the screen.
     def init(self):
+        """
+        Initializes keyboard by connecting buttons to slots. Setting window
+        flags. And  positioning it in the screen.
+        :return:
+        """
         self.pushEscape.clicked.connect(self.escape)
         if hasattr(self, 'pushCaps'):
             self.pushCaps.clicked.connect(self.caps)
@@ -57,8 +63,11 @@ class AbstractKeyboardWidget(QWidget):
             self.caps()
         self.show()
 
-    # @brief Tries to position the Keyboard in the best place in the screen.
     def fitInScreen(self):
+        """
+        Tries to position the Keyboard in the best place in the screen.
+        :return:
+        """
         parent = self.parent()
         parentPos = parent.parent().mapToGlobal(parent.pos())
         screenHeight = QApplication.desktop().screenGeometry().height()
@@ -97,12 +106,19 @@ class AbstractKeyboardWidget(QWidget):
         event = QKeyEvent(QEvent.KeyPress, key, Qt.NoModifier, text)
         QApplication.sendEvent(self.parent(), event)
 
-    # @brief Returns the value of "Qt.Key_" + text value.
     def key(self, text):
+        """
+        Returns the value of "Qt.Key_" + text value.
+        :param text:
+        :return:
+        """
         return eval('Qt.%s' % text)
 
-    # @brief Hides the keyboard.
     def escape(self):
+        """
+        Hides the keyboard.
+        :return:
+        """
         self.hide()
 
     def caps(self):

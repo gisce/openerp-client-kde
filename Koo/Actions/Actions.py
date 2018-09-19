@@ -257,8 +257,6 @@ def executeAction(action, datas, context=None):
     elif action['type'] == 'ir.actions.act_url':
         Api.instance.createWebWindow(action.get('url'), action.get('name'))
 
-# @brief
-
 
 def executeKeyword(keyword, data=None, context=None):
     """

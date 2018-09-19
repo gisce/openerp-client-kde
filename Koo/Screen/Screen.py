@@ -162,24 +162,27 @@ class Screen(QScrollArea):
         if self._firstTimeShown:
             self._firstTimeShown = False
             # The first time Screen is shown/rendered we'll set current record
-            # if none is yet selected. Note that this means that it's not possible
-            # to explicitly make Screen NOT select any items.
+            # if none is yet selected. Note that this means that it's not
+            # possible to explicitly make Screen NOT select any items.
             #
-            # The reason for doing this is that it allows delayed loading of embedded
-            # one2many and many2many fields because those not in the main tab won't
-            # receive the 'showEvent' and won't try to load data from the server, which
-            # greatly improves load time of some forms.
+            # The reason for doing this is that it allows delayed loading of
+            # embedded one2many and many2many fields because those not in the
+            # main tab won't receive the 'showEvent' and won't try to load data
+            # from the server, which greatly improves load time of some forms.
             #
-            # If we don't do this here, and let 2many widgets to try to implement it,
-            # they have to set current record on switchView, but the problem is that
-            # label is kept as 0/0 (instead of 1/3, for example), until user clicks
-            # switch view.
+            # If we don't do this here, and let 2many widgets to try to
+            # implement it, they have to set current record on switchView, but
+            # the problem is that label is kept as 0/0 (instead of 1/3, for
+            # example), until user clicks switch view.
             if self.group and self.group.count() and not self.currentRecord():
                 self.setCurrentRecord(self.group.recordByIndex(0))
         return QScrollArea.showEvent(self, event)
 
-    # @brief Sets the focus to current view.
     def setFocusToView(self):
+        """
+        Sets the focus to current view.
+        :return:
+        """
         self.currentView().setFocus()
 
     def sizeHint(self):
@@ -191,12 +194,18 @@ class Screen(QScrollArea):
     def preloadedViews(self, views):
         return self.views_preload
 
-    # @brief Initializes the list of views using a types list and an ids list.
-    #
-    # Example:
-    #
-    # screen.setupViews( ['tree','form'], [False, False] )
     def setupViews(self, types, ids):
+        """
+        Initializes the list of views using a types list and an ids list.
+
+        Example:
+
+        screen.setupViews( ['tree','form'], [False, False] )
+        :param types:
+        :param ids:
+        :return: None
+        :rtype: None
+        """
         self._viewQueue.setup(types, ids)
         # Try to load only if model group has been set
         if self.name:
@@ -217,21 +226,34 @@ class Screen(QScrollArea):
         if self.name:
             self.switchView()
 
-    # @brief Sets whether the screen is embedded.
-    #
-    # Embedded screens don't show the search or toolbar widgets.
-    # By default embedded is True so it doesn't load unnecessary forms.
+
     def setEmbedded(self, value):
+        """
+        Sets whether the screen is embedded.
+
+        Embedded screens don't show the search or toolbar widgets.
+        By default embedded is True so it doesn't load unnecessary forms.
+        :param value:
+        :return:
+        """
         self._embedded = value
         self.setToolbarVisible(not value)
         self.setSearchFormVisible(not value)
 
-    # @brief Returns True if the Screen acts in embedded mode.
     def embedded(self):
+        """
+        Returns True if the Screen acts in embedded mode.
+        :return:
+        """
         return self._embedded
 
-    # @brief Allows making the toolbar visible or hidden.
+    # @brief
     def setToolbarVisible(self, value):
+        """
+        Allows making the toolbar visible or hidden.
+        :param value:
+        :return:
+        """
         self._toolbarVisible = value
         self.toolBar.setVisible(value)
 
@@ -332,9 +354,10 @@ class Screen(QScrollArea):
             self.containerView.hide()
 
         self.containerView = widget
-        # Calling first "loadSearchForm()" because when the search form is hidden
-        # it looks better to the user. If we show the widget and then hide the search
-        # form it produces an ugly flickering.
+        # Calling first "loadSearchForm()" because when the search form is
+        # hidden
+        # it looks better to the user. If we show the widget and then hide the
+        # search form it produces an ugly flickering.
         self.loadSearchForm()
         self.containerView.show()
         # @xtorello toreview zzz
@@ -358,9 +381,12 @@ class Screen(QScrollArea):
         print ("tancant")
         self.closed.emit()
 
-    # @brief Searches with the current parameters of the search form and loads the
-    # models that fit the criteria.
     def search(self):
+        """
+        Searches with the current parameters of the search form and loads the
+        models that fit the criteria.
+        :return:
+        """
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
             value = self.searchForm.value()
@@ -442,24 +468,27 @@ class Screen(QScrollArea):
         :return:
         """
 
-        # Checking _currentRecordPosition before count() can save a search() call to the server because
-        # count() will execute a search() in the server if no items have been loaded yet. What happens is
-        # that the first time a screen with a TreeView is shown currentRecord() will be called but there
-        # will be no currentRecord. TreeView then will set the appropiate order by loading settings from
-        # the server through restoreViewSettings, and KooModel will load data on demand.
+        # Checking _currentRecordPosition before count() can save a search()
+        # call to the server because count() will execute a search() in the
+        # server if no items have been loaded yet. What happens is that the
+        # first time a screen with a TreeView is shown currentRecord() will be
+        # called but there will be no currentRecord. TreeView then will set the
+        # appropiate order by loading settings from the server through
+        # restoreViewSettings, and KooModel will load data on demand.
         if self._currentRecordPosition and self._currentRecordPosition >= 0 and self.group.count():
-            # In some cases self._currentRecordPosition might point to a position
-            # beyond group size. In this case ensure current record is set to None.
+            # In some cases self._currentRecordPosition might point to a
+            # position beyond group size. In this case ensure current record
+            # is set to None.
             if self._currentRecordPosition >= self.group.count():
                 self.setCurrentRecord(None)
                 return None
-            # Use modelByIndex because this ensures all missing fields of the model
-            # are loaded. For example, the model could have been loaded in tree view
-            # but now might need more fields for form view.
+            # Use modelByIndex because this ensures all missing fields of the
+            # model are loaded. For example, the model could have been loaded
+            # in tree view but now might need more fields for form view.
             return self.group.modelByIndex(self._currentRecordPosition)
         else:
-            # New records won't have that problem (althouth the problem might be that
-            # fields haven't been created yet??)
+            # New records won't have that problem (althouth the problem might
+            # be that fields haven't been created yet??)
             return self._currentRecord
 
     def setCurrentRecord(self, value):
@@ -500,8 +529,8 @@ class Screen(QScrollArea):
 
     def switchView(self, viewType=None):
         """
-        Switches the current view to the previous one. If viewType (such as 'calendar')
-        is given it will switch to that view type.
+        Switches the current view to the previous one. If viewType
+        (such as 'calendar') is given it will switch to that view type.
         :param viewType:
         :return:
         """
@@ -542,16 +571,22 @@ class Screen(QScrollArea):
             self.currentRecord().setValidate()
         self.display()
 
-    # @brief Adds a view given it's id and type.
-    #
-    # This function is needed to resemble server's fields_view_get function. This
-    # function wasn't necessary but accounting module needs it because it tries to
-    # open a view with it's ID but reimplements fields_view_get and checks the view
-    # type.
-    #
-    # @see AddViewById
-    # @see AddViewByType
     def addViewByIdAndType(self, id, type, display=False):
+        """
+        Adds a view given it's id and type.
+
+        This function is needed to resemble server's fields_view_get function.
+        This function wasn't necessary but accounting module needs it because
+        it tries to open a view with it's ID but reimplements fields_view_get
+        and checks the view type.
+
+        see AddViewById
+        see AddViewByType
+        :param id:
+        :param type:
+        :param display:
+        :return:
+        """
         if type in self.views_preload:
             return self.addView(self.views_preload[type]['arch'], self.views_preload[type]['fields'], display, toolbar=self.views_preload[type].get('toolbar', False), id=self.views_preload[type].get('view_id', False))
         else:
@@ -561,28 +596,32 @@ class Screen(QScrollArea):
             view = self.rpc.fields_view_get(id, type, self.context, True)
             return self.addView(view['arch'], view['fields'], display, toolbar=view.get('toolbar', False), id=view.get('view_id', False))
 
-    # @brief Adds a view given its id.
-    # @param id View id to load or False if you want to load given view_type.
-    # @param display Whether you want the added view to be shown (True) or only loaded (False).
-    # @return The view widget
-    #
-    # @see AddViewByType
-    # @see AddViewByIdAndType
     def addViewById(self, id, display=False):
+        """
+        Adds a view given its id.
+
+        see AddViewByType
+        seee AddViewByIdAndType
+        :param id: View id to load or False if you want to load given view_type.
+        :param display: Whether you want the added view to be shown (True) or
+        only loaded (False).
+        :return: The view widget
+        """
         # By now we set toolbar to True always. Even when the Screen is embedded.
         # This way we don't force setting the embedded option in the class constructor
         # and can be set later.
         view = self.rpc.fields_view_get(id, False, self.context, True)
         return self.addView(view['arch'], view['fields'], display, toolbar=view.get('toolbar', False), id=id)
 
-    # @brief Adds a view given a view type.
-    # @param type View type ('form', 'tree', 'calendar', 'graph'...).
-    # @param display Whether you want the added view to be shown (True) or only loaded (False).
-    # @return The view widget
-    #
-    # @see AddViewById
-    # @see AddViewByIdAndType
     def addViewByType(self, type, display=False):
+        """
+        see AddViewById
+        see AddViewByIdAndType
+        :param type: View type ('form', 'tree', 'calendar', 'graph'...).
+        :param display: Whether you want the added view to be shown (True) or
+        only loaded (False).
+        :return: The view widget
+        """
         if type in self.views_preload:
             return self.addView(self.views_preload[type]['arch'], self.views_preload[type]['fields'], display, toolbar=self.views_preload[type].get('toolbar', False), id=self.views_preload[type].get('view_id', False))
         else:
@@ -592,15 +631,23 @@ class Screen(QScrollArea):
             view = self.rpc.fields_view_get(False, type, self.context, True)
             return self.addView(view['arch'], view['fields'], display, toolbar=view.get('toolbar', False), id=view.get('view_id', False))
 
-    # @brief Adds a view given it's XML description and fields
-    # @param arch XML string: typically 'arch' field returned by model fields_view_get() function.
-    # @param fields Fields dictionary containing each field (widget) properties.
-    # @param display Whether you want the added view to be shown (True) or only loaded (False)
-    # @param toolbar Toolbar information as returned from fields_view_get server function.
-    # @param id View id. This parameter is used for storing and loading settings for the view. If id=False, no
-    #		settings will be stored/loaded.
-    # @return The view widget
     def addView(self, arch, fields, display=False, toolbar=None, id=False):
+        """
+        Adds a view given it's XML description and fields
+
+        :param arch: typically 'arch' field returned by model fields_view_get()
+        function.
+        :type arch: str
+        :param fields: Fields dictionary containing each field (widget)
+        properties.
+        :param display: Whether you want the added view to be shown (True) or
+        only loaded (False)
+        :param toolbar: Toolbar information as returned from fields_view_get
+        server function.
+        :param id: View id. This parameter is used for storing and loading
+        settings for the view. If id=False, no
+        :return: The view widget
+        """
         if toolbar is None:
             toolbar = {}
 
@@ -650,8 +697,12 @@ class Screen(QScrollArea):
             self.setView(view)
         return view
 
-    # @brief Loads all actions associated with the current model including plugins.
     def loadActions(self, actions):
+        """
+        Loads all actions associated with the current model including plugins.
+        :param actions:
+        :return:
+        """
         self.actions = ActionFactory.create(self, actions, self.resource)
         if self.actions:
             for action in self.actions:
@@ -669,9 +720,14 @@ class Screen(QScrollArea):
             else:
                 self.toolBar.hide()
 
-    # @brief Creates a new record in the current model. If the current view is not editable
-    # it will automatically switch to a view that allows editing.
     def new(self, default=True, context=None):
+        """
+        Creates a new record in the current model. If the current view is not editable
+        it will automatically switch to a view that allows editing.
+        :param default:
+        :param context:
+        :return:
+        """
         if context is None:
             context = {}
 
@@ -694,27 +750,39 @@ class Screen(QScrollArea):
             self.currentView().startEditing()
         return self.currentRecord()
 
-    # @brief Returns 0 or -1 depending on new records policy for the current view.
-    # If the view adds on top it will return 0, otherwise it will return -1
     def newRecordPosition(self):
+        """
+        Returns 0 or -1 depending on new records policy for the
+        current view.
+        If the view adds on top it will return 0, otherwise it will return -1
+        :return:
+        :rtype: int
+        """
         if self.currentView() and self.currentView().addOnTop():
             return 0
         else:
             return -1
 
-    # @brief Returns whether new records will be added on top or on the bottom.
-    #
-    # Note that this is a property defined by the current view. If there's no current view
-    # it will return False.
     def addOnTop(self):
+        """
+        Returns whether new records will be added on top or on the bottom.
+
+        Note that this is a property defined by the current view. If there's
+        no current view it will return False.
+        :return:
+        """
         if self.currentView():
             return self.currentView().addOnTop()
         else:
             return False
 
-    # @brief Sets the on_write function. That is the function (in the server) that must
-    # be called after storing a record.
     def setOnWriteFunction(self, functionName):
+        """
+        Sets the on_write function. That is the function (in the server) that
+        must be called after storing a record.
+        :param functionName:
+        :return:
+        """
         self.group.setOnWriteFunction(functionName)
 
     def save(self):
@@ -881,8 +949,13 @@ class Screen(QScrollArea):
         else:
             return False
 
-    # @brief Loads the given ids to the RecordGroup and refreshes the view.
     def load(self, ids, addOnTop=False):
+        """
+        Loads the given ids to the RecordGroup and refreshes the view.
+        :param ids:
+        :param addOnTop:
+        :return:
+        """
         self.currentView().reset()
         self.group.load(ids, addOnTop)
         if ids:
@@ -891,8 +964,6 @@ class Screen(QScrollArea):
             self.setCurrentRecord(None)
             self.display()
 
-    # @brief Displays the record with id 'id' or refreshes the current record if
-    # no id is given.
     def display(self, id=None):
         """
         Displays the record with id 'id' or refreshes the current record if
@@ -908,9 +979,12 @@ class Screen(QScrollArea):
             self.currentView().setReadOnly(self.isReadOnly())
             self.currentView().display(self.currentRecord(), self.group)
 
-    # @brief Moves current record to the next one in the list and displays it in the
-    # current view.
     def displayNext(self):
+        """
+        Moves current record to the next one in the list and displays it in the
+        current view.
+        :return: None
+        """
         self.currentView().store()
         if self.group.recordExists(self.currentRecord()):
             idx = self.group.indexOfRecord(self.currentRecord())
@@ -923,9 +997,13 @@ class Screen(QScrollArea):
             self.currentRecord().setValidate()
         self.display()
 
-    # @brief Moves current record to the previous one in the list and displays it in the
-    # current view.
     def displayPrevious(self):
+        """
+        Moves current record to the previous one in the list and displays it
+        in the current view.
+        :return: None
+        """
+
         self.currentView().store()
         if self.group.recordExists(self.currentRecord()):
             #idx = self.group.records.index(self.currentRecord())-1
@@ -940,7 +1018,6 @@ class Screen(QScrollArea):
         if self.currentRecord():
             self.currentRecord().setValidate()
         self.display()
-
 
     def selectedIds(self):
         """
@@ -957,30 +1034,42 @@ class Screen(QScrollArea):
         ids = [record.id for record in records]
         return ids
 
-    # @brief Returns all selected records
     def selectedRecords(self):
+        """
+        Returns all selected records
+        :return:
+        """
         return self.currentView().selectedRecords()
 
-    # @brief Returns the current record id.
     def currentId(self):
+        """
+        Returns the current record id.
+        :return:
+        """
         if self.currentRecord():
             return self.currentRecord().id
         else:
             return None
 
-    # @brief Clears the list of records and refreshes the view.
-    #
-    # Note that this won't remove the records from the database. But clears
-    # the records from the model. It means that sometimes you might want to
-    # use setRecordGroup( None ) instead of calling clear(). This is what
-    # OneToMany and ManyToMany widgets do, for example.
-    # @see remove()
     def clear(self):
+        """
+        Clears the list of records and refreshes the view.
+
+        Note that this won't remove the records from the database. But clears
+        the records from the model. It means that sometimes you might want to
+        use setRecordGroup( None ) instead of calling clear(). This is what
+        OneToMany and ManyToMany widgets do, for example.
+        see remove()
+        :return:
+        """
         self.group.clear()
         self.display()
 
-    # @brief Stores settings of all opened views
     def storeViewSettings(self):
+        """
+        Stores settings of all opened views
+        :return:
+        """
         for view in list(self.views.values()):
             ViewSettings.store(view.id, view.viewSettings())
 
