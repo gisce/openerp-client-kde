@@ -68,8 +68,10 @@ class ArrowsEventFilter(QObject):
         return False
 
     def eventFilter(self, obj, event):
+        arrow_keys = (Qt.Key_Up, Qt.Key_Down, Qt.Key_Left, Qt.Key_Right)
+        plus_minus_keys = (Qt.Key_Plus, Qt.Key_Minus)
         if event.type() in (QEvent.KeyPress, QEvent.KeyRelease) and event.modifiers() & Qt.AltModifier and \
-                event.key() in (Qt.Key_Up, Qt.Key_Down, Qt.Key_Left, Qt.Key_Right, Qt.Key_Plus, Qt.Key_Minus):
+                event.key() in (arrow_keys + plus_minus_keys):
 
             if event.type() == QEvent.KeyRelease:
                 return True
