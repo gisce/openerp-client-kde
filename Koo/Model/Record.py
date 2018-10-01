@@ -397,7 +397,7 @@ class Record(QObject):
         if context is None:
             context = {}
         if len(self.group.fields):
-            val = self.rpc.default_get(list(self.group.fields.keys()), context)
+            val = self.rpc.default_get(sorted(list(self.group.fields.keys())), context)
             for d in domain:
                 if d[0] in self.group.fields:
                     if d[1] == '=':
