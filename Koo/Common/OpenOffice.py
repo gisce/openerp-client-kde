@@ -19,7 +19,6 @@
 #
 """helper tools for using pyUNO"""
 
-import sys
 try:
     import uno
     import unohelper

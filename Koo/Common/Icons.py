@@ -30,8 +30,9 @@ from PyQt5.QtGui import *
 
 #
 # GTK -> KDE Icons mapping
-# Due to the fact that the server expects the client to understand GTK icon names
-# we used a set of two functions and a dictionary to help us work correctly.
+# Due to the fact that the server expects the client to understand GTK icon
+# names we used a set of two functions and a dictionary to help us work
+# correctly.
 # The 'mapIcons' dictionary should have an entry for each icon name used by
 # the server, the value of the entry is the name of the image in our resource
 # file. Simply use kdeIcon() and kdePixmap() functions to get the appropiate

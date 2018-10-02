@@ -38,7 +38,25 @@ from Koo import Rpc
 
 
 def createWindow(view_ids, model, res_id=False, domain=None,
-                 view_type='form', window=None, context=None, mode=None, name=False, autoReload=False, target='current'):
+                 view_type='form', window=None, context=None, mode=None,
+                 name=False, autoReload=False, target='current',
+                 readonly=False):
+    """
+    Creates a Koo window
+
+    :param view_ids:
+    :param model:
+    :param res_id:
+    :param domain:
+    :param view_type:
+    :param window:
+    :param context:
+    :param mode:
+    :param name:
+    :param autoReload:
+    :param target:
+    :return:
+    """
 
     if context is None:
         context = {}
@@ -50,7 +68,7 @@ def createWindow(view_ids, model, res_id=False, domain=None,
         try:
             widget = FormWidget(model, res_id, domain, view_type=mode,
                                 view_ids=(view_ids or []),
-                                context=context, name=name)
+                                context=context, name=name, readonly=readonly)
         except Rpc.RpcException as e:
             QApplication.restoreOverrideCursor()
             return

@@ -32,14 +32,19 @@ import sys
 import inspect
 from Koo.Common.Settings import Settings
 
-# @brief This functions searches the given file (optionally adding a subdirectory)
-# in the possible directories it could be found.
-#
-# This should hide different installation and operating system directories. Making
-# it easier to find resource files.
-
 
 def searchFile(file, subdir=None, extraDir=None):
+    """
+    This functions searches the given file (optionally adding a subdirectory)
+    in the possible directories it could be found.
+
+    This should hide different installation and operating system directories.
+    Making it easier to find resource files.
+    :param file:
+    :param subdir:
+    :param extraDir:
+    :return:
+    """
     tests = []
     if Settings.value('koo.custom_ui_dir'):
         tests += [Settings.value('koo.custom_ui_dir')]

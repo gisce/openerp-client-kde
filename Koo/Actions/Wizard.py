@@ -29,8 +29,6 @@
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from Koo.Common.Ui import *
 
 from Koo import Rpc
 from Koo.Common import Api
@@ -115,6 +113,7 @@ class WizardPage(QDialog):
     def cancel(self):
         pass
 
+
 class Wizard(QObject):
     """
     The Wizard class shows a step by step wizard with the provided information.
@@ -123,7 +122,7 @@ class Wizard(QObject):
         QObject.__init__(self, parent)
         if context is None:
             context = {}
-        if not 'form' in datas:
+        if 'form' not in datas:
             datas['form'] = {}
         self.action = action
         self.datas = datas
@@ -149,8 +148,10 @@ class Wizard(QObject):
         self.progress.stop()
         QApplication.restoreOverrideCursor()
 
-        # Check if 'res' is None as it can happen with 'Split in production lots'
-        # in inventory 'Movements', for example, if no production sequence is defined.
+        # Check if 'res' is None as it can happen with
+        # 'Split in production lots'
+        # in inventory 'Movements', for example, if no production sequence is
+        # defined.
         # We'll also leave the wizard if an exception was thrown.
         if exception or not res:
             self.state = 'end'
@@ -194,6 +195,7 @@ class Wizard(QObject):
 def execute(action, datas, state='init', parent=None, context=None):
     """
     Executes the wizard with the provided information.
+
     :param action:
     :param datas:
     :param state:
@@ -201,6 +203,7 @@ def execute(action, datas, state='init', parent=None, context=None):
     :param context:
     :return:
     """
+
     if context is None:
         context = {}
     w = Wizard(action, datas, state, parent, context)

@@ -93,7 +93,7 @@ def nodeAttributes(node):
 
 
 def sendEMail(to, subject, body):
-        # Import smtplib for the actual sending function
+    # Import smtplib for the actual sending function
     import smtplib
 
     # Import the email modules we'll need
@@ -117,7 +117,6 @@ def sendEMail(to, subject, body):
 
 
 (SelectionDialogUi, SelectionDialogBase) = loadUiType(uiPath('win_selection.ui'))
-
 
 
 class SelectionDialog(QDialog, SelectionDialogUi):
@@ -147,8 +146,6 @@ class SelectionDialog(QDialog, SelectionDialogUi):
         item = self.uiList.currentItem()
         self.result = (str(item.text()), item.value)
         self.accept()
-
-# @brief
 
 
 def selection(title, values, alwaysask=False):
@@ -307,8 +304,6 @@ def error(title, message, details=''):
 (LostConnectionDialogUi, LostConnectionDialogBase) = loadUiType(
     uiPath('lostconnection.ui'))
 
-# @brief
-
 
 class LostConnectionDialog(QDialog, LostConnectionDialogUi):
     """
@@ -368,7 +363,6 @@ def lostConnectionError(count):
 
 
 (ProgressDialogUi, ProgressDialogBase) = loadUiType(uiPath('progress.ui'))
-
 
 
 class ProgressDialog(QDialog, ProgressDialogUi):

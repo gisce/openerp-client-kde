@@ -38,40 +38,78 @@ from Koo import Rpc
 
 
 class Action(QAction):
-    # @brief Creates a new Action instance given a parent.
     def __init__(self, parent):
+        """
+        Creates a new Action instance given a parent.
+
+        :param parent:
+        """
         QAction.__init__(self, parent)
         self._data = None
         self._type = None
         self._model = None
 
-    # @brief Sets the data associated with the action.
     def setData(self, data):
+        """
+        Sets the data associated with the action.
+
+        :param data:
+        :return:
+        """
         self._data = data
 
-    # @brief Returns the data associated with the action.
     def data(self):
+        """
+        Returns the data associated with the action.
+
+        :return:
+        """
         return self._data
 
-    # @brief Sets the type of action (such as 'print' or 'plugin')
     def setType(self, type):
+        """
+        Sets the type of action (such as 'print' or 'plugin')
+
+        :param type:
+        :return:
+        """
         self._type = type
 
-    # @brief Returns the type of action (such as 'print' or 'plugin')
     def type(self):
+        """
+        Returns the type of action (such as 'print' or 'plugin')
+        :return:
+        """
         return self._type
 
-    # @brief Sets the model the action refers to
     def setModel(self, model):
+        """
+        Sets the model the action refers to
+
+        :param model:
+        :return:
+        """
         self._model = model
 
-    # @brief Returns the model the action refers to
     def model(self):
+        """
+        Returns the model the action refers to
+
+        :return:
+        """
         return self._model
 
-    # @brief Executes the action (depending on its type), given the current id
-    # and the selected ids.
     def execute(self, currentId, selectedIds, context):
+        """
+        Executes the action (depending on its type), given the current id and
+        the selected ids.
+
+        :param currentId:
+        :param selectedIds:
+        :param context:
+        :return:
+        """
+
         if self._type == 'relate':
             self.executeRelate(currentId, context)
         elif self._type in ('action', 'print'):
@@ -79,8 +117,14 @@ class Action(QAction):
         else:
             self.executePlugin(currentId, selectedIds, context)
 
-    # Executes the action as a 'relate' type
     def executeRelate(self, currentId, context):
+        """
+        Executes the action as a 'relate' type
+
+        :param currentId:
+        :param context:
+        :return:
+        """
         if not currentId:
             QMessageBox.information(self, _('Information'), _(
                 'You must select a record to use the relate button !'))
@@ -88,8 +132,15 @@ class Action(QAction):
             'id': currentId
         }, context)
 
-    # Executes the action as a 'relate' or 'action' type
     def executeAction(self, currentId, selectedIds, context):
+        """
+        Executes the action as a 'relate' or 'action' type
+
+        :param currentId:
+        :param selectedIds:
+        :param context:
+        :return:
+        """
         if not currentId and not selectedIds:
             QMessageBox.information(self, _('Information'), _(
                 'You must save this record to use the relate button !'))
@@ -112,8 +163,15 @@ class Action(QAction):
         if self._type == 'print':
             QApplication.restoreOverrideCursor()
 
-    # Executes the action as a plugin type
     def executePlugin(self, currentId, selectedIds, context):
+        """
+        Executes the action as a plugin type
+
+        :param currentId:
+        :param selectedIds:
+        :param context:
+        :return:
+        """
         Plugins.execute(self._data, self._model,
                         currentId, selectedIds, context)
 
@@ -153,14 +211,15 @@ class ActionFactory:
             'report_name': 'printscreen.list',
             'type': 'ir.actions.report.xml'
         })
-
-        # Save action
-        definition['action'].append({
-            'name': 'save',
-            'string': _('Save'),
-            'shortcut': 'S',
-            'action': parent.parentWidget().save,
-        })
+        fwidget = parent.parentWidget()
+        if not fwidget.isReadonly():
+            # Save action
+            definition['action'].append({
+                'name': 'save',
+                'string': _('Save'),
+                'shortcut': 'S',
+                'action': parent.parentWidget().save,
+            })
 
         # Cancel action
         definition['action'].append({

@@ -290,7 +290,7 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
         res = self.record.value(self.name)
         if res:
             self.uiText.setCursorPosition(0)
-            self.uiText.setText(res)
+            self.uiText.setText(str(res))
             self.uiText.setToolTip(res)
             self.pushOpen.setIcon(QIcon(":/images/folder.png"))
             self.pushOpen.setToolTip(_("Open"))
