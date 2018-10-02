@@ -27,14 +27,9 @@
 #
 ##############################################################################
 
-import os
 from PyQt5.QtWidgets import *
 import time
-import base64
 import datetime
-import copy
-
-from Koo import Rpc
 
 from . import Wizard
 from Koo.Printer import *
@@ -42,7 +37,6 @@ from Koo.Printer import *
 from Koo.Common import Api
 from Koo.Common import Common
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
 
 
 class ExecuteReportThread(QThread):
@@ -71,7 +65,7 @@ class ExecuteReportThread(QThread):
                                             str(e.type), e.message, e.data))
                 return
 
-            if ids == []:
+            if not ids:
                 self.warning.emit(_('Nothing to print.'))
                 return
             self.datas['id'] = ids[0]
@@ -97,10 +91,17 @@ class ExecuteReportThread(QThread):
             self.error.emit((_('Error: %s') %
                                         str(e.type), e.message, e.data))
 
-# @brief Executes the given report.
-
 
 def executeReport(name, data, context=None):
+    """
+    Executes the given report.
+
+    :param name:
+    :param data:
+    :param context:
+    :return:
+    """
+
     if context is None:
         context = {}
     QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -111,7 +112,7 @@ def executeReport(name, data, context=None):
         if not ids:
             ids = Rpc.session.execute(
                 '/object', 'execute', datas['model'], 'search', [])
-            if ids == []:
+            if not ids:
                 QApplication.restoreOverrideCursor()
                 QMessageBox.information(
                     None, _('Information'), _('Nothing to print!'))
@@ -156,7 +157,7 @@ def execute(act_id, datas, type=None, context=None):
         context = {}
     ctx = Rpc.session.context.copy()
     ctx.update(context)
-    if type == None:
+    if type is None:
         res = Rpc.session.execute(
             '/object', 'execute', 'ir.actions.actions', 'read', [act_id], ['type'], ctx)
         if not len(res):
@@ -216,11 +217,11 @@ def executeAction(action, datas, context=None):
         target = action.get('target', 'current')
         if not target:
             target = 'current'
-        Api.instance.createWindow(view_ids, datas['res_model'], datas['res_id'], domain,
-                                  action['view_type'], datas.get(
-                                      'window', None), ctx,
-                                  datas['view_mode'], name=action.get('name', False), autoReload=datas['auto_refresh'],
-                                  target=target)
+        Api.instance.createWindow(
+            view_ids, datas['res_model'], datas['res_id'], domain,
+            action['view_type'], datas.get('window', None), ctx,
+            datas['view_mode'], name=action.get('name', False),
+            autoReload=datas['auto_refresh'], target=target)
 
         # for key in tools.expr_eval(action.get('context', '{}')).keys():
         #	del Rpc.session.context[key]
@@ -265,7 +266,8 @@ def executeKeyword(keyword, data=None, context=None):
     :param keyword:
     :param data:
     :param context:
-    :return:
+    :return: Name, action
+    :rtype: tuple
     """
     if data is None:
         data = {}
@@ -274,12 +276,14 @@ def executeKeyword(keyword, data=None, context=None):
     actions = None
     if 'id' in data:
         try:
-            id = data.get('id', False)
-            actions = Rpc.session.execute('/object', 'execute',
-                                          'ir.values', 'get', 'action', keyword,
-                                          [(data['model'], id)], False, Rpc.session.context)
+            ident = data.get('id', False)
+            actions = Rpc.session.execute(
+                '/object', 'execute',
+                'ir.values', 'get', 'action', keyword,
+                [(data['model'], ident)], False, Rpc.session.context
+            )
             actions = [x[2] for x in actions]
-        except Rpc.RpcException as e:
+        except Rpc.RpcException:
             return None
 
     if not actions:
@@ -294,4 +298,4 @@ def executeKeyword(keyword, data=None, context=None):
         return None
     (name, action) = res
     Api.instance.executeAction(action, data, context=context)
-    return (name, action)
+    return name, action
