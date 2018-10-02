@@ -17,22 +17,33 @@
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-
-# @brief The ArrowsEventFilter class provides an eventFilter that allows
-# moving from one widget to another using Alt + Arrow (Left, Right, Up, Down)
-# and also Alt + Minus and Alt + Plus.
-#
-# To install it in an application use 'app.installEventFilter( Koo.Common.ArrowsEventFilter( mainWindow ) )'
 
 
 class ArrowsEventFilter(QObject):
-    # @brief Creates a new ArrowsEventFilter object.
+    """
+    The ArrowsEventFilter class provides an eventFilter that allows
+    moving from one widget to another using Alt + Arrow (Left, Right, Up, Down)
+    and also Alt + Minus and Alt + Plus.
+
+    To install it in an application use
+    'app.installEventFilter( Koo.Common.ArrowsEventFilter( mainWindow ) )'
+    """
+
     def __init__(self, parent=None):
+        """
+        Creates a new ArrowsEventFilter object.
+
+        :param parent:
+        """
         QObject.__init__(self, parent)
 
-    # Get all visible and focusable child widgets of the given widget
     def allWidgets(self, object):
+        """
+        Get all visible and focusable child widgets of the given widget
+        :param object:
+        :return:
+        """
+
         if not object.isWidgetType():
             return []
         result = []
@@ -57,8 +68,10 @@ class ArrowsEventFilter(QObject):
         return False
 
     def eventFilter(self, obj, event):
+        arrow_keys = (Qt.Key_Up, Qt.Key_Down, Qt.Key_Left, Qt.Key_Right)
+        plus_minus_keys = (Qt.Key_Plus, Qt.Key_Minus)
         if event.type() in (QEvent.KeyPress, QEvent.KeyRelease) and event.modifiers() & Qt.AltModifier and \
-                event.key() in (Qt.Key_Up, Qt.Key_Down, Qt.Key_Left, Qt.Key_Right, Qt.Key_Plus, Qt.Key_Minus):
+                event.key() in (arrow_keys + plus_minus_keys):
 
             if event.type() == QEvent.KeyRelease:
                 return True
