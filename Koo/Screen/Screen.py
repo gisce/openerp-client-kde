@@ -310,15 +310,23 @@ class Screen(QScrollArea):
     def isReadOnly(self):
         return self._readOnly
 
-    # @brief This function is expected to be used as a slot for an Action trigger signal.
-    # (as it will check the sender). It will call the Action.execute(id,ids) function.
     def triggerAction(self):
+        """
+        This function is expected to be used as a slot for an Action trigger
+        signal.
+        (as it will check the sender). It will call the Action.execute(id,ids)
+        function.
+        :return:
+        """
         # We expect a Screen.Action here
         action = self.sender()
 
-        # If record has been modified save before executing the action. Otherwise:
-        # - With new records nothing is done without notifying the user which isn't intuitive.
-        # - With existing records it prints (for example) old values, which isn't intuitive either.
+        # If record has been modified save before executing the action.
+        # Otherwise:
+        # - With new records nothing is done without notifying the user
+        # which isn't intuitive.
+        # - With existing records it prints (for example) old values, which
+        # isn't intuitive either.
         if self.isModified():
             if not self.save():
                 return
@@ -328,7 +336,7 @@ class Screen(QScrollArea):
         if not self.currentId() and action.type() != 'plugin':
             return
 
-        id = self.currentId()
+        ident = self.currentId()
         ids = self.selectedIds()
 
         if action.type() != 'relate':
@@ -340,7 +348,7 @@ class Screen(QScrollArea):
             # Plugins may be executed even if there's no current record.
             context.update(self.currentRecord().get())
 
-        action.execute(id, ids, context)
+        action.execute(ident, ids, context)
 
         if action.type() != 'relate':
             self.reload()
@@ -590,13 +598,23 @@ class Screen(QScrollArea):
         :return:
         """
         if type in self.views_preload:
-            return self.addView(self.views_preload[type]['arch'], self.views_preload[type]['fields'], display, toolbar=self.views_preload[type].get('toolbar', False), id=self.views_preload[type].get('view_id', False))
+            return self.addView(
+                self.views_preload[type]['arch'],
+                self.views_preload[type]['fields'], display,
+                toolbar=self.views_preload[type].get('toolbar', False),
+                ident=self.views_preload[type].get('view_id', False)
+            )
         else:
-            # By now we set toolbar to True always. Even when the Screen is embedded.
-            # This way we don't force setting the embedded option in the class constructor
-            # and can be set later.
+            # By now we set toolbar to True always. Even when the Screen is
+            # embedded.
+            # This way we don't force setting the embedded option in the
+            # class constructor and can be set later.
             view = self.rpc.fields_view_get(id, type, self.context, True)
-            return self.addView(view['arch'], view['fields'], display, toolbar=view.get('toolbar', False), id=view.get('view_id', False))
+            return self.addView(
+                view['arch'], view['fields'], display,
+                toolbar=view.get('toolbar', False),
+                ident=view.get('view_id', False)
+            )
 
     def addViewById(self, id, display=False):
         """
@@ -633,7 +651,24 @@ class Screen(QScrollArea):
             view = self.rpc.fields_view_get(False, type, self.context, True)
             return self.addView(view['arch'], view['fields'], display, toolbar=view.get('toolbar', False), id=view.get('view_id', False))
 
-    def addView(self, arch, fields, display=False, toolbar=None, id=False):
+    def _parse_fields(self, node, fields):
+        if node.nodeType == node.ELEMENT_NODE:
+            if node.localName == 'field':
+                attrs = Common.nodeAttributes(node)
+                if attrs.get('widget', False):
+                    if attrs['widget'] == 'one2many_list':
+                        attrs['widget'] = 'one2many'
+                    attrs['type'] = attrs['widget']
+                try:
+                    fields[attrs['name']].update(attrs)
+                except:
+                    print("-" * 30, "\n malformed tag for :", attrs)
+                    print("-" * 30)
+                    raise
+        for node2 in node.childNodes:
+            self._parse_fields(node2, fields)
+
+    def addView(self, arch, fields, display=False, toolbar=None, ident=False):
         """
         Adds a view given it's XML description and fields
 
@@ -646,37 +681,21 @@ class Screen(QScrollArea):
         only loaded (False)
         :param toolbar: Toolbar information as returned from fields_view_get
         server function.
-        :param id: View id. This parameter is used for storing and loading
+        :param ident: View id. This parameter is used for storing and loading
         settings for the view. If id=False, no
         :return: The view widget
         """
         if toolbar is None:
             toolbar = {}
 
-        def _parse_fields(node, fields):
-            if node.nodeType == node.ELEMENT_NODE:
-                if node.localName == 'field':
-                    attrs = Common.nodeAttributes(node)
-                    if attrs.get('widget', False):
-                        if attrs['widget'] == 'one2many_list':
-                            attrs['widget'] = 'one2many'
-                        attrs['type'] = attrs['widget']
-                    try:
-                        fields[attrs['name']].update(attrs)
-                    except:
-                        print("-" * 30, "\n malformed tag for :", attrs)
-                        print("-" * 30)
-                        raise
-            for node2 in node.childNodes:
-                _parse_fields(node2, fields)
         dom = xml.dom.minidom.parseString(arch.encode('utf-8'))
-        _parse_fields(dom, fields)
+        self._parse_fields(dom, fields)
 
         self.group.addFields(fields)
 
         self.fields = self.group.fields
 
-        view = ViewFactory.create(id, self, self.resource, dom, self.fields)
+        view = ViewFactory.create(ident, self, self.resource, dom, self.fields)
         self.viewLayout.addWidget(view)
         self.setOnWriteFunction(view.onWriteFunction())
         # Load view settings
@@ -711,8 +730,9 @@ class Screen(QScrollArea):
                 action.triggered.connect(self.triggerAction)
             # If there's only one action it will be the 'Print Screen' action
             # that is added "manually" by ActionFactory. In those cases in which
-            # Print Screen is the only action we won't show it in the toolbar. We
-            # don't consider Plugins a good reason to show the toolbar either.
+            # Print Screen is the only action we won't show it in the toolbar.
+            # We don't consider Plugins a good reason to show the toolbar
+            # either.
             # This way dashboards won't show the toolbar, though the option will
             # remain available in the menu for those screens that don't have any
             # actions configured in the server, but Print Screen can be useful.
@@ -893,8 +913,12 @@ class Screen(QScrollArea):
         self.currentView().store()
         return self.currentRecord().get()
 
-    # @brief Returns True if any record has been modified. Returns False otherwise.
     def isModified(self):
+        """
+        Returns True if any record has been modified. Returns False otherwise.
+
+        :return:
+        """
         if not self.currentRecord():
             return False
         self.currentView().store()
