@@ -57,7 +57,8 @@ class FormWidget(QWidget, FormWidgetUi):
     shortcutsChanged = pyqtSignal()
 
     def __init__(self, model, res_id=False, domain=None, view_type=None,
-                 view_ids=None, context=None, parent=None, name=False):
+                 view_ids=None, context=None, parent=None, name=False,
+                 readonly=False):
         """
         Class constructor
 
@@ -70,9 +71,11 @@ class FormWidget(QWidget, FormWidgetUi):
         :param parent: Parent widget of the form
         :param name: User visible title of the form
         """
+
         QWidget.__init__(self, parent)
         FormWidgetUi.__init__(self)
         self.setupUi(self)
+        self.readonly = readonly
 
         if domain is None:
             domain = []
@@ -195,6 +198,15 @@ class FormWidget(QWidget, FormWidgetUi):
         if Settings.value('koo.auto_reload'):
             self.subscriber.subscribe(
                 'updated_model:%s' % model, self.autoReload)
+
+    def isReadonly(self):
+        """
+        Returns if the form widget is in read only mode
+
+        :return: True if is in read only mode
+        :rtype: bool
+        """
+        return self.readonly
 
     def save(self):
         pass

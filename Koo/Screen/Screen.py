@@ -378,7 +378,6 @@ class Screen(QScrollArea):
     def close(self):
         # @xtorello @xbarnada TODO revisar si hi ha canvis pendents d'aplicar abans de tancar
         ## veure FormWidget.canClose / modifiedSave
-        print ("tancant")
         self.closed.emit()
 
     def search(self):
@@ -506,7 +505,8 @@ class Screen(QScrollArea):
             pos = -1
         # In order to "discover" if we need to update current record we
         # use "self._currentRecordPosition", because setRecordGroup sets
-        # self._currentRecordPosition = None and then calls setCurrentRecord( None )
+        # self._currentRecordPosition = None and then calls
+        # setCurrentRecord( None )
         # Which will make pos = -1 and will emit the recordMessage() signal.
         #
         # Trying to "discover" this with self._currentRecord will not work.
@@ -515,14 +515,14 @@ class Screen(QScrollArea):
         self._currentRecord = value
         self._currentRecordPosition = pos
         if value and value.id:
-            id = value.id
+            ident = value.id
         else:
-            id = -1
+            ident = -1
         if self.group:
             count = self.group.count()
         else:
             count = 0
-        self.recordMessage.emit(pos, count, id)
+        self.recordMessage.emit(pos, count, ident)
         if self._currentRecord:
             if self.currentView():
                 self.currentView().setSelected(self._currentRecord)
@@ -557,10 +557,12 @@ class Screen(QScrollArea):
             self._currentView = min(
                 self._currentView, self._viewQueue.count() - 1)
 
-        # If the view can show multiple records we set the default loading method in the
-        # record group, otherwise we set the load one-by-one mode, so only the current record
-        # is loaded. This improves performance on switching views from list to form with forms
-        # that contain a lot of fields.
+        # If the view can show multiple records we set the default loading
+        # method in the record group, otherwise we set the load one-by-one
+        # mode, so only the current record is loaded. This improves performance
+        # on switching views from list to form with forms that contain a lot
+        # of fields.
+
         if self.currentView().showsMultipleRecords():
             self.group.setLoadOneByOne(False)
         else:
