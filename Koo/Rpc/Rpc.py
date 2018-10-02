@@ -672,7 +672,8 @@ class Session:
             context = {}
         context['uid'] = self.uid
         if isinstance(expression, str):
-            expression = expression.replace("'active_id'", "active_id")
+            if "'active_id'" in expression:
+                expression = expression.replace("'active_id'", "active_id")
             return eval(expression, context)
         else:
             return expression
