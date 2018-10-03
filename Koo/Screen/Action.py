@@ -212,7 +212,8 @@ class ActionFactory:
             'type': 'ir.actions.report.xml'
         })
         fwidget = parent.parentWidget()
-        if not fwidget.isReadonly():
+        hasReadonly = getattr(fwidget, "isReadonly", None)
+        if hasReadonly and not fwidget.isReadonly():
             # Save action
             definition['action'].append({
                 'name': 'save',
