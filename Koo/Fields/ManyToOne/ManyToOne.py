@@ -291,7 +291,7 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
         if res:
             self.uiText.setCursorPosition(0)
             self.uiText.setText(str(res))
-            self.uiText.setToolTip(res)
+            self.uiText.setToolTip(str(res))
             self.pushOpen.setIcon(QIcon(":/images/folder.png"))
             self.pushOpen.setToolTip(_("Open"))
             # pushOpen will always be enabled if it has to open an existing
