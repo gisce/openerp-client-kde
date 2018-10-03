@@ -159,7 +159,7 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
     def completerActivated(self, index):
         id = self.completerList[index.row()][0]
         assert isinstance(id, int), id
-        text = str(index.data().toString())
+        text = str(index.data())
         self.record.setValue(self.name, (id, text))
 
     def match(self):
