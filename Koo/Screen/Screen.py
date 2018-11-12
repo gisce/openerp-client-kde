@@ -649,7 +649,7 @@ class Screen(QScrollArea):
             # This way we don't force setting the embedded option in the class constructor
             # and can be set later.
             view = self.rpc.fields_view_get(False, type, self.context, True)
-            return self.addView(view['arch'], view['fields'], display, toolbar=view.get('toolbar', False), id=view.get('view_id', False))
+            return self.addView(view['arch'], view['fields'], display, toolbar=view.get('toolbar', False), ident=view.get('view_id', False))
 
     def _parse_fields(self, node, fields):
         if node.nodeType == node.ELEMENT_NODE:
