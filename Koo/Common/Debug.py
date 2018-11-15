@@ -27,7 +27,10 @@
 
 import gc
 from PyQt5.QtCore import *
-from raven import Client
+try:
+    from raven import Client
+except ImportError:
+    pass
 
 
 def printObjects():
