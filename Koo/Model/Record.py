@@ -78,6 +78,7 @@ class Record(QObject):
         self.invalidFields = []
         self.read_time = time.time()
         self.new = new
+        self.before_save_fnc = None
 
     def __del__(self):
         self.rpc = None
@@ -99,6 +100,9 @@ class Record(QObject):
         if self.id == 2:
             Debug.printReferrers(self)
         self.group = None
+
+    def set_before_save_fnc(self, func):
+        self.before_save_fnc = func
 
     def _getModified(self):
         return self._modified
@@ -355,6 +359,9 @@ class Record(QObject):
         """
 
         from .Group import RecordGroup
+
+        if self.before_save_fnc:
+            self.before_save_fnc()
 
         self.ensureIsLoaded()
         if not self.id:
