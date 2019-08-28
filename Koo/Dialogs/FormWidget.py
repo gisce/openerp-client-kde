@@ -443,6 +443,12 @@ class FormWidget(QWidget, FormWidgetUi):
                 if not modification and Settings.value('koo.auto_new'):
                     self.screen.new()
                 QApplication.restoreOverrideCursor()
+            # This condition is an ugly patch to avoid popup error msg, the real
+            # fix must be find why the Koo tries to create the record on the
+            # ERP-Side
+            elif not self.screen.currentRecord().invalidFields:
+                QApplication.restoreOverrideCursor()
+                ident = False
             else:
                 self.updateStatus(_('<font color="red">Invalid form</font>'))
 

@@ -1,3 +1,5 @@
 pyqt5
 pyserial
 raven<5.0
+erppeek
+msgpack

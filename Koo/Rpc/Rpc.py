@@ -46,6 +46,7 @@ except:
     isNetRpcAvailable = False
 
 import xmlrpc.client
+import urllib
 import base64
 import socket
 
@@ -54,6 +55,12 @@ import os
 
 import traceback
 from gettext import gettext as _
+
+try:
+    import msgpack
+    is_msgpack_available = True
+except ImportError:
+    is_msgpack_available = False
 
 ConcurrencyCheckField = '__last_update'
 
@@ -105,16 +112,16 @@ class Connection:
         self.url = url
 
     def stringToUnicode(self, result):
-        if isinstance(result, str):
-            return str(result, 'utf-8')
+        if isinstance(result, bytes):
+            return result.decode('utf-8')
         elif isinstance(result, list):
             return [self.stringToUnicode(x) for x in result]
         elif isinstance(result, tuple):
             return tuple([self.stringToUnicode(x) for x in result])
         elif isinstance(result, dict):
             newres = {}
-            for i in list(result.keys()):
-                newres[i] = self.stringToUnicode(result[i])
+            for i in result.keys():
+                newres[self.stringToUnicode(i)] = self.stringToUnicode(result[i])
             return newres
         else:
             return result
@@ -317,6 +324,33 @@ class XmlRpcConnection(Connection):
         return result
 
 
+class MsgpackConnection(Connection):
+    def __init__(self, url):
+        super(MsgpackConnection, self).__init__(url)
+
+    def call(self, obj, method, *args):
+        endpoint = '%s%s' % (self.url, obj)
+        try:
+            if self.authorized:
+                m = msgpack.packb(
+                    [method, self.databaseName, self.uid, self.password]
+                    + list(args)
+                )
+            else:
+                m = msgpack.packb([method] + list(args))
+            u = urllib.request.urlopen(endpoint, m)
+            s = u.read()
+            u.close()
+            result = msgpack.unpackb(s, raw=False)
+            if u.code == 210:
+                raise RpcServerException(
+                    result['exception'],
+                    result['traceback']
+                )
+        except socket.error as err:
+            raise RpcProtocolException(err)
+        return result
+
 # @brief Creates an instance of the appropiate Connection class.
 #
 # These can be:
@@ -329,6 +363,11 @@ def createConnection(url):
         con = SocketConnection(url)
     elif qUrl.scheme() == 'PYROLOC' or qUrl.scheme() == 'PYROLOCSSL':
         con = PyroConnection(url)
+    elif qUrl.scheme().endswith('+msgpack'):
+        url = '{}://{}:{}'.format(
+            qUrl.scheme().split('+')[0], qUrl.host(), qUrl.port()
+        )
+        con = MsgpackConnection(url)
     else:
         con = XmlRpcConnection(url)
     return con

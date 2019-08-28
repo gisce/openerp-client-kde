@@ -238,6 +238,8 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
         """
         domain = self.record.domain(self.name)
         context = self.record.fieldContext(self.name)
+        if 'session' in context:
+            context.update({'no_bbox_search': True})
         ids = Rpc.session.execute(
             '/object', 'execute', self.attrs['relation'], 'name_search', name, domain, 'ilike', context, False)
         if ids and len(ids) == 1:
