@@ -72,4 +72,4 @@ class Model(erppeek.Model):
             context = self.client.context
         values = self._unbrowse_values(values)
         default_values.update(values)
-        return super(Model, self).create(default_values, values, context)
+        return super(Model, self).create(default_values, context)
