@@ -43,7 +43,7 @@ from Koo.Common.Ui import *
 from gettext import gettext as _
 
 try:
-    from PyQt5.QtWebKitWidgets import QWebPage, QWebView
+    from PyQt5.QtWebEngineWidgets import QWebPage, QWebView
     isHelpWidgetAvailable = True
 except:
     isHelpWidgetAvailable = False

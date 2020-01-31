@@ -18,7 +18,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QWebView" name="uiWeb">
+    <widget class="QWebEngineView" name="uiWeb">
      <property name="url">
       <url>
        <string>about:blank</string>
@@ -30,9 +30,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QWebView</class>
+   <class>QWebEngineView</class>
    <extends>QWidget</extends>
-   <header>PyQt5.QtWebKitWidgets</header>
+   <header>PyQt5.QtWebEngineWidgets</header>
   </customwidget>
  </customwidgets>
  <resources/>

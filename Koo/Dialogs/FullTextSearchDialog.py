@@ -43,7 +43,7 @@ from PyQt5.QtCore import *
 from Koo.Common.Ui import *
 
 try:
-    from PyQt5.QtWebKit import *
+    from PyQt5.QtWebEngineWidgets import *
     from PyQt5.QtNetwork import *
     isWebKitAvailable = True
 except:
