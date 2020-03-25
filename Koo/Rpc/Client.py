@@ -66,7 +66,17 @@ class Client(erppeek.Client):
 
 class Model(erppeek.Model):
     def create(self, values, context=None):
-        fields = self.fields()
+
+        fields = list(self.fields().keys())
+
+        # Avoid recompute default fields if they already have value
+        fields_with_values = []
+        for field in fields:
+            if field in values.keys():
+                fields_with_values.append(field)
+        for field in fields_with_values:
+            fields.remove(field)
+
         default_values = self._execute('default_get', fields, context=context)
         if context is None:
             context = self.client.context
