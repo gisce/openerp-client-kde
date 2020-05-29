@@ -71,7 +71,7 @@ def createWindow(view_ids, model, res_id=False, domain=None,
                                 context=context, name=name, readonly=readonly)
         except Rpc.RpcException as e:
             QApplication.restoreOverrideCursor()
-            return
+            raise e
         if target == 'new':
             widget.setStatusBarVisible(False)
         widget.setAutoReload(autoReload)
@@ -95,7 +95,7 @@ def createWindow(view_ids, model, res_id=False, domain=None,
             win = TreeWidget(view, model, domain, context, name=name)
         except Rpc.RpcException as e:
             QApplication.restoreOverrideCursor()
-            return
+            raise e
         QApplication.restoreOverrideCursor()
         Api.instance.windowCreated(win, target)
     else:
