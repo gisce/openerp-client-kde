@@ -101,7 +101,9 @@ mapIcons = {
     'terp-sale': 'sale.png',
     'terp-stock': 'stock.png',
     'terp-stock_effects-object-colorize': 'view_tree.png',
-    'reload': 'reload.png'
+    'reload': 'reload.png',
+    'gtk-add': 'new.png',
+    'gtk-remove': 'delete.png'
 }
 
 # @brief Returns a QIcon given an icon name. The name of the icon is usually a
