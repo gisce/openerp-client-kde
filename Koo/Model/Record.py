@@ -78,7 +78,8 @@ class Record(QObject):
         self.invalidFields = []
         self.read_time = time.time()
         self.new = new
-        self.before_save_fnc = None
+        self.after_save_function = None
+        self.error_procedure = None
 
     def __del__(self):
         self.rpc = None
@@ -101,8 +102,11 @@ class Record(QObject):
             Debug.printReferrers(self)
         self.group = None
 
-    def set_before_save_fnc(self, func):
-        self.before_save_fnc = func
+    def set_after_save_function(self, func):
+        self.after_save_function = func
+
+    def set_error_procedure(self, func):
+        self.error_procedure = func
 
     def _getModified(self):
         return self._modified
