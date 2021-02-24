@@ -361,40 +361,70 @@ class Record(QObject):
         :param reload:
         :return:
         """
-
         from .Group import RecordGroup
-
-        if self.before_save_fnc:
-            self.before_save_fnc()
-
         self.ensureIsLoaded()
-        if not self.id:
-            value = self.get(get_readonly=False)
-            self.id = self.rpc.create(value, self.context())
-        else:
-            if not self.isModified():
-                return self.id
-            value = self.get(get_readonly=False, get_modifiedonly=True)
-            context = self.context()
-            context = context.copy()
-            context[ConcurrencyCheckField] = time.time() - self.read_time
-            if not self.rpc.write([self.id], value, context):
-                return False
-        self._loaded = False
+        dialog_container = False
+        is_modal = False
+        action = ''
+        try:
+            try:
+                dialog_container = self.sender().parentWidget().parentWidget().parentWidget()
+                is_modal = dialog_container.isModal()
+            except Exception:
+                pass
+            if not self.id:
+                values = self.get(get_readonly=False)
+                action = 'create'
+                context = self.context()
+                if 'geom' in context and 'geom' not in values:
+                    values['geom'] = context['geom']
+                self.id = self.rpc.create(values, self.context())
+            else:
+                if not self.isModified():
+                    if is_modal:
+                        QTimer.singleShot(0, dialog_container.accept)
+                    return self.id
+                values = self.get(get_readonly=False, get_modifiedonly=True)
+                context = self.context()
+                context = context.copy()
+                context[ConcurrencyCheckField] = time.time() - self.read_time
+                action = 'write'
+                if not self.rpc.write([self.id], values, context):
+                    if is_modal:
+                        QTimer.singleShot(0, dialog_container.accept)
+                    return False
+            self._loaded = False
 
-        # Delete elements
-        for key_name, value in self.values.items():
-            if isinstance(value, RecordGroup):
-                if value.removedRecords:
-                    model = value.resource
-                    ids = value.removedRecords
-                    Rpc.RpcProxy(model).unlink(ids)
-        if reload:
-            self.reload()
-        if self.group:
-            self.group.written(self.id)
-        self.modified = False
-        return self.id
+            # Delete elements
+            for key_name, value in self.values.items():
+                if isinstance(value, RecordGroup):
+                    if value.removedRecords:
+                        model = value.resource
+                        ids = value.removedRecords
+                        Rpc.RpcProxy(model).unlink(ids)
+            if reload:
+                self.reload()
+            if self.group:
+                self.group.written(self.id)
+            self.modified = False
+
+            if self.after_save_function:
+                self.after_save_function(self.id, values)
+            if is_modal:
+                QTimer.singleShot(0, dialog_container.accept)
+            return self.id
+        except Exception as e:
+            if action == 'create':
+                # Si venim d'un CREATE s'ha de fer rollback i donar info de
+                # l'error.
+                self.error_procedure(action, e)
+                if is_modal:
+                    QTimer.singleShot(0, dialog_container.accept)
+            elif action == 'write':
+                # Si venim d'un WRITE s'ha de donar info de l'error i de que
+                # l'accio s'ha invalidat i no ha tingut cap efecte
+                self.error_procedure(action, e)
+            return False
 
     def fillWithDefaults(self, domain=None, context=None):
         """
