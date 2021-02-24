@@ -616,9 +616,10 @@ class Session:
                     else:
                         Notifier.notifyWarning(err.info, err.data)
                 else:
-                    Notifier.notifyError(_('Application Error'), _(
-                        'View details'), err.backtrace)
-                raise
+                    # Si venim a aquest punt l'error no es controlar i per tant
+                    # s'ha de fer raise i tractar on toqui del Qgis.
+                    raise
+                return
             count += 1
 
     def login(self, url, db):
