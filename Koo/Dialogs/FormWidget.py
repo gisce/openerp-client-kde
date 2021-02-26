@@ -736,8 +736,9 @@ class FormWidget(QWidget, FormWidgetUi):
         QApplication.restoreOverrideCursor()
 
     def __del__(self):
-        self.group.__del__()
-        del self.group
+        if hasattr(self, 'group'):
+            self.group.__del__()
+            del self.group
 
     def batchButton(self):
         viewTypes = self.viewTypes

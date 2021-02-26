@@ -78,6 +78,13 @@ class ServerConfigurationDialog(QDialog, ServerConfigurationDialogUi):
         if Rpc.isPyroSslAvailable:
             self.uiConnection.addItem(
                 _("Pyro SSL (faster)"), QVariant('PYROLOCSSL'))
+        if Rpc.is_msgpack_available:
+            self.uiConnection.addItem(
+                _("MsgPack"), QVariant('http+msgpack')
+            )
+            self.uiConnection.addItem(
+                _("MsgPack SSL"), QVariant('https+msgpack')
+            )
         result = False
         self.pushCancel.clicked.connect(self.reject)
         self.pushAccept.clicked.connect(self.slotAccept)

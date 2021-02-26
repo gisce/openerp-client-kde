@@ -136,6 +136,8 @@ class ReferenceFieldWidget(AbstractFieldWidget, ReferenceFieldWidgetUi):
     def search(self):
         domain = self.record.domain(self.name)
         context = self.record.fieldContext(self.name)
+        if 'session' in context:
+            context.update({'no_bbox_search': True})
         resource = str(self.uiModel.itemData(
             self.uiModel.currentIndex()))
         ids = Rpc.session.execute('/object', 'execute', resource, 'name_search',
