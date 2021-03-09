@@ -97,8 +97,12 @@ class ButtonFieldWidget(AbstractFieldWidget):
             try:
                 result = Rpc.session.execute(
                     '/object', 'execute', screen.name, self.name, [id], self.record.context())
-            except Rpc.RpcException as e:
+            except Rpc.RpcException as err:
                 QApplication.restoreOverrideCursor()
+                title = err.__class__.__name__
+                msg = err.code
+                details = err.backtrace
+                Notifier.notifyError(title, msg, details)
                 return
             QApplication.restoreOverrideCursor()
             if isinstance(result, dict):
