@@ -376,7 +376,12 @@ class Record(QObject):
                 values = self.get(get_readonly=False)
                 action = 'create'
                 context = self.context()
-                if 'geom' in context and 'geom' not in values:
+                fill_geom = (
+                    'geom' in context and
+                    'geom' not in values and
+                    'geom' in self.rpc.fields_get()
+                )
+                if fill_geom:
                     values['geom'] = context['geom']
                 self.id = self.rpc.create(values, self.context())
             else:
@@ -417,13 +422,15 @@ class Record(QObject):
             if action == 'create':
                 # Si venim d'un CREATE s'ha de fer rollback i donar info de
                 # l'error.
-                self.error_procedure(action, e)
+                if self.error_procedure:
+                    self.error_procedure(action, e)
                 if is_modal:
                     QTimer.singleShot(0, dialog_container.accept)
             elif action == 'write':
                 # Si venim d'un WRITE s'ha de donar info de l'error i de que
                 # l'accio s'ha invalidat i no ha tingut cap efecte
-                self.error_procedure(action, e)
+                if self.error_procedure:
+                    self.error_procedure(action, e)
             return False
 
     def fillWithDefaults(self, domain=None, context=None):
