@@ -422,13 +422,15 @@ class Record(QObject):
             if action == 'create':
                 # Si venim d'un CREATE s'ha de fer rollback i donar info de
                 # l'error.
-                self.error_procedure(action, e)
+                if self.error_procedure:
+                    self.error_procedure(action, e)
                 if is_modal:
                     QTimer.singleShot(0, dialog_container.accept)
             elif action == 'write':
                 # Si venim d'un WRITE s'ha de donar info de l'error i de que
                 # l'accio s'ha invalidat i no ha tingut cap efecte
-                self.error_procedure(action, e)
+                if self.error_procedure:
+                    self.error_procedure(action, e)
             return False
 
     def fillWithDefaults(self, domain=None, context=None):
