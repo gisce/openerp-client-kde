@@ -376,7 +376,12 @@ class Record(QObject):
                 values = self.get(get_readonly=False)
                 action = 'create'
                 context = self.context()
-                if 'geom' in context and 'geom' not in values:
+                fill_geom = (
+                    'geom' in context and
+                    'geom' not in values and
+                    'geom' in self.rpc.fields_get()
+                )
+                if fill_geom:
                     values['geom'] = context['geom']
                 self.id = self.rpc.create(values, self.context())
             else:
