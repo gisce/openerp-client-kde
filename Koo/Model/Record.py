@@ -378,7 +378,10 @@ class Record(QObject):
                 context = self.context()
                 fill_geom = (
                     'geom' in context and
-                    'geom' not in values and
+                    (
+                        'geom' not in values or
+                        ('geom' in values and not values.get('geom', True))
+                    ) and
                     'geom' in self.rpc.fields_get()
                 )
                 if fill_geom:
