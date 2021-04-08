@@ -170,14 +170,12 @@ class ReferenceFieldWidget(AbstractFieldWidget, ReferenceFieldWidgetUi):
         self.search()
 
     def new(self):
-        resource = str(self.uiModel.itemData(
-            self.uiModel.currentIndex()).toString())
+        resource = self.uiModel.itemData(self.uiModel.currentIndex())
         dialog = ScreenDialog(self)
         dialog.setup(resource)
         dialog.setAttributes(self.attrs)
         if dialog.exec_() == QDialog.Accepted:
-            resource = str(self.uiModel.itemData(
-                self.uiModel.currentIndex()).toString())
+            resource = self.uiModel.itemData(self.uiModel.currentIndex())
             self.record.setValue(self.name, (resource, dialog.record))
 
     def open(self):
