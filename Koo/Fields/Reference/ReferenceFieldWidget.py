@@ -172,6 +172,7 @@ class ReferenceFieldWidget(AbstractFieldWidget, ReferenceFieldWidgetUi):
     def new(self):
         resource = self.uiModel.itemData(self.uiModel.currentIndex())
         dialog = ScreenDialog(self)
+        dialog.setContext(self.record.fieldContext(self.name))
         dialog.setup(resource)
         dialog.setAttributes(self.attrs)
         if dialog.exec_() == QDialog.Accepted:
