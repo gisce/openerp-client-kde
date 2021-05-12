@@ -29,7 +29,7 @@ Topic :: Office/Business
 
 setup(
     name='koo',
-    version='6.1.4',
+    version='6.2.0',
     packages=find_packages(),
     url='http://www.NaN-tic.com/koo-platform',
     license='GPL',
