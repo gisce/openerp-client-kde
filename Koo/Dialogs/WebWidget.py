@@ -34,7 +34,7 @@ from Koo.Common.Settings import *
 from Koo.Common import Help
 
 try:
-    from PyQt5.QtWebKit import *
+    from PyQt5.QtWebEngineWidgets import *
     isWebWidgetAvailable = True
 except:
     isWebWidgetAvailable = False

@@ -32,6 +32,9 @@
 # Added so py2exe properly packs xml.etree.ElementTree
 from xml.etree.ElementTree import parse, SubElement
 from PyQt5.QtWidgets import *
+# Needed due ImportError: QtWebEngineWidgets must be imported before a
+# QCoreApplication instance is created
+from PyQt5.QtWebEngineWidgets import *
 from raven import Client
 from Koo.Common.Settings import Settings
 from Koo.Common.Version import Version
