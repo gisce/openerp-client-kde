@@ -1,5 +1,4 @@
 pyqt5
-pyqtwebengine
 pyserial
 raven<5.0
 erppeek
