@@ -388,12 +388,14 @@ class Record(QObject):
                     values['geom'] = context['geom']
                 self.id = self.rpc.create(values, self.context())
             else:
+                context = self.context()
                 if not self.isModified():
                     if is_modal:
                         QTimer.singleShot(0, dialog_container.accept)
+                    if self.after_save_function and context.get('from_search', False):
+                        self.after_save_function(self.id, {})
                     return self.id
                 values = self.get(get_readonly=False, get_modifiedonly=True)
-                context = self.context()
                 context = context.copy()
                 context[ConcurrencyCheckField] = time.time() - self.read_time
                 action = 'write'
