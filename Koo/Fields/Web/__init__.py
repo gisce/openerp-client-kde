@@ -31,7 +31,7 @@ from .WebFieldWidget import *
 from Koo.Fields.FieldWidgetFactory import *
 
 try:
-    from PyQt5.QtWebEngineWidgets import *
+    from PyQt5.QtWebKit import *
     from PyQt5.QtNetwork import *
 
     FieldWidgetFactory.register('web', WebFieldWidget)
