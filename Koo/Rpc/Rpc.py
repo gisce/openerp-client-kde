@@ -49,6 +49,7 @@ import xmlrpc.client
 import urllib
 import base64
 import socket
+from contextlib import contextmanager
 
 import sys
 import os
@@ -63,6 +64,16 @@ except ImportError:
     is_msgpack_available = False
 
 ConcurrencyCheckField = '__last_update'
+
+
+@contextmanager
+def NoTimeout():
+    timeout = socket.getdefaulttimeout()
+    try:
+        socket.setdefaulttimeout(None)
+        yield
+    finally:
+        socket.setdefaulttimeout(timeout)
 
 
 class RpcException(Exception):
@@ -311,12 +322,13 @@ class XmlRpcConnection(Connection):
         remote = xmlrpc.client.ServerProxy(self.url + obj, allow_none=True)
         function = getattr(remote, method)
         try:
-            if self.authorized:
-                result = function(self.databaseName, self.uid,
-                                  self.password, *args)
+            with NoTimeout():
+                if self.authorized:
+                    result = function(self.databaseName, self.uid,
+                                      self.password, *args)
 
-            else:
-                result = function(*args)
+                else:
+                    result = function(*args)
         except socket.error as err:
             raise RpcProtocolException(err)
         except xmlrpc.client.Fault as err:
@@ -331,22 +343,23 @@ class MsgpackConnection(Connection):
     def call(self, obj, method, *args):
         endpoint = '%s%s' % (self.url, obj)
         try:
-            if self.authorized:
-                m = msgpack.packb(
-                    [method, self.databaseName, self.uid, self.password]
-                    + list(args)
-                )
-            else:
-                m = msgpack.packb([method] + list(args))
-            u = urllib.request.urlopen(endpoint, m)
-            s = u.read()
-            u.close()
-            result = msgpack.unpackb(s, raw=False)
-            if u.code == 210:
-                raise RpcServerException(
-                    result['exception'],
-                    result['traceback']
-                )
+            with NoTimeout():
+                if self.authorized:
+                    m = msgpack.packb(
+                        [method, self.databaseName, self.uid, self.password]
+                        + list(args)
+                    )
+                else:
+                    m = msgpack.packb([method] + list(args))
+                u = urllib.request.urlopen(endpoint, m)
+                s = u.read()
+                u.close()
+                result = msgpack.unpackb(s, raw=False)
+                if u.code == 210:
+                    raise RpcServerException(
+                        result['exception'],
+                        result['traceback']
+                    )
         except socket.error as err:
             raise RpcProtocolException(err)
         return result
