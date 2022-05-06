@@ -204,74 +204,32 @@ class ActionFactory:
                 'relate': []
             }
 
-        # We always add the 'Print Screen' action.
-        definition['print'].append({
-            'name': 'Print Screen',
-            'string': _('Print Screen'),
-            'report_name': 'printscreen.list',
-            'type': 'ir.actions.report.xml'
+        # Save action
+        definition['action'].append({
+            'name': 'save',
+            'string': _('Save'),
+            'action': parent.parentWidget().save,
         })
-        fwidget = parent.parentWidget()
-        hasReadonly = getattr(fwidget, "isReadonly", None)
-        if hasReadonly and not fwidget.isReadonly():
-            # Save action
-            definition['action'].append({
-                'name': 'save',
-                'string': _('Save'),
-                'shortcut': 'S',
-                'action': parent.parentWidget().save,
-            })
-
         # Cancel action
         definition['action'].append({
             'name': 'cancel',
             'string': _('Cancel'),
-            'shortcut': 'C',
             'action': parent.parentWidget().cancel,
         })
 
         actions = []
-        for icontype in ('print', 'action', 'relate'):
-            for tool in definition[icontype]:
-                action = Action(parent)
-                action.setIcon(QIcon(":/images/%s.png" % icontype))
-                action.setText(Common.normalizeLabel(tool['string']))
-                action.setType(icontype)
-                action.setData(tool)
-                action.setModel(model)
-
-                number = len(actions)
-
-                shortcut = 'Ctrl+'
-
-                # Add save shortcut with Ctrl + S
-                if tool['name'] in ["save", "cancel"]:
-                    shortcut += tool['shortcut']
-                    action.setShortcut(QKeySequence(shortcut))
-                    action.setToolTip(action.text() + ' (%s)' % shortcut)
-                    action.setIcon(QIcon(":/images/{}.png".format(tool['name'])))
-                    action.triggered.connect(tool['action'])
-
-                else:
-                    if number > 9:
-                        shortcut += 'Shift+'
-                        number -= 10
-                    if number < 10:
-                        shortcut += str(number)
-                        action.setShortcut(QKeySequence(shortcut))
-                        action.setToolTip(action.text() + ' (%s)' % shortcut)
-
-
-                actions.append(action)
-
-
-        plugs = Plugins.list(model)
-        for p in sorted(list(plugs.keys()), key=lambda x: plugs[x].get('string', '')):
+        for tool in definition['action']:
             action = Action(parent)
-            action.setIcon(QIcon(":/images/exec.png"))
-            action.setText(str(plugs[p]['string']))
-            action.setData(p)
-            action.setType('plugin')
+            if tool['name'] in ("save", "cancel"):
+                action.setIcon(QIcon(":/images/{}.png".format(tool['name'])))
+            else:
+                action.setIcon(QIcon(":/images/{}.png".format('action')))
+            action.setText(Common.normalizeLabel(tool['string']))
+            action.setType('action')
+            action.setData(tool)
             action.setModel(model)
+            if 'action' in tool:
+                action.triggered.connect(tool['action'])
             actions.append(action)
+
         return actions

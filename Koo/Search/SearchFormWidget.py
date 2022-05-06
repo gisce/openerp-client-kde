@@ -352,8 +352,8 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
 
         self.uiCustomContainer.setup(fields, domain)
 
-        #self.uiSearchView.setup( xml, fields, model, domain )
-        self.load()
+        # self.uiSearchView.setup( xml, fields, model, domain )
+        # self.load()
 
     def keyPressEvent(self, event):
         if event.key() in (Qt.Key_Return, Qt.Key_Enter):

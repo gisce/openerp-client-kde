@@ -207,5 +207,9 @@ try:
     win.showLoginDialog()
 
     app.exec_()
-except:
-    client.captureException()
+except Exception as e:
+    print(e)
+    import sys, traceback
+    traceback.print_exc(file=sys.stdout)
+    # client.captureException()
+

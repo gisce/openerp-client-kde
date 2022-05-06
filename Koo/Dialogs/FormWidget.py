@@ -148,7 +148,10 @@ class FormWidget(QWidget, FormWidgetUi):
 
         self._allowOpenInNewWindow = True
 
-        # Remove ids with False value
+        # Disable toolbar if the window is created by an action, since it'll be
+        # a wizard dialog
+        if context.get('from_action', False):
+            self.screen.setToolbarVisible(False)
         self.screen.setupViews(view_type, view_ids)
 
         if name:

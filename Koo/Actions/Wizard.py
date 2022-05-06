@@ -76,6 +76,8 @@ class WizardPage(QDialog):
         self.screen = Screen(self)
         self.screen.setRecordGroup(self.group)
         self.screen.new(default=False)
+        # We don't want the toolbar to be shown at the wizard
+        self.screen.setToolbarVisible(False)
         self.screen.addView(arch, fields, display=True)
         # Set default values
         self.screen.currentRecord().set(val)

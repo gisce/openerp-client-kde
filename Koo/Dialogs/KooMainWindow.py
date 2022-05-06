@@ -502,7 +502,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
             loginResponse = Rpc.session.login(url, databaseName)
             url = QUrl(url)
             if loginResponse == Rpc.session.LoggedIn:
-                Settings.loadFromServer()
+                # Settings.loadFromServer()
                 if Settings.value('koo.stylesheet_code'):
                     QApplication.instance().setStyleSheet(Settings.value('koo.stylesheet_code'))
                 if Settings.value('koo.use_cache'):

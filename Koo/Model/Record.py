@@ -366,6 +366,8 @@ class Record(QObject):
         dialog_container = False
         is_modal = False
         action = ''
+        write_res = False
+        create_res = False
         try:
             try:
                 dialog_container = self.sender().parentWidget().parentWidget().parentWidget()
@@ -386,7 +388,10 @@ class Record(QObject):
                 )
                 if fill_geom:
                     values['geom'] = context['geom']
-                self.id = self.rpc.create(values, self.context())
+                create_res = self.rpc.create_qread(
+                    values, self.group.allFieldNames(), context, '_classic_read'
+                )
+                self.id = create_res['id']
             else:
                 context = self.context()
                 if not self.isModified():
@@ -399,7 +404,11 @@ class Record(QObject):
                 context = context.copy()
                 context[ConcurrencyCheckField] = time.time() - self.read_time
                 action = 'write'
-                if not self.rpc.write([self.id], values, context):
+                write_res = self.rpc.write_qread(
+                    self.id, values, self.group.allFieldNames(), context,
+                    '_classic_read'
+                )
+                if not write_res:
                     if is_modal:
                         QTimer.singleShot(0, dialog_container.accept)
                     return False
@@ -412,12 +421,18 @@ class Record(QObject):
                         model = value.resource
                         ids = value.removedRecords
                         Rpc.RpcProxy(model).unlink(ids)
-            if reload:
+            if write_res:
+                self.set(write_res, signal=False)
+                Rpc.session.context['skip_reload'] = True
+            elif create_res:
+                self.set(create_res, signal=False)
+                Rpc.session.context['skip_reload'] = True
+            elif reload:
                 self.reload()
+                Rpc.session.context['skip_reload'] = True
             if self.group:
                 self.group.written(self.id)
             self.modified = False
-
             if self.after_save_function:
                 self.after_save_function(self.id, values)
             if is_modal:
