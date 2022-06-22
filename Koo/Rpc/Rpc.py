@@ -308,20 +308,20 @@ class XmlRpcConnection(Connection):
         self.url += '/xmlrpc'
 
     def call(self, obj, method, *args):
-        remote = xmlrpc.client.ServerProxy(self.url + obj, allow_none=True)
-        function = getattr(remote, method)
-        try:
-            if self.authorized:
-                result = function(self.databaseName, self.uid,
-                                  self.password, *args)
+        with xmlrpc.client.ServerProxy(self.url + obj, allow_none=True) as remote:
+            function = getattr(remote, method)
+            try:
+                if self.authorized:
+                    result = function(self.databaseName, self.uid,
+                                      self.password, *args)
 
-            else:
-                result = function(*args)
-        except socket.error as err:
-            raise RpcProtocolException(err)
-        except xmlrpc.client.Fault as err:
-            raise RpcServerException(err.faultCode, err.faultString)
-        return result
+                else:
+                    result = function(*args)
+            except socket.error as err:
+                raise RpcProtocolException(err)
+            except xmlrpc.client.Fault as err:
+                raise RpcServerException(err.faultCode, err.faultString)
+            return result
 
 
 class MsgpackConnection(Connection):
