@@ -46,6 +46,7 @@ except:
     isNetRpcAvailable = False
 
 import xmlrpc.client
+import json
 import urllib
 import base64
 import socket
@@ -325,23 +326,38 @@ class XmlRpcConnection(Connection):
 
 
 class MsgpackConnection(Connection):
-    def __init__(self, url):
+    def __init__(self, url, content_type="application/msgpack"):
+        self.content_type = content_type
         super(MsgpackConnection, self).__init__(url)
+
+    def encode(self, payload):
+        if self.content_type == "application/json":
+            return json.dumps(payload).encode('utf-8')
+        else:
+            return msgpack.packb(payload)
+
+    def decode(self, payload):
+        if self.content_type == "application/json":
+            return json.loads(payload)
+        else:
+            return msgpack.unpackb(payload, raw=False)
 
     def call(self, obj, method, *args):
         endpoint = '%s%s' % (self.url, obj)
         try:
             if self.authorized:
-                m = msgpack.packb(
+                m = self.encode(
                     [method, self.databaseName, self.uid, self.password]
                     + list(args)
                 )
             else:
-                m = msgpack.packb([method] + list(args))
-            u = urllib.request.urlopen(endpoint, m)
+                m = self.encode([method] + list(args))
+            req = urllib.request.Request(endpoint, m)
+            req.add_header('Content-Type', self.content_type)
+            u = urllib.request.urlopen(req)
             s = u.read()
             u.close()
-            result = msgpack.unpackb(s, raw=False)
+            result = self.decode(s)
             if u.code == 210:
                 raise RpcServerException(
                     result['exception'],
@@ -363,11 +379,12 @@ def createConnection(url):
         con = SocketConnection(url)
     elif qUrl.scheme() == 'PYROLOC' or qUrl.scheme() == 'PYROLOCSSL':
         con = PyroConnection(url)
-    elif qUrl.scheme().endswith('+msgpack'):
+    elif '+' in qUrl.scheme():
         url = '{}://{}:{}'.format(
             qUrl.scheme().split('+')[0], qUrl.host(), qUrl.port()
         )
-        con = MsgpackConnection(url)
+        content_type = 'application/{}'.format(qUrl.scheme().split('+')[1])
+        con = MsgpackConnection(url, content_type)
     else:
         con = XmlRpcConnection(url)
     return con

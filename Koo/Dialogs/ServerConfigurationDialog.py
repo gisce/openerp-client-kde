@@ -85,6 +85,8 @@ class ServerConfigurationDialog(QDialog, ServerConfigurationDialogUi):
             self.uiConnection.addItem(
                 _("MsgPack SSL"), QVariant('https+msgpack')
             )
+        self.uiConnection.addItem(_("JSON"), QVariant('http+json'))
+        self.uiConnection.addItem(_("JSON SSL"), QVariant('https+json'))
         result = False
         self.pushCancel.clicked.connect(self.reject)
         self.pushAccept.clicked.connect(self.slotAccept)
