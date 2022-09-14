@@ -388,10 +388,12 @@ class Record(QObject):
                 )
                 if fill_geom:
                     values['geom'] = context['geom']
-                create_res = self.rpc.create_qread(
-                    values, self.group.allFieldNames(), context, '_classic_read'
-                )
-                self.id = create_res['id']
+                    create_res = self.rpc.create_qread(
+                        values, self.group.allFieldNames(), context, '_classic_read'
+                    )
+                    self.id = create_res['id']
+                else:
+                    self.id = self.rpc.create(values, context)
             else:
                 context = self.context()
                 if not self.isModified():
@@ -404,10 +406,13 @@ class Record(QObject):
                 context = context.copy()
                 context[ConcurrencyCheckField] = time.time() - self.read_time
                 action = 'write'
-                write_res = self.rpc.write_qread(
-                    self.id, values, self.group.allFieldNames(), context,
-                    '_classic_read'
-                )
+                if 'geom' in self.rpc.fields_get():
+                    write_res = self.rpc.write_qread(
+                        self.id, values, self.group.allFieldNames(), context,
+                        '_classic_read'
+                    )
+                else:
+                    write_res = self.rpc.write([self.id], values, context)
                 if not write_res:
                     if is_modal:
                         QTimer.singleShot(0, dialog_container.accept)
@@ -421,7 +426,7 @@ class Record(QObject):
                         model = value.resource
                         ids = value.removedRecords
                         Rpc.RpcProxy(model).unlink(ids)
-            if write_res:
+            if write_res and isinstance(write_res, dict):
                 self.set(write_res, signal=False)
                 Rpc.session.context['skip_reload'] = True
             elif create_res:
