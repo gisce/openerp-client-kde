@@ -26,7 +26,7 @@
 #
 ##############################################################################
 
-import gettext
+from gettext import gettext as _
 from PyQt5.QtWidgets import *
 
 from Koo.Common import Api

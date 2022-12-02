@@ -31,7 +31,7 @@ from xml.parsers import expat
 from PyQt5.QtWidgets import *
 
 import sys
-import gettext
+from gettext import gettext as _
 
 from .CustomSearchFormWidget import *
 from .SearchViewWidget import *
