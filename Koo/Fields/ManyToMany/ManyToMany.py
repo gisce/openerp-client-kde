@@ -120,8 +120,6 @@ class ManyToManyFieldWidget(AbstractFieldWidget, ManyToManyFieldWidgetUi):
         self.uiLabel.setText(line)
 
     def open(self):
-        if not (QApplication.keyboardModifiers() & Qt.ControlModifier):
-            return
 
         if not self.screen.currentRecord():
             return
