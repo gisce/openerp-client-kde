@@ -1,4 +1,12 @@
-pyqt5
-pyserial
-erppeek
-msgpack
+ERPpeek==1.7.1
+msgpack==1.0.2
+packaging==21.3
+ply==3.11
+pyparsing==3.0.9
+PyQt5==5.15.2
+PyQt5-sip==12.11.0
+PyQt5-stubs==5.15.6.0
+PyQtWebKit==5.15.2
+pyserial==3.5
+sip==6.7.5
+toml==0.10.2
