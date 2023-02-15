@@ -441,7 +441,7 @@ class AsynchronousSessionCall(QThread):
                     Notifier.notifyWarning(*self.warning)
                 else:
                     raise self.exception
-            self.exception.emit(self.exception)
+            self.called.emit(self.exception)
         else:
             self.called.emit(self.result)
 

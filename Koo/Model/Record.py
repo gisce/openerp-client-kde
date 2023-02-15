@@ -406,7 +406,7 @@ class Record(QObject):
                 context = context.copy()
                 context[ConcurrencyCheckField] = time.time() - self.read_time
                 action = 'write'
-                if 'geom' in self.rpc.fields_get():
+                if 'geom' in self.rpc.fields_get() and 'session' in context:
                     write_res = self.rpc.write_qread(
                         self.id, values, self.group.allFieldNames(), context,
                         '_classic_read'

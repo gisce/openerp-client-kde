@@ -32,14 +32,18 @@
 # Added so py2exe properly packs xml.etree.ElementTree
 from xml.etree.ElementTree import parse, SubElement
 from PyQt5.QtWidgets import *
-from raven import Client
+try:
+    from raven import Client
+except ImportError:
+    Client = None
+    pass
 from Koo.Common.Settings import Settings
 from Koo.Common.Version import Version
 
 
 sentry_dsn = Settings.get("client.sentry_dsn")
 sentry_dsn = None
-if sentry_dsn:
+if sentry_dsn and Client:
     client = Client(sentry_dsn)
 
     extra = Settings.options

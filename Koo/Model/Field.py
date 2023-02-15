@@ -179,7 +179,7 @@ class BinaryField(StringField):
         record.values[self.sizeName] = False
         if value:
             if record.isWizard():
-                value = base64.decodestring(value)
+                value = base64.decodebytes(value)
                 record.values[self.name] = value
                 if value:
                     record.values[self.sizeName] = Numeric.bytesToText(
@@ -210,7 +210,7 @@ class BinaryField(StringField):
         else:
             value = record.values[self.name]
         if value:
-            value = base64.encodestring(value)
+            value = base64.encodebytes(value)
         else:
             # OpenERP 5.0 server doesn't like False as a value for Binary fields.
             value = ''
@@ -231,7 +231,7 @@ class BinaryField(StringField):
         record.values[self.name] = None
         record.values[self.sizeName] = False
         if value:
-            value = base64.decodestring(value)
+            value = base64.decodebytes(value)
             record.values[self.name] = value
             if value:
                 record.values[self.sizeName] = Numeric.bytesToText(len(value))

@@ -62,9 +62,9 @@ class FormParser(AbstractParser):
         attrs = Common.nodeAttributes(root_node)
         onWriteFunction = attrs.get('on_write', '')
 
-        if container == None:
+        if container is None:
             parent = self.view
-            if notebook:
+            if notebook is not None:
                 parent = notebook
             # We want FormContainer parent to be the notebook for the case
             # when it's a QTabWidget. This way FormContainer can enable/disable
