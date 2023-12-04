@@ -211,7 +211,7 @@ class Record(QObject):
         for key_name, value in self.values.items():
             from .Group import RecordGroup
             if isinstance(value, RecordGroup):
-                if value.isModified():
+                if value.modified:
                     mod = True
         return mod
 
