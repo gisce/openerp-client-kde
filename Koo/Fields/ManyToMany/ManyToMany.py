@@ -193,6 +193,9 @@ class ManyToManyFieldWidget(AbstractFieldWidget, ManyToManyFieldWidgetUi):
         self.view.store()
         self.screen.remove()
         self.screen.display()
+        self.uiText.clear()
+        self.screen.group.recordChanged(None)
+        self.screen.group.recordModified(None, True)
 
     def setReadOnly(self, value):
         AbstractFieldWidget.setReadOnly(self, value)
