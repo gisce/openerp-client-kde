@@ -496,6 +496,7 @@ class RecordGroup(QObject):
             self.recordChangedSignal.emit(self.parent)
 
     def recordModified(self, record, many2many=False):
+        # whole group marked as modified when adding/removing items in many2many
         if many2many:
             self._modified = True
         if self._signalsEnabled:
