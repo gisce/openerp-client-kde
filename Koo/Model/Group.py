@@ -69,6 +69,7 @@ class RecordGroup(QObject):
     recordsRemoved = pyqtSignal(int, int)
     recordChangedSignal = pyqtSignal('PyQt_PyObject')
     # recordChanged = pyqtSignal(QObject)
+    _modified = False
     modified = pyqtSignal()
     # @xtorello toreview signal int type
     sorting = pyqtSignal(int)
@@ -494,7 +495,9 @@ class RecordGroup(QObject):
         if self.parent:
             self.recordChangedSignal.emit(self.parent)
 
-    def recordModified(self, record):
+    def recordModified(self, record, many2many=False):
+        if many2many:
+            self._modified = True
         if self._signalsEnabled:
             self.modified.emit()
         if self.parent:
@@ -1195,6 +1198,8 @@ class RecordGroup(QObject):
         :return: True if any of the records in the group has been modified.
         :rtype: bool
         """
+        if self._modified:
+            return True
         for record in self.records:
             if isinstance(record, Record):
                 if record.isModified():

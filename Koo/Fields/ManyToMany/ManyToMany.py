@@ -184,7 +184,7 @@ class ManyToManyFieldWidget(AbstractFieldWidget, ManyToManyFieldWidgetUi):
         # This is not necessary in case of removing an item.
         # Maybe a better option should be found. But this one works just right.
         self.screen.group.recordChanged(None)
-        self.screen.group.recordModified(None)
+        self.screen.group.recordModified(None, True)
 
     def remove(self):
         # As the 'remove' button modifies the model we need to be sure all other fields/widgets
