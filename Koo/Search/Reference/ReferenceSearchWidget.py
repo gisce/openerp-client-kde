@@ -52,8 +52,7 @@ class ReferenceSearchWidget(AbstractSearchWidget, ReferenceSearchWidgetUi):
             self.invertedModels[i] = j
 
     def value(self):
-        resource = str(self.uiModel.itemData(
-            self.uiModel.currentIndex()).toString())
+        resource = self.uiModel.itemData(self.uiModel.currentIndex())
         if resource:
             return [(self.name, 'like', resource + ',')]
         else:
