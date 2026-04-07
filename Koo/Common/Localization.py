@@ -47,7 +47,7 @@ def initializeTranslations(language=None):
         print("Warning: Unsupported locale.")
 
     if not language:
-        language, encoding = locale.getdefaultlocale()
+        language, encoding = locale.getlocale()
         if not language:
             language = 'C'
 
