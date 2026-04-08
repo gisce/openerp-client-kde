@@ -102,7 +102,7 @@ def floatToText(number, digits=None, thousands=False):
         d = '2'
 
     if thousands:
-        return locale.format_string('%.' + d + 'f', number, True, True)
+        return locale.format_string('%.' + d + 'f', number, grouping=True)
     else:
         return ('%.' + d + 'f') % number
 
