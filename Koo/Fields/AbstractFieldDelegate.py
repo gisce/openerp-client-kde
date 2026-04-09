@@ -26,10 +26,10 @@
 ##############################################################################
 
 from Koo import Rpc
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 from .FieldPreferencesDialog import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 
 # @brief AbstractFieldDelegate is the base class for all delegates used in Koo.
 # Delegates are used by editable lists but could be used by any Model/View based

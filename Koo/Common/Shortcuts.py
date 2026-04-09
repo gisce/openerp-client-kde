@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
+from PySide6.QtCore import *
 
 # @brief The Shortcuts module stores default keyboard shortcuts for common functions
 

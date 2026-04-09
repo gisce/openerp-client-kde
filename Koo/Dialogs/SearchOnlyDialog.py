@@ -27,7 +27,7 @@
 #
 ##############################################################################
 
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 from Koo.Common import Common
 from Koo.Common.Settings import *
 
@@ -35,8 +35,8 @@ from Koo import Rpc
 
 from Koo.Model.Group import RecordGroup
 
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 from Koo.Common.Ui import *
 
 (SearchOnlyDialogUi, SearchDialogBase) = loadUiType(Common.uiPath('win_search_only.ui'))

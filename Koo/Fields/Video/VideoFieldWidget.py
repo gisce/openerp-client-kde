@@ -27,14 +27,14 @@
 
 
 from Koo.Common import Common
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 
 from Koo.Fields.AbstractFieldWidget import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 
 try:
-    from PyQt5.phonon import *
+    from PySide6.phonon import *
     phononAvailable = True
 except:
     phononAvailable = False

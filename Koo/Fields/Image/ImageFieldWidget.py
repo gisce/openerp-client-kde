@@ -27,7 +27,7 @@
 ##############################################################################
 
 import os
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 import base64
 import binascii
 import tempfile
@@ -37,8 +37,8 @@ from Koo.Common import Icons
 from Koo.Common import Semantic
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 
 (ImageFieldWidgetUi, ImageFieldWidgetBase) = loadUiType(Common.uiPath('image.ui'))
@@ -118,7 +118,7 @@ class ImageFieldWidget(AbstractFieldWidget, ImageFieldWidgetUi):
         label.setPixmap(pix)
         layout = QHBoxLayout(dialog)
         layout.addWidget(label)
-        dialog.exec_()
+        dialog.exec()
 
     def removeImage(self):
         self.setImage(False)

@@ -26,9 +26,9 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
+from PySide6.QtCore import *
 try:
-    from PyQt5.QtNetwork import *
+    from PySide6.QtNetwork import *
     isQtNetworkAvailable = True
 except:
     isQtNetworkAvailable = False
@@ -391,8 +391,8 @@ def createConnection(url):
 
 
 class AsynchronousSessionCall(QThread):
-    exception = pyqtSignal('PyQt_PyObject')
-    called = pyqtSignal('PyQt_PyObject')
+    exception = Signal(object)
+    called = Signal(object)
 
     def __init__(self, session, parent=None):
         QThread.__init__(self, parent)
@@ -903,9 +903,9 @@ if isQtNetworkAvailable:
             self.offset = 0
 
             self.setHeader(QNetworkRequest.ContentTypeHeader,
-                           QVariant("text/html; charset=utf-8"))
+                           "text/html; charset=utf-8")
             self.setHeader(QNetworkRequest.ContentLengthHeader,
-                           QVariant(len(self.content)))
+                           len(self.content))
             QTimer.singleShot(0, self, SIGNAL("readyRead()"))
             QTimer.singleShot(0, self, SIGNAL("finished()"))
             self.open(self.ReadOnly | self.Unbuffered)

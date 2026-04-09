@@ -27,12 +27,12 @@
 ##############################################################################
 
 from Koo.Fields.AbstractFieldWidget import *
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 from Koo.Fields.AbstractFieldDelegate import *
 from Koo.Common.Numeric import *
 from Koo.Common import Shortcuts
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 
 
 class FloatFieldWidget(AbstractFieldWidget):
@@ -102,4 +102,4 @@ class FloatFieldWidget(AbstractFieldWidget):
 class FloatFieldDelegate(AbstractFieldDelegate):
     def setModelData(self, editor, model, index):
         value = textToFloat(str(editor.text()))
-        model.setData(index, QVariant(value), Qt.EditRole)
+        model.setData(index, value, Qt.EditRole)

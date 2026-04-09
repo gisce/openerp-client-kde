@@ -27,8 +27,8 @@
 ##############################################################################
 
 import os
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from Koo.Common import Plugins
 from .DummyView import *
 

@@ -25,9 +25,9 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 from Koo.Common import Common
 from Koo.Common import Calendar
@@ -179,22 +179,22 @@ class GraphicsDayItem(QGraphicsItemGroup):
                 index.row(), self.parentItem()._modelTitleColumn)
             dateIdx = model.index(
                 index.row(), self.parentItem()._modelDateColumn)
-            task.setTitle(titleIdx.data().toString())
-            task.setStart(dateIdx.data().toString())
+            task.setTitle(str(titleIdx.data() or ''))
+            task.setStart(str(dateIdx.data() or ''))
 
             if self.parentItem()._modelColorColumn >= 0:
                 colorIdx = model.index(
                     index.row(), self.parentItem()._modelColorColumn)
                 task.setBackgroundColor(
-                    GraphicsDayItem.colorManager.color(colorIdx.data().toInt()[0]))
+                    GraphicsDayItem.colorManager.color(int(colorIdx.data() or 0)))
                 task.setEdgeColor(GraphicsDayItem.colorManager.edgeColor(
-                    colorIdx.data().toInt()[0]))
+                    int(colorIdx.data() or 0)))
             if self.parentItem()._hasDurationColumn:
                 durationIdx = model.index(
                     index.row(), self.parentItem()._modelDurationColumn)
-                task.setDuration(durationIdx.data().toString())
-                durationTime, ok = durationIdx.data(
-                    self.parentItem().ValueRole).toDouble()
+                task.setDuration(str(durationIdx.data() or ''))
+                _duration_val = durationIdx.data(self.parentItem().ValueRole)
+                durationTime = float(_duration_val) if _duration_val is not None else 0.0
             else:
                 task.setDuration('--')
                 durationTime = 1.0
@@ -213,7 +213,7 @@ class GraphicsDayItem(QGraphicsItemGroup):
             y = secs * height / 86400.0
             task.setSize(QSize(self._size.width(), y))
 
-            title = str(titleIdx.data().toString())
+            title = str(titleIdx.data() or '')
 
     def taskFromIndex(self, index):
         return self._tasks.get(index, None)
@@ -291,10 +291,10 @@ class GraphicsCalendarItem(QGraphicsItemGroup):
     def extractDate(self, variant):
         if not variant:
             return QDate()
-        if variant.type() == QVariant.Date:
-            return variant.toDate()
-        elif variant.type() == QVariant.DateTime:
-            return variant.toDateTime().date()
+        if isinstance(variant, QDate):
+            return variant
+        elif isinstance(variant, QDateTime):
+            return variant.date()
         else:
             return QDate()
 
@@ -353,11 +353,11 @@ class GraphicsCalendarItem(QGraphicsItemGroup):
 
     def dateTimeFromIndex(self, idx):
         data = self._model.data(idx)
-        if data.type() == QVariant.DateTime:
-            return data.toDateTime()
+        if isinstance(data, QDateTime):
+            return data
         data = self._model.data(idx, self.ValueRole)
-        if data.type() == QVariant.DateTime:
-            return data.toDateTime()
+        if isinstance(data, QDateTime):
+            return data
         # If neither DisplayRole nor ValueRole contain
         # a DateTime, simply return an invalid DateTime object
         return QDateTime()
@@ -411,8 +411,8 @@ class GraphicsCalendarItem(QGraphicsItemGroup):
 
 
 class GraphicsCalendarScene(QGraphicsScene):
-    currentChanged = pyqtSignal('PyQt_PyObject')
-    activated = pyqtSignal()
+    currentChanged = Signal(object)
+    activated = Signal()
 
     def __init__(self, parent=None):
         QGraphicsScene.__init__(self, parent)
@@ -521,8 +521,8 @@ class GraphicsCalendarView(QGraphicsView):
 
 
 class CalendarView(AbstractView, CalendarViewUi):
-    currentChanged = pyqtSignal('PyQt_PyObject')
-    activated = pyqtSignal()
+    currentChanged = Signal(object)
+    activated = Signal()
 
     def __init__(self, parent):
         AbstractView.__init__(self, parent)
@@ -535,7 +535,7 @@ class CalendarView(AbstractView, CalendarViewUi):
         self.setReadOnly(True)
         self.title = ""
         self.updateCalendarView()
-        self.calendarView.scene().currentChanged['PyQt_PyObject'].connect(self.currentChanged)
+        self.calendarView.scene().currentChanged.connect(self.currentChanged)
         self.calendarView.scene().activated.connect(self.activated)
 
     def viewType(self):

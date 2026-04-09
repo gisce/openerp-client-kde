@@ -26,11 +26,11 @@
 ##############################################################################
 
 from Koo.Common import Common
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 from . import FormWidget
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 
 (AttachmentDialogUi, AttachmentDialogBase) = loadUiType(
@@ -45,7 +45,7 @@ class AttachmentDialog(QMainWindow, AttachmentDialogUi):
         self.setupUi(self)
 
         # Center dialog on the screen
-        rect = QApplication.desktop().screenGeometry()
+        rect = QApplication.primaryScreen().geometry()
         centerh = rect.width() / 2
         centerv = rect.height() / 2
         self.setGeometry(centerh - self.width() / 2, centerv -
@@ -68,7 +68,7 @@ class AttachmentDialog(QMainWindow, AttachmentDialogUi):
         # Set minimum and maximum dialog size
         size = self.form.sizeHint()
         self.setMinimumSize(size.width() + 100, min(600, size.height() + 25))
-        size = QApplication.desktop().availableGeometry(self).size()
+        size = QApplication.primaryScreen().availableGeometry().size()
         size -= QSize(50, 50)
         self.setMaximumSize(size)
 

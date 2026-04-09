@@ -27,11 +27,11 @@
 ##############################################################################
 
 from Koo.Common import Common
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 
 
 class SelectionFieldWidget(AbstractFieldWidget):
@@ -113,7 +113,7 @@ class SelectionFieldWidget(AbstractFieldWidget):
         if not value:
             self.widget.setCurrentIndex(self.widget.findText(''))
         else:
-            self.widget.setCurrentIndex(self.widget.findData(QVariant(value)))
+            self.widget.setCurrentIndex(self.widget.findData(value))
         self._changed = False
 
     def activated(self, idx):
@@ -129,7 +129,7 @@ class SelectionFieldDelegate(AbstractFieldDelegate):
         widget.setEditable(False)
         widget.setInsertPolicy(QComboBox.InsertAtTop)
         for (ident, name) in self.attributes.get('selection', []):
-            widget.addItem(name, QVariant(ident))
+            widget.addItem(name, ident)
         return widget
 
     def setEditorData(self, editor, index):
@@ -137,7 +137,7 @@ class SelectionFieldDelegate(AbstractFieldDelegate):
         editor.setCurrentIndex(editor.findText(value))
 
     def setModelData(self, editor, model, index):
-        model.setData(index, QVariant(editor.currentText()), Qt.EditRole)
+        model.setData(index, editor.currentText(), Qt.EditRole)
 
     # def sizeHint(self, option, index):
     #	return QSize(30, 30)

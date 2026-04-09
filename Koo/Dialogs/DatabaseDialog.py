@@ -26,9 +26,9 @@
 ##############################################################################
 
 import base64
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 from . import ServerConfigurationDialog
 from Koo.Common import Common
@@ -105,7 +105,7 @@ class DatabaseDialog(QDialog, DatabaseDialogUi):
     def slotChange(self):
         dialog = ServerConfigurationDialog.ServerConfigurationDialog(self)
         dialog.setUrl(Settings.value('login.url'))
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.Accepted:
             self.uiServer.setText(dialog.url)
             self.refreshList()
 
@@ -116,7 +116,7 @@ def restoreDatabase(parent):
         return
     dialog = DatabaseDialog(DatabaseDialog.TypeEdit,
                             _('Restore a database'), parent)
-    r = dialog.exec_()
+    r = dialog.exec()
     if r == QDialog.Rejected:
         return
     parent.setCursor(Qt.WaitCursor)
@@ -143,7 +143,7 @@ def restoreDatabase(parent):
 def backupDatabase(parent):
     dialog = DatabaseDialog(DatabaseDialog.TypeSelect,
                             _('Backup a database'), parent)
-    r = dialog.exec_()
+    r = dialog.exec()
     if r == QDialog.Rejected:
         return
     fileName = QFileDialog.getSaveFileName(parent, _('Save as...'))[0]
@@ -170,7 +170,7 @@ def backupDatabase(parent):
 def dropDatabase(parent):
     dialog = DatabaseDialog(DatabaseDialog.TypeSelect,
                             _('Delete a database'), parent)
-    r = dialog.exec_()
+    r = dialog.exec()
 
     if r == QDialog.Rejected:
         return

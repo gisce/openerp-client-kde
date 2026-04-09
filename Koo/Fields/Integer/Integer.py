@@ -27,12 +27,12 @@
 ##############################################################################
 
 from Koo.Fields.AbstractFieldWidget import *
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 from Koo.Fields.AbstractFieldDelegate import *
 from Koo.Common.Numeric import *
 from Koo.Common import Shortcuts
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 
 
 class IntegerFieldWidget(AbstractFieldWidget):
@@ -88,4 +88,4 @@ class IntegerFieldWidget(AbstractFieldWidget):
 class IntegerFieldDelegate(AbstractFieldDelegate):
     def setModelData(self, editor, model, index):
         value = textToInteger(str(editor.text()))
-        model.setData(index, QVariant(value), Qt.EditRole)
+        model.setData(index, value, Qt.EditRole)

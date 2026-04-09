@@ -27,13 +27,13 @@
 ##############################################################################
 
 from Koo.Common import Common
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 from Koo.Common import Shortcuts
 
 from Koo.Fields.TranslationDialog import *
 from Koo.Fields.AbstractFieldWidget import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 
 
 class CharFieldWidget(AbstractFieldWidget):
@@ -83,7 +83,7 @@ class CharFieldWidget(AbstractFieldWidget):
             return
         dialog = TranslationDialog(self.record.id, self.record.group.resource, self.attrs['name'], str(
             self.widget.text()), TranslationDialog.LineEdit, self)
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.Accepted:
             self.setText(dialog.result)
 
     def storeValue(self):

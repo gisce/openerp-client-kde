@@ -28,7 +28,7 @@
 ##############################################################################
 
 import gettext
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 
 from Koo.Common import Api
 from Koo.Common.Settings import *
@@ -38,8 +38,8 @@ import os
 import sys
 from Koo.Common import Debug
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo.Common.Paths import *
@@ -61,7 +61,7 @@ except:
 
 
 def isQtVersion45():
-    return PYQT_VERSION >= 0x40500
+    return True  # Qt6 >= Qt 4.5
 
 
 serverVersion = None
@@ -169,7 +169,7 @@ def selection(title, values, alwaysask=False):
         key = list(values.keys())[0]
         return (key, values[key])
     s = SelectionDialog(title, values)
-    if s.exec_() == QDialog.Accepted:
+    if s.exec() == QDialog.Accepted:
         return s.result
     else:
         return False
@@ -215,7 +215,7 @@ def concurrencyError(model, id, context):
     """
     QApplication.setOverrideCursor(Qt.ArrowCursor)
     dialog = ConcurrencyErrorDialog()
-    result = dialog.exec_()
+    result = dialog.exec()
     QApplication.restoreOverrideCursor()
     if result == 0:
         return True
@@ -297,7 +297,7 @@ def error(title, message, details=''):
     """
     QApplication.setOverrideCursor(Qt.ArrowCursor)
     dialog = ErrorDialog(str(title), str(message), str(details))
-    dialog.exec_()
+    dialog.exec()
     QApplication.restoreOverrideCursor()
 
 
@@ -352,7 +352,7 @@ def lostConnectionError(count):
     """
     QApplication.setOverrideCursor(Qt.ArrowCursor)
     dialog = LostConnectionDialog(count)
-    if dialog.exec_() == QDialog.Rejected:
+    if dialog.exec() == QDialog.Rejected:
         result = QMessageBox.warning(None, _("Quit"), _(
             "Leaving the application now will lose all unsaved changes. Are you sure you want to quit?"), QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if result == QMessageBox.Yes:

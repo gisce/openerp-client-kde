@@ -27,9 +27,9 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 import gettext
 from Koo.Common import Common
@@ -134,7 +134,7 @@ class ImportDialog(QDialog, ImportDialogUi):
 
     def fileFormat(self):
         index = self.uiFileFormat.currentIndex()
-        return str(self.uiFileFormat.itemData(index).toString())
+        return str(self.uiFileFormat.itemData(index) or '')
 
     def updateFileFormat(self):
         if self.fileFormat() == 'csv':
@@ -233,7 +233,7 @@ class ImportDialog(QDialog, ImportDialogUi):
         item = self.allModel.itemFromIndex(idx)
         newItem = QStandardItem(item)
         newItem.setText(self.fullPathText(item))
-        newItem.setData(QVariant(self.fullPathData(item)))
+        newItem.setData(self.fullPathData(item))
         self.selectedModel.appendRow(newItem)
 
     def slotRemove(self):
@@ -255,10 +255,10 @@ class ImportDialog(QDialog, ImportDialogUi):
         return path
 
     def fullPathData(self, item):
-        path = str(item.data().toString())
+        path = str(item.data() or '')
         while item.parent() != None:
             item = item.parent()
-            path = item.data().toString() + "/" + path
+            path = str(item.data() or '') + "/" + path
         return path
 
     def csvAutoDetect(self):
@@ -449,7 +449,7 @@ class ImportDialog(QDialog, ImportDialogUi):
         fieldsData = []
         for x in range(0, self.selectedModel.rowCount()):
             fieldsData.append(
-                str(self.selectedModel.item(x).data().toString()))
+                str(self.selectedModel.item(x).data() or '')))
 
         if csv['fname']:
             if not importCsv(csv, fieldsData, self.model):
@@ -469,7 +469,7 @@ class ImportDialog(QDialog, ImportDialogUi):
         fieldsData = []
         for x in range(0, self.selectedModel.rowCount()):
             fieldsData.append(
-                str(self.selectedModel.item(x).data().toString()))
+                str(self.selectedModel.item(x).data() or '')))
 
         records = self.xlsRecords(fileName, sheet)
         records = records[linesToSkip:]
@@ -489,7 +489,7 @@ class ImportDialog(QDialog, ImportDialogUi):
         fieldsData = []
         for x in range(0, self.selectedModel.rowCount()):
             fieldsData.append(
-                str(self.selectedModel.item(x).data().toString()))
+                str(self.selectedModel.item(x).data() or '')))
 
         records = self.odsRecords(fileName, sheet)
         records = records[linesToSkip:]

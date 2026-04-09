@@ -38,12 +38,12 @@ from Koo.Common import Help
 
 from Koo.Screen.Screen import *
 from Koo.Model.Group import RecordGroup
-from PyQt5.QtCore import *
+from PySide6.QtCore import *
 from Koo.Common.Ui import *
 from gettext import gettext as _
 
 try:
-    from PyQt5.QtWebKitWidgets import QWebPage, QWebView
+    from PySide6.QtWebEngineWidgets import QWebEngineView
     isHelpWidgetAvailable = True
 except:
     isHelpWidgetAvailable = False
@@ -53,8 +53,8 @@ except:
 
 class FormWidget(QWidget, FormWidgetUi):
 
-    closed = pyqtSignal()
-    shortcutsChanged = pyqtSignal()
+    closed = Signal()
+    shortcutsChanged = Signal()
 
     def __init__(self, model, res_id=False, domain=None, view_type=None,
                  view_ids=None, context=None, parent=None, name=False,
@@ -256,7 +256,7 @@ class FormWidget(QWidget, FormWidgetUi):
         if not self.modifiedSave():
             return
         dialog = GoToIdDialog(self)
-        if dialog.exec_() == QDialog.Rejected:
+        if dialog.exec() == QDialog.Rejected:
             return
         if not dialog.result in self.group.ids():
             QMessageBox.information(self, _('Go To Id'), _(
@@ -377,7 +377,7 @@ class FormWidget(QWidget, FormWidgetUi):
         dialog = ImportDialog(self)
         dialog.setModel(self.model)
         dialog.setup(self.viewTypes, self.viewIds)
-        dialog.exec_()
+        dialog.exec()
         if not self.screen.isModified():
             self.reload()
 
@@ -386,7 +386,7 @@ class FormWidget(QWidget, FormWidgetUi):
         dialog.setModel(self.model)
         dialog.setIds(self.screen.selectedIds())
         dialog.setup(self.viewTypes, self.viewIds)
-        dialog.exec_()
+        dialog.exec()
 
     def new(self):
         if not self.modifiedSave():
@@ -551,7 +551,7 @@ class FormWidget(QWidget, FormWidgetUi):
         dom = self.domain
         dialog = SearchDialog(self.model, domain=self.domain,
                               context=self.context, parent=self)
-        if dialog.exec_() == QDialog.Rejected:
+        if dialog.exec() == QDialog.Rejected:
             return
         self.screen.clear()
         self.screen.load(dialog.result)
@@ -652,7 +652,7 @@ class FormWidget(QWidget, FormWidgetUi):
         dialog.setViewTypes(self.viewTypes)
         dialog.setViewIds(self.viewIds)
         dialog.setup()
-        if dialog.exec_() == QDialog.Rejected:
+        if dialog.exec() == QDialog.Rejected:
             return
         self.reload()
 
@@ -666,7 +666,7 @@ class FormWidget(QWidget, FormWidgetUi):
         dialog.setModel(self.model)
         dialog.setContext(self.context)
         dialog.setup(self.viewTypes, self.viewIds)
-        if dialog.exec_() == QDialog.Rejected:
+        if dialog.exec() == QDialog.Rejected:
             return
         self.reload()
 
@@ -678,7 +678,7 @@ class FormWidget(QWidget, FormWidgetUi):
         dialog.setViewTypes(self.viewTypes)
         dialog.setViewIds(self.viewIds)
         dialog.setup()
-        if dialog.exec_() == QDialog.Rejected:
+        if dialog.exec() == QDialog.Rejected:
             return
 
         if len(dialog.newValues) != len(self.screen.selectedRecords()):
@@ -774,7 +774,7 @@ class FormWidget(QWidget, FormWidgetUi):
 
         selectionDialog = Common.SelectionDialog(
             _('Choose action to apply to selected records'), buttons, self)
-        if selectionDialog.exec_() == QDialog.Rejected:
+        if selectionDialog.exec() == QDialog.Rejected:
             return
 
         buttonString = selectionDialog.result[0]

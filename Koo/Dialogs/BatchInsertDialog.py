@@ -25,9 +25,9 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 from Koo import Rpc
 from Koo.Common import Common
@@ -86,7 +86,7 @@ class BatchInsertDialog(QDialog, BatchInsertDialogUi):
         oneToManyFields = dict(oneToManyFields)
         selectionDialog = Common.SelectionDialog(
             _('Choose field to insert in batch action'), oneToManyFields, self)
-        if selectionDialog.exec_() == QDialog.Rejected:
+        if selectionDialog.exec() == QDialog.Rejected:
             return False
         fieldString = selectionDialog.result[0]
         fieldName = selectionDialog.result[1]

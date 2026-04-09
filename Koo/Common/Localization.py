@@ -80,7 +80,7 @@ def initializeQtTranslations(language=None):
     :param language:
     :return:
     """
-    from PyQt5.QtCore import QTranslator, QCoreApplication, QLocale
+    from PySide6.QtCore import QTranslator, QCoreApplication, QLocale
     if not language:
         language = str(QLocale.system().name())
 
