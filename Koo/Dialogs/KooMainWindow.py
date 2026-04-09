@@ -50,11 +50,11 @@ from Koo.View.ViewFactory import *
 
 from Koo.Plugins import *
 from gettext import gettext as _
-from PyQt5.uic import loadUi
+from PySide6.uic import loadUi
 
 
 class MainTabWidget(QTabWidget):
-    middleClicked = pyqtSignal(int)
+    middleClicked = Signal(int)
 
     def __init__(self, parent=None):
         QTabWidget.__init__(self, parent)
@@ -335,7 +335,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
             self.showNormal()
 
         win = FullTextSearchDialog(self)
-        win.exec_()
+        win.exec()
 
     def nextTab(self):
         pn = self.tabWidget.currentIndex()
@@ -355,7 +355,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
 
     def userPreferences(self):
         win = PreferencesDialog(self)
-        win.exec_()
+        win.exec()
 
     def newRequest(self):
         if not self.isVisible():
@@ -477,7 +477,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
 
     def showLoginDialog(self):
         dialog = LoginDialog(self)
-        while dialog.exec_() == QDialog.Accepted:
+        while dialog.exec() == QDialog.Accepted:
             self.login(dialog.url, dialog.databaseName)
             if Rpc.session.open:
                 return
@@ -603,12 +603,12 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
 
     def showTipOfTheDay(self):
         dialog = TipOfTheDayDialog(self)
-        dialog.exec_()
+        dialog.exec()
 
     def showLicense(self):
         dialog = QDialog(self)
         loadUi(Common.uiPath('license.ui'), dialog)
-        dialog.exec_()
+        dialog.exec()
 
     def showAboutDialog(self):
         dialog = QDialog(self)
@@ -616,12 +616,12 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
         from Koo.Common import Version
         dialog.uiOpenErp.setHtml(
             str(dialog.uiOpenErp.toHtml()) % Version.Version)
-        dialog.exec_()
+        dialog.exec()
 
     def showShortcuts(self):
         dialog = QDialog(self)
         loadUi(Common.uiPath('shortcuts.ui'), dialog)
-        dialog.exec_()
+        dialog.exec()
 
     def shortcutsChanged(self, model):
         if model == 'ir.ui.menu':
@@ -746,7 +746,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
         Rpc.session.logout()
         self.systemTrayIcon.setVisible(False)
 
-    @pyqtSlot()
+    @Slot()
     def closeTabForced(self):
         idx = self.tabWidget.indexOf(self.sender())
         self.tabWidget.removeTab(idx)
@@ -778,7 +778,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
             win.setParent(dialog)
             win.closed.connect(dialog.accept)
             win.show()
-            dialog.exec_()
+            dialog.exec()
 
     def updateEnabledActions(self):
 
@@ -878,7 +878,7 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
 
     def createDatabase(self):
         dialog = DatabaseCreationDialog(self)
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.Accepted:
             self.login(dialog.url, dialog.databaseName)
 
     def dropDatabase(self):
@@ -892,6 +892,6 @@ class KooMainWindow(QMainWindow, KooMainWindowUi):
 
     def changeAdministratorPassword(self):
         dialog = AdministratorPasswordDialog(self)
-        dialog.exec_()
+        dialog.exec()
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:

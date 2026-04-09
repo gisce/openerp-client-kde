@@ -31,7 +31,7 @@
 
 # Added so py2exe properly packs xml.etree.ElementTree
 from xml.etree.ElementTree import parse, SubElement
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 
 import sys
 import os
@@ -70,8 +70,8 @@ Localization.initializeTranslations(Settings.value('client.language'))
 
 imports = {}
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 from Koo.Common import Notifier, Common
 from Koo.Common import DBus
 
@@ -293,4 +293,4 @@ menuId = id[0]['action_id'][0]
 
 Api.instance.execute(menuId)
 
-app.exec_()
+app.exec()

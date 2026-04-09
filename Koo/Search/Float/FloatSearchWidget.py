@@ -28,10 +28,10 @@
 ##############################################################################
 
 from Koo.Common.Numeric import *
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 from Koo.Search.AbstractSearchWidget import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 from Koo.Common.Ui import *
 
 

@@ -28,11 +28,11 @@
 ##############################################################################
 
 from Koo.Common import Common
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 
 from Koo.Search.AbstractSearchWidget import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 
 
 class BooleanSearchWidget(AbstractSearchWidget):
@@ -40,9 +40,9 @@ class BooleanSearchWidget(AbstractSearchWidget):
         AbstractSearchWidget.__init__(self, name, parent, attrs)
         self.uiCombo = QComboBox(self)
         self.uiCombo.setEditable(False)
-        self.uiCombo.addItem('', QVariant())
-        self.uiCombo.addItem(_('Yes'), QVariant(True))
-        self.uiCombo.addItem(_('No'), QVariant(False))
+        self.uiCombo.addItem('', None)
+        self.uiCombo.addItem(_('Yes'), True)
+        self.uiCombo.addItem(_('No'), False)
         layout = QVBoxLayout(self)
         layout.addWidget(self.uiCombo)
         layout.setSpacing(0)
@@ -59,4 +59,4 @@ class BooleanSearchWidget(AbstractSearchWidget):
         self.uiCombo.setCurrentIndex(self.uiCombo.findText(''))
 
     def setValue(self, value):
-        self.uiCombo.setCurrentIndex(self.uiCombo.findData(QVariant(value)))
+        self.uiCombo.setCurrentIndex(self.uiCombo.findData(value))

@@ -34,7 +34,7 @@ from Koo.Rpc import RpcProxy
 from .Field import ToManyField
 from Koo.Common import Debug
 
-from PyQt5.QtCore import *
+from PySide6.QtCore import *
 
 # ConcurrencyCheckField = '__last_update'
 ConcurrencyCheckField = 'read_delta'
@@ -60,9 +60,9 @@ class EvalEnvironment(object):
 
 
 class Record(QObject):
-    recordChanged = pyqtSignal('PyQt_PyObject')
-    recordModified = pyqtSignal('PyQt_PyObject')
-    setFocus = pyqtSignal('QString')
+    recordChanged = Signal(object)
+    recordModified = Signal(object)
+    setFocus = Signal('QString')
 
     def __init__(self, ident, group, parent=None, new=False):
         QObject.__init__(self, group)

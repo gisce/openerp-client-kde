@@ -27,13 +27,13 @@
 ##############################################################################
 
 from Koo.Common import Shortcuts
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 from Koo.Common.SpellChecker import *
 
 from Koo.Fields.TranslationDialog import *
 from Koo.Fields.AbstractFieldWidget import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 
 
 class TextBoxFieldWidget(AbstractFieldWidget):
@@ -73,7 +73,7 @@ class TextBoxFieldWidget(AbstractFieldWidget):
             return
         dialog = TranslationDialog(self.record.id, self.record.group.resource, self.attrs['name'], str(
             self.uiText.toPlainText()), TranslationDialog.TextEdit, self)
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.Accepted:
             self.uiText.setPlainText(dialog.result)
             self._highlighter.setDocument(self.uiText.document())
 

@@ -26,7 +26,7 @@
 ##############################################################################
 
 from Koo.Search.AbstractSearchWidget import *
-from PyQt5.QtGui import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 from Koo.Common import Common
 
@@ -48,7 +48,7 @@ class ReferenceSearchWidget(AbstractSearchWidget, ReferenceSearchWidgetUi):
     def setPopdown(self, selection):
         self.invertedModels = {}
         for (i, j) in [('', '')] + selection:
-            self.uiModel.addItem(j, QVariant(i))
+            self.uiModel.addItem(j, i)
             self.invertedModels[i] = j
 
     def value(self):

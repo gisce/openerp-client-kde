@@ -27,7 +27,7 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
+from PySide6.QtCore import *
 from Koo.Common import Notifier
 from Koo.Common import Common
 from Koo.Common import Semantic

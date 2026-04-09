@@ -25,7 +25,7 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
+from PySide6.QtCore import *
 from time import sleep
 
 # @brief The Subscriber class provides a mechanisme for subscribing to server events.
@@ -49,7 +49,7 @@ from time import sleep
 
 class Subscriber(QThread):
     # @brief Creates a new Subscriber object from the given session and with 'parent' as QObject parent.
-    published = pyqtSignal()
+    published = Signal()
 
     def __init__(self, session, parent=None):
         QThread.__init__(self, parent)

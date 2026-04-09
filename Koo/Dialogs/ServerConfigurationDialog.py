@@ -25,9 +25,9 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 import re
 from Koo.Common import Common
@@ -70,23 +70,23 @@ class ServerConfigurationDialog(QDialog, ServerConfigurationDialogUi):
         self.setupUi(self)
 
         if Rpc.isNetRpcAvailable:
-            self.uiConnection.addItem(_("NET-RPC"), QVariant('socket'))
-        self.uiConnection.addItem(_("XML-RPC"), QVariant('http'))
-        self.uiConnection.addItem(_("Secure XML-RPC"), QVariant('https'))
+            self.uiConnection.addItem(_("NET-RPC"), 'socket')
+        self.uiConnection.addItem(_("XML-RPC"), 'http')
+        self.uiConnection.addItem(_("Secure XML-RPC"), 'https')
         if Rpc.isPyroAvailable:
-            self.uiConnection.addItem(_("Pyro (faster)"), QVariant('PYROLOC'))
+            self.uiConnection.addItem(_("Pyro (faster)"), 'PYROLOC')
         if Rpc.isPyroSslAvailable:
             self.uiConnection.addItem(
-                _("Pyro SSL (faster)"), QVariant('PYROLOCSSL'))
+                _("Pyro SSL (faster)"), 'PYROLOCSSL')
         if Rpc.is_msgpack_available:
             self.uiConnection.addItem(
-                _("MsgPack"), QVariant('http+msgpack')
+                _("MsgPack"), 'http+msgpack'
             )
             self.uiConnection.addItem(
-                _("MsgPack SSL"), QVariant('https+msgpack')
+                _("MsgPack SSL"), 'https+msgpack'
             )
-        self.uiConnection.addItem(_("JSON"), QVariant('http+json'))
-        self.uiConnection.addItem(_("JSON SSL"), QVariant('https+json'))
+        self.uiConnection.addItem(_("JSON"), 'http+json')
+        self.uiConnection.addItem(_("JSON SSL"), 'https+json')
         result = False
         self.pushCancel.clicked.connect(self.reject)
         self.pushAccept.clicked.connect(self.slotAccept)
@@ -96,7 +96,7 @@ class ServerConfigurationDialog(QDialog, ServerConfigurationDialogUi):
         url = QUrl(url)
         if url.isValid():
             self.uiConnection.setCurrentIndex(
-                self.uiConnection.findData(QVariant(url.scheme())))
+                self.uiConnection.findData(url.scheme()))
             self.uiServer.setText(url.host())
             self.uiPort.setText(str(url.port()))
 

@@ -25,9 +25,9 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 from .ServerConfigurationDialog import *
 from Koo.Common.Settings import *
@@ -54,7 +54,7 @@ class AdministratorPasswordDialog(QDialog, AdministratorPasswordDialogUi):
     def slotChange(self):
         dialog = ServerConfigurationDialog(self)
         dialog.setDefault(str(self.uiServer.text()))
-        dialog.exec_()
+        dialog.exec()
         self.uiServer.setText(dialog.url)
 
     def slotAccept(self):

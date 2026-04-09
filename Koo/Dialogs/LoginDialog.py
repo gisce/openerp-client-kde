@@ -25,9 +25,9 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 from Koo.Common import Common
 from Koo.Common import Url
@@ -151,7 +151,7 @@ class LoginDialog(QDialog, LoginDialogUi):
     def slotChange(self):
         dialog = ServerConfigurationDialog.ServerConfigurationDialog(self)
         dialog.setUrl(Settings.value('login.url'))
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.Accepted:
             QApplication.setOverrideCursor(Qt.WaitCursor)
             self.uiServer.setText(dialog.url)
             self.refreshList()
@@ -213,7 +213,7 @@ class LoginDialog(QDialog, LoginDialogUi):
 
     def createDatabase(self):
         dialog = DatabaseCreationDialog(self)
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.Accepted:
             self.url = dialog.url
             self.databaseName = dialog.databaseName
             self.accept()

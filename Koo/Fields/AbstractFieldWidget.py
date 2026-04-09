@@ -28,7 +28,7 @@
 ##############################################################################
 
 import os
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 import re
 import tempfile
 
@@ -39,8 +39,8 @@ from Koo.Common import Common
 from Koo.Common.Settings import *
 from .FieldPreferencesDialog import *
 
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 
 
 class AbstractFieldWidget(QWidget):
@@ -241,7 +241,7 @@ class AbstractFieldWidget(QWidget):
         model = self.record.group.resource
         dialog = FieldPreferencesDialog(self.attrs['name'], self.attrs.get(
             'string', self.attrs['name']), model, value, deps)
-        dialog.exec_()
+        dialog.exec()
 
     def updateColor(self):
         if self.record and not self.record.isFieldValid(self.name):

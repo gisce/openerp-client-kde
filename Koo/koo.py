@@ -31,7 +31,7 @@
 
 # Added so py2exe properly packs xml.etree.ElementTree
 from xml.etree.ElementTree import parse, SubElement
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 try:
     from raven import Client
 except ImportError:
@@ -87,8 +87,8 @@ try:
 
     imports = {}
 
-    from PyQt5.QtCore import *
-    from PyQt5.QtGui import *
+    from PySide6.QtCore import *
+    from PySide6.QtGui import *
     from Koo.Common import Notifier, Common
     from Koo.Common import DBus
 
@@ -206,11 +206,11 @@ try:
     if Settings.value('tip.autostart'):
         from Koo.Dialogs.TipOfTheDayDialog import *
         dialog = TipOfTheDayDialog()
-        dialog.exec_()
+        dialog.exec()
 
     win.showLoginDialog()
 
-    app.exec_()
+    app.exec()
 except Exception as e:
     print(e)
     import sys, traceback

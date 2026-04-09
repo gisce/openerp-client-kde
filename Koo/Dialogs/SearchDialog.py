@@ -28,7 +28,7 @@
 ##############################################################################
 
 import gettext
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 from Koo.Common import Common
 from Koo.Common.Settings import *
 
@@ -38,8 +38,8 @@ from Koo.Screen import Screen
 from Koo.Screen.ScreenDialog import ScreenDialog
 from Koo.Model.Group import RecordGroup
 
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 from Koo.Common.Ui import *
 
 (SearchDialogUi, SearchDialogBase) = loadUiType(Common.uiPath('win_search.ui'))
@@ -143,7 +143,7 @@ class SearchDialog(QDialog, SearchDialogUi):
         dialog.setContext(self.context)
         dialog.setDomain(self.modelGroup.domain())
         dialog.setup(self.model)
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.Accepted:
             self.result = [dialog.recordId]
             self.accept()
         else:

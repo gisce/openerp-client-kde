@@ -39,8 +39,8 @@ import sys
 
 from Koo.View.AbstractParser import *
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 
 
 class ChartParser(AbstractParser):

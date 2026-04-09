@@ -27,8 +27,8 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
 
 from Koo import Rpc
 from Koo.Common import Api
@@ -88,7 +88,7 @@ class WizardPage(QDialog):
         # Set minimum and maximum dialog size
         size = self.screen.sizeHint()
         self.setMinimumSize(size.width() + 100, min(600, size.height() + 25))
-        size = QApplication.desktop().availableGeometry(self).size()
+        size = QApplication.primaryScreen().availableGeometry().size()
         size -= QSize(50, 50)
         self.setMaximumSize(size)
 
@@ -166,7 +166,7 @@ class Wizard(QObject):
             dialog = WizardPage(res['arch'], res['fields'],
                                 res['state'], self.action, self.datas['form'])
 
-            if dialog.exec_() == QDialog.Rejected:
+            if dialog.exec() == QDialog.Rejected:
                 self.finished = True
                 return
             (self.state, new_data) = dialog.result

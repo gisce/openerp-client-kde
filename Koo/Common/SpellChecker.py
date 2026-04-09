@@ -26,8 +26,8 @@
 #
 ##############################################################################
 
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 
 from . import Debug
 

@@ -26,9 +26,9 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo.Common import Api
@@ -172,7 +172,7 @@ class ManyToManyFieldWidget(AbstractFieldWidget, ManyToManyFieldWidgetUi):
         if str(self.uiText.text()) == '' or len(ids) != 1:
             dialog = SearchDialog(
                 self.attrs['relation'], sel_multi=True, ids=ids, domain=domain, context=context)
-            if dialog.exec_() == QDialog.Rejected:
+            if dialog.exec() == QDialog.Rejected:
                 self.uiText.clear()
                 return
             ids = dialog.result
@@ -226,12 +226,12 @@ class ManyToManyFieldWidget(AbstractFieldWidget, ManyToManyFieldWidgetUi):
 
 class ManyToManyFieldDelegate(AbstractFieldDelegate):
     def setModelData(self, editor, kooModel, index):
-        if str(editor.text()) == str(index.data(Qt.DisplayRole).toString()):
+        if str(editor.text()) == str(index.data(Qt.DisplayRole) or ''):
             return
         # We expecte a KooModel here
         model = kooModel.recordFromIndex(index)
 
-        #model.setData( index, QVariant( editor.currentText() ), Qt.EditRole )
+        #model.setData( index,  editor.currentText() , Qt.EditRole )
         domain = model.domain(self.name)
         context = model.fieldContext(self.name)
 
@@ -241,9 +241,9 @@ class ManyToManyFieldDelegate(AbstractFieldDelegate):
         if len(ids) != 1:
             dialog = SearchDialog(
                 self.attributes['relation'], sel_multi=True, ids=ids, domain=domain, context=context)
-            if dialog.exec_() == QDialog.Rejected:
+            if dialog.exec() == QDialog.Rejected:
                 return
             ids = dialog.result
 
-        ids = [QVariant(x) for x in ids]
-        kooModel.setData(index, QVariant(ids), Qt.EditRole)
+        ids = [x for x in ids]
+        kooModel.setData(index, ids, Qt.EditRole)

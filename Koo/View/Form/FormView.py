@@ -27,7 +27,7 @@
 ##############################################################################
 
 import os
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 import re
 import tempfile
 
@@ -37,8 +37,8 @@ from Koo import Rpc
 
 from Koo.View.AbstractView import *
 from Koo.Fields.AbstractFieldWidget import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 
 # @brief The FormTabWidget class is the widget used instead of QTabWidget in forms.
 #
@@ -178,9 +178,9 @@ class FormContainer(QWidget):
 
 class FormView(AbstractView):
     # @xtorello toreview
-    activated = pyqtSignal()
-    currentChanged = pyqtSignal('PyQt_PyObject')
-    statusMessage = pyqtSignal('QString')
+    activated = Signal()
+    currentChanged = Signal(object)
+    statusMessage = Signal('QString')
 
     def __init__(self, parent=None):
         AbstractView.__init__(self, parent)
@@ -255,11 +255,11 @@ class FormView(AbstractView):
         # be reset to its previous state. Take a look at OneToMany implementation to see what's needed
         # in such buttons.
         if self.record:
-            self.record.recordChanged['PyQt_PyObject'].disconnect(self.updateDisplay)
+            self.record.recordChanged.disconnect(self.updateDisplay)
             self.record.setFocus['QString'].disconnect(self.setFieldFocus)
         self.record = currentRecord
         if self.record:
-            self.record.recordChanged['PyQt_PyObject'].connect(self.updateDisplay)
+            self.record.recordChanged.connect(self.updateDisplay)
             self.record.setFocus['QString'].connect(self.setFieldFocus)
         self.updateDisplay(self.record)
 

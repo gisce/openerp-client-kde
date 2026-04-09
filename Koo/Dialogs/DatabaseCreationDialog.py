@@ -25,9 +25,9 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 from . import ServerConfigurationDialog
 from Koo.Common import Common
@@ -120,7 +120,7 @@ class ProgressBar(QDialog, ProgressBarUi):
             pwdlst = '\n'.join(
                 ['    - %s: %s / %s' % (x['name'], x['login'], x['password']) for x in users])
             dialog = CreationOkDialog(pwdlst, self)
-            r = dialog.exec_()
+            r = dialog.exec()
             # Propagate the result of the dialog. If the user wants to connect return
             # Accepted, otherwise return Rejected
             self.done(r)
@@ -164,7 +164,7 @@ class DatabaseCreationDialog(QDialog, DatabaseCreationDialogUi):
         for key, val in lang_list:
             if appLanguage and key.startswith(appLanguage):
                 currentLanguage = val
-            self.uiLanguage.addItem(val, QVariant(key))
+            self.uiLanguage.addItem(val, key)
         if currentLanguage:
             self.uiLanguage.setCurrentIndex(
                 self.uiLanguage.findText(currentLanguage))
@@ -201,7 +201,7 @@ class DatabaseCreationDialog(QDialog, DatabaseCreationDialogUi):
         demoData = self.uiDemoData.isChecked()
 
         langreal = str(self.uiLanguage.itemData(
-            self.uiLanguage.currentIndex()).toString())
+            self.uiLanguage.currentIndex()) or '')
         password = str(self.uiPassword.text())
         url = str(self.uiServer.text())
         adminPassword = str(self.uiAdminPassword.text())
@@ -214,7 +214,7 @@ class DatabaseCreationDialog(QDialog, DatabaseCreationDialogUi):
         progress.password = password
         progress.adminPassword = adminPassword
         progress.start()
-        r = progress.exec_()
+        r = progress.exec()
 
         if r == QDialog.Accepted:
             m = QUrl(url)
@@ -227,7 +227,7 @@ class DatabaseCreationDialog(QDialog, DatabaseCreationDialogUi):
     def changeServer(self):
         dialog = ServerConfigurationDialog.ServerConfigurationDialog(self)
         dialog.setUrl(Settings.value('login.url'))
-        ret = dialog.exec_()
+        ret = dialog.exec()
         if ret == QDialog.Accepted:
             url = dialog.url
             self.uiServer.setText(url)

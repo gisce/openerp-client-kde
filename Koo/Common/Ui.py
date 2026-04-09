@@ -27,27 +27,47 @@
 ##############################################################################
 
 import os
-
-try:
-    from PyQt5 import uic
-    isUicAvailable = True
-except:
-    isUicAvailabe = False
+import subprocess
+import tempfile
+import importlib.util
 
 
 def uiToModule(filePath):
     return os.path.split(filePath[:-3])[-1]
 
 
-if isUicAvailable:
-    def loadUiType(fileName):
-        return uic.loadUiType(fileName)
-else:
-    def loadUiType(fileName):
+def loadUiType(fileName):
+    """Load a Qt Designer .ui file and return (Ui_class, None).
+
+    Uses pyside6-uic to compile the .ui file on-the-fly so it works
+    with both installed and development trees without a pre-build step.
+    Falls back to loading a pre-compiled Python module from the 'ui'
+    package when pyside6-uic is not available.
+    """
+    try:
+        with tempfile.NamedTemporaryFile(suffix='.py', delete=False, mode='w') as tmp:
+            tmpPath = tmp.name
+        try:
+            subprocess.run(
+                ['pyside6-uic', '-o', tmpPath, fileName],
+                check=True,
+                capture_output=True,
+            )
+            spec = importlib.util.spec_from_file_location('_koo_tmp_ui', tmpPath)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+        finally:
+            if os.path.exists(tmpPath):
+                os.unlink(tmpPath)
+        uiClasses = [x for x in dir(mod) if x.startswith('Ui_')]
+        if not uiClasses:
+            raise ValueError('No Ui_ class found in compiled output for %s' % fileName)
+        return (getattr(mod, uiClasses[0]), None)
+    except Exception:
         module = uiToModule(fileName)
         module = __import__('ui.%s' % module, globals(), locals(), [module])
         uiClasses = [x for x in dir(module) if x.startswith('Ui_')]
-        ui = eval('module.%s' % uiClasses[0])
+        ui = getattr(module, uiClasses[0])
         return (ui, None)
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:

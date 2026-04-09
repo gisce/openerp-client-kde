@@ -27,9 +27,9 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 
 import gettext
@@ -287,7 +287,7 @@ class ExportDialog(QDialog, ExportDialogUi):
             return
 
         for key, export in ExportDialog.exports.items():
-            self.uiFormat.addItem(export['label'], QVariant(key))
+            self.uiFormat.addItem(export['label'], key)
 
         self.fieldsInfo = {}
         self.allModel = FieldsModel()
@@ -340,7 +340,7 @@ class ExportDialog(QDialog, ExportDialogUi):
         for x in fields:
             newItem = QStandardItem()
             newItem.setText(str(self.fieldsInfo[x]['string']))
-            newItem.setData(QVariant(x))
+            newItem.setData(x)
             self.selectedModel.appendRow(newItem)
 
     def export(self):
@@ -348,10 +348,10 @@ class ExportDialog(QDialog, ExportDialogUi):
         fieldTitles = []
         for x in range(0, self.selectedModel.rowCount()):
             fields.append(
-                str(self.selectedModel.item(x).data().toString()))
+                str(self.selectedModel.item(x).data() or ''))
             fieldTitles.append(str(self.selectedModel.item(x).text()))
         action = str(self.uiFormat.itemData(
-            self.uiFormat.currentIndex()).toString())
+            self.uiFormat.currentIndex()) or '')
         importCompatible = self.uiImportCompatible.isChecked()
         result = exportData(self.ids, self.model, fields, importCompatible)
         if 'warning' in result:
@@ -378,7 +378,7 @@ class ExportDialog(QDialog, ExportDialogUi):
         item = self.allModel.itemFromIndex(idx)
         newItem = QStandardItem(item)
         newItem.setText(self.fullPathText(item))
-        newItem.setData(QVariant(self.fullPathData(item)))
+        newItem.setData(self.fullPathData(item))
         self.selectedModel.appendRow(newItem)
 
     def remove(self):
@@ -400,10 +400,10 @@ class ExportDialog(QDialog, ExportDialogUi):
         return path
 
     def fullPathData(self, item):
-        path = str(item.data().toString())
+        path = str(item.data() or '')
         while item.parent() != None:
             item = item.parent()
-            path = item.data().toString() + "/" + path
+            path = str(item.data() or '') + "/" + path
         return path
 
     def save(self):
@@ -415,7 +415,7 @@ class ExportDialog(QDialog, ExportDialogUi):
         fields = []
         for x in range(0, self.selectedModel.rowCount()):
             fields.append(
-                str(self.selectedModel.item(x).data().toString()))
+                str(self.selectedModel.item(x).data() or ''))
 
         ir_export.create({
             'name': str(name),
@@ -451,11 +451,11 @@ class StoredExportsModel(QStandardItemModel):
         QStandardItemModel.__init__(self)
         self.rootItem = self.invisibleRootItem()
         self.setColumnCount(4)
-        self.setHeaderData(0, Qt.Horizontal, QVariant(
-            'Field list (internal names)'))
-        self.setHeaderData(1, Qt.Horizontal, QVariant('Export id'))
-        self.setHeaderData(2, Qt.Horizontal, QVariant(_('Export name')))
-        self.setHeaderData(3, Qt.Horizontal, QVariant(_('Exported fields')))
+        self.setHeaderData(0, Qt.Horizontal, 
+            'Field list (internal names)')
+        self.setHeaderData(1, Qt.Horizontal, 'Export id')
+        self.setHeaderData(2, Qt.Horizontal, _('Export name'))
+        self.setHeaderData(3, Qt.Horizontal, _('Exported fields'))
 
     def load(self, model, fieldsInfo):
         if self.rowCount() > 0:

@@ -26,9 +26,9 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo.Dialogs.BatchUpdateDialog import *
@@ -109,7 +109,7 @@ class OneToManyDialog(QDialog, OneToManyDialogUi):
         # the available space on screen (minus some pixels so they can be
         # used by dialog).
         size = self.screen.sizeHint()
-        available = QDesktopWidget().availableGeometry().size()
+        available = QApplication.primaryScreen().availableGeometry().size()
         available -= QSize(180, 180)
         self.screen.setMinimumSize(size.boundedTo(available))
 
@@ -281,7 +281,7 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
         dialog.setContext(Rpc.session.context)
         dialog.setGroup(self.screen.group)
         dialog.setup([], [])
-        if dialog.exec_() == QDialog.Rejected:
+        if dialog.exec() == QDialog.Rejected:
             return
         for record in selectedRecords:
             record.set(dialog.newValues, modified=True)
@@ -294,7 +294,7 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
         dialog.setContext(Rpc.session.context)
         if not dialog.setup():
             return
-        if dialog.exec_() == QDialog.Rejected:
+        if dialog.exec() == QDialog.Rejected:
             return
         for value in dialog.newValues:
             record = self.screen.group.create()
@@ -309,7 +309,7 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
         dialog.setContext(Rpc.session.context)
         if not dialog.setup():
             return
-        if dialog.exec_() == QDialog.Rejected:
+        if dialog.exec() == QDialog.Rejected:
             return
         if len(dialog.newValues) != len(self.screen.selectedRecords()):
             QMessageBox.warning(
@@ -386,7 +386,7 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
             dialog = OneToManyDialog(
                 self.screen.group, parent=self,
                 attrs=self.attrs, creationContext=ctx)
-            dialog.exec_()
+            dialog.exec()
             self.screen.display()
 
     def edit(self):
@@ -399,7 +399,7 @@ class OneToManyFieldWidget(AbstractFieldWidget, OneToManyFieldWidgetUi):
             record=self.screen.currentRecord(), attrs=self.attrs
         )
         dialog.setReadOnly(self.isReadOnly())
-        dialog.exec_()
+        dialog.exec()
         self.screen.display()
 
     def __next__(self):

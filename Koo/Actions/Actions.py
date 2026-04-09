@@ -27,7 +27,7 @@
 #
 ##############################################################################
 
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 import time
 import datetime
 
@@ -36,12 +36,12 @@ from Koo.Printer import *
 
 from Koo.Common import Api
 from Koo.Common import Common
-from PyQt5.QtCore import *
+from PySide6.QtCore import *
 
 
 class ExecuteReportThread(QThread):
-    error = pyqtSignal()
-    warning = pyqtSignal()
+    error = Signal()
+    warning = Signal()
 
     def __init__(self, name, data, context=None, parent=None):
         QThread.__init__(self, parent)

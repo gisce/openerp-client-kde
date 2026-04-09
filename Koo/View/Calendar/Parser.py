@@ -29,8 +29,8 @@ from Koo.Model.KooModel import *
 from Koo.View.AbstractParser import *
 from .Calendar import *
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 
 
 class CalendarParser(AbstractParser):

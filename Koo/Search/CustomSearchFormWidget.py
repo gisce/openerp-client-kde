@@ -27,7 +27,7 @@
 ##############################################################################
 
 from xml.parsers import expat
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 
 import sys
 from gettext import gettext as _
@@ -41,8 +41,8 @@ from Koo.Common import Numeric
 from Koo.Common.Ui import *
 from Koo import Rpc
 
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 
 
 class SearchFormContainer(QWidget):
@@ -89,8 +89,8 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
     #   2) Label shown to the user
     #   3) Field types in which the operator should be shown
     #   4) Whether the user should be able to input a text to search for or not.
-    newItem = pyqtSignal()
-    removeItem = pyqtSignal()
+    newItem = Signal()
+    removeItem = Signal()
     operators = (
         ('is empty', _('is empty'), ('char', 'text', 'many2one',
                                      'date', 'time', 'datetime', 'float_time'), False),
@@ -143,11 +143,11 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
         fields = [(x, fields[x].get('string', x)) for x in fields]
         fields.sort(key=lambda x: x[1])
         for field in fields:
-            self.uiField.addItem(field[1], QVariant(field[0]))
+            self.uiField.addItem(field[1], field[0])
 
         self.uiOperator.addItem('')
         for operator in self.operators:
-            self.uiOperator.addItem(operator[1], QVariant(operator[0]))
+            self.uiOperator.addItem(operator[1], operator[0])
 
         self.scNew = QShortcut(self)
         self.scNew.setKey(Shortcuts.CreateInField)
@@ -221,12 +221,12 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
                 self.relatedFields = {}
 
             self.uiRelatedField.clear()
-            self.uiRelatedField.addItem('', QVariant(''))
+            self.uiRelatedField.addItem('', '')
             fields = [(x, self.relatedFields[x].get('string', x))
                       for x in self.relatedFields]
             fields.sort(key=lambda x: x[1])
             for field in fields:
-                self.uiRelatedField.addItem(field[1], QVariant(field[0]))
+                self.uiRelatedField.addItem(field[1], field[0])
         else:
             self.uiRelatedField.clear()
             self.uiRelatedField.setVisible(False)
@@ -246,9 +246,9 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
             return
 
         fieldName = str(self.uiField.itemData(
-            self.uiField.currentIndex()).toString())
+            self.uiField.currentIndex()) or '')
         relatedFieldName = str(self.uiRelatedField.itemData(
-            self.uiRelatedField.currentIndex()).toString())
+            self.uiRelatedField.currentIndex()) or '')
         if not fieldName:
             return
 
@@ -260,7 +260,7 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
         self.uiOperator.addItem('')
         for operator in self.operators:
             if fieldType in operator[2]:
-                self.uiOperator.addItem(operator[1], QVariant(operator[0]))
+                self.uiOperator.addItem(operator[1], operator[0])
 
     def updateValue(self, index):
         operatorData = self.uiField.itemData(self.uiOperator.currentIndex())
@@ -356,11 +356,11 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
             return []
         self.setValid(True)
         fieldName = str(self.uiField.itemData(
-            self.uiField.currentIndex()).toString())
+            self.uiField.currentIndex()) or '')
         relatedFieldName = str(self.uiRelatedField.itemData(
-            self.uiRelatedField.currentIndex()).toString())
+            self.uiRelatedField.currentIndex()) or '')
         operator = str(self.uiOperator.itemData(
-            self.uiOperator.currentIndex()).toString())
+            self.uiOperator.currentIndex()) or '')
         value = str(self.uiValue.text())
         fieldType = self.fields[fieldName].get('type')
 
@@ -433,14 +433,14 @@ class CustomSearchItemWidget(AbstractSearchWidget, CustomSearchItemWidgetUi):
         field = field.split('.')[0]
         fieldType = self.fields[field].get('type')
 
-        index = self.uiField.findData(QVariant(field))
+        index = self.uiField.findData(field)
         self.uiField.setCurrentIndex(index)
 
         self.updateRelatedAndOperators()
 
         if relatedField != field:
             fieldType = self.fields[relatedField].get('type')
-            index = self.uiRelatedField.findData(QVariant(relatedField))
+            index = self.uiRelatedField.findData(relatedField)
             self.uiRelatedField.setCurrentIndex(index)
 
         self.updateOperators()

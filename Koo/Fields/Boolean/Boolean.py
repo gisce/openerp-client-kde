@@ -26,8 +26,8 @@
 #
 ##############################################################################
 
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
@@ -73,8 +73,8 @@ class BooleanFieldDelegate(AbstractFieldDelegate):
 
     def editorEvent(self, event, model, option, index):
         if event.type() == QEvent.MouseButtonPress:
-            model.setData(index, QVariant(
-                not model.data(index).value()), Qt.EditRole)
+            model.setData(index, 
+                not model.data(index).value(), Qt.EditRole)
         return False
 
     def paint(self, painter, option, index):

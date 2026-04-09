@@ -28,9 +28,9 @@
 ##############################################################################
 
 from Koo.Search.AbstractSearchWidget import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 
 
 class SelectionSearchWidget(AbstractSearchWidget):
@@ -51,7 +51,7 @@ class SelectionSearchWidget(AbstractSearchWidget):
         # The first is a blank element
         self.uiCombo.addItem('')
         for (id, name) in selection:
-            self.uiCombo.addItem(name, QVariant(id))
+            self.uiCombo.addItem(name, id)
 
     def value(self):
         value = self.uiCombo.itemData(self.uiCombo.currentIndex())
@@ -66,7 +66,7 @@ class SelectionSearchWidget(AbstractSearchWidget):
             self.uiCombo.setCurrentIndex(self.uiCombo.findText(''))
         else:
             self.uiCombo.setCurrentIndex(
-                self.uiCombo.findData(QVariant(value)))
+                self.uiCombo.findData(value))
 
     def clear(self):
         self.setValue(False)

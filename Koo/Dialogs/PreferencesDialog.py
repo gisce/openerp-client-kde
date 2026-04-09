@@ -28,9 +28,9 @@
 ##############################################################################
 
 import gettext
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo import Rpc
@@ -81,7 +81,7 @@ class PreferencesDialog(QDialog, PreferencesDialogUi):
         if self.parent():
             rect = self.parent().geometry()
         else:
-            rect = QApplication.desktop().availableGeometry(self)
+            rect = QApplication.primaryScreen().availableGeometry()
         self.move(rect.x() + (rect.width() / 2) - (self.width() / 2),
                   rect.y() + (rect.height() / 2) - (self.height() / 2))
 

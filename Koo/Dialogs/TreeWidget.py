@@ -28,7 +28,7 @@
 ##############################################################################
 
 import gettext
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 from xml.parsers import expat
 
 from .ExportDialog import *
@@ -45,8 +45,8 @@ from Koo.Fields.FieldDelegateFactory import *
 from Koo.Model.KooModel import KooModel
 from Koo.Model.Group import *
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 
 # @brief The TreeParser class parses the arch (XML) of tree views.
@@ -94,10 +94,10 @@ class TreeParser:
 
 
 class TreeWidget(QWidget, TreeWidgetUi):
-    shortcutsChanged = pyqtSignal()
+    shortcutsChanged = Signal()
 
-    closed = pyqtSignal()
-    shortcutsChanged = pyqtSignal()
+    closed = Signal()
+    shortcutsChanged = Signal()
 
     def __init__(self, view, model, domain=None, context=None, name=False, parent=None):
         QWidget.__init__(self, parent)
@@ -257,7 +257,7 @@ class TreeWidget(QWidget, TreeWidgetUi):
         if not item.isValid():
             return
         value = item.data(Qt.UserRole)
-        id = value if isinstance(value, int) else item.data(Qt.UserRole).toInt()[0]
+        id = value if isinstance(value, int) else (int(item.data(Qt.UserRole)) if item.data(Qt.UserRole) is not None else 0)
         if not id:
             return
         m = self.group[id]
@@ -381,7 +381,7 @@ class TreeWidget(QWidget, TreeWidgetUi):
         dialog.setModel(self.model)
         dialog.setIds(self.treeModel.recordGroup().ids())
         dialog.setup(['tree', 'form'], [self.view['view_id'], False])
-        dialog.exec_()
+        dialog.exec()
 
     def expand(self):
         if self.toolbar:

@@ -35,9 +35,9 @@
 #
 # Also a calendar popup is provided for use in widgets.
 #
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from .Ui import *
 import math
 import locale
@@ -307,7 +307,7 @@ class PopupCalendarWidget(QWidget, PopupCalendarUi):
     functions.
     """
 
-    selected = pyqtSignal()
+    selected = Signal()
 
     def __init__(self, parent, showTime=False):
         """
@@ -337,10 +337,10 @@ class PopupCalendarWidget(QWidget, PopupCalendarUi):
         # Check if the widget falls out of the available screen space
         newX = self.x()
         newY = self.y()
-        if self.frameGeometry().right() > QApplication.desktop().availableGeometry().right():
-            newX = QApplication.desktop().availableGeometry().right() - self.width()
-        if self.frameGeometry().bottom() > QApplication.desktop().availableGeometry().bottom():
-            newY = QApplication.desktop().availableGeometry().bottom() - self.height()
+        if self.frameGeometry().right() > QApplication.primaryScreen().availableGeometry().right():
+            newX = QApplication.primaryScreen().availableGeometry().right() - self.width()
+        if self.frameGeometry().bottom() > QApplication.primaryScreen().availableGeometry().bottom():
+            newY = QApplication.primaryScreen().availableGeometry().bottom() - self.height()
         self.move(newX, newY)
 
         self.uiCalendar.activated[QDate].connect(self.storeOnParent)

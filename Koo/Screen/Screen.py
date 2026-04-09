@@ -27,7 +27,7 @@
 ##############################################################################
 
 import xml.dom.minidom
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 
 from Koo.Rpc import RpcProxy
 from Koo import Rpc
@@ -40,8 +40,8 @@ from Koo.Common import Common
 from Koo.Common.Settings import *
 from Koo.Common.ViewSettings import *
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 
 from Koo.Search import SearchFormWidget
 from Koo.Plugins import *
@@ -76,11 +76,11 @@ class Screen(QScrollArea):
         recordMessage(int,int,int) -> Emited each time the current record
         changes (such as moving to previous or next).
     """
-    activated = pyqtSignal()
-    closed = pyqtSignal()
-    currentChangedSignal = pyqtSignal()
-    recordMessage = pyqtSignal(int, int, int)
-    statusMessage = pyqtSignal('QString')
+    activated = Signal()
+    closed = Signal()
+    currentChangedSignal = Signal()
+    recordMessage = Signal(int, int, int)
+    statusMessage = Signal('QString')
 
     def __init__(self, parent=None):
         QScrollArea.__init__(self, parent)
@@ -357,7 +357,7 @@ class Screen(QScrollArea):
     def setView(self, widget):
         if self.containerView:
             self.containerView.activated.disconnect(self.activate)
-            self.containerView.currentChanged['PyQt_PyObject'].disconnect(self.currentChanged)
+            self.containerView.currentChanged.disconnect(self.currentChanged)
             self.containerView.statusMessage['QString'].disconnect(self.statusMessage['QString'])
             self.containerView.hide()
 
@@ -370,7 +370,7 @@ class Screen(QScrollArea):
         self.containerView.show()
         # @xtorello toreview zzz
         widget.activated.connect(self.activate)
-        widget.currentChanged['PyQt_PyObject'].connect(self.currentChanged)
+        widget.currentChanged.connect(self.currentChanged)
         widget.statusMessage['QString'].connect(self.statusMessage['QString'])
 
         # Set focus proxy so other widgets can try to setFocus to us
@@ -421,7 +421,7 @@ class Screen(QScrollArea):
             self.searchForm.setEnabled(True)
 
     # Slot to recieve the signal from a view when the current item changes
-    @pyqtSlot()
+    @Slot()
     def currentChanged(self, model):
         self.setCurrentRecord(model)
         self.currentChanged.emit()

@@ -27,14 +27,14 @@
 ##############################################################################
 
 from Koo.Common import Common
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 from Koo.Common import Shortcuts
 
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
 from Koo.Common.Calendar import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 
 (DateFieldWidgetUi, DateFieldWidgetBase) = loadUiType(Common.uiPath('calendar.ui'))
@@ -272,22 +272,22 @@ class FloatTimeFieldWidget(AbstractFieldWidget):
 class DateFieldDelegate(AbstractFieldDelegate):
     def setModelData(self, editor, model, index):
         value = textToDate(editor.text())
-        model.setData(index, QVariant(value), Qt.EditRole)
+        model.setData(index, value, Qt.EditRole)
 
 
 class TimeFieldDelegate(AbstractFieldDelegate):
     def setModelData(self, editor, model, index):
         value = textToTime(editor.text())
-        model.setData(index, QVariant(value), Qt.EditRole)
+        model.setData(index, value, Qt.EditRole)
 
 
 class DateTimeFieldDelegate(AbstractFieldDelegate):
     def setModelData(self, editor, model, index):
         value = textToDateTime(editor.text())
-        model.setData(index, QVariant(value), Qt.EditRole)
+        model.setData(index, value, Qt.EditRole)
 
 
 class FloatTimeFieldDelegate(AbstractFieldDelegate):
     def setModelData(self, editor, model, index):
         value = textToFloatTime(str(editor.text()))
-        model.setData(index, QVariant(value), Qt.EditRole)
+        model.setData(index, value, Qt.EditRole)
