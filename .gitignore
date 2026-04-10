@@ -7,3 +7,5 @@ koo
 .pytest_cache/
 .mypy_cache/
 .vscode/
+htmlcov/
+.pytest_cache/

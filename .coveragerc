@@ -1,0 +1,19 @@
+[run]
+source = koo2
+branch = True
+omit =
+    koo2/app.py
+    */test_*
+    */__init__.py
+
+[report]
+show_missing = True
+precision = 2
+# fail_under = 80  # Enable when PySide6 is available (80%+ with UI tests)
+
+[html]
+directory = htmlcov
+
+[paths]
+source =
+    koo2
