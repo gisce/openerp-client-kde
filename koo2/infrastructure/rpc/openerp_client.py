@@ -7,6 +7,7 @@ exposing a clean, typed interface to the rest of koo2.
 """
 from __future__ import annotations
 
+import importlib
 from typing import Any, Dict, List, Optional
 
 from koo2.core.domain.session import Session, SessionState
@@ -38,7 +39,6 @@ class OpenErpRpcClient:
     def _get_koo_session(self) -> Any:
         """Return the Koo.Rpc.Session singleton (lazy import)."""
         if self._session is None:
-            import importlib  # noqa: PLC0415
             KooRpc = importlib.import_module("Koo.Rpc")
             self._session = KooRpc.session
         return self._session
@@ -64,7 +64,6 @@ class OpenErpRpcClient:
         Raises ``RpcAuthError`` on invalid credentials and ``RpcError`` for
         other server-side failures.
         """
-        import importlib  # noqa: PLC0415
         koo_session = self._get_koo_session()
         login_url = f"{url}/{username}:{password}@{database}"
         result = koo_session.login(login_url, database)

@@ -2,12 +2,12 @@
 MaterialTextField – MD3 filled text field with floating label support.
 
 The widget wraps a QLineEdit inside a QWidget container so that the floating
-label animation (label moves up when focused or non-empty) can be achieved
-purely in Python without a custom QSS hack.
+label colour changes with focus state.  Focus tracking is implemented via
+QObject.installEventFilter() rather than monkey-patching event methods.
 """
 from __future__ import annotations
 
-from PySide6.QtCore import QPropertyAnimation, Qt, QEasingCurve
+from PySide6.QtCore import QEvent, QObject, Qt
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (
     QLabel,
@@ -18,6 +18,21 @@ from PySide6.QtWidgets import (
 )
 
 from koo2.ui.theme.palette import DEFAULT_LIGHT, Palette
+
+
+class _FocusFilter(QObject):
+    """Event filter that notifies the parent text field on focus changes."""
+
+    def __init__(self, text_field: "MaterialTextField") -> None:
+        super().__init__(text_field)
+        self._field = text_field
+
+    def eventFilter(self, watched: QObject, event: QEvent) -> bool:
+        if event.type() == QEvent.Type.FocusIn:
+            self._field._on_focus_in()
+        elif event.type() == QEvent.Type.FocusOut:
+            self._field._on_focus_out()
+        return super().eventFilter(watched, event)
 
 
 class MaterialTextField(QWidget):
@@ -41,7 +56,6 @@ class MaterialTextField(QWidget):
 
         self._label_text = label
         self._build_ui(placeholder)
-        self._connect_signals()
 
     # ------------------------------------------------------------------
     # Public API (mirrors QLineEdit)
@@ -100,28 +114,26 @@ class MaterialTextField(QWidget):
             f"color: {self._palette.on_surface_variant}; background: transparent;"
         )
 
-        # Line edit
+        # Line edit – use an event filter instead of monkey-patching events
         self._edit = QLineEdit(self)
         if placeholder:
             self._edit.setPlaceholderText(placeholder)
+
+        self._focus_filter = _FocusFilter(self)
+        self._edit.installEventFilter(self._focus_filter)
 
         layout.addWidget(self._label)
         layout.addWidget(self._edit)
 
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
 
-    def _connect_signals(self) -> None:
-        self._edit.focusInEvent = self._on_focus_in  # type: ignore[assignment]
-        self._edit.focusOutEvent = self._on_focus_out  # type: ignore[assignment]
-
-    def _on_focus_in(self, event) -> None:
+    def _on_focus_in(self) -> None:
         self._label.setStyleSheet(
             f"color: {self._palette.primary.color}; background: transparent;"
         )
-        QLineEdit.focusInEvent(self._edit, event)
 
-    def _on_focus_out(self, event) -> None:
+    def _on_focus_out(self) -> None:
         self._label.setStyleSheet(
             f"color: {self._palette.on_surface_variant}; background: transparent;"
         )
-        QLineEdit.focusOutEvent(self._edit, event)
+
