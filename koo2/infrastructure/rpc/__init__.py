@@ -1,0 +1,1 @@
+"""OpenERP RPC adapters."""
