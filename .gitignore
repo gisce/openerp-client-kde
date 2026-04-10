@@ -8,4 +8,3 @@ koo
 .mypy_cache/
 .vscode/
 htmlcov/
-.pytest_cache/
