@@ -46,13 +46,13 @@ class TestLoginDialog:
         dialog._user_field.setText("")
         dialog._pass_field.setText("")
         dialog._on_connect()
-        assert dialog._error_label.isVisible()
+        assert not dialog._error_label.isHidden()
 
     def test_set_error_shows_message(self, qapp):
         from koo2.ui.dialogs.login_dialog import LoginDialog
         dialog = LoginDialog()
         dialog.set_error("Test error")
-        assert dialog._error_label.isVisible()
+        assert not dialog._error_label.isHidden()
         assert "Test error" in dialog._error_label.text()
 
     def test_clear_error_hides_label(self, qapp):
