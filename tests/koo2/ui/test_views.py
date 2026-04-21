@@ -130,21 +130,21 @@ class TestFormView:
 
     def test_display_fills_widgets(self, qapp, simple_view_definition, sample_record):
         from koo2.ui.views.form.form_view import FormView
-        from koo2.ui.widgets.text_field import MaterialTextField
+        from koo2.ui.widgets.fields import CharWidget
         view = FormView(view_definition=simple_view_definition)
         view.display(sample_record)
         name_widget = view._field_widgets["name"]
-        assert isinstance(name_widget, MaterialTextField)
-        assert name_widget.text == "ACME"
+        assert isinstance(name_widget, CharWidget)
+        assert name_widget.get_value() == "ACME"
 
     def test_store_updates_record(self, qapp, simple_view_definition, sample_record):
         from koo2.ui.views.form.form_view import FormView
-        from koo2.ui.widgets.text_field import MaterialTextField
+        from koo2.ui.widgets.fields import CharWidget
         view = FormView(view_definition=simple_view_definition)
         view.display(sample_record)
         name_widget = view._field_widgets["name"]
-        if isinstance(name_widget, MaterialTextField):
-            name_widget.setText("New Name")
+        if isinstance(name_widget, CharWidget):
+            name_widget.set_value("New Name")
         view.store()
         assert view.current_record.get("name") == "New Name"
 
