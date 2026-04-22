@@ -230,7 +230,7 @@ class FormView(BaseView):
                 name=field_name,
                 field_type=field_def.field_type or "char",
                 string=field_def.string or field_name,
-                read_only=self._read_only or field_def.read_only,
+                read_only=self._read_only or field_def.readonly,
             )
             widget = self._factory.create_field(node)
             if isinstance(widget, AbstractFieldWidget):
