@@ -26,7 +26,7 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
+from PySide6.QtCore import *
 from Koo.Rpc import RpcProxy, Rpc
 from Koo import Rpc
 import base64

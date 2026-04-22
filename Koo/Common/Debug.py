@@ -26,7 +26,7 @@
 ##############################################################################
 
 import gc
-from PyQt5.QtCore import *
+from PySide6.QtCore import *
 try:
     from raven import Client
 except ImportError:
@@ -115,7 +115,7 @@ if 'frozen' in dir(sys) and sys.frozen == "windows_exe":
 
 
 def exceptionHook(type, value, backtrace):
-    from PyQt5.QtWidgets import QApplication
+    from PySide6.QtWidgets import QApplication
     from Koo.Common.Version import Version
     cursor = QApplication.overrideCursor()
     if cursor:
@@ -153,7 +153,7 @@ def debug_trace():
     messages while in pdb
     :return:
     """
-    from PyQt5.QtCore import pyqtRemoveInputHook
+    from PySide6.QtCore import pyqtRemoveInputHook
     from pdb import set_trace
     pyqtRemoveInputHook()
     set_trace()

@@ -27,11 +27,11 @@
 ##############################################################################
 
 import os
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 import base64
 from Koo import Rpc
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 from Koo.Common.Ui import *
 from Koo.Plugins import Plugins
 from Koo.Common import Calendar
@@ -47,7 +47,7 @@ def scan(model, id, ids, context):
     dialog.addButton(_('Select Files'), 3)
     dialog.addButton(_('Selected Directory'), 2)
     dialog.addButton(_('Cancel Import'), 1)
-    result = dialog.exec_()
+    result = dialog.exec()
     if result == Cancel:
         return
 

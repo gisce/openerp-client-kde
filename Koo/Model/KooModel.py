@@ -25,9 +25,9 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 
 from Koo.Common import Icons
 from Koo.Common import Calendar
@@ -57,9 +57,9 @@ QStringList = list
 class KooModel(QAbstractItemModel):
 
     # Modes
-    modelAboutToBeReset = pyqtSignal()
-    modelReset = pyqtSignal()
-    dataChanged = pyqtSignal(QModelIndex, QModelIndex)
+    modelAboutToBeReset = Signal()
+    modelReset = Signal()
+    dataChanged = Signal(QModelIndex, QModelIndex)
     TreeMode = 1
     ListMode = 2
 
@@ -109,7 +109,7 @@ class KooModel(QAbstractItemModel):
         if self.group:
             self.group.recordsInserted[int, int].disconnect(self.recordsInserted)
             # @xtorello toreview
-            self.group.recordChangedSignal['PyQt_PyObject'].disconnect(self.recordChanged)
+            self.group.recordChangedSignal.disconnect(self.recordChanged)
             # self.group.recordChanged['QObject'].disconnect(self.recordChanged)
             self.group.recordsRemoved[int, int].disconnect(self.recordsRemoved)
 
@@ -117,7 +117,7 @@ class KooModel(QAbstractItemModel):
         if self.group:
             self.group.recordsInserted[int, int].connect(self.recordsInserted)
             # @xtorello toreview
-            self.group.recordChangedSignal['PyQt_PyObject'].connect(self.recordChanged)
+            self.group.recordChangedSignal.connect(self.recordChanged)
             # self.group.recordChanged[QObject].connect(self.recordChanged)
             self.group.recordsRemoved[int, int].connect(self.recordsRemoved)
 
@@ -418,11 +418,11 @@ class KooModel(QAbstractItemModel):
         if fieldType == 'boolean':
             model.setValue( field, bool(value))
         elif fieldType in ('float', 'float_time'):
-            model.setValue(field, value.value())
+            model.setValue(field, float(value) if value is not None else value)
         elif fieldType == 'integer':
-            model.setValue(field, value.toInt()[0])
+            model.setValue(field, int(value))
         elif fieldType == 'selection':
-            value = str(value.toString())
+            value = str(value)
             modelField = self.fields[self.field(index.column())]
             for x in modelField['selection']:
                 if x[1] == value:
@@ -430,20 +430,22 @@ class KooModel(QAbstractItemModel):
         elif fieldType in ('char', 'text'):
             model.setValue(field, str(value))
         elif fieldType == 'date':
-            model.setValue(field, Calendar.dateToStorage(value.toDate()))
+            model.setValue(field, Calendar.dateToStorage(value if isinstance(value, QDate) else QDate(value)))
         elif fieldType == 'datetime' and value:
-            model.setValue(field, Calendar.dateTimeToStorage(value.value()))
+            model.setValue(field, Calendar.dateTimeToStorage(value if isinstance(value, QDateTime) else QDateTime(value)))
         elif fieldType == 'time' and value:
-            model.setValue(field, Calendar.timeToStorage(value.toTime()))
+            model.setValue(field, Calendar.timeToStorage(value if isinstance(value, QTime) else QTime(value)))
         elif fieldType == 'many2many':
             m = model.value(field)
             m.clear()
-            ids = [x.toInt()[0] for x in value.toList()]
+            ids = [int(x) for x in (value if isinstance(value, list) else [])]
             m.load(ids)
         elif fieldType == 'many2one':
-            value = value.toList()
-            if value:
-                value = [int(value[0].toInt()[0]), str(value[1].toString())]
+            if isinstance(value, list):
+                if value:
+                    value = [int(value[0]), str(value[1])]
+            else:
+                value = []
             model.setValue(field, value)
         else:
             print("Unable to store value of type: ", fieldType)
@@ -452,24 +454,24 @@ class KooModel(QAbstractItemModel):
 
     def data(self, index, role=Qt.DisplayRole ):
         if not self.group:
-            return QVariant()
+            return None
         if role in (Qt.DisplayRole, Qt.EditRole) or (self._showToolTips and role == Qt.ToolTipRole):
             value = self.value(index.row(), index.column(), index.internalPointer())
             if value is None:
-                return QVariant()
+                return None
             fieldType = self.fieldType(index.column(), index.internalPointer())
             if fieldType in ['one2many', 'many2many']:
-                return QVariant('(%d)' % value.count())
+                return '(%d' % value.count())
             elif fieldType == 'selection':
                 field = self.fields[self.field(index.column())]
                 for x in field['selection']:
                     if x[0] == value:
-                        return QVariant(str(x[1]))
-                return QVariant()
+                        return str(x[1])
+                return None
             elif fieldType == 'date' and value:
-                return QVariant(Calendar.dateToText(Calendar.storageToDate(value)))
+                return Calendar.dateToText(Calendar.storageToDate(value))
             elif fieldType == 'datetime' and value:
-                return QVariant(Calendar.dateTimeToText(Calendar.storageToDateTime(value)))
+                return Calendar.dateTimeToText(Calendar.storageToDateTime(value))
             elif fieldType == 'float':
                 # If we use the default conversion big numbers are shown
                 # in scientific notation. Also we have to respect the number
@@ -479,46 +481,46 @@ class KooModel(QAbstractItemModel):
                     thousands = False
                 else:
                     thousands = True
-                return QVariant(Numeric.floatToText(value, field.get('digits', None), thousands))
+                return Numeric.floatToText(value, field.get('digits', None, thousands))
             elif fieldType == 'integer':
-                return QVariant(Numeric.integerToText(value))
+                return Numeric.integerToText(value)
             elif fieldType == 'float_time':
-                return QVariant(Calendar.floatTimeToText(value))
+                return Calendar.floatTimeToText(value)
             elif fieldType == 'binary':
                 if value:
-                    return QVariant(_('%d bytes') % len(value))
+                    return _('%d bytes' % len(value))
                 else:
-                    return QVariant()
+                    return None
             elif fieldType == 'boolean':
-                return QVariant(bool(value))
+                return bool(value)
             elif fieldType == 'button':
                 if role == Qt.ToolTipRole:
                     fieldName = self.field(index.column())
-                    return QVariant( self.buttons[fieldName].get('string', ''))
-                return QVariant()
+                    return  self.buttons[fieldName].get('string', '')
+                return None
             else:
                 if not value  or value is None:
-                    return QVariant()
+                    return None
                 else:
                     # If the text has several lines put them all in a single one
-                    return QVariant(str(value).replace('\n', ' '))
+                    return str(value.replace('\n', ' '))
         elif role == Qt.DecorationRole:
             fieldType = self.fieldType(index.column(), index.internalPointer())
             if fieldType == 'button':
                 fieldName = self.field(index.column())
-                return QVariant(Icons.kdeIcon(self.buttons[fieldName].get('icon')))
+                return Icons.kdeIcon(self.buttons[fieldName].get('icon'))
             if self.field(index.column()) == self.iconField:
                 # Not all models necessarily have the icon so check that first
                 model = self.record(index.row(), index.internalPointer())
                 if model and self.icon in model.values:
-                    return QVariant(Icons.kdeIcon(model.value(self.icon)))
+                    return Icons.kdeIcon(model.value(self.icon))
                 else:
-                    return QVariant()
+                    return None
             else:
-                return QVariant()
+                return None
         elif role == Qt.BackgroundRole:
             if not self.showBackgroundColor:
-                return QVariant()
+                return None
             field = self.fields[self.field( index.column() )]
             model = self.record( index.row(), index.internalPointer() )
             # We need to ensure we're not being asked about a non existent row.
@@ -529,7 +531,7 @@ class KooModel(QAbstractItemModel):
             # some tree structures (such as the menu).
             # So we need to make the check here.
             if not model:
-                return QVariant()
+                return None
             # Priorize readonly to required as if it's readonly the
             # user doesn't mind if it's required as she won't be able
             # to change it anyway.
@@ -541,10 +543,10 @@ class KooModel(QAbstractItemModel):
                 color = '#ddddff'
             else:
                 color = 'white'
-            return QVariant(QBrush(QColor(color)))
+            return QBrush(QColor(color))
         elif role == Qt.ForegroundRole:
             if not self.colors:
-                return QVariant()
+                return None
             model = self.record(index.row(), index.internalPointer())
             # We need to ensure we're not being asked about a non existent row.
             # This happens in some special cases (an editable tree in a
@@ -554,62 +556,62 @@ class KooModel(QAbstractItemModel):
             # problems with some tree structures (such as the menu). So we
             # need to make the check here.
             if not model:
-                return QVariant()
+                return None
             palette = QPalette()
             color = palette.color(QPalette.WindowText)
             for (c, expression) in self.colors:
                 if model.evaluateExpression( expression, checkLoad=False ):
                     color = c
                     break
-            return QVariant(QBrush(QColor(color)))
+            return QBrush(QColor(color))
         elif role == Qt.TextAlignmentRole:
             fieldType = self.fieldType(index.column(), index.internalPointer())
             if fieldType in ['integer', 'float', 'float_time', 'time', 'date', 'datetime']:
-                return QVariant(Qt.AlignRight | Qt.AlignVCenter)
+                return Qt.AlignRight | Qt.AlignVCenter
             else:
-                return QVariant(Qt.AlignLeft | Qt.AlignVCenter)
+                return Qt.AlignLeft | Qt.AlignVCenter
         elif role == KooModel.IdRole:
             model = self.record(index.row(), index.internalPointer())
-            return QVariant(model.id)
+            return model.id
         elif role == KooModel.ValueRole:
             value = self.value( index.row(), index.column(), index.internalPointer())
             fieldType = self.fieldType( index.column(), index.internalPointer())
             if fieldType in ['one2many', 'many2many']:
                 # By now, return the same as DisplayRole for these
-                return QVariant( '(%d)' % value.count())
+                return  '(%d' % value.count())
             elif fieldType == 'selection':
                 # By now, return the same as DisplayRole for these
                 field = self.fields[self.field(index.column())]
                 for x in field['selection']:
                     if x[0] == value:
-                        return QVariant(str(x[1]))
-                return QVariant()
+                        return str(x[1])
+                return None
             elif fieldType == 'date' and value:
-                return QVariant(Calendar.storageToDate(value))
+                return Calendar.storageToDate(value)
             elif fieldType == 'datetime' and value:
-                return QVariant(Calendar.storageToDateTime(value))
+                return Calendar.storageToDateTime(value)
             elif fieldType == 'float':
                 # If we use the default conversion big numbers are shown
                 # in scientific notation. Also we have to respect the number
                 # of decimal digits given by the server.
                 field = self.fields[self.field(index.column())]
-                return QVariant(Numeric.floatToText(value, field.get('digits',None)))
+                return Numeric.floatToText(value, field.get('digits',None))
             elif fieldType == 'float_time':
-                return QVariant(value)
+                return value
             elif fieldType == 'binary':
                 if value:
-                    return QVariant(QByteArray.fromBase64(value))
+                    return QByteArray.fromBase64(value)
                 else:
-                    return QVariant()
+                    return None
             elif fieldType == 'boolean':
-                return QVariant(bool(value))
+                return bool(value)
             else:
                 if not value:
-                    return QVariant()
+                    return None
                 else:
-                    return QVariant(str(value))
+                    return str(value)
         else:
-            return QVariant()
+            return None
 
     def index(self, row, column, parent=QModelIndex()):
         if not self.group:
@@ -731,19 +733,19 @@ class KooModel(QAbstractItemModel):
 
     def headerData(self, section, orientation, role):
         if orientation == Qt.Vertical:
-            return QVariant()
+            return None
         if role == Qt.DisplayRole:
             field = self.fields.get(self.field(section))
             if not field:
                 field = self.buttons.get(self.field(section))
-            return QVariant(Common.normalizeLabel(str(field['string'])))
+            return Common.normalizeLabel(str(field['string']))
         elif role == Qt.FontRole and not self._readOnly:
             fieldName = self.field(section)
             if self.group.fieldExists(fieldName) and self.group.isFieldRequired(fieldName):
                 font = QFont()
                 font.setBold(True)
-                return QVariant(font)
-        return QVariant()
+                return font
+        return None
 
     def field(self, column):
         """

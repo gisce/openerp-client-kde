@@ -25,8 +25,8 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 from Koo import Rpc
 from Koo.Common import Common
 
@@ -36,11 +36,11 @@ class FieldsModel(QStandardItemModel):
         QStandardItemModel.__init__(self)
         self.rootItem = self.invisibleRootItem()
         self.setColumnCount(1)
-        self.setHeaderData(0, Qt.Horizontal, QVariant(_('Fields')))
+        self.setHeaderData(0, Qt.Horizontal, _('Fields'))
 
     def addField(self, text, data):
         item = QStandardItem(text)
-        item.setData(QVariant(data))
+        item.setData(data)
         self.rootItem.appendRow(item)
 
     def load(self, fields, fieldsInfo=None, fieldsInvertedInfo=None):
@@ -73,7 +73,7 @@ class FieldsModel(QStandardItemModel):
         for field in fields_order:
             st_name = fields[field]['string'] or field
             node = QStandardItem(st_name)
-            node.setData(QVariant(field))
+            node.setData(field)
             if fields[field].get('required', False):
                 font = node.font()
                 font.setBold(True)

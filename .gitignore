@@ -1,5 +1,6 @@
 *.pyc
 *.idea
+.python-version
 build/*
 koo
 .cache/
@@ -7,3 +8,4 @@ koo
 .pytest_cache/
 .mypy_cache/
 .vscode/
+htmlcov/

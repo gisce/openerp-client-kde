@@ -27,7 +27,7 @@
 ##############################################################################
 
 from gettext import gettext as _
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 
 from Koo.Common import Api
 from Koo.Common import Common
@@ -42,8 +42,8 @@ from Koo import Rpc
 
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 
 
@@ -204,7 +204,7 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
                 dialog.setAttributes(self.attrs)
                 dialog.setup(self.attrs['relation'],
                              self.record.get()[self.name])
-                if dialog.exec_() == QDialog.Accepted:
+                if dialog.exec() == QDialog.Accepted:
                     # TODO: As we want to ensure that if the user changed any field
                     # in the related model, on_change event is triggered in our model
                     # so those changes can take effect, we force the change by setting
@@ -255,7 +255,7 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
                 domain=domain,
                 parent=self
             )
-            if dialog.exec_() == QDialog.Accepted and dialog.result:
+            if dialog.exec() == QDialog.Accepted and dialog.result:
                 if len(dialog.result) == 1:
                     ident = dialog.result[0]
                     name = Rpc.session.execute(
@@ -273,7 +273,7 @@ class ManyToOneFieldWidget(AbstractFieldWidget, ManyToOneFieldWidgetUi):
         dialog.setContext(self.record.fieldContext(self.name))
         dialog.setDomain(self.record.domain(self.name))
         dialog.setup(self.attrs['relation'])
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.Accepted:
             self.record.setValue(self.name, dialog.record)
             self.display()
 
@@ -450,7 +450,7 @@ class ManyToOneFieldDelegate(AbstractFieldDelegate):
                 dialog.setDomain(self.record.domain(self.name))
                 dialog.setup(
                     self.attributes['relation'], self.record.get()[self.name])
-                if dialog.exec_() == QDialog.Accepted:
+                if dialog.exec() == QDialog.Accepted:
                     self.record.setValue(self.name, dialog.record)
         else:
             self.search('')
@@ -469,7 +469,7 @@ class ManyToOneFieldDelegate(AbstractFieldDelegate):
         else:
             dialog = SearchDialog(self.attributes['relation'], sel_multi=False, ids=[
                                   x[0] for x in ids], context=context, domain=domain)
-            if dialog.exec_() == QDialog.Accepted and dialog.result:
+            if dialog.exec() == QDialog.Accepted and dialog.result:
                 id = dialog.result[0]
                 name = Rpc.session.execute(
                     '/object', 'execute', self.attributes['relation'], 'name_get', [id], Rpc.session.context)[0]
@@ -481,7 +481,7 @@ class ManyToOneFieldDelegate(AbstractFieldDelegate):
         dialog.setContext(self.record.fieldContext(self.name))
         dialog.setDomain(self.record.domain(self.name))
         dialog.setup(self.attributes['relation'])
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.Accepted:
             self.record.setValue(self.name, dialog.record)
 
     def setModelData(self, editor, kooModel, index):
@@ -504,7 +504,7 @@ class ManyToOneFieldDelegate(AbstractFieldDelegate):
         else:
             dialog = SearchDialog(self.attributes['relation'], sel_multi=False, ids=[
                                   x[0] for x in ids], context=context, domain=domain)
-            if dialog.exec_() == QDialog.Accepted and dialog.result:
+            if dialog.exec() == QDialog.Accepted and dialog.result:
                 id = dialog.result[0]
                 name = Rpc.session.execute(
                     '/object', 'execute', self.attributes['relation'], 'name_get', [id], Rpc.session.context)[0]
@@ -512,8 +512,8 @@ class ManyToOneFieldDelegate(AbstractFieldDelegate):
                 # Directly set the value to the model. There's no need to
                 # use setData() but we mainly want to workaround a bug in
                 # PyQt 4.4.3 and 4.4.4.
-                #value = [ QVariant( name[0] ), QVariant( name[1] ) ]
-                #kooModel.setData( index, QVariant( value ), Qt.EditRole )
+                #value = [  name[0] ,  name[1]  ]
+                #kooModel.setData( index,  value , Qt.EditRole )
                 model.setValue(self.name, name)
 
 # vim:noexpandtab:smartindent:tabstop=8:softtabstop=8:shiftwidth=8:

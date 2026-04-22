@@ -28,7 +28,7 @@
 ##############################################################################
 
 from xml.parsers import expat
-from PyQt5.QtWidgets import *
+from PySide6.QtWidgets import *
 
 import sys
 from gettext import gettext as _
@@ -41,8 +41,8 @@ from Koo.Common import Common
 from Koo.Common import Api
 from Koo import Rpc
 
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 from Koo.Common.Ui import *
 
 
@@ -155,11 +155,11 @@ class SearchFormParser(object):
 
 class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
     # @brief Constructs a new SearchFormWidget.
-    performSearch = pyqtSignal()
-    keyDownPressed = pyqtSignal()
+    performSearch = Signal()
+    keyDownPressed = Signal()
 
     # @xtorello 2review slot?
-    # @pyqtSlot()
+    # @Slot()
     def search(self):
         if self.isCustomSearch():
             # Do not emit the signal if the server raises an exception with the search
@@ -242,7 +242,7 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
 
     def setStoredFilter(self, index):
         if index >= 0:
-            id = self.uiStoredFilters.itemData(index).toInt()[0]
+            id = int(self.uiStoredFilters.itemData(index) or 0)
             if id:
                 storedDomain = eval(self._storedFilters[id]['domain'])
             else:
@@ -426,7 +426,7 @@ class SearchFormWidget(AbstractSearchWidget, SearchFormWidgetUi):
 
         index = self.uiStoredFilters.currentIndex()
         if index > 0:
-            ident = self.uiStoredFilters.itemData(index).toInt()[0]
+            ident = int(self.uiStoredFilters.itemData(index) or 0)
             storedDomain = eval(self._storedFilters[ident]['domain'])
             domain = domain + storedDomain
 

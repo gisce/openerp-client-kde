@@ -1,9 +1,9 @@
-from PyQt5.QtWidgets import QSlider, QDialog, QLabel, QHBoxLayout
-from PyQt5.QtCore import Qt, pyqtSignal
+from PySide6.QtWidgets import QSlider, QDialog, QLabel, QHBoxLayout
+from PySide6.QtCore import Qt, Signal
 
 class Slider_Dialog(QDialog):
 
-    changedValue = pyqtSignal(int)
+    changedValue = Signal(int)
 
     def __init__(self):
         super(Slider_Dialog, self).__init__()
@@ -42,8 +42,8 @@ class Slider_Dialog(QDialog):
 
 
 
-from PyQt5.QtWidgets import QDialog, QProgressBar, QLabel, QHBoxLayout
-from PyQt5.QtCore import pyqtSlot
+from PySide6.QtWidgets import QDialog, QProgressBar, QLabel, QHBoxLayout
+from PySide6.QtCore import Slot
 
 class ProgressBar_Dialog(QDialog):
     def __init__(self):
@@ -75,13 +75,13 @@ class ProgressBar_Dialog(QDialog):
     def make_connection(self, slider_object):
         slider_object.changedValue.connect(self.get_slider_value)
 
-    @pyqtSlot(int)
+    @Slot(int)
     def get_slider_value(self, val):
         self.progressBar.setValue(val)
 
 
 import sys
-from PyQt5.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -93,4 +93,4 @@ if __name__ == '__main__':
     # sd.changedValue.connect(pb.get_slider_value)
     sd.changedValue.connect(pb.get_slider_value)
 
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

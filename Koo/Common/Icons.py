@@ -26,7 +26,7 @@
 ##############################################################################
 
 
-from PyQt5.QtGui import *
+from PySide6.QtGui import *
 
 #
 # GTK -> KDE Icons mapping

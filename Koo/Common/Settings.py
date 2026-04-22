@@ -32,7 +32,7 @@ import os
 import sys
 from Koo import Rpc
 from . import Debug
-from PyQt5.QtCore import QDir, QUrl
+from PySide6.QtCore import QDir, QUrl
 import traceback
 
 

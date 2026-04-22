@@ -26,9 +26,9 @@
 #
 ##############################################################################
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo.Common import Common
@@ -101,7 +101,7 @@ class ReferenceFieldWidget(AbstractFieldWidget, ReferenceFieldWidgetUi):
         self.invertedModels = {}
 
         for (i, j) in selection:
-            self.uiModel.addItem(j, QVariant(i))
+            self.uiModel.addItem(j, i)
             self.invertedModels[i] = j
 
     def setReadOnly(self, value):
@@ -151,7 +151,7 @@ class ReferenceFieldWidget(AbstractFieldWidget, ReferenceFieldWidgetUi):
 
         dialog = SearchDialog(resource, sel_multi=False, ids=[
                               x[0] for x in ids], context=context, domain=domain)
-        if dialog.exec_() == QDialog.Accepted and dialog.result:
+        if dialog.exec() == QDialog.Accepted and dialog.result:
             id = dialog.result[0]
             id, name = Rpc.session.execute(
                 '/object', 'execute', resource, 'name_get', [id], Rpc.session.context)[0]
@@ -175,7 +175,7 @@ class ReferenceFieldWidget(AbstractFieldWidget, ReferenceFieldWidgetUi):
         dialog.setContext(self.record.fieldContext(self.name))
         dialog.setup(resource)
         dialog.setAttributes(self.attrs)
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.Accepted:
             resource = self.uiModel.itemData(self.uiModel.currentIndex())
             self.record.setValue(self.name, (resource, dialog.record))
 
@@ -202,7 +202,7 @@ class ReferenceFieldWidget(AbstractFieldWidget, ReferenceFieldWidgetUi):
                 dialog = ScreenDialog(self)
                 dialog.setup(model, id)
                 dialog.setAttributes(self.attrs)
-                dialog.exec_()
+                dialog.exec()
         else:
             self.search()
 

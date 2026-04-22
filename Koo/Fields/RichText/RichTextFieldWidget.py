@@ -27,9 +27,9 @@
 ##############################################################################
 
 
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
+from PySide6.QtCore import *
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
 from Koo.Common.Ui import *
 from Koo.Common import Common
 from Koo.Common import Shortcuts
@@ -95,7 +95,7 @@ class RichTextFieldWidget(AbstractFieldWidget, RichTextFieldWidgetUi):
         html = Common.simplifyHtml(self.uiText.document().toHtml())
         dialog = TranslationDialog(self.record.id, self.record.group.resource,
                                    self.attrs['name'], html, TranslationDialog.RichEdit, self)
-        if dialog.exec_() == QDialog.Accepted:
+        if dialog.exec() == QDialog.Accepted:
             self.record.setValue(self.name, str(dialog.result) or False)
 
     def updateCurrentColors(self):

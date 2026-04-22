@@ -26,8 +26,8 @@
 #
 ##############################################################################
 
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
 from Koo.Fields.AbstractFieldWidget import *
 from Koo.Fields.AbstractFieldDelegate import *
@@ -74,10 +74,10 @@ class BooleanFieldDelegate(AbstractFieldDelegate):
         return QCheckBox(parent)
 
     def setEditorData(self, editor, index):
-        editor.setChecked(index.data(Qt.EditRole).toBool())
+        editor.setChecked(bool(index.data(Qt.EditRole)))
 
     def setModelData(self, editor, model, index):
-        model.setData(index, QVariant(editor.isChecked()), Qt.EditRole)
+        model.setData(index, editor.isChecked(), Qt.EditRole)
 
     def paint(self, painter, option, index):
         # Paint background
@@ -87,7 +87,7 @@ class BooleanFieldDelegate(AbstractFieldDelegate):
         # Paint CheckBox
         op = QStyleOptionButton()
         op.rect = option.rect
-        value = index.data(Qt.DisplayRole).toBool()
+        value = index.data(Qt.DisplayRole)
         if value:
             op.state = QStyle.State_On
         else:

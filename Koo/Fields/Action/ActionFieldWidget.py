@@ -146,7 +146,7 @@ class ActionFieldWidget(AbstractFieldWidget, ActionFieldWidgetUi):
     def slotSearch(self):
         win = SearchDialog(
             self.action['res_model'], domain=self.domain, context=self.context)
-        win.exec_()
+        win.exec()
         if win.result:
             self.screen.clear()
             self.screen.load(win.result)

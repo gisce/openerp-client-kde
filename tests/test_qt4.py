@@ -25,7 +25,7 @@ class TestWindow(QMainWindow):
         window.setParent( dialog )
         self.connect( window, SIGNAL('closed()'), dialog.accept )
         window.show()
-        dialog.exec_()
+        dialog.exec()
 
 win = TestWindow()
 
