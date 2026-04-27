@@ -562,12 +562,19 @@ class FieldFactory:
         if fieldType == 'selection' and 'relation' in attributes:
             fieldType = 'many2one'
 
-        if fieldType == "one2many" or fieldType == "many2many":
-            return FieldFactory.types[fieldType](parent,attributes)
+        # If the widget type overrides the field type (e.g. 'indicator') and it
+        # is unknown, fall back to original_type stored by Screen._parse_fields
+        # so the model handles field values correctly.
+        if fieldType not in FieldFactory.types:
+            original_type = attributes.get('original_type')
+            if original_type and original_type in FieldFactory.types:
+                fieldType = original_type
+            else:
+                return FieldFactory.types['char'](parent, attributes)
 
-        if fieldType in FieldFactory.types:
+        if fieldType == "one2many" or fieldType == "many2many":
             return FieldFactory.types[fieldType](parent, attributes)
-        else:
-            return FieldFactory.types['char'](parent, attributes)
+
+        return FieldFactory.types[fieldType](parent, attributes)
 
 # vim:noexpandtab:

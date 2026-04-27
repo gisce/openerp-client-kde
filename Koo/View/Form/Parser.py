@@ -227,13 +227,17 @@ class FormParser(AbstractParser):
                     continue
                 name = attrs['name']
                 del attrs['name']
-                type = attrs.get('widget', fields[name]['type'])
+                field_type = fields[name].get('original_type') or fields[name]['type']
+                type = attrs.get('widget', field_type)
                 fields[name].update(attrs)
                 fields[name]['model'] = self.viewModel
 
-                # Create the appropiate widget for the given field type
+                # Create the appropiate widget for the given field type.
+                # Pass field_type as fallback so unknown widget= hints
+                # degrade gracefully to the default widget for the field.
                 widget = FieldWidgetFactory.create(
-                    type, container, self.view, fields[name])
+                    type, container, self.view, fields[name],
+                    fallback_type=field_type)
                 if not widget:
                     continue
 

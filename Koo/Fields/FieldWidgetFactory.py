@@ -26,7 +26,10 @@
 ##############################################################################
 
 from Koo.Common import Plugins
+import logging
 import os
+
+logger = logging.getLogger(__name__)
 
 # @brief The FieldWidgetFactory class specializes in creating the appropiate
 # widget for a given type.
@@ -45,17 +48,29 @@ class FieldWidgetFactory:
         Plugins.scan('Koo.Fields', os.path.abspath(os.path.dirname(__file__)))
 
     # @brief Creates a new widget given type, parent and attributes.
+    # @param fallback_type: field type to use if widgetType is not registered.
     @staticmethod
-    def create(widgetType, parent, view, attributes):
+    def create(widgetType, parent, view, attributes, fallback_type=None):
         FieldWidgetFactory.scan()
 
         # We do not support relational fields treated as selection ones
         if widgetType == 'selection' and 'relation' in attributes:
             widgetType = 'many2one'
 
-        if not widgetType in FieldWidgetFactory.widgets:
-            print("Widget '%s' not available" % widgetType)
-            return None
+        if widgetType not in FieldWidgetFactory.widgets:
+            if fallback_type and fallback_type in FieldWidgetFactory.widgets:
+                logger.warning(
+                    "Widget '%s' not available, falling back to field type '%s'",
+                    widgetType, fallback_type
+                )
+                # Fix the type in attributes so the fallback widget initialises correctly
+                attributes['type'] = fallback_type
+                # indicator-like widgets are display-only — force readonly
+                attributes['readonly'] = True
+                widgetType = fallback_type
+            else:
+                logger.warning("Widget '%s' not available", widgetType)
+                return None
 
         widgetClass = FieldWidgetFactory.widgets[widgetType]
         return widgetClass(parent, view, attributes)
