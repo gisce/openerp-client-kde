@@ -52,13 +52,17 @@ class SvgParser(AbstractParser):
             if node.localName == 'field':
                 attributes = Common.nodeAttributes(node)
                 name = attributes['name']
-                type = attributes.get('widget', fields[name]['type'])
+                field_type = fields[name].get('original_type') or fields[name]['type']
+                type = attributes.get('widget', field_type)
                 fields[name].update(attributes)
                 fields[name]['model'] = viewModel
 
-                # Create the appropiate widget for the given field type
+                # Create the appropiate widget for the given field type.
+                # Pass field_type as fallback so unknown widget= hints
+                # degrade gracefully to the default widget for the field.
                 widget = FieldWidgetFactory.create(
-                    type, None, self.view, fields[name])
+                    type, None, self.view, fields[name],
+                    fallback_type=field_type)
                 if not widget:
                     continue
                 self.view.widgets[name] = widget

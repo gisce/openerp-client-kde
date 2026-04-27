@@ -658,6 +658,10 @@ class Screen(QScrollArea):
                 if attrs.get('widget', False):
                     if attrs['widget'] == 'one2many_list':
                         attrs['widget'] = 'one2many'
+                    # Preserve original field type before overwriting with widget name
+                    original_type = fields.get(attrs.get('name', ''), {}).get('type')
+                    if original_type:
+                        attrs['original_type'] = original_type
                     attrs['type'] = attrs['widget']
                 try:
                     fields[attrs['name']].update(attrs)
