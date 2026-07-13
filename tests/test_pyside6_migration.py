@@ -102,6 +102,23 @@ class TestPySide6Imports(unittest.TestCase):
         self.assertEqual([], violations,
                          'These files still import from PyQt5: %s' % violations)
 
+    def test_qt_designer_files_do_not_reference_pyqt5_or_webkit(self):
+        """Qt Designer forms loaded at runtime must use Qt6 WebEngine."""
+        import os
+        import glob
+        ui_dir = os.path.join(os.path.dirname(__file__), '..', 'Koo', 'ui')
+        ui_files = glob.glob(os.path.join(ui_dir, '*.ui'))
+        forbidden = ('PyQt5', 'QtWebKit', 'QWebView')
+        violations = []
+        for f in ui_files:
+            with open(f) as fh:
+                content = fh.read()
+            for token in forbidden:
+                if token in content:
+                    violations.append('%s: %s' % (f.replace(ui_dir, 'Koo/ui'), token))
+        self.assertEqual([], violations,
+                         'These .ui files still reference PyQt5/WebKit: %s' % violations)
+
     def test_requirements_uses_pyside6(self):
         """requirements.txt must reference PySide6, not PyQt5."""
         import os
