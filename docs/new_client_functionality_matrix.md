@@ -19,7 +19,7 @@ Status values:
 | --- | --- | --- | --- | --- |
 | F01 | Authentication and session bootstrap | Connect to an ERP server, authenticate the user, keep session context and surface authentication errors. | partial | `tests/koo2/infrastructure/test_erppeek_client.py`, `tests/koo2/infrastructure/test_restapi_client.py`, `tests/koo2/ui/test_login_dialog.py` |
 | F02 | QGIS-oriented launch contract | Allow QGIS 4 / Qt6 integrations to launch the new client independently from legacy Koo versions. | missing | Launch contract test once the qgisce integration entry point is agreed. |
-| F03 | Menu and action loading | Load ERP menus/actions and open the requested model, wizard, report or URL action. | missing | New action service tests using mocked ERP metadata. |
+| F03 | Menu and action loading | Load ERP menus/actions and open the requested model, wizard, report or URL action. | covered | `tests/koo2/core/test_action_service.py` |
 | F04 | Form view parsing | Parse `fields_view_get` XML forms with groups, notebooks, labels, separators, buttons, modifiers and field metadata. | partial | `tests/koo2/core/test_view_parser.py` |
 | F05 | Tree/list view parsing | Parse list views, preserve column order, metadata, visibility and read-only state. | partial | `tests/koo2/core/test_view_parser.py` |
 | F06 | Search view and filters | Render ERP search views, domains, contexts, saved filters and quick filters. | missing | Search parser and search model tests. |
