@@ -25,7 +25,7 @@ def _make_app() -> QApplication:
     app = QApplication.instance()
     if app is None:
         app = QApplication(sys.argv)
-    app.setApplicationName("koo2")
+    app.setApplicationName("GISCE ERP Qt Client")
     app.setOrganizationName("GISCE-TI")
     apply_to_app(app, DEFAULT_LIGHT)
     return app
