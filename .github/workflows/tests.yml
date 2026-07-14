@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    name: Koo Qt5 tests
+    name: Koo model tests
     if: contains(github.event.pull_request.labels.*.name, 'to be merged')
     runs-on: ubuntu-22.04
     env:
@@ -32,10 +32,5 @@ jobs:
           pip install pytest
           pip install -e .
 
-      - name: Run Qt5 tests
-        run: |
-          xvfb-run -a pytest \
-            tests/test_qt5.py \
-            tests/test_show_qt5_window.py \
-            tests/test_slider_progress.py \
-            -q
+      - name: Run model tests
+        run: pytest tests/test.py -q
