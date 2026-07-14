@@ -25,7 +25,7 @@ Status values:
 | F06 | Search view and filters | Render ERP search views, domains, contexts, saved filters and quick filters. | missing | Search parser and search model tests. |
 | F07 | Field widgets | Render and edit scalar fields, selections, dates, booleans, relational fields, binary/image/url/html fields and required/read-only/invisible state. | partial | `tests/koo2/ui/test_widgets_factory.py` |
 | F08 | Relational field workflows | Support many2one lookup/create/open, one2many and many2many embedded lists/forms and inline commands. | missing | Repository-backed relational widget tests. |
-| F09 | Record lifecycle | Create, read, update, delete, duplicate, discard changes, reload and detect dirty records. | missing | Model repository and form controller tests. |
+| F09 | Record lifecycle | Create, read, update, delete, duplicate, discard changes, reload and detect dirty records. | covered | `tests/koo2/core/test_record.py`, `tests/koo2/core/test_record_lifecycle_service.py` |
 | F10 | Button, object and workflow actions | Execute object buttons, workflow transitions, action buttons and confirmation prompts with context. | missing | Action executor tests. |
 | F11 | Wizards | Open transient models, run multi-step wizard flows and apply returned actions. | missing | Wizard controller tests. |
 | F12 | Reports and print actions | Execute report actions, download/open generated files and surface report errors. | missing | Report service tests with mocked RPC responses. |

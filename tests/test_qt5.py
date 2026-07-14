@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-from PySide6.QtWidgets import QApplication, QMainWindow, QDialog, QHBoxLayout
-#from PySide6.QtCore import SIGNAL
+from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QHBoxLayout
+#from PyQt5.QtCore import SIGNAL
 
 import sys
 sys.path.insert(0, '..')
@@ -33,7 +33,7 @@ class TestWindow(QMainWindow):
         #self.connect( window, SIGNAL('closed()'), dialog.accept )
         # self.connect( window, oialog.accept )
         window.show()
-        dialog.exec()
+        dialog.exec_()
 
 win = TestWindow()
 

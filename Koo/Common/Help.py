@@ -26,12 +26,11 @@
 #
 ##############################################################################
 
-from PySide6.QtWidgets import *
-from PySide6.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 
 try:
-    from PySide6.QtWebEngineWidgets import QWebEngineView
-    from PySide6.QtWebEngineCore import QWebEnginePage, QWebEngineSettings
+    from PyQt5.QtWebKitWidgets import QWebPage, QWebView
     isHelpWidgetAvailable = True
 except:
     isHelpWidgetAvailable = False
@@ -40,22 +39,25 @@ from Koo import Rpc
 from Koo.Common import Api
 
 if isHelpWidgetAvailable:
-    class HelpWidget(QWebEngineView):
+    class HelpWidget(QWebView):
 
         FieldType = 1
         ViewType = 2
         MenuType = 3
 
         def __init__(self, parent=None):
-            QWebEngineView.__init__(self, parent)
-            self.setWindowFlags(Qt.WindowType.Popup)
+            QWebView.__init__(self, parent)
+            self.setWindowFlags(Qt.Popup)
             self.setFixedSize(600, 400)
-            self.page().navigationRequested.connect(self._onNavigationRequested)
+            self.manager = Rpc.RpcNetworkAccessManager(
+                self.page().networkAccessManager())
+            self.page().setNetworkAccessManager(self.manager)
+            self.page().setLinkDelegationPolicy(QWebPage.DelegateExternalLinks)
+            self.linkClicked[QUrl].connect(self.openLink)
 
             # Determine appropiate position for the popup
-            screenGeometry = QApplication.primaryScreen().geometry()
-            screenHeight = screenGeometry.height()
-            screenWidth = screenGeometry.width()
+            screenHeight = QApplication.desktop().screenGeometry().height()
+            screenWidth = QApplication.desktop().screenGeometry().width()
             pos = parent.parent().mapToGlobal(parent.pos())
 
             # Fix y coordinate
@@ -84,7 +86,7 @@ if isHelpWidgetAvailable:
             if not self.geometry().contains(event.globalPos()):
                 self.hide()
                 return
-            QWebEngineView.mousePressEvent(self, event)
+            QWebView.mousePressEvent(self, event)
 
         def setLabel(self, text):
             self._label = text
@@ -106,13 +108,6 @@ if isHelpWidgetAvailable:
             Api.instance.createWebWindow(
                 str(url.toString()), _('Documentation'))
             self.hide()
-
-        def _onNavigationRequested(self, request):
-            url = request.requestUrl()
-            scheme = url.scheme()
-            if scheme not in ('', 'about', 'data'):
-                request.block(True)
-                self.openLink(url)
 
         def updateText(self):
             if not self._type:

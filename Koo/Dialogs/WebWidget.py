@@ -27,20 +27,20 @@
 ##############################################################################
 
 from Koo import Rpc
-from PySide6.QtWidgets import *
+from PyQt5.QtWidgets import *
 
 from Koo.Common import Common
 from Koo.Common.Settings import *
 from Koo.Common import Help
 
 try:
-    from PySide6.QtWebEngineWidgets import *
+    from PyQt5.QtWebKit import *
     isWebWidgetAvailable = True
 except:
     isWebWidgetAvailable = False
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 if isWebWidgetAvailable:
@@ -57,12 +57,16 @@ if isWebWidgetAvailable:
         # context -> Context for the current data set
         # parent -> Parent widget of the form
         # name -> User visible title of the form
-        closed = Signal()
+        closed = pyqtSignal()
 
         def __init__(self, parent=None):
             QWidget.__init__(self, parent)
             WebWidgetUi.__init__(self)
             self.setupUi(self)
+
+            self.manager = Rpc.RpcNetworkAccessManager(
+                self.uiWeb.page().networkAccessManager())
+            self.uiWeb.page().setNetworkAccessManager(self.manager)
 
             self.name = ''
             self.handlers = {
@@ -88,7 +92,7 @@ if isWebWidgetAvailable:
             text, ok = QInputDialog.getText(self, _('Find'), _('Find:'))
             if not ok:
                 return
-            self.uiWeb.findText(text)
+            self.uiWeb.findText(text, QWebPage.HighlightAllOccurrences)
 
         def previous(self):
             self.uiWeb.back()

@@ -16,9 +16,9 @@
 #   Free Software Foundation, Inc.,
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-from PySide6.QtCore import *
-from PySide6.QtWidgets import *
-from PySide6.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 
 # @brief
 
@@ -30,7 +30,7 @@ class AbstractKeyboardWidget(QWidget):
     """
     # @brief Creates a KeyboardWidget that will send keyboard events to it's parent. It will
     # also be positioned in the screen acording to its parent coordinates.
-    tabKeyPressed = Signal()
+    tabKeyPressed = pyqtSignal()
 
     def __init__(self, parent):
         QWidget.__init__(self, parent)
@@ -70,8 +70,8 @@ class AbstractKeyboardWidget(QWidget):
         """
         parent = self.parent()
         parentPos = parent.parent().mapToGlobal(parent.pos())
-        screenHeight = QApplication.primaryScreen().geometry().height()
-        screenWidth = QApplication.primaryScreen().geometry().width()
+        screenHeight = QApplication.desktop().screenGeometry().height()
+        screenWidth = QApplication.desktop().screenGeometry().width()
         # Fix y coordinate
         y = parentPos.y() + parent.height()
         if y + self.height() > screenHeight:

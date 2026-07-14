@@ -28,8 +28,8 @@
 
 import base64
 from Koo import Rpc
-from PySide6.QtGui import *
-from PySide6.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from Koo.Common.Ui import *
 from Koo.Plugins import Plugins
 
@@ -46,7 +46,7 @@ if isNanScanAvailable:
         saver = DocumentSaverFactory(context)
         dialog = ScanDialog()
         dialog.setImageSaverFactory(saver)
-        dialog.exec()
+        dialog.exec_()
 
     class DocumentSaverFactory(AbstractImageSaverFactory):
         def __init__(self, context):

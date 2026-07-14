@@ -27,7 +27,7 @@
 #
 ##############################################################################
 
-from PySide6.QtGui import *
+from PyQt5.QtGui import *
 from Koo.Common import Common
 import Koo.Common.Plugins
 import re

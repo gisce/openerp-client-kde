@@ -25,9 +25,9 @@
 #
 ##############################################################################
 
-from PySide6.QtCore import *
-from PySide6.QtWidgets import *
-from PySide6.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 from Koo import Rpc
 from Koo.Common import Common
@@ -145,7 +145,7 @@ class BatchUpdateDialog(QDialog, BatchUpdateDialogUi):
                 messageBox.setFields(fields)
                 messageBox.setMessage(
                     _('Select the fields you want to update in the <b>%d</b> selected records:') % len(self.ids))
-                if messageBox.exec() == QDialog.Rejected:
+                if messageBox.exec_() == QDialog.Rejected:
                     return
                 self.newValues = {}
                 for field in messageBox.selectedFields():

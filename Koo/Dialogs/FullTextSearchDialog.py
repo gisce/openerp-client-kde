@@ -28,7 +28,7 @@
 ##############################################################################
 
 import gettext
-from PySide6.QtWidgets import *
+from PyQt5.QtWidgets import *
 import re
 from Koo.Common import Common
 from Koo.Common import Numeric
@@ -38,13 +38,13 @@ from Koo.Common.Settings import *
 from Koo import Rpc
 from Koo.Model.Group import RecordGroup
 
-from PySide6.QtGui import *
-from PySide6.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from Koo.Common.Ui import *
 
 try:
-    from PySide6.QtWebEngineWidgets import *
-    from PySide6.QtNetwork import *
+    from PyQt5.QtWebKit import *
+    from PyQt5.QtNetwork import *
     isWebKitAvailable = True
 except:
     isWebKitAvailable = False
@@ -74,7 +74,8 @@ if isWebKitAvailable:
             self.title_results = _('Full Text Search (%%d result(s))')
 
             self.setWindowTitle(self.title)
-            self.uiWeb.page().navigationRequested.connect(self._onNavigationRequested)
+            self.uiWeb.page().setLinkDelegationPolicy(QWebPage.DelegateAllLinks)
+            self.uiWeb.linkClicked[QUrl].connect(self.open)
 
             self.shortcuts = {}
             self.related = []
@@ -102,13 +103,6 @@ if isWebKitAvailable:
                 thread.terminate()
                 thread.wait()
 
-        def _onNavigationRequested(self, request):
-            url = request.requestUrl()
-            scheme = url.scheme()
-            if scheme not in ('', 'about', 'data'):
-                request.block(True)
-                self.open(url)
-
         def showHelp(self, link):
             QApplication.postEvent(self.sender(), QEvent(QEvent.WhatsThis))
 
@@ -116,9 +110,9 @@ if isWebKitAvailable:
             try:
                 answer = Rpc.session.call(
                     '/fulltextsearch', 'indexedModels', Rpc.session.context)
-                self.uiModel.addItem(_('(Everywhere)'), False)
+                self.uiModel.addItem(_('(Everywhere)'), QVariant(False))
                 for x in answer:
-                    self.uiModel.addItem(x['name'], x['id'])
+                    self.uiModel.addItem(x['name'], QVariant(x['id']))
                 if len(answer) == 0:
                     self.setQueriesEnabled(False, _(
                         '<b>Full text search is not configured.</b><br/>Go to <i>Administration - Configuration - Full Text Search - Indexes</i>. Then add the fields you want to be indexed and finally use <i>Update Full Text Search</i>.'))
@@ -147,7 +141,7 @@ if isWebKitAvailable:
             self.uiModel.setEnabled(value)
             self.pushFind.setEnabled(value)
             self.uiText.setEnabled(value)
-            self.uiWeb.setHtml(
+            self.uiWeb.page().mainFrame().setHtml(
                 "<span style='font-size: large'>%s</span>" % text)
 
         def textToQuery(self):
@@ -160,7 +154,7 @@ if isWebKitAvailable:
                 model = False
             else:
                 model = str(self.uiModel.itemData(
-                    self.uiModel.currentIndex()) or '')
+                    self.uiModel.currentIndex()).toString())
 
             # We always query for limit+1 items so we can know if there will be more records in the next page
             thread = Rpc.session.executeAsync(self.showResults, '/fulltextsearch', 'search',
@@ -248,7 +242,7 @@ if isWebKitAvailable:
                 }
 
             page = '<html>%s</html>' % page
-            self.uiWeb.setHtml(page)
+            self.uiWeb.page().mainFrame().setHtml(page)
             #self.serverOrder = ['id', 'model_id', 'model_name', 'model_label', 'name', 'headline', 'ranking']
 
         def previous(self):

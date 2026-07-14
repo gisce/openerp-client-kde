@@ -28,12 +28,12 @@
 ##############################################################################
 
 from Koo.Model import KooModel
-from PySide6.QtWidgets import *
+from PyQt5.QtWidgets import *
 from Koo.Model.Group import RecordGroup
 from Koo.View.AbstractView import *
 from Koo.Fields.AbstractFieldDelegate import *
-from PySide6.QtCore import *
-from PySide6.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common import Numeric
 from Koo import Rpc
 
@@ -120,9 +120,9 @@ class KooTreeView(QTreeView):
 
 
 class TreeView(AbstractView):
-    statusMessage = Signal('QString')
-    activated = Signal()
-    currentChanged = Signal(object)
+    statusMessage = pyqtSignal('QString')
+    activated = pyqtSignal()
+    currentChanged = pyqtSignal('PyQt_PyObject')
 
     def __init__(self, parent, widgetType='tree'):
         AbstractView.__init__(self, parent)
@@ -283,8 +283,8 @@ class TreeView(AbstractView):
             # self.activated.emit()
 
     # @xtorello toreview
-    # @Slot(object)
-    # @Slot(object, object)
+    # @pyqtSlot('PyQt_PyObject')
+    # @pyqtSlot('PyQt_PyObject', 'PyQt_PyObject')
     def perform_currentChanged(self, current, previous=None):
         if self.selecting:
             return

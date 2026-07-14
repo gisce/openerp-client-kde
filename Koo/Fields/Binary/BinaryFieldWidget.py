@@ -27,12 +27,12 @@
 ##############################################################################
 
 import os
-from PySide6.QtWidgets import *
+from PyQt5.QtWidgets import *
 import tempfile
 
 from Koo.Fields.AbstractFieldWidget import *
-from PySide6.QtCore import *
-from PySide6.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 from Koo.Common.Ui import *
 
 from Koo.Common import Common
@@ -223,7 +223,7 @@ class BinaryFieldWidget(AbstractFieldWidget, BinaryFieldWidgetUi):
         label.setPixmap(pix)
         layout = QHBoxLayout(dialog)
         layout.addWidget(label)
-        dialog.exec()
+        dialog.exec_()
 
     def new(self):
         filename = QFileDialog.getOpenFileName(

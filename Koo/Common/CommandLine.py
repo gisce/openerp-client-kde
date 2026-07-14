@@ -29,7 +29,7 @@ import optparse
 
 from .Settings import *
 
-from PySide6.QtCore import QDir, QUrl
+from PyQt5.QtCore import QDir, QUrl
 
 
 def homeDirectory():
